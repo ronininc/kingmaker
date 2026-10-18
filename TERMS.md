@@ -43,14 +43,13 @@ Kingmaker's source is public, so anyone can build a copy and put the Kingmaker n
 
 ## Licence, and the absence of a warranty
 
-*(This section states the licensing and liability position in plain terms. It is written for a lawyer to finalize before launch — the bracketed items and the governing-law line especially — and is not itself legal advice.)*
+*(This section states the licensing and liability position in plain terms. It is not itself legal advice.)*
 
 - **Licence.** Kingmaker's source code is made available under **PolyForm Noncommercial 1.0.0** (see `LICENSE`); commercial use is offered separately (see `COMMERCIAL-LICENSE.md`). The licence covers not only the source but the **compiled application, the installer, and everything Ronin Inc. distributes as part of Kingmaker**.
 - **No warranty.** Kingmaker — the source, the app, and the installer alike — is provided **"as is" and "as available," without warranty of any kind**, express or implied, including merchantability, fitness for a particular purpose, title, and non-infringement. Ronin Inc. does not warrant that Kingmaker will be uninterrupted, error-free, or secure, or that it will meet your needs. This restates, for the app and the installer, the same disclaimer the source licence already makes.
 - **You run it; you are responsible for how.** Kingmaker acts on your Mac under your direction, with the models and connectors you choose. You are responsible for what you ask it to do and for complying with the law and with the terms of any model, service, or account you use through it.
-- **Limitation of liability.** To the fullest extent the law allows, Ronin Inc. is **not liable for any indirect, incidental, special, consequential, or punitive damages, or for lost data, profits, or goodwill**, arising from Kingmaker; and Ronin Inc.'s total liability for any claim is limited to **[the amount you paid Ronin Inc. for Kingmaker in the twelve months before the claim, which for a free install is nothing]**.
+- **Limitation of liability.** To the fullest extent the law allows, Ronin Inc. is **not liable for any indirect, incidental, special, consequential, or punitive damages, or for lost data, profits, or goodwill**, arising from Kingmaker; and Ronin Inc.'s total liability for any claim is limited to **the amount you paid Ronin Inc. for Kingmaker in the twelve months before the claim, which for a free install is nothing**.
 - **You indemnify Ronin Inc.** You agree to defend and hold Ronin Inc. harmless from claims arising out of your use of Kingmaker in breach of these terms or of the law.
 - **Acceptable use.** Do not use Kingmaker to break the law, to harm others, or in breach of the terms of the models, services, or accounts you connect to it. Kingmaker runs the models you choose, including uncensored ones; choosing and using them is yours to answer for, not Ronin Inc.'s.
 - **Who may use it.** Kingmaker is for adults: you must be at least **18**.
-- **Governing law.** These terms are governed by the laws of **[jurisdiction — to be set by counsel]**, without regard to conflict-of-laws rules.
 - **If a part fails.** If any part of this section is unenforceable, the rest still stands.

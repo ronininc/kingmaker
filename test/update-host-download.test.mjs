@@ -137,3 +137,14 @@ test('/enroll is unchanged: POST only, and it needs the enroll token', async () 
   assert.equal(out.url, 'https://host');
   assert.match(out.key, /^[0-9a-f]{64}$/);
 });
+
+test('/enroll keeps no computer name: an older installer\'s name is dropped, and the installer sends none', async () => {
+  const env = { ...devEnv(), ENROLL_TOKEN: 'tok' };
+  const res = await worker.fetch(new Request('https://host/enroll', { method: 'POST', headers: withKey('tok'), body: JSON.stringify({ device: 'abcdef0123456789abcd', name: "Jane's MacBook Pro" }) }), env);
+  assert.equal(res.status, 200);
+  const stored = env.puts.filter(([k]) => /^(key|device):/.test(k)).map(([, v]) => String(v));
+  assert.ok(stored.length >= 2, 'the key and device records were written');
+  assert.ok(stored.every((v) => !/Jane|MacBook|"name"/.test(v)), stored.join(' | '));
+  const engine = readFileSync(new URL('../installer/engine.sh', import.meta.url), 'utf8');
+  assert.doesNotMatch(engine, /scutil --get ComputerName|\\"name\\":/, 'the installer never reads or sends the computer name');
+});

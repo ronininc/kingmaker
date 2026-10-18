@@ -367,8 +367,9 @@ fail_at preflight
 
 # Self-enrollment (operator 2026-10-08: "anyone who downloads it auto gets a Mac key … as easy as possible"): an
 # installer that carries enroll.json ({"url", "code"}) asks the update host for THIS Mac's own key, so nobody pastes
-# anything. The Mac is named by a sha256 of its hardware UUID (never the UUID itself) and its computer name; the key
-# comes back once and is kept only in update.json (0600). A Mac that already has update.json keeps its key.
+# anything. The Mac is named only by a sha256 of its hardware UUID (never the UUID itself, never its computer name:
+# that is often a person's name, the owner 2026-10-17); the key comes back once and is kept only in update.json (0600).
+# A Mac that already has update.json keeps its key.
 ENROLL_FILE="$HERE/enroll.json"
 # A Mac that already has update.json (a reinstall) downloads with its own key; otherwise it enrolls first. Either
 # way, with no --source/--base-url the release comes from the update host, not GitHub (no sign-in needed).
@@ -378,11 +379,10 @@ fi
 if [ -z "${KINGMAKER_UPDATE_KEY:-}" ] && [ -s "$ENROLL_FILE" ] && [ -z "$PREFIX" ]; then
   E_URL="$(plutil -extract url raw -o - "$ENROLL_FILE" 2>/dev/null || true)"; E_CODE="$(plutil -extract code raw -o - "$ENROLL_FILE" 2>/dev/null || true)"
   DEV="$(ioreg -rd1 -c IOPlatformExpertDevice | awk -F'"' '/IOPlatformUUID/{print $4}' | shasum -a 256 | cut -c1-64)"
-  NAME="$(scutil --get ComputerName 2>/dev/null | tr -cd '[:alnum:] ._-' | cut -c1-60)"
   if [ -n "$E_URL" ] && [ -n "$E_CODE" ]; then
     EH="$CACHE/.enroll-header"; ( umask 077; printf 'Authorization: Bearer %s\n' "$E_CODE" > "$EH" )
     if curl -fsS --max-time 30 -H @"$EH" -H 'content-type: application/json' -X POST "${E_URL%/}/enroll" \
-         -d "{\"device\":\"$DEV\",\"name\":$(json_str "$NAME"),\"installId\":\"$(uuidgen 2>/dev/null | tr 'A-Z' 'a-z')\"}" -o "$CACHE/.enroll.json" 2>>"$LOG"; then
+         -d "{\"device\":\"$DEV\",\"installId\":\"$(uuidgen 2>/dev/null | tr 'A-Z' 'a-z')\"}" -o "$CACHE/.enroll.json" 2>>"$LOG"; then
       KINGMAKER_UPDATE_URL="$(plutil -extract url raw -o - "$CACHE/.enroll.json")"; KINGMAKER_UPDATE_KEY="$(plutil -extract key raw -o - "$CACHE/.enroll.json")"
       note "This Mac is enrolled for Kingmaker updates."
       # Hand the signed install certificate to the Ronin Launcher by storing it where the launcher reads it: a login

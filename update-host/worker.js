@@ -1,6 +1,6 @@
 // Kingmaker's update host: release folders in a private R2 bucket, served only to a Mac holding an update key.
 // Keys: the operator's hand-made ones (secret UPDATE_KEYS, comma-separated) and one per enrolled Mac (KV DEVICES,
-// stored as sha256(key) → {device, name, at, revoked}). POST /enroll is how an installing Mac gets its own key with no
+// stored as sha256(key) → {device, at, revoked}; never a computer name). POST /enroll is how an installing Mac gets its own key with no
 // pasting (operator 2026-10-08: "anyone who downloads it auto gets a Mac key … as easy as possible"): it needs the
 // enrollment code the installer carries (secret ENROLL_TOKEN; rotate it if an installer leaks), and any one Mac is
 // revoked by setting revoked:true on its record. GET/HEAD only for releases, with Range so a cut-off part resumes.
@@ -213,7 +213,7 @@ function derToRaw(der) {
   return raw;
 }
 
-/** POST /enroll {device, name, installId?}: a new key for this Mac, returned once (only its sha256 is kept), plus a
+/** POST /enroll {device, installId?} (a `name` from an older installer is ignored): a new key for this Mac, returned once (only its sha256 is kept), plus a
  *  signed install certificate (when CERT_SIGNING_KEY is set) the launcher stores and checks.
  *
  *  Limit by design: the enroll token is embedded in every installer (operator's "anyone auto-enrolls" choice), so it
@@ -230,12 +230,13 @@ async function enroll(req, env, token) {
   try { body = await req.json(); } catch { /* empty */ }
   const device = String(body.device || '').replace(/[^a-f0-9]/gi, '').slice(0, 64);
   if (device.length < 16) return new Response('Bad device', { status: 400 });
-  const name = String(body.name || '').replace(/[^\w .'-]/g, '').slice(0, 64);
+  // No computer name is kept (it is often a person's name, the owner 2026-10-17): older installers still send one, and
+  // it is dropped here. A Mac is known only by the sha256 of its hardware UUID.
   const key = hex(crypto.getRandomValues(new Uint8Array(32)));
   const keySha = await sha(key);
   const at = new Date().toISOString();
-  await env.DEVICES.put(`key:${keySha}`, JSON.stringify({ device, name, at, revoked: false }));
-  await env.DEVICES.put(`device:${device}:${at}`, JSON.stringify({ name, at, keySha }));
+  await env.DEVICES.put(`key:${keySha}`, JSON.stringify({ device, at, revoked: false }));
+  await env.DEVICES.put(`device:${device}:${at}`, JSON.stringify({ at, keySha }));
 
   const out = { url: new URL(req.url).origin, key };
   // The install certificate (ronin.install-cert/1): a Ronin-signed, revocable proof this Mac enrolled as a genuine

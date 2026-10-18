@@ -141,10 +141,10 @@ enum WakeWord {
 // ── the terms (a hook: the wording waits for the operator's legal decision, branch legal/terms-review) ────────────
 /// "I accept the terms" next to Download & Install: a checkbox the button requires, with TERMS.md readable in the
 /// window. The text shown is the TERMS.md this installer carries (scripts/build-installer.sh copies it in); the label
-/// below is a placeholder until the legal review settles the words. Info.plist KingmakerTermsRequired = false turns
+/// below is the owner's chosen wording. Info.plist KingmakerTermsRequired = false turns
 /// the requirement off without removing the hook. The engine records the accepted text's sha256 in install.json.
 enum TermsHook {
-  static let checkboxLabel = "I accept the Kingmaker terms" // PLACEHOLDER wording: pending the operator's legal decision
+  static let checkboxLabel = "I agree to the Kingmaker Terms and License"
   static let readLabel = "Read the terms"
   static var required: Bool { (Bundle.main.object(forInfoDictionaryKey: "KingmakerTermsRequired") as? Bool) ?? true }
   static var url: URL? { Bundle.main.url(forResource: "TERMS", withExtension: "md") }

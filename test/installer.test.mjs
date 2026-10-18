@@ -400,7 +400,8 @@ test('the terms hook: the install screen needs "I accept" (TERMS.md readable), a
   const swift = readFileSync(new URL('../installer/KingmakerInstaller.swift', import.meta.url), 'utf8');
   assert.match(swift, /if TermsHook\.required && !termsAccepted \{ return "terms" \}/, 'the button is blocked until the box is ticked');
   assert.match(swift, /\.disabled\(installer\.blocker != nil\)/);
-  assert.match(swift, /static let checkboxLabel = ".*" \/\/ PLACEHOLDER wording: pending the operator's legal decision/);
+  assert.match(swift, /static let checkboxLabel = "I agree to the Kingmaker Terms and License"/);
+  assert.doesNotMatch(swift, /PLACEHOLDER wording/);
   assert.match(swift, /\.sheet\(isPresented: \$installer\.showingTerms\) \{ TermsSheet/, 'TERMS.md is readable in the window');
   assert.match(readFileSync(new URL('../scripts/build-installer.sh', import.meta.url), 'utf8'), /cp "\$here\/TERMS\.md" "\$app\/Contents\/Resources\/TERMS\.md"/);
   assert.match(readFileSync(new URL('../installer/Info.plist', import.meta.url), 'utf8'), /<key>KingmakerTermsRequired<\/key><true\/>/);
