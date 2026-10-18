@@ -52,7 +52,7 @@ export function makeFixtureApp(parent, { version = '0.2.0', padBytes = 300_000, 
   const app = join(parent, 'Kingmaker.app');
   const c = join(app, 'Contents');
   mkdirSync(join(c, 'MacOS'), { recursive: true });
-  mkdirSync(join(c, 'Resources', 'solomon-runtime', 'scripts'), { recursive: true });
+  mkdirSync(join(c, 'Resources', 'kingmaker-runtime', 'scripts'), { recursive: true });
   // Stand-ins for every runtime a release requires (release-parts REQUIRED_RUNTIMES); the release refuses an app without them.
   for (const r of ['voice-runtime', 'guardrails-runtime', 'guardrails-config', 'agent-runtime', 'knowledge-runtime', 'playwright-browsers', 'chrome-connector', 'sol-ghost', 'app.asar']) {
     mkdirSync(join(c, 'Resources', r), { recursive: true });
@@ -71,20 +71,20 @@ export function makeFixtureApp(parent, { version = '0.2.0', padBytes = 300_000, 
 <key>CFBundleExecutable</key><string>${executable}</string>
 <key>CFBundleName</key><string>Kingmaker</string>
 <key>CFBundleShortVersionString</key><string>${version}</string>
-<key>SolomonRuntimeBuild</key><string>fixture</string>
+<key>KingmakerEngineBuild</key><string>fixture</string>
 </dict></plist>
 `);
   writeFileSync(join(c, 'MacOS', executable), '#!/bin/sh\nexit 0\n');
-  // Electron-as-Node stand-in: the engine runs the bundled scripts with Contents/MacOS/Solomon + ELECTRON_RUN_AS_NODE=1.
-  writeFileSync(join(c, 'MacOS', 'Solomon'), `#!/bin/sh\nexec "${process.execPath}" "$@"\n`);
+  // Electron-as-Node stand-in: the engine runs the bundled scripts with Contents/MacOS/KingmakerEngine + ELECTRON_RUN_AS_NODE=1.
+  writeFileSync(join(c, 'MacOS', 'KingmakerEngine'), `#!/bin/sh\nexec "${process.execPath}" "$@"\n`);
   chmodSync(join(c, 'MacOS', executable), 0o755);
-  chmodSync(join(c, 'MacOS', 'Solomon'), 0o755);
-  writeFileSync(join(c, 'Resources', 'solomon-runtime', 'scripts', 'solomon-bootstrap-corpus.mjs'), CORPUS);
-  writeFileSync(join(c, 'Resources', 'solomon-runtime', 'scripts', 'solomon-searxng-native-setup.mjs'), SEARXNG);
+  chmodSync(join(c, 'MacOS', 'KingmakerEngine'), 0o755);
+  writeFileSync(join(c, 'Resources', 'kingmaker-runtime', 'scripts', 'solomon-bootstrap-corpus.mjs'), CORPUS);
+  writeFileSync(join(c, 'Resources', 'kingmaker-runtime', 'scripts', 'solomon-searxng-native-setup.mjs'), SEARXNG);
   // Incompressible padding, so the archive really splits into several parts.
   writeFileSync(join(c, 'Resources', 'payload.bin'), randomBytes(padBytes));
   // Inside out, as the real packager signs: the second executable first, then the bundle.
-  for (const target of [join(c, 'MacOS', 'Solomon'), app]) {
+  for (const target of [join(c, 'MacOS', 'KingmakerEngine'), app]) {
     const sign = spawnSync('codesign', ['--force', '--sign', '-', target], { encoding: 'utf8' });
     if (sign.status !== 0) throw new Error(`codesign ${target}: ${sign.stderr}`);
   }

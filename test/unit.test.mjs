@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { parseSseFrame } from '../lib/client.mjs';
 import { callTool, handleMessage, TOOLS } from '../lib/mcp.mjs';
-import { findGhostBinary, resolvePaths, singletonPid } from '../lib/paths.mjs';
+import { LEGACY_RUNTIME_DIR, RUNTIME_DIR, findGhostBinary, resolvePaths, singletonPid } from '../lib/paths.mjs';
 import { DESKTOP_NONCE_HEADER, ghostBackendEnv, mintLaunchSecrets, redactedEnv } from '../lib/profile.mjs';
 import { startBlockers } from '../lib/runtime.mjs';
 import { classifyLine, newestPending } from '../lib/session.mjs';
@@ -59,13 +59,13 @@ test('inside a built Sol Ghost.app it runs its OWN runtime; KINGMAKER_RUNTIME_AP
   const own = resolvePaths({ SOL_GHOST_HOME: '/tmp/sg-state', KINGMAKER_RUNTIME_APP: '/nowhere/Solomon.app' }, '/Users/owner', { modulePath, exists: () => true });
   assert.equal(own.runtimeSource, 'bundle');
   assert.equal(own.app, '/Users/owner/Applications/Sol Ghost.app');
-  assert.equal(own.binary, '/Users/owner/Applications/Sol Ghost.app/Contents/MacOS/Solomon');
+  assert.equal(own.binary, '/Users/owner/Applications/Sol Ghost.app/Contents/MacOS/KingmakerEngine');
   assert.equal(own.headlessEntry, '/Users/owner/Applications/Sol Ghost.app/Contents/Resources/app.asar/desktop/headless-server.mjs');
   assert.ok(!JSON.stringify(own).includes('/nowhere/'), 'a missing Solomon.app path is never consulted');
   // A thin dev build (scripts/build-app.sh) carries no runtime: it borrows the installed app.
-  const thin = resolvePaths({ SOL_GHOST_HOME: '/tmp/sg-state' }, '/Users/owner', { modulePath, exists: (p) => !p.endsWith('solomon-runtime') });
+  const thin = resolvePaths({ SOL_GHOST_HOME: '/tmp/sg-state' }, '/Users/owner', { modulePath, exists: (p) => ![RUNTIME_DIR, LEGACY_RUNTIME_DIR].some((d) => p.endsWith(d)) });
   assert.equal(thin.runtimeSource, 'borrowed-app');
-  assert.equal(thin.binary, '/Applications/Kingmaker.app/Contents/MacOS/Solomon');
+  assert.equal(thin.binary, '/Applications/Kingmaker.app/Contents/MacOS/KingmakerEngine');
 });
 
 test('the server gets the plain wake PHRASE file, never the tokenized spotter keywords', () => {

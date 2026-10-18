@@ -2,7 +2,7 @@
 // and eye, app/Resources/MenuBarLogo.png, a template image), which says what Kingmaker is doing (operator
 // 2026-10-08: "a tiny Ronin Inc logo that glows when awake, pulses while speaking to the user, and shows an RGB
 // outline while listening; no windows"). It starts its engine headless (lib/cli.mjs start --agent) on the runtime this
-// bundle carries (Contents/MacOS/Solomon, from the engine build), reads its "@@ghost {json}" state
+// bundle carries (Contents/MacOS/KingmakerEngine, from the engine build; an older name in an app built before 0.3.0), reads its "@@ghost {json}" state
 // lines, and stops it on quit. A thin dev build (scripts/build-app.sh) carries no runtime and borrows the installed
 // Kingmaker.app's (KINGMAKER_RUNTIME_APP). Approvals are never a click: they are your word.
 //
@@ -3818,10 +3818,15 @@ final class GhostApp: NSObject, NSApplicationDelegate {
   private let runtimeApp = ProcessInfo.processInfo.environment["KINGMAKER_RUNTIME_APP"] ?? "/Applications/Kingmaker.app"
   /// The Node runtime to run the CLI with: this bundle's own (no Solomon.app needed), else the installed app's.
   private var runtimeBinary: (path: String, bundled: Bool) {
-    let own = Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/Solomon").path
-    let runtime = Bundle.main.bundleURL.appendingPathComponent("Contents/Resources/solomon-runtime").path
-    if FileManager.default.isExecutableFile(atPath: own) && FileManager.default.fileExists(atPath: runtime) { return (own, true) }
-    return ("\(runtimeApp)/Contents/MacOS/Solomon", false)
+    // The engine's names inside the app (0.3.0 on), then the older ones (an app built before 0.3.0).
+    let fm = FileManager.default
+    let firstExecutable = { (app: String) -> String? in
+      ["KingmakerEngine", "Solomon"].map { "\(app)/Contents/MacOS/\($0)" }.first { fm.isExecutableFile(atPath: $0) }
+    }
+    let ownApp = Bundle.main.bundleURL.path
+    let hasRuntime = ["kingmaker-runtime", "solomon-runtime"].contains { fm.fileExists(atPath: "\(ownApp)/Contents/Resources/\($0)") }
+    if let own = firstExecutable(ownApp), hasRuntime { return (own, true) }
+    return (firstExecutable(runtimeApp) ?? "\(runtimeApp)/Contents/MacOS/KingmakerEngine", false)
   }
   private lazy var activeProfile: ActiveProfile? = {
     let home = URL(fileURLWithPath: NSHomeDirectory(), isDirectory: true)

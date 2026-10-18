@@ -12,7 +12,7 @@ yes=0; [ "${1:-}" = "--yes" ] && yes=1
 missing=0
 cli="$here/bin/kingmaker"
 for g in "$HOME/Applications/Kingmaker.app" "/Applications/Kingmaker.app" "$HOME/Applications/Sol Ghost.app" "/Applications/Sol Ghost.app"; do
-  if [ -x "$g/Contents/MacOS/Solomon" ] && [ -d "$g/Contents/Resources/solomon-runtime" ]; then
+  if { [ -x "$g/Contents/MacOS/KingmakerEngine" ] || [ -x "$g/Contents/MacOS/Solomon" ]; } && { [ -d "$g/Contents/Resources/kingmaker-runtime" ] || [ -d "$g/Contents/Resources/solomon-runtime" ]; }; then
     cli="$g/Contents/Resources/sol-ghost/bin/kingmaker"
     [ -e "$cli" ] || cli="$g/Contents/Resources/sol-ghost/bin/sol-ghost"
     break
@@ -30,8 +30,8 @@ case "$cli" in
     if [ -f "$fork/server/src/index.ts" ]; then
       echo "✓ the engine's source in this checkout (UI stripped)"
       need "server dependencies" "test -f '$fork/server/node_modules/tsx/dist/cli.mjs'" "npm ci --prefix '$fork/server'"
-      [ -x "$app/Contents/MacOS/Solomon" ] && echo "✓ native runtimes from $app" || echo "· native runtimes (voice, guardrails): install Kingmaker.app once or set SOL_GHOST_RESOURCES"
-    elif [ -x "$app/Contents/MacOS/Solomon" ]; then echo "✓ engine runtime borrowed from $app"; else
+      { [ -x "$app/Contents/MacOS/KingmakerEngine" ] || [ -x "$app/Contents/MacOS/Solomon" ]; } && echo "✓ native runtimes from $app" || echo "· native runtimes (voice, guardrails): install Kingmaker.app once or set SOL_GHOST_RESOURCES"
+    elif [ -x "$app/Contents/MacOS/KingmakerEngine" ] || [ -x "$app/Contents/MacOS/Solomon" ]; then echo "✓ engine runtime borrowed from $app"; else
       echo "✗ No engine runtime. Install Kingmaker with Kingmaker Installer, or build Kingmaker.app (the engine build), or set KINGMAKER_RUNTIME_APP to one."; exit 78
     fi ;;
   *) echo "✓ engine runtime inside $(dirname "$(dirname "$(dirname "$(dirname "$(dirname "$cli")")")")")" ;;

@@ -9,7 +9,8 @@ import { get as httpGet } from 'node:http';
 import { request } from 'node:https';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { CA_DAYS, PAIR_CODE_TTL_MS, PAIR_LOCK_MS, caConfig, companionControl, companionWanted, createCompanion, ensureTls, deviceStore, isLoopback, lanIp, setCompanionWanted, tailscalePeer } from '../lib/phone-companion.mjs';
+import { CA_DAYS, PAIR_CODE_TTL_MS, PAIR_LOCK_MS, caConfig, companionControl, companionWanted, createCompanion, ensureTls, deviceStore, isLoopback, lanIp, setCompanionWanted, tailscalePeer, tailscalePeerAsync } from '../lib/phone-companion.mjs';
+import { connect as tlsConnect } from 'node:tls';
 
 const at = (p) => new URL(`../${p}`, import.meta.url);
 
@@ -340,4 +341,84 @@ test('the Local CA carries critical nameConstraints and a two-year life, keeps i
     assert.deepEqual(readFileSync(join(tls, 'ca.pem')), before);
     assert.match(caConfig('Evil Host!.local'), /nameConstraints=critical,/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+/** The names in the certificate the live HTTPS server presents right now. */
+const servedNames = (port) => new Promise((resolve, reject) => {
+  const sock = tlsConnect({ host: '127.0.0.1', port, servername: 'localhost', rejectUnauthorized: false }, () => { const n = sock.getPeerCertificate().subjectaltname || ''; sock.end(); resolve(n); });
+  sock.on('error', reject);
+});
+
+test('Tailscale signed in after start: the running phone link re-issues its cert and serves it, no restart', { timeout: 60_000 }, async (t) => {
+  const state = mkdtempSync(join(tmpdir(), 'km-companion-ts-'));
+  let peer = null;
+  const events = [];
+  const companion = createCompanion({ state, port: 0, setupPort: 0, host: 'localhost', icon: null, log: (e, d) => events.push([e, d]), tailscale: () => peer, tailscaleEvery: 0 });
+  t.after(async () => { await companion.stop(); rmSync(state, { recursive: true, force: true }); });
+  const port = Number(new URL((await companion.start()).app).port);
+  assert.doesNotMatch(await servedNames(port), /ts\.net/, 'home-only at start');
+  assert.equal(companion.status().remote, null);
+
+  assert.deepEqual(await companion.recheckTailscale(), { changed: false, remote: null }, 'nothing changed, nothing re-issued');
+  peer = { name: 'mac.tail1234.ts.net', ip: '100.64.0.7' };
+  assert.deepEqual(await companion.recheckTailscale(), { changed: true, remote: 'mac.tail1234.ts.net' });
+  const names = await servedNames(port);
+  assert.match(names, /DNS:mac\.tail1234\.ts\.net/); assert.match(names, /IP Address:100\.64\.0\.7/); assert.match(names, /DNS:localhost/, 'the home names stay');
+  assert.equal(companion.status().remote.app, `https://mac.tail1234.ts.net:${port}`);
+  assert.deepEqual(events.find(([e]) => e === 'tailscale'), ['tailscale', { remote: 'mac.tail1234.ts.net' }]);
+
+  const pem = statSync(join(state, 'phone-tls', 'server.pem')).mtimeMs;
+  assert.deepEqual(await companion.recheckTailscale(), { changed: false, remote: 'mac.tail1234.ts.net' });
+  assert.equal(statSync(join(state, 'phone-tls', 'server.pem')).mtimeMs, pem, 'unchanged: the cert is not re-issued');
+
+  peer = null;
+  assert.deepEqual(await companion.recheckTailscale(), { changed: true, remote: null }, 'signed out: back to home-only');
+  assert.doesNotMatch(await servedNames(port), /ts\.net/);
+  assert.equal(companion.status().remote, null);
+});
+
+test('the re-check runs on its own while the phone link is up, and stops with it', { timeout: 30_000 }, async (t) => {
+  const state = mkdtempSync(join(tmpdir(), 'km-companion-tstimer-'));
+  let peer = null, reads = 0;
+  const companion = createCompanion({ state, port: 0, setupPort: 0, host: 'localhost', icon: null, tailscale: () => { reads += 1; return peer; }, tailscaleEvery: 25 });
+  t.after(async () => { await companion.stop(); rmSync(state, { recursive: true, force: true }); });
+  await companion.start();
+  peer = { name: 'mac.tail1234.ts.net', ip: '100.64.0.7' };
+  for (let i = 0; i < 80 && !companion.status().remote; i += 1) await new Promise((r) => setTimeout(r, 25));
+  assert.equal(companion.status().remote?.name, 'mac.tail1234.ts.net');
+  await companion.stop();
+  const after = reads;
+  await new Promise((r) => setTimeout(r, 120));
+  assert.equal(reads, after, 'no re-check after stop');
+});
+
+test('tailscalePeerAsync reads the same identity without blocking, and never rejects', async () => {
+  const running = JSON.stringify({ BackendState: 'Running', Self: { DNSName: 'mac.tail1234.ts.net.', TailscaleIPs: ['100.64.0.7', 'fd7a::7'] } });
+  const base = { env: {}, clis: ['/x/tailscale'], exists: () => true, run: async () => running };
+  assert.deepEqual(await tailscalePeerAsync(base), { name: 'mac.tail1234.ts.net', ip: '100.64.0.7' });
+  assert.equal(await tailscalePeerAsync({ ...base, env: { SOL_GHOST_TAILSCALE: '0' } }), null);
+  assert.equal(await tailscalePeerAsync({ ...base, run: async () => { throw new Error('timed out'); } }), null);
+  assert.equal(await tailscalePeerAsync({ ...base, run: async () => JSON.stringify({ BackendState: 'NeedsLogin' }) }), null);
+});
+
+test('the phone needs nothing from the engine: pairing page, app page, manifest, icon and service worker all come from the companion', { timeout: 30_000 }, async (t) => {
+  const state = mkdtempSync(join(tmpdir(), 'km-companion-pwa-'));
+  const icon = join(state, 'crest.png'); writeFileSync(icon, Buffer.from('89504e470d0a1a0a', 'hex'));
+  const companion = createCompanion({ state, port: 0, setupPort: 0, host: 'localhost', icon, tailscale: () => null, tailscaleEvery: 0 });
+  t.after(async () => { await companion.stop(); rmSync(state, { recursive: true, force: true }); });
+  const up = await companion.start();
+  const ca = readFileSync(join(state, 'phone-tls', 'ca.pem'));
+  const get = (url) => new Promise((resolve, reject) => {
+    const u = new URL(url);
+    const req = (u.protocol === 'https:' ? request : httpGet)(u, u.protocol === 'https:' ? { ca } : {}, (res) => { let b = ''; res.on('data', (c) => { b += c; }); res.on('end', () => resolve({ status: res.statusCode, type: String(res.headers['content-type'] || ''), body: b })); });
+    req.on('error', reject); if (req.end) req.end();
+  });
+  const setup = await get(up.setup);
+  assert.equal(setup.status, 200); assert.match(setup.type, /text\/html/); assert.match(setup.body, /Kingmaker/);
+  const app = new URL(up.app).origin;
+  const page = await get(`${app}/`); assert.equal(page.status, 200); assert.match(page.body, /manifest\.webmanifest/);
+  const manifest = await get(`${app}/manifest.webmanifest`); assert.equal(manifest.status, 200); assert.equal(JSON.parse(manifest.body).name, 'Kingmaker');
+  assert.equal((await get(`${app}/icon.png`)).status, 200);
+  const sw = await get(`${app}/sw.js`); assert.equal(sw.status, 200); assert.match(sw.type, /javascript/);
+  assert.ok(!/solomon-runtime|kingmaker-runtime|app\/dist/.test(JSON.stringify([setup.body, page.body, manifest.body])), 'nothing points into the engine runtime');
 });

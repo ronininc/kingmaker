@@ -1,7 +1,7 @@
 #!/bin/bash
 # Run Kingmaker (`sol-ghost` is a compatibility alias of this script). No window is ever opened. Which
 # engine runs, first match wins (lib/paths.mjs agrees):
-#   bundle  inside a Kingmaker.app that carries the engine: its own Contents/MacOS/Solomon as Node.
+#   bundle  inside a Kingmaker.app that carries the engine: its own Contents/MacOS/KingmakerEngine as Node.
 #   fork    an operator checkout that carries the engine's source: this Mac's Node >=22.
 #   app     otherwise the installed Kingmaker.app's engine binary as Node (KINGMAKER_RUNTIME_APP); with none, this Mac's Node.
 # SOL_GHOST_RUNTIME=app skips fork mode.
@@ -12,8 +12,9 @@ while [ -L "$self" ]; do
 done
 here="$(cd "$(dirname "$self")/.." && pwd -P)"
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
-bundled="$here/../../MacOS/Solomon"
-if [ -x "$bundled" ] && [ -d "$here/../solomon-runtime" ]; then
+# The engine's names inside the app (0.3.0 on), then the older ones (an app built before 0.3.0).
+bundled="$here/../../MacOS/KingmakerEngine"; [ -x "$bundled" ] || bundled="$here/../../MacOS/Solomon"
+if [ -x "$bundled" ] && { [ -d "$here/../kingmaker-runtime" ] || [ -d "$here/../solomon-runtime" ]; }; then
   bin="$(cd "$(dirname "$bundled")" && pwd -P)/$(basename "$bundled")"
 elif [ -f "$here/solomon/server/src/index.ts" ] && [ "${SOL_GHOST_RUNTIME:-}" != "app" ]; then
   node_bin="$(command -v node || true)"
@@ -23,7 +24,7 @@ elif [ -f "$here/solomon/server/src/index.ts" ] && [ "${SOL_GHOST_RUNTIME:-}" !=
   exit 78
 else
   app="${KINGMAKER_RUNTIME_APP:-/Applications/Kingmaker.app}"
-  bin="$app/Contents/MacOS/Solomon"
+  bin="$app/Contents/MacOS/KingmakerEngine"; [ -x "$bin" ] || bin="$app/Contents/MacOS/Solomon"
   if [ ! -x "$bin" ]; then
     # No engine here (the public checkout): this Mac's Node still runs every command that needs no engine
     # (version, help, markets, …); `kingmaker start` and the rest say plainly that they need Kingmaker.app.

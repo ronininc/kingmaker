@@ -114,7 +114,7 @@ Kingmaker and the desktop app both serve `127.0.0.1:3001`, so run one at a time.
 | "put my keys in the vault" / `:key import` | The keys the scan found, read back by name and provider; on your yes they go to Kingmaker's vault in one receipted call (`/api/key-handoff/console/import`), and the lanes that read an env var (Tavily, Groq, Gemini, NIM, …) can use them. |
 | "get me a Groq key" / "set up my keys" / `:key setup` | For the free APIs the engine uses (its free-tier catalog) with no key yet: read back, then on your yes the key page opens in your Chrome and a hidden Kingmaker paste box for that provider opens with it. You sign up and copy the key (Kingmaker never signs up, accepts terms, types a password or passes a check); paste and Save is your act: shape-checked, sealed, receipted, then a read-only check says whether it works. A provider already in the vault is never asked for again: the vault is outside every app bundle (`~/.solomon-secure`), so a rebuild or reinstall keeps it. "Save the Groq key" reads your clipboard once instead, on your spoken yes. |
 | `kingmaker markets install\|status` / `kingmaker markets <TICKER>` | TradingAgents (TauricResearch, Apache-2.0) as a research-only ability: a desk of AI analysts on your local models rates one ticker Buy to Sell, with its reports. It never trades; not financial advice. See `core/skills/trading-agents/SKILL.md`. |
-| `kingmaker settings` | Opens the engine's own settings pages in your browser, only when you ask. |
+| `kingmaker settings` | Says where Kingmaker's settings are: the menu bar's gear, or `/connectors` (connectors, keys, and what it may reach on this Mac). |
 | `kingmaker status` / `stop` | Up or down, what's waiting, RAM across the process tree. |
 
 ### Grok brain

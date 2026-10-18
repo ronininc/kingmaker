@@ -543,7 +543,7 @@ if [ -n "$PIN" ]; then
     || fail "This Kingmaker.app is not signed by Ronin Inc.'s Kingmaker Release certificate, so it was not installed. Download Kingmaker again from ronininc.org."
   note "Kingmaker.app is signed by the Kingmaker Release certificate."
 fi
-NODE_BIN="$STAGED_APP/Contents/MacOS/Solomon"
+NODE_BIN="$STAGED_APP/Contents/MacOS/KingmakerEngine"; [ -x "$NODE_BIN" ] || NODE_BIN="$STAGED_APP/Contents/MacOS/Solomon"   # before 0.3.0
 progress 1 "code signature valid"
 note "Kingmaker.app unpacked into staging and verified (bundle id $GOT_ID, signature valid)."
 fail_at unpack

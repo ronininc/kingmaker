@@ -25,7 +25,7 @@
 
 import { createHash } from 'node:crypto';
 import { spawn, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 // Ronin's signing check needs its private tooling; without it (the public repo) every app counts as unverified.
@@ -45,8 +45,18 @@ export const BREW_TOOLS = Object.freeze([
   { formula: 'sox', bin: 'sox', label: 'microphone capture (sox)' },
   { formula: 'python@3.12', check: 'python3.10+', label: 'Python for SearXNG' },
 ]);
-export const CORPUS_SCRIPT = 'Contents/Resources/solomon-runtime/scripts/solomon-bootstrap-corpus.mjs';
-export const SEARXNG_SCRIPT = 'Contents/Resources/solomon-runtime/scripts/solomon-searxng-native-setup.mjs';
+/** The engine runtime folder in a Kingmaker.app (kingmaker-runtime from 0.3.0; an older app's name is still read). */
+export const runtimeFolder = (app) => (existsSync(join(app, 'Contents', 'Resources', 'kingmaker-runtime')) || !existsSync(join(app, 'Contents', 'Resources', 'solomon-runtime')) ? 'kingmaker-runtime' : 'solomon-runtime');
+export const corpusScript = (app) => `Contents/Resources/${runtimeFolder(app)}/scripts/solomon-bootstrap-corpus.mjs`;
+export const searxngScript = (app) => `Contents/Resources/${runtimeFolder(app)}/scripts/solomon-searxng-native-setup.mjs`;
+/** Pure: the pinned SearXNG commit from the setup script's text, plain or minified (`export{x as SEARXNG_PIN}`). */
+export function searxngPin(text) {
+  const direct = /SEARXNG_PIN\s*=\s*['"]([0-9a-f]{40})['"]/.exec(text)?.[1];
+  if (direct) return direct;
+  const alias = /export\s*\{[^}]*?\b([\w$]+)\s+as\s+SEARXNG_PIN\b/.exec(text)?.[1];
+  if (!alias) return null;
+  return new RegExp(`(?:^|[^\\w$])${alias.replace(/\$/g, '\\$')}\\s*=\\s*['"]([0-9a-f]{40})['"]`).exec(text)?.[1] ?? null;
+}
 
 function arg(argv, name, fallback = undefined) {
   const at = argv.indexOf(name);
@@ -149,8 +159,16 @@ async function localOllamaDigests() {
 
 const plistJson = (file) => JSON.parse(spawnSync('plutil', ['-convert', 'json', '-o', '-', file], { encoding: 'utf8' }).stdout || '{}');
 
+/** Source maps of the engine's own code under a runtime folder (outside node_modules, which ships as published). */
+export function engineSourceMaps(root) {
+  const out = [];
+  const walk = (dir) => { for (const e of readdirSync(dir, { withFileTypes: true })) { const p = join(dir, e.name); if (e.isDirectory()) { if (e.name !== 'node_modules') walk(p); } else if (e.name.endsWith('.map')) out.push(p.slice(root.length + 1)); } };
+  try { walk(root); } catch { /* no runtime folder: reported above */ }
+  return out;
+}
+
 /** What the app is: bundle id, version, engine build, signing authority, unpacked size. Throws when it is not Kingmaker. */
-export const REQUIRED_RUNTIMES = Object.freeze(['solomon-runtime', 'voice-runtime', 'guardrails-runtime', 'guardrails-config', 'agent-runtime', 'knowledge-runtime', 'playwright-browsers', 'chrome-connector', 'sol-ghost', 'app.asar']);
+export const REQUIRED_RUNTIMES = Object.freeze(['kingmaker-runtime', 'voice-runtime', 'guardrails-runtime', 'guardrails-config', 'agent-runtime', 'knowledge-runtime', 'playwright-browsers', 'chrome-connector', 'sol-ghost', 'app.asar']);
 
 export function inspectApp(app, { skipCodesign = false, allowAdhoc = false } = {}) {
   if (basename(app) !== 'Kingmaker.app') throw new Error(`${app} is not named Kingmaker.app`);
@@ -162,6 +180,17 @@ export function inspectApp(app, { skipCodesign = false, allowAdhoc = false } = {
   // run its agent or knowledge base; a release refuses it.
   const missing = REQUIRED_RUNTIMES.filter((r) => !existsSync(join(app, 'Contents', 'Resources', r)));
   if (missing.length) throw new Error(`${app}: missing ${missing.join(', ')}; stage them (desktop/build/<runtime>) and rebuild`);
+  // Kingmaker's names inside its own bundle, no web interface, and no source maps of the engine's own code (the engine
+  // build). An app with the older names, or with any of these left in, is not released.
+  const resources = join(app, 'Contents', 'Resources'), runtimeDir = join(resources, 'kingmaker-runtime');
+  const leftovers = [
+    ...(existsSync(join(resources, 'solomon-runtime')) ? ['Contents/Resources/solomon-runtime (the runtime folder is kingmaker-runtime)'] : []),
+    ...(existsSync(join(app, 'Contents', 'MacOS', 'Solomon')) ? ['Contents/MacOS/Solomon (the engine binary is KingmakerEngine)'] : []),
+    ...(existsSync(join(app, 'Contents', 'MacOS', 'KingmakerEngine')) ? [] : ['no Contents/MacOS/KingmakerEngine']),
+    ...(existsSync(join(runtimeDir, 'app')) ? ['kingmaker-runtime/app (web files Kingmaker never serves)'] : []),
+    ...engineSourceMaps(runtimeDir).slice(0, 3).map((m) => `${m} (a source map)`),
+  ];
+  if (leftovers.length) throw new Error(`${app}: rebuild it with the current engine build: ${leftovers.join('; ')}`);
   // Kingmaker's own data beside its code, and proof the engine starts. 0.2.6 shipped without sol-ghost/vendor, catalog
   // and core (the engine build packaged only lib/, bin/, package.json) and its engine exited on start on every Mac that took it.
   const engine = join(app, 'Contents', 'Resources', 'sol-ghost');
@@ -191,23 +220,22 @@ export function inspectApp(app, { skipCodesign = false, allowAdhoc = false } = {
     }
   }
   const du = spawnSync('du', ['-sk', app], { encoding: 'utf8' });
-  return { bundleId: info.CFBundleIdentifier, version: info.CFBundleShortVersionString ?? PKG.version, solomonBuild: info.SolomonRuntimeBuild ?? null, signing, unpackedBytes: Number(String(du.stdout).split('\t')[0]) * 1024 || null };
+  return { bundleId: info.CFBundleIdentifier, version: info.CFBundleShortVersionString ?? PKG.version, solomonBuild: info.KingmakerEngineBuild ?? info.SolomonRuntimeBuild ?? null, signing, unpackedBytes: Number(String(du.stdout).split('\t')[0]) * 1024 || null };
 }
 
 /** The confirmed corpora the installer fetches, read from the app's own copy of the bootstrap script. */
 export async function knowledgePlan(app) {
-  const script = join(app, CORPUS_SCRIPT);
+  const rel = corpusScript(app), script = join(app, rel);
   if (!existsSync(script)) return null;
   const { TIER1 } = await import(pathToFileURL(script).href);
   const corpora = (TIER1 ?? []).filter((e) => e.confirmed && e.license).map((e) => ({ id: e.id, field: e.field, sizeMB: e.sizeMB }));
-  return { script: CORPUS_SCRIPT, corpora, totalMB: corpora.reduce((n, c) => n + (Number(c.sizeMB) || 0), 0) };
+  return { script: rel, corpora, totalMB: corpora.reduce((n, c) => n + (Number(c.sizeMB) || 0), 0) };
 }
 
 export function searxngPlan(app) {
-  const script = join(app, SEARXNG_SCRIPT);
+  const rel = searxngScript(app), script = join(app, rel);
   if (!existsSync(script)) return null;
-  const pin = /SEARXNG_PIN = '([0-9a-f]{40})'/.exec(readFileSync(script, 'utf8'))?.[1] ?? null;
-  return { script: SEARXNG_SCRIPT, pin };
+  return { script: rel, pin: searxngPin(readFileSync(script, 'utf8')) };
 }
 
 /** Notarize + staple, only when it can be real. → { ok, line }. */

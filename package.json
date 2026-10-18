@@ -1,6 +1,6 @@
 {
   "name": "kingmaker",
-  "version": "0.2.8",
+  "version": "0.3.0",
   "private": true,
   "description": "Kingmaker: a Mac agent with no window. Your Mac's own apps are the screen, voice drives it, its engine governs every step, the Hands of Horus do the clicking.",
   "type": "module",
