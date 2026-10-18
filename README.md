@@ -1,5 +1,3 @@
-🤫 source-available: open to everyone, not for commercial use 🤫
-
 # Kingmaker
 
 Kingmaker is a headless, voice-driven agent for your Mac. Your Mac's own apps are the screen and your voice drives it. Its engine governs every step, and the Hands of Horus do the clicking (ghost-os when they are not installed). It is source-available under the [PolyForm Noncommercial License 1.0.0](LICENSE).
@@ -13,6 +11,29 @@ Kingmaker runs its engine with no window: the engine's binary is used only as No
 **Current release:** [v0.3.0](https://github.com/ronininc/kingmaker/releases/tag/v0.3.0) (published Oct 17, 2026, 7:42 PM MST). Ships with **Ronin Launcher 0.3.1**. The installer requires **macOS 14 or later** (15 for clicking and typing in other apps).
 
 System requirements (macOS, Linux, Windows, Node, disk, permissions, lean 8 GB profile, test matrix): [docs/SYSTEM-REQUIREMENTS.md](docs/SYSTEM-REQUIREMENTS.md)
+
+## Quick start
+
+**Download:** [ronininc.org/download/kingmaker](https://www.ronininc.org/download/kingmaker) (the Ronin Launcher DMG), or either DMG from the [v0.3.0 release](https://github.com/ronininc/kingmaker/releases/tag/v0.3.0).
+
+**You need:** a Mac with Apple silicon, macOS 14 or later (macOS 15 or later to control other apps), and about 25 GB free. The installer checks all of this and says how much room it needs before it starts.
+
+1. Download the DMG and open it.
+2. Double-click the installer. Kingmaker isn't notarized yet, so macOS will block it the first time (see below).
+3. Pick your wake word (default **Kingmaker**) and press **Download & Install**. It downloads the app, the local models and the knowledge library, then opens Kingmaker.
+4. Allow **Microphone**, **Accessibility** and **Screen Recording** when macOS asks.
+5. Say "*your wake word*, open Notes". Kingmaker proposes the step and waits for your yes.
+
+**First launch ("Open Anyway"):** there's no Apple Developer ID yet, so the installer is signed ad hoc, not notarized. When macOS says it can't verify the installer, click **Done**. Then go to **System Settings → Privacy & Security**, scroll down, click **Open Anyway** next to the installer, and confirm with your password. You only do this once. (On macOS 14 you can also Control-click the installer and choose **Open**.)
+
+**Verify the download (optional):** `shasum -a 256 ~/Downloads/<file>.dmg` should match the `SHA256SUMS` file on the [v0.3.0 release](https://github.com/ronininc/kingmaker/releases/tag/v0.3.0):
+
+```
+cc9b9ef6515a6de827a022a06661c49593dda691337dd66af0f4a365fbe51b7e  Ronin-Launcher-0.3.1-arm64.dmg
+61e252acab6334aa5d90b01c6ac3dba6d21550d0a16d5ba45d3005ee5585ae27  Kingmaker-Installer-v0.3.0.dmg
+```
+
+(The ronininc.org download saves as `Ronin-Launcher.dmg`; it's the same file as `Ronin-Launcher-0.3.1-arm64.dmg`.)
 
 ## Install: one window, one button
 
@@ -323,8 +344,6 @@ The engine's ArtCraft adapter drives seven open-source creative apps from `story
 - **The verified mode is proven on synthetic voices, not yet on your own.** The end-to-end proof (`npm run proof:owner-voice`) uses `say` voices as stand-ins for people; your first live run is `kingmaker enroll`.
 - **The engine's own Kokoro voice** isn't wired yet; `say` is the 0-MB default. Kokoro can be added when RAM allows.
 - **The wake detector** runs whisper on every speech segment while asleep. The bundled KWS spotter would make sleep near-zero CPU.
-
-(yes the title is deliberate, share this by word of mouth not social media please.)
 
 ## Licence
 
