@@ -191,10 +191,11 @@ At idle the processes split into the server (via tsx) ~355-375 MB, `cli.mjs star
   build a DMG from a manifest without packs or the Ronin Launcher, below the macOS floor, of another version than
   `package.json`, or without `KINGMAKER_ENROLL_URL`/`_CODE` (installed Macs would never update). `--draft` builds one
   anyway, named `…-DRAFT.dmg`, for a look on this Mac.
-- **Still the owner's:** an Apple Developer ID (signing and notarization), and a public release to download from.
-  `dist/Kingmaker-Installer-v0.2.0.dmg` is the old v0.2.0 build: rebuild it from a fresh `release-parts.mjs` manifest.
+- **Still the owner's:** an Apple Developer ID (signing and notarization). A public GitHub release now exists:
+  [v0.3.0](https://github.com/ronininc/kingmaker/releases/tag/v0.3.0) (published Oct 17, 2026, 7:42 PM MST),
+  with `Kingmaker-Installer-v0.3.0.dmg` and **Ronin Launcher 0.3.1**. Older local builds such as
+  `dist/Kingmaker-Installer-v0.2.0.dmg` are stale; rebuild from a fresh `release-parts.mjs` manifest when cutting a new version.
 - The installer has no lean or component switches (§6).
-- No GitHub release exists yet, so the installer has nothing to download.
 
 ## 8. Test matrix (2026-10-09, Linux x86_64, Docker 26.1.5, non-root, 6 GB cap)
 
@@ -217,7 +218,7 @@ Skipped: 12 are "macOS only" and 7 need the engine's source beside the repo. Run
 
 - [ ] The installer end to end from a published release: parts, sha256, unpack, `codesign --verify --deep --strict`, rollback
 - [ ] Gatekeeper "Open Anyway" for the unsigned installer; quarantine handling
-- [ ] The real minimum macOS: install and run on 13, 14 and 15 (Ollama ≥ 14, Peekaboo 15, Kokoro-ANE 14)
+- [ ] The real minimum macOS: install and run on 14 and 15 (installer floor is 14; Ollama ≥ 14, Peekaboo 15, Kokoro-ANE 14)
 - [ ] TCC prompts and persistence for `com.ronininc.solghost`: Microphone, Accessibility, Screen Recording, Automation, Event Synthesizing
 - [ ] Live mic, wake word, Whisper STT, Kokoro/FluidAudio TTS on the Neural Engine, voiceprint enrollment
 - [ ] Peekaboo and ghost-os clicks, including the open "approved click with another app in front → REFUSED" issue (Kingmaker README)

@@ -10,6 +10,8 @@ Kingmaker runs its engine with no window: the engine's binary is used only as No
 - **A git checkout (`bin/kingmaker`) has no engine**, so it borrows the runtime of an installed Kingmaker.app (`KINGMAKER_RUNTIME_APP`, default `/Applications/Kingmaker.app`). Inside the app, that variable is ignored.
 - **The engine's source is not in this repo.** This repo is Kingmaker: the headless shell, its voice, console, abilities and installer. The engine ships compiled inside Kingmaker.app.
 
+**Current release:** [v0.3.0](https://github.com/ronininc/kingmaker/releases/tag/v0.3.0) (published Oct 17, 2026, 7:42 PM MST). Ships with **Ronin Launcher 0.3.1**. The installer requires **macOS 14 or later** (15 for clicking and typing in other apps).
+
 System requirements (macOS, Linux, Windows, Node, disk, permissions, lean 8 GB profile, test matrix): [docs/SYSTEM-REQUIREMENTS.md](docs/SYSTEM-REQUIREMENTS.md)
 
 ## Install: one window, one button
@@ -311,7 +313,7 @@ The engine's ArtCraft adapter drives seven open-source creative apps from `story
 - **Using them.** Only through the engine: by voice ("PhotoCraft, make a carousel image from beach.jpg"), at the console (`:craft`), with `kingmaker craft`, or over MCP. The apps' own `<app>-cli mcp` servers are never started or re-exported. With no flags, VectorCraft's attaches to an unauthenticated `127.0.0.1:7979`. VectorCraft `screenshot` and DesignCraft `render_page` claim to be read-only but write a file when given a path. What a request does is judged from its words and by the engine, never from a tool's hint. FilmCraft and EffectCraft renders wait for the engine's heavy slot, never beside a model load.
 - **LightCraft in this build.** HEIC and AVIF do not decode, and its folder import skips Nikon `.nrw`. `kingmaker craft lightcraft --input <folder>` counts those files and says so.
 
-## Known gaps (v0.1, honest)
+## Known gaps (v0.3.0, honest)
 
 - **Not notarized yet.** Kingmaker.app is about 4 GB, mostly the knowledge runtime (2 GB) and the voice runtime (1 GB). Kingmaker Installer downloads it as release parts. Until there is an Apple Developer ID to sign and notarize the installer with, your Mac needs "Open Anyway" once for the installer.
 - **System software it doesn't bundle** comes with the installer: Ollama and the models, the Hands of Horus, sox, SearXNG (Kingmaker starts an installed `ollama serve` when none is running). ghost-os stays an optional fallback for the hands. Blender, Godot and Chrome are found where they're installed.
