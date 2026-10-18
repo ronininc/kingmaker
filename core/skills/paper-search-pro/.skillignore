@@ -1,0 +1,68 @@
+# paper-search-pro distribution exclusions
+# These paths are excluded from skill packaging / distribution zips.
+# Tools that respect .skillignore: future Claude Code skill packagers,
+# rsync (via --filter=':- .skillignore'), and the bundle-artifact script.
+
+# --- Web artifact build output (rebuildable from source) ---
+assets/webartifacts_app/paper-report/node_modules/
+assets/webartifacts_app/paper-report/dist/
+assets/webartifacts_app/paper-report/.parcel-cache/
+assets/webartifacts_app/paper-report/.vite/
+
+# --- Python build artifacts ---
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- OS / editor noise ---
+.DS_Store
+**/.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# --- Local search outputs (user-generated; never distributed) ---
+paper-search-results/
+/tmp/paper-search-*/
+
+# --- Local dev caches ---
+.cache/
+.coverage
+htmlcov/
+
+# --- Backup / pre-rework artifacts (SA-Ship2 D1+D2 — added 2026-05-22) ---
+# Backups produced by `backup-before-irreversible-rework` rule should sit
+# under `~/<skill>-archive-<date>/` outside the Skill tree. Defensively
+# exclude any that leak in so they never ship with distribution.
+**/*.backup
+**/src.before-*/
+
+# --- Developer-only directories (added 2026-05-27) ---
+# Unit tests + eval fixtures are checked into the GitHub repo so contributors
+# can run them, but the Claude Code Skill runtime never invokes them — the
+# main agent follows SKILL.md's 14-step recipe and never imports pytest.
+# Excluding them keeps the distributed Skill bundle ~100 KB lighter and
+# removes confusing "what is this for?" surface area for end users.
+tests/
+evals/
+
+# --- Repo-level README (added 2026-06-27, v2.2-evolution) ---
+# Anthropic's skill spec is explicit: "Don't include README.md inside your skill
+# folder." README.md / README.zh.md exist only for human visitors browsing the
+# GitHub repo (per the Distribution chapter, which keeps the repo README separate
+# from the skill package). They are EXCLUDED from the skill bundle here but stay
+# git-tracked — that is why .gitignore intentionally does NOT mirror this line.
+# Nested attribution/build READMEs (scripts/vendored/README-vendored.md,
+# assets/.../paper-report/README.md) are deliberately kept: they document vendored
+# code provenance + build steps and ship harmlessly with their directories.
+/README.md
+/README.zh.md
+
+# --- Repo dev-context file (added 2026-06-28) ---
+# CLAUDE.md guides sessions that MODIFY this repo (invariants + test cmd); it is
+# not part of the runnable Skill. Excluded from the bundle, kept git-tracked.
+/CLAUDE.md

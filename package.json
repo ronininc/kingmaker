@@ -1,0 +1,24 @@
+{
+  "name": "kingmaker",
+  "version": "0.2.8",
+  "private": true,
+  "description": "Kingmaker: a Mac agent with no window. Your Mac's own apps are the screen, voice drives it, its engine governs every step, the Hands of Horus do the clicking.",
+  "type": "module",
+  "bin": {
+    "kingmaker": "bin/kingmaker",
+    "sol-ghost": "bin/sol-ghost"
+  },
+  "scripts": {
+    "test": "node --test --test-force-exit \"test/*.test.mjs\"",
+    "icons": "swift scripts/make-icons.swift .",
+    "build:app": "scripts/build-app.sh",
+    "build:installer": "scripts/build-installer.sh",
+    "release:parts": "node scripts/release-parts.mjs",
+    "proof:owner-voice": "node --experimental-sqlite ${KINGMAKER_ENGINE_SRC:?set KINGMAKER_ENGINE_SRC to the engine source checkout}/server/node_modules/tsx/dist/cli.mjs test/owner-voice.proof.mjs",
+    "proof:owner-keys": "node --experimental-sqlite ${KINGMAKER_ENGINE_SRC:?set KINGMAKER_ENGINE_SRC to the engine source checkout}/server/node_modules/tsx/dist/cli.mjs test/owner-keys.proof.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "PolyForm-Noncommercial-1.0.0"
+}

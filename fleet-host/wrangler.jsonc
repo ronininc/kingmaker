@@ -1,0 +1,16 @@
+{
+  // The collective's front door (docs/community-learning.md). Not deployed until the owner says so.
+  // Before the first deploy: create the bucket and namespace, put their ids here, and set the key pair:
+  //   wrangler r2 bucket create kingmaker-fleet
+  //   wrangler kv namespace create FLEET
+  //   node scripts/fleet-keygen.mjs   (prints the public key for FLEET_PUBLIC_KEY; pipe the private key to the secret)
+  //   wrangler secret put FLEET_SIGNING_KEY
+  "name": "kingmaker-fleet",
+  "main": "worker.js",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "r2_buckets": [{ "binding": "PACKETS", "bucket_name": "kingmaker-fleet" }],
+  "kv_namespaces": [{ "binding": "FLEET", "id": "SET-BEFORE-DEPLOY" }],
+  "vars": { "FLEET_PUBLIC_KEY": "SET-BEFORE-DEPLOY" }
+}

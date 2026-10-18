@@ -1,0 +1,22 @@
+{
+    "name": "smarthome-bench",
+    "version": "1.0.0",
+    "description": "SmartHome-Bench video anomaly detection benchmark for VLM evaluation",
+    "main": "scripts/run-benchmark.cjs",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "benchmark",
+        "vlm",
+        "video",
+        "anomaly-detection",
+        "smart-home"
+    ],
+    "author": "",
+    "license": "ISC",
+    "type": "commonjs",
+    "dependencies": {
+        "openai": "^6.27.0"
+    }
+}

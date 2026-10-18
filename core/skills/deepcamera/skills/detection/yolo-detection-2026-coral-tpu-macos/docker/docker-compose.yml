@@ -1,0 +1,35 @@
+services:
+  # ─────────────────────────────────────────────────────────────────────────
+  # coral-compiler
+  #
+  # Compiles YOLO 2026 nano (.pt) → TFLite INT8 → Edge TPU (.tflite).
+  # Output files land in the skill's models/ directory.
+  #
+  # Usage:
+  #   docker compose run --rm coral-compiler                        # default 320×320
+  #   docker compose run --rm coral-compiler --size 640             # 640×640
+  #   docker compose run --rm coral-compiler --model yolo26s        # small model
+  #
+  # Build only:
+  #   docker compose build coral-compiler
+  # ─────────────────────────────────────────────────────────────────────────
+  coral-compiler:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      platforms:
+        - linux/amd64
+    platform: linux/amd64
+    image: coral-tpu-compiler:latest
+    volumes:
+      # Mount the skill's models/ directory as the compiler output
+      - ../models:/compile/output
+    command:
+      - --model
+      - yolo26n
+      - --size
+      - "320"
+      - --output
+      - /compile/output
+    # Don't restart — this is a one-shot build job
+    restart: "no"

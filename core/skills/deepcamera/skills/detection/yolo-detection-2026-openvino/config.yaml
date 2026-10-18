@@ -1,0 +1,64 @@
+# OpenVINO Detection Skill — Configuration Schema
+# Parsed by Aegis skill-registry-service.cjs → parseConfigYaml()
+
+params:
+  - key: auto_start
+    label: Auto Start
+    type: boolean
+    default: false
+    description: "Start this skill automatically when Aegis launches"
+
+  - key: confidence
+    label: Confidence Threshold
+    type: number
+    default: 0.5
+    description: "Minimum detection confidence (0.1–1.0)"
+
+  - key: fps
+    label: Frame Rate
+    type: select
+    default: 5
+    description: "Detection processing rate"
+    options:
+      - { value: 0.2, label: "Ultra Low (0.2 FPS)" }
+      - { value: 0.5, label: "Low (0.5 FPS)" }
+      - { value: 1, label: "Normal (1 FPS)" }
+      - { value: 3, label: "Active (3 FPS)" }
+      - { value: 5, label: "High (5 FPS)" }
+      - { value: 15, label: "Real-time (15 FPS)" }
+
+  - key: classes
+    label: Detection Classes
+    type: string
+    default: "person,car,dog,cat"
+    description: "Comma-separated COCO class names to detect"
+
+  - key: input_size
+    label: Input Resolution
+    type: select
+    default: 640
+    description: "Image size for inference — OpenVINO handles 640 well on most hardware"
+    options:
+      - { value: 320, label: "320×320 (fastest)" }
+      - { value: 640, label: "640×640 (recommended)" }
+
+  - key: device
+    label: Inference Device
+    type: select
+    default: AUTO
+    description: "OpenVINO device — AUTO picks best available"
+    options:
+      - { value: AUTO, label: "Auto-detect (best available)" }
+      - { value: CPU, label: "CPU" }
+      - { value: GPU, label: "Intel GPU (iGPU / Arc)" }
+      - { value: MYRIAD, label: "Intel NCS2 (Myriad X)" }
+
+  - key: precision
+    label: Model Precision
+    type: select
+    default: FP16
+    description: "FP16 is fastest on GPU/NCS2; INT8 is fastest on CPU; FP32 is most accurate"
+    options:
+      - { value: FP16, label: "FP16 (recommended for GPU/NCS2)" }
+      - { value: INT8, label: "INT8 (fastest on CPU)" }
+      - { value: FP32, label: "FP32 (most accurate)" }

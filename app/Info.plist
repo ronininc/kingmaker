@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Kingmaker.app's Info.plist. scripts/build-app.sh (thin dev app) and the engine build (the standalone
+     app with the engine runtime inside) both fill @VERSION@ and @SOLOMON_BUILD@. The bundle id stays
+     com.ronininc.solghost on purpose. The build must also retain its certificate-based designated requirement:
+     macOS keys privacy grants to that requirement, not to the bundle id alone. -->
+<plist version="1.0"><dict>
+  <key>CFBundleName</key><string>Kingmaker</string>
+  <key>CFBundleDisplayName</key><string>Kingmaker</string>
+  <key>CFBundleIdentifier</key><string>com.ronininc.solghost</string>
+  <key>CFBundleExecutable</key><string>Kingmaker</string>
+  <key>CFBundleIconFile</key><string>AppIcon</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleShortVersionString</key><string>@VERSION@</string>
+  <key>CFBundleVersion</key><string>@VERSION@</string>
+  <key>SolomonRuntimeBuild</key><string>@SOLOMON_BUILD@</string>
+  <key>LSMinimumSystemVersion</key><string>14.0</string>
+  <key>LSUIElement</key><true/>
+  <key>NSHumanReadableCopyright</key><string>Ronin Inc. Free for personal and noncommercial use (PolyForm Noncommercial 1.0.0).</string>
+  <!-- kingmaker://wake: what Siri's "Wake Kingmaker" shortcut and `kingmaker wake` open. Launches the app if needed,
+       else wakes it, so the next words are a command with no wake word. solghost://wake stays as an alias, so a
+       "Wake Ghost" shortcut made before the rename keeps working. -->
+  <key>CFBundleURLTypes</key><array><dict>
+    <key>CFBundleURLName</key><string>com.ronininc.solghost.wake</string>
+    <key>CFBundleURLSchemes</key><array><string>kingmaker</string><string>solghost</string></array>
+  </dict></array>
+  <key>NSMicrophoneUsageDescription</key><string>Kingmaker listens for its wake word and, once awake, for your commands. While it is asleep the microphone is off and nothing it hears is sent anywhere.</string>
+  <key>NSContactsUsageDescription</key><string>Kingmaker finds the person you ask it to message (their number) in your Contacts. Nothing is sent anywhere until you press Send.</string>
+  <key>NSAppleEventsUsageDescription</key><string>Kingmaker opens and controls apps you ask it to, through its engine’s governance.</string>
+</dict></plist>

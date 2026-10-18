@@ -1,0 +1,315 @@
+{
+  "version": "1.0.0",
+  "repository": "SharpAI/DeepCamera",
+  "updated": "2026-03-02",
+  "description": "AI skill catalog for SharpAI Aegis. Each skill is a self-contained folder with a SKILL.md manifest.",
+  "categories": {
+    "detection": "Object detection, person recognition, visual grounding",
+    "analysis": "VLM scene understanding, interactive segmentation",
+    "transformation": "Depth estimation, style transfer, video effects",
+    "privacy": "Privacy transforms — depth maps, blur, anonymization for blind mode",
+    "annotation": "Dataset labeling, COCO export, training data",
+    "segmentation": "Pixel-level object segmentation — SAM2, interactive masks",
+    "training": "Model fine-tuning, hardware-optimized export, deployment",
+    "camera-providers": "Camera brand integrations — clip feed, live stream",
+    "streaming": "RTSP/WebRTC live view via go2rtc",
+    "channels": "Messaging platform channels for Clawdbot agent",
+    "automation": "MQTT, webhooks, Home Assistant triggers",
+    "integrations": "Smart home and IoT platform bridges"
+  },
+  "skills": [
+    {
+      "id": "home-security-benchmark",
+      "name": "Home Security AI Benchmark",
+      "description": "LLM & VLM evaluation suite for home security AI — tests dedup, classification, tool use, and scene analysis.",
+      "version": "1.0.0",
+      "category": "analysis",
+      "path": "skills/analysis/home-security-benchmark",
+      "tags": [
+        "benchmark",
+        "llm",
+        "vlm",
+        "testing",
+        "evaluation",
+        "security"
+      ],
+      "platforms": [
+        "linux-x64",
+        "linux-arm64",
+        "darwin-arm64",
+        "darwin-x64",
+        "win-x64"
+      ],
+      "requirements": {
+        "node": ">=18",
+        "ram_gb": 1
+      },
+      "capabilities": [
+        "benchmark",
+        "report_generation"
+      ],
+      "ui_unlocks": [
+        "benchmark_report"
+      ]
+    },
+    {
+      "id": "yolo-detection-2026",
+      "name": "YOLO 2026",
+      "description": "State-of-the-art real-time object detection — 80+ COCO classes, bounding box overlays, multi-size model selection.",
+      "version": "1.0.0",
+      "category": "detection",
+      "path": "skills/detection/yolo-detection-2026",
+      "tags": [
+        "detection",
+        "yolo",
+        "object-detection",
+        "real-time",
+        "coco"
+      ],
+      "platforms": [
+        "linux-x64",
+        "linux-arm64",
+        "darwin-arm64",
+        "darwin-x64",
+        "win-x64"
+      ],
+      "requirements": {
+        "python": ">=3.9",
+        "ram_gb": 2
+      },
+      "capabilities": [
+        "live_detection",
+        "bbox_overlay"
+      ],
+      "ui_unlocks": [
+        "detection_overlay",
+        "detection_results"
+      ],
+      "fps_presets": [
+        0.2,
+        0.5,
+        1,
+        3,
+        5,
+        15
+      ],
+      "model_sizes": [
+        "nano",
+        "small",
+        "medium",
+        "large"
+      ]
+    },
+    {
+      "id": "yolo-detection-2026-coral-tpu",
+      "name": "YOLO 2026 Coral TPU",
+      "description": "Google Coral Edge TPU — real-time object detection with LiteRT (INT8, ~4ms inference at 320×320).",
+      "version": "2.0.0",
+      "category": "detection",
+      "path": "skills/detection/yolo-detection-2026-coral-tpu",
+      "tags": [
+        "detection",
+        "yolo",
+        "coral",
+        "edge-tpu",
+        "litert",
+        "real-time",
+        "coco"
+      ],
+      "platforms": [
+        "linux-x64",
+        "linux-arm64",
+        "darwin-arm64",
+        "darwin-x64",
+        "win-x64"
+      ],
+      "requirements": {
+        "python": ">=3.9",
+        "system": "libedgetpu",
+        "hardware": "Google Coral USB Accelerator"
+      },
+      "capabilities": [
+        "live_detection",
+        "bbox_overlay"
+      ],
+      "ui_unlocks": [
+        "detection_overlay",
+        "detection_results"
+      ],
+      "fps_presets": [
+        0.2,
+        0.5,
+        1,
+        3,
+        5,
+        15
+      ],
+      "model_sizes": [
+        "nano"
+      ]
+    },
+    {
+      "id": "camera-claw",
+      "name": "Camera Claw",
+      "description": "Security camera for your AI agent — sandbox, record, and monitor OpenClaw activity.",
+      "version": "2026.3.12",
+      "category": "integrations",
+      "url": "https://github.com/SharpAI/CameraClaw",
+      "repo_url": "https://github.com/SharpAI/CameraClaw",
+      "code_structure": [
+        { "path": "SKILL.md", "desc": "Aegis skill manifest (11 params)" },
+        { "path": "package.json", "desc": "Node.js dependencies" },
+        { "path": "config.yaml", "desc": "Default params" },
+        { "path": "deploy.sh", "desc": "Node.js + Docker bootstrapper" },
+        { "path": "deploy.bat", "desc": "Windows bootstrapper" },
+        { "path": "scripts/monitor.js", "desc": "Main entry — Docker orchestrator + JSONL protocol" },
+        { "path": "scripts/health-check.js", "desc": "Container health checker" },
+        { "path": "docs/aegis_openclaw_note.md", "desc": "Aegis integration requirements" }
+      ],
+      "tags": ["security", "sandbox", "monitoring", "openclaw", "ai-agent"],
+      "platforms": [
+        "linux-x64",
+        "linux-arm64",
+        "darwin-arm64",
+        "darwin-x64",
+        "win-x64"
+      ],
+      "requirements": {
+        "docker": true
+      },
+      "capabilities": [
+        "monitoring",
+        "recording"
+      ]
+    },
+    {
+      "id": "depth-estimation",
+      "name": "Depth Anything V2",
+      "description": "Privacy-first depth map transforms — anonymize camera feeds with Depth Anything v2 while preserving spatial awareness.",
+      "version": "1.1.0",
+      "category": "privacy",
+      "path": "skills/transformation/depth-estimation",
+      "tags": [
+        "privacy",
+        "depth",
+        "transform",
+        "anonymization",
+        "blind-mode"
+      ],
+      "platforms": [
+        "linux-x64",
+        "linux-arm64",
+        "darwin-arm64",
+        "darwin-x64",
+        "win-x64"
+      ],
+      "requirements": {
+        "python": ">=3.9",
+        "ram_gb": 2
+      },
+      "capabilities": [
+        "live_transform",
+        "privacy_overlay"
+      ],
+      "ui_unlocks": [
+        "privacy_overlay",
+        "blind_mode"
+      ]
+    },
+    {
+      "id": "model-training",
+      "name": "Model Training",
+      "disabled": true,
+      "description": "Agent-driven YOLO fine-tuning — annotate, train, auto-export to TensorRT/CoreML/OpenVINO, deploy as detection skill.",
+      "version": "1.0.0",
+      "category": "training",
+      "path": "skills/training/model-training",
+      "tags": [
+        "training",
+        "fine-tuning",
+        "yolo",
+        "custom-model",
+        "export"
+      ],
+      "platforms": [
+        "linux-x64",
+        "linux-arm64",
+        "darwin-arm64",
+        "darwin-x64",
+        "win-x64"
+      ],
+      "requirements": {
+        "python": ">=3.9",
+        "ram_gb": 4
+      },
+      "capabilities": [
+        "fine_tuning",
+        "model_export",
+        "deployment"
+      ]
+    },
+    {
+      "id": "segmentation-sam2",
+      "name": "SAM2 Segmentation",
+      "disabled": true,
+      "description": "Interactive click-to-segment using Segment Anything 2 — pixel-perfect masks, point/box prompts, video tracking.",
+      "version": "1.0.0",
+      "category": "segmentation",
+      "path": "skills/segmentation/sam2-segmentation",
+      "tags": [
+        "annotation",
+        "segmentation",
+        "sam2",
+        "labeling",
+        "masks"
+      ],
+      "platforms": [
+        "linux-x64",
+        "linux-arm64",
+        "darwin-arm64",
+        "darwin-x64",
+        "win-x64"
+      ],
+      "requirements": {
+        "python": ">=3.9",
+        "ram_gb": 4
+      },
+      "capabilities": [
+        "interactive_segmentation",
+        "video_tracking"
+      ]
+    },
+    {
+      "id": "annotation-data",
+      "name": "Annotation Data",
+      "disabled": true,
+      "description": "Dataset annotation management — COCO labels, sequences, export, and Kaggle upload for Annotation Studio.",
+      "version": "1.0.0",
+      "category": "annotation",
+      "path": "skills/annotation/dataset-management",
+      "tags": [
+        "annotation",
+        "dataset",
+        "coco",
+        "labeling"
+      ],
+      "platforms": [
+        "linux-x64",
+        "linux-arm64",
+        "darwin-arm64",
+        "darwin-x64",
+        "win-x64"
+      ],
+      "requirements": {
+        "python": ">=3.9"
+      },
+      "capabilities": [
+        "dataset_management",
+        "coco_export"
+      ],
+      "ui_unlocks": [
+        "annotation_studio"
+      ]
+    }
+  ]
+}

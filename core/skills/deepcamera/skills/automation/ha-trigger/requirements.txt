@@ -1,0 +1,2 @@
+# HA Automation Trigger
+requests>=2.31.0

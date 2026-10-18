@@ -1,0 +1,21 @@
+{
+    "name": "homesafe-bench",
+    "version": "1.0.0",
+    "description": "VLM indoor safety hazard detection benchmark",
+    "main": "scripts/run-benchmark.cjs",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "benchmark",
+        "vlm",
+        "safety",
+        "hazard"
+    ],
+    "author": "SharpAI",
+    "license": "ISC",
+    "type": "commonjs",
+    "dependencies": {
+        "openai": "^6.27.0"
+    }
+}

@@ -1,0 +1,74 @@
+{
+ "models": [
+  "huihui_ai/qwen3-abliterated:0.6b",
+  "huihui_ai/qwen3-abliterated:1.7b",
+  "huihui_ai/qwen3.5-abliterated:2b",
+  "huihui_ai/qwen2.5-coder-abliterate:1.5b"
+ ],
+ "resident_after": [
+  [
+   "huihui_ai/qwen2.5-coder-abliterate:1.5b",
+   1.24,
+   1.24
+  ]
+ ],
+ "swap_delta_mb": 1159,
+ "turns": [
+  {
+   "round": 0,
+   "model": "huihui_ai/qwen3-abliterated:0.6b",
+   "wall_s": 1.48,
+   "load_s": 1.39,
+   "gen_tok_s": 128.8
+  },
+  {
+   "round": 0,
+   "model": "huihui_ai/qwen3-abliterated:1.7b",
+   "wall_s": 2.67,
+   "load_s": 2.07,
+   "gen_tok_s": 53.7
+  },
+  {
+   "round": 0,
+   "model": "huihui_ai/qwen3.5-abliterated:2b",
+   "wall_s": 7.22,
+   "load_s": 5.12,
+   "gen_tok_s": 19.6
+  },
+  {
+   "round": 0,
+   "model": "huihui_ai/qwen2.5-coder-abliterate:1.5b",
+   "wall_s": 5.81,
+   "load_s": 4.85,
+   "gen_tok_s": 32.8
+  },
+  {
+   "round": 1,
+   "model": "huihui_ai/qwen3-abliterated:0.6b",
+   "wall_s": 1.22,
+   "load_s": 1.12,
+   "gen_tok_s": 114.4
+  },
+  {
+   "round": 1,
+   "model": "huihui_ai/qwen3-abliterated:1.7b",
+   "wall_s": 3.11,
+   "load_s": 1.6,
+   "gen_tok_s": 19.2
+  },
+  {
+   "round": 1,
+   "model": "huihui_ai/qwen3.5-abliterated:2b",
+   "wall_s": 6.05,
+   "load_s": 3.9,
+   "gen_tok_s": 16.2
+  },
+  {
+   "round": 1,
+   "model": "huihui_ai/qwen2.5-coder-abliterate:1.5b",
+   "wall_s": 3.51,
+   "load_s": 2.51,
+   "gen_tok_s": 31.9
+  }
+ ]
+}

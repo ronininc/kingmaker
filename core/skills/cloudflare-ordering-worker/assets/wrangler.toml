@@ -1,0 +1,29 @@
+# wrangler.toml — Online Ordering Worker
+# Rename "lacasa" throughout to the client's slug. Deploy: `npx wrangler deploy`.
+
+name = "CLIENT_SLUG-ordering"          # e.g. lacasa-ordering  → https://lacasa-ordering.<subdomain>.workers.dev
+main = "worker.js"
+compatibility_date = "2024-11-01"
+
+# --- Public config (NOT secret). Edit these per site. ---
+[vars]
+ALLOWED_ORIGIN = "https://REPLACE-with-live-site-origin.com"   # exact origin the site is served from
+SUCCESS_URL    = "https://REPLACE-with-live-site-origin.com/?order=success"
+CANCEL_URL     = "https://REPLACE-with-live-site-origin.com/?order=cancelled"
+NOTIFY_WEBHOOK = ""                                            # optional: Slack/Make/owner endpoint for paid orders
+
+# --- KV namespaces. Create with:  npx wrangler kv namespace create ORDERS  (then paste the id) ---
+[[kv_namespaces]]
+binding = "ORDERS"
+id = "PASTE_ORDERS_KV_ID"
+
+[[kv_namespaces]]
+binding = "MENU"
+id = "PASTE_MENU_KV_ID"
+
+# --- Secrets are NOT stored here. Set them out-of-band so keys never hit git: ---
+#   npx wrangler secret put STRIPE_SECRET_KEY
+#   npx wrangler secret put STRIPE_WEBHOOK_SECRET
+#
+# Upload the menu into KV (server-side source of truth for prices):
+#   npx wrangler kv key put --binding=MENU menu --path=menu.example.json

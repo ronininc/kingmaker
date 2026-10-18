@@ -1,0 +1,19 @@
+{
+  "name": "Simple skill — no scripts",
+  "skills": ["claude-code-skillforge"],
+  "query": "Build a Claude Code skill that formats commit messages from staged git diffs following Conventional Commits. Category: dev.",
+  "expected_behavior": [
+    "Name uses gerund form, kebab-case, ≤64 chars, lowercase+hyphens only, no reserved words",
+    "Description starts with 3rd-person verb and includes 'Use when' with 3+ trigger phrases",
+    "Description is ≤1024 chars with no XML tags",
+    "Front matter uses ONLY standard fields (name, description, argument-hint, etc.) — no license, metadata, category, version, or generated-by",
+    "Front matter total is under 1024 characters",
+    "Body is under 500 lines",
+    "All SOP steps begin with an imperative command verb",
+    "Output includes correct mkdir path for Claude Code ecosystem (~/.claude/skills/)",
+    "No time-sensitive information (no dates, version numbers, trending tools)",
+    "Consistent terminology throughout (no mixing synonyms)",
+    "Includes input/output example pairs demonstrating the expected commit message format",
+    "References are one level deep from SKILL.md (no nested chains)"
+  ]
+}

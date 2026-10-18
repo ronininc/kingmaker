@@ -1,0 +1,2 @@
+# LINE Channel
+line-bot-sdk>=3.5.0

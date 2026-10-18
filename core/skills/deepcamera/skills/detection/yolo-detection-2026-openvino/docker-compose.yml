@@ -1,0 +1,34 @@
+# OpenVINO Detection — Docker Compose for testing
+#
+# Interactive mode: docker compose run --rm openvino-detect
+
+services:
+  openvino-detect:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: aegis-openvino-detect:latest
+    stdin_open: true
+    tty: false
+    devices:
+      - /dev/dri:/dev/dri         # Intel GPU access
+      - /dev/bus/usb:/dev/bus/usb # NCS2 USB access
+    volumes:
+      - /tmp/aegis_detection:/tmp/aegis_detection
+    environment:
+      - PYTHONUNBUFFERED=1
+      - AEGIS_SKILL_ID=yolo-detection-2026-openvino
+      - AEGIS_SKILL_PARAMS={"confidence":0.5,"classes":"person,car,dog,cat","fps":5,"input_size":640,"device":"AUTO","precision":"FP16"}
+    restart: "no"
+
+  # Utility: probe OpenVINO devices
+  device-probe:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    devices:
+      - /dev/dri:/dev/dri
+      - /dev/bus/usb:/dev/bus/usb
+    entrypoint: ["python3", "scripts/device_probe.py"]
+    profiles:
+      - tools

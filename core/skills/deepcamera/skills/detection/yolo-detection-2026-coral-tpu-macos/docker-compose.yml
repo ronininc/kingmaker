@@ -1,0 +1,38 @@
+# Coral TPU Detection — Docker Compose for manual testing
+#
+# Usage:
+#   Linux:   docker compose up
+#   macOS:   Docker Desktop 4.35+ handles USB/IP automatically
+#   Windows: Docker Desktop 4.35+ with USB/IP or WSL2 backend
+#
+# Interactive mode (for JSONL stdin/stdout testing):
+#   docker compose run --rm coral-detect
+
+services:
+  coral-detect:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: aegis-coral-tpu:latest
+    stdin_open: true    # Keep stdin open for JSONL input
+    tty: false          # No pseudo-TTY — raw pipe mode
+    devices:
+      - /dev/bus/usb:/dev/bus/usb   # Linux USB passthrough
+    volumes:
+      - /tmp/aegis_detection:/tmp/aegis_detection   # Shared frame exchange
+    environment:
+      - PYTHONUNBUFFERED=1
+      - AEGIS_SKILL_ID=yolo-detection-2026-coral-tpu
+      - AEGIS_SKILL_PARAMS={"confidence":0.5,"classes":"person,car,dog,cat","fps":5,"input_size":320,"tpu_device":"auto","clock_speed":"standard"}
+    restart: "no"
+
+  # Utility: probe connected TPU devices
+  tpu-probe:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    devices:
+      - /dev/bus/usb:/dev/bus/usb
+    entrypoint: ["python3", "scripts/tpu_probe.py"]
+    profiles:
+      - tools   # Only runs with: docker compose --profile tools run tpu-probe

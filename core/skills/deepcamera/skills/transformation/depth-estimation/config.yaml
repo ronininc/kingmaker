@@ -1,0 +1,72 @@
+# Depth Estimation Skill — Configuration Schema
+# Parsed by Aegis skill-registry-service.cjs → parseConfigYaml()
+# Format: params[] with key, type, label, default, description, options
+
+params:
+  - key: auto_start
+    label: Auto Start
+    type: boolean
+    default: true
+    description: "Start this skill automatically when Aegis launches"
+
+  - key: model
+    label: Depth Model
+    type: select
+    default: depth-anything-v2-small
+    description: "Depth Anything v2 model size — larger = more accurate but slower"
+    options:
+      - { value: depth-anything-v2-small, label: "Small (fastest)" }
+      - { value: depth-anything-v2-base, label: "Base (balanced)" }
+      - { value: depth-anything-v2-large, label: "Large (most accurate)" }
+
+  - key: variant
+    label: CoreML Variant (macOS)
+    type: select
+    default: DepthAnythingV2SmallF16
+    description: "CoreML model format — F16 recommended for Apple Neural Engine"
+    options:
+      - { value: DepthAnythingV2SmallF16, label: "Small F16 (recommended)" }
+      - { value: DepthAnythingV2SmallF16INT8, label: "Small F16+INT8 (faster)" }
+      - { value: DepthAnythingV2SmallF32, label: "Small F32 (highest precision)" }
+
+  - key: blend_mode
+    label: Display Mode
+    type: select
+    default: depth_only
+    description: "How the depth map is displayed over the camera feed"
+    options:
+      - { value: depth_only, label: "Depth Only (privacy)" }
+      - { value: overlay, label: "Overlay (semi-transparent)" }
+      - { value: side_by_side, label: "Side-by-Side" }
+
+  - key: opacity
+    label: Overlay Opacity
+    type: number
+    default: 0.5
+    description: "Overlay transparency when using overlay blend mode (0.0–1.0)"
+
+  - key: colormap
+    label: Depth Colormap
+    type: select
+    default: viridis
+    description: "Color scheme for depth visualization"
+    options:
+      - { value: inferno, label: "Inferno (warm)" }
+      - { value: viridis, label: "Viridis (green-blue)" }
+      - { value: plasma, label: "Plasma (purple-yellow)" }
+      - { value: magma, label: "Magma (dark-hot)" }
+      - { value: jet, label: "Jet (rainbow)" }
+      - { value: turbo, label: "Turbo (improved rainbow)" }
+      - { value: hot, label: "Hot (black-red-yellow)" }
+      - { value: cool, label: "Cool (cyan-magenta)" }
+
+  - key: device
+    label: Inference Device
+    type: select
+    default: auto
+    description: "Compute backend for inference"
+    options:
+      - { value: auto, label: "Auto-detect" }
+      - { value: cpu, label: "CPU" }
+      - { value: cuda, label: "NVIDIA CUDA" }
+      - { value: mps, label: "Apple Silicon (MPS)" }

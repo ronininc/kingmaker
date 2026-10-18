@@ -1,0 +1,2 @@
+# Annotation Data Management — minimal deps (stdlib only)
+# No external packages needed — all Python stdlib

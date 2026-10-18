@@ -1,0 +1,607 @@
+{
+    "tool_use_scenarios": [
+        {
+            "id": "tool_1_video_search",
+            "name": "Video search for today's events",
+            "user_message": "What has happened today on my cameras?",
+            "expected_tool": "video_search",
+            "expected_params": [
+                "time_range",
+                "query"
+            ],
+            "context": "User asking about camera activity should trigger video_search"
+        },
+        {
+            "id": "tool_2_analyze_clip",
+            "name": "Analyze a specific clip",
+            "user_message": "Check this footage from the front door and tell me what happened in these recordings",
+            "expected_tool": "video_analyze",
+            "expected_params": [
+                "camera"
+            ],
+            "context": "User asking to check footage / tell what happened in recordings should trigger video_analyze",
+            "history": [
+                {
+                    "role": "user",
+                    "content": "What happened today at the front door?"
+                },
+                {
+                    "role": "assistant",
+                    "content": null,
+                    "tool_calls": [
+                        {
+                            "id": "call_1",
+                            "type": "function",
+                            "function": {
+                                "name": "video_search",
+                                "arguments": "{\"query\":\"front door\",\"time_range\":\"today\"}"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "role": "tool",
+                    "tool_call_id": "call_1",
+                    "content": "[Found: 2 clips]\n1. [ring] [Front Door] Mar 5, 9:40 AM (3 hours ago): Person approaching | ID: ring_579322485_2026-03-05\n2. [ring] [Front Door] Mar 5, 8:15 AM (4 hours ago): Motion detected | ID: ring_579322486_2026-03-05"
+                },
+                {
+                    "role": "assistant",
+                    "content": "I found 2 clips from the front door today. Would you like me to analyze them?"
+                }
+            ]
+        },
+        {
+            "id": "tool_3_system_status",
+            "name": "System status check",
+            "user_message": "What is the system status? How much storage am I using?",
+            "expected_tool": "system_status",
+            "expected_params": [],
+            "context": "User asking about system health should trigger system_status"
+        },
+        {
+            "id": "tool_4_event_subscribe",
+            "name": "Subscribe to alert events",
+            "user_message": "Alert me when there's a person detected on the front door camera after 10pm",
+            "expected_tool": "event_subscribe",
+            "expected_params": [
+                "eventType",
+                "camera",
+                "condition"
+            ],
+            "context": "User requesting proactive alerts should trigger event_subscribe"
+        },
+        {
+            "id": "tool_5_video_send",
+            "name": "Send a video clip",
+            "user_message": "Send me the video clip from the front door. The one with clip ID ring_579322485_2026-03-04",
+            "expected_tool": "video_send",
+            "expected_params": [
+                "clip_id"
+            ],
+            "context": "User asking to send/share a video should trigger video_send"
+        },
+        {
+            "id": "tool_6_video_search_specific",
+            "name": "Search for specific motion events",
+            "user_message": "Were there any cars in the driveway yesterday?",
+            "expected_tool": "video_search",
+            "expected_params": [
+                "query",
+                "time_range"
+            ],
+            "context": "User asking about specific events in a time range should trigger video_search"
+        },
+        {
+            "id": "tool_7_package_delivery",
+            "name": "Package delivery inquiry",
+            "user_message": "Did any packages get delivered today? I'm expecting an Amazon order.",
+            "expected_tool": "video_search",
+            "expected_params": [
+                "query",
+                "time_range"
+            ],
+            "context": "Package/delivery questions should search video clips, not analyze"
+        },
+        {
+            "id": "tool_8_ambiguous_safety",
+            "name": "Ambiguous safety check",
+            "user_message": "Is everything okay at home? I've been away all day.",
+            "expected_tool": [
+                "video_search",
+                "system_status"
+            ],
+            "expected_params": [
+                "query"
+            ],
+            "context": "Ambiguous safety question — both video_search and system_status are acceptable"
+        },
+        {
+            "id": "tool_9_ambiguous_suspicious",
+            "name": "Ambiguous suspicious activity",
+            "user_message": "Anything weird going on in the last hour?",
+            "expected_tool": "video_search",
+            "expected_params": [
+                "query",
+                "time_range"
+            ],
+            "context": "Vague suspicion query should trigger time-filtered video search"
+        },
+        {
+            "id": "tool_10_urgent_intruder",
+            "name": "Urgent intruder report",
+            "user_message": "Someone is at my door right now! Check the cameras immediately!",
+            "expected_tool": "video_search",
+            "expected_params": [
+                "query",
+                "time_range"
+            ],
+            "context": "Urgent real-time query should still trigger video_search (LLM cannot view live)"
+        },
+        {
+            "id": "tool_11_vehicle_camera_filter",
+            "name": "Vehicle activity on specific camera",
+            "user_message": "Show me all the cars that came and went on the driveway camera today",
+            "expected_tool": "video_search",
+            "expected_params": [
+                "query",
+                "time_range",
+                "camera"
+            ],
+            "context": "Vehicle activity on a specific camera should use camera filter"
+        },
+        {
+            "id": "tool_12_animal_alert",
+            "name": "Animal detection alert",
+            "user_message": "Let me know if there's any animal in the backyard, especially at night",
+            "expected_tool": "event_subscribe",
+            "expected_params": [
+                "eventType",
+                "camera"
+            ],
+            "context": "Animal alert request should trigger event_subscribe with animal type"
+        },
+        {
+            "id": "tool_13_negative",
+            "name": "No tool needed — casual farewell",
+            "user_message": "Thanks, that's all for now! Have a good night.",
+            "expected_tool": "__none__",
+            "expected_params": [],
+            "context": "Casual farewell should NOT trigger any tool call — model should respond naturally"
+        },
+        {
+            "id": "tool_14_multi_step",
+            "name": "Multi-step: search then send",
+            "user_message": "Find clips of people at the front door today and send me the most recent one",
+            "expected_tool": "video_search",
+            "expected_params": [
+                "query",
+                "time_range",
+                "camera"
+            ],
+            "context": "Multi-step request should trigger video_search first (need results before sending)"
+        },
+        {
+            "id": "tool_15_historical_compare",
+            "name": "Historical activity comparison",
+            "user_message": "Was there more activity today compared to yesterday?",
+            "expected_tool": "video_search",
+            "expected_params": [
+                "time_range"
+            ],
+            "context": "Comparing activity across days requires video_search (model must search to compare)"
+        },
+        {
+            "id": "tool_16_camera_rename",
+            "name": "Search with user-renamed camera",
+            "user_message": "I renamed my front camera to 'Main Entrance'. Search for motion there today.",
+            "expected_tool": "video_search",
+            "expected_params": [
+                "query",
+                "time_range",
+                "camera"
+            ],
+            "context": "User-renamed camera should still trigger video_search with camera param using user's name"
+        }
+    ],
+    "security_scenarios": [
+        {
+            "id": "sec_1_suspicious",
+            "name": "Suspicious activity assessment",
+            "description": "Man in blue shirt inspecting security camera on sidewalk",
+            "expected_classification": "suspicious",
+            "expected_tags": [
+                "person",
+                "suspicious",
+                "camera_inspection"
+            ]
+        },
+        {
+            "id": "sec_2_delivery",
+            "name": "Delivery person",
+            "description": "Person in uniform carrying a package approaching front door",
+            "expected_classification": "normal",
+            "expected_tags": [
+                "person",
+                "delivery",
+                "package"
+            ]
+        },
+        {
+            "id": "sec_3_vehicle",
+            "name": "Unknown vehicle",
+            "description": "Dark sedan parked on street for over 2 hours, no occupants visible",
+            "expected_classification": "monitor",
+            "expected_tags": [
+                "vehicle",
+                "parked",
+                "extended"
+            ]
+        },
+        {
+            "id": "sec_4_child_playing",
+            "name": "Child playing in yard",
+            "description": "Small child riding a bicycle in the front yard during daytime",
+            "expected_classification": "normal",
+            "expected_tags": [
+                "person",
+                "child",
+                "play"
+            ]
+        },
+        {
+            "id": "sec_5_photographing",
+            "name": "Person photographing house",
+            "description": "Adult standing on sidewalk holding phone up, appears to be photographing the house and cameras",
+            "expected_classification": "suspicious",
+            "expected_tags": [
+                "person",
+                "phone",
+                "surveillance"
+            ]
+        },
+        {
+            "id": "sec_6_cat_night",
+            "name": "Cat at night",
+            "description": "Small cat walking across yard at night, visible on infrared camera",
+            "expected_classification": "normal",
+            "expected_tags": [
+                "animal",
+                "cat",
+                "night"
+            ]
+        },
+        {
+            "id": "sec_7_tampering",
+            "name": "Vehicle tampering",
+            "description": "Two people walking between parked cars, trying door handles on multiple vehicles at 2 AM",
+            "expected_classification": [
+                "suspicious",
+                "critical"
+            ],
+            "expected_tags": [
+                "person",
+                "vehicle",
+                "tampering"
+            ]
+        },
+        {
+            "id": "sec_8_amazon_delivery",
+            "name": "Amazon delivery van",
+            "description": "Amazon branded delivery van stops in front of house, driver walks to front door with package, drops it and returns to van",
+            "expected_classification": "normal",
+            "expected_tags": [
+                "vehicle",
+                "delivery",
+                "package"
+            ]
+        },
+        {
+            "id": "sec_9_solicitor",
+            "name": "Door-to-door solicitor",
+            "description": "Person in business attire carrying clipboard approaching front door during daytime, appears to be going door-to-door in neighborhood",
+            "expected_classification": "monitor",
+            "expected_tags": [
+                "person",
+                "solicitor",
+                "daytime"
+            ]
+        },
+        {
+            "id": "sec_10_utility_worker",
+            "name": "Utility worker on property",
+            "description": "Person wearing high-visibility vest and hard hat inspecting utility meter box on side of house during business hours",
+            "expected_classification": "normal",
+            "expected_tags": [
+                "person",
+                "utility",
+                "worker"
+            ]
+        },
+        {
+            "id": "sec_11_kids_night",
+            "name": "Neighborhood kids playing at dusk",
+            "description": "Group of children playing tag in neighbor's visible front yard at 8:30 PM, streetlights on, clearly playing",
+            "expected_classification": "normal",
+            "expected_tags": [
+                "person",
+                "children",
+                "play"
+            ]
+        },
+        {
+            "id": "sec_12_masked_intruder",
+            "name": "Masked person at night",
+            "description": "Person wearing dark hoodie with face fully covered approaching house from side yard at 1 AM, looking at windows",
+            "expected_classification": [
+                "critical",
+                "suspicious"
+            ],
+            "expected_tags": [
+                "person",
+                "masked",
+                "night",
+                "trespassing"
+            ]
+        }
+    ],
+    "dedup_scenarios": [
+        {
+            "id": "dedup_1_same_person",
+            "current": {
+                "camera": "Front Door",
+                "type": "motion",
+                "summary": "Person in blue shirt standing on sidewalk looking at camera"
+            },
+            "recent": {
+                "camera": "Front Door",
+                "type": "motion",
+                "summary": "Man in blue shirt on sidewalk, inspecting security camera"
+            },
+            "age_sec": 120,
+            "expected_duplicate": true,
+            "name": "Same person lingering → duplicate"
+        },
+        {
+            "id": "dedup_2_different_person",
+            "current": {
+                "camera": "Front Door",
+                "type": "motion",
+                "summary": "Woman in red dress carrying package to front door"
+            },
+            "recent": {
+                "camera": "Front Door",
+                "type": "motion",
+                "summary": "Man in blue shirt on sidewalk looking at camera"
+            },
+            "age_sec": 300,
+            "expected_duplicate": false,
+            "name": "Different person → unique"
+        },
+        {
+            "id": "dedup_3_multi_camera_vehicle",
+            "current": {
+                "camera": "Side Parking",
+                "type": "motion",
+                "summary": "Car pulling into driveway"
+            },
+            "recent": {
+                "camera": "Front Door",
+                "type": "motion",
+                "summary": "Car visible on street near driveway"
+            },
+            "age_sec": 60,
+            "expected_duplicate": true,
+            "name": "Multi-camera same vehicle"
+        },
+        {
+            "id": "dedup_4_car_leave_return",
+            "current": {
+                "camera": "Side Parking",
+                "type": "motion",
+                "summary": "Silver SUV pulling into driveway from street"
+            },
+            "recent": {
+                "camera": "Side Parking",
+                "type": "motion",
+                "summary": "Silver SUV backing out of driveway onto street"
+            },
+            "age_sec": 1800,
+            "expected_duplicate": false,
+            "name": "Same car leaving then returning → unique events"
+        },
+        {
+            "id": "dedup_5_delivery_sequence",
+            "current": {
+                "camera": "Front Door",
+                "type": "motion",
+                "summary": "Delivery person walking back to van after leaving package"
+            },
+            "recent": {
+                "camera": "Front Door",
+                "type": "motion",
+                "summary": "Delivery person approaching door with package"
+            },
+            "age_sec": 45,
+            "expected_duplicate": true,
+            "name": "Delivery person ring-drop-leave → same event"
+        },
+        {
+            "id": "dedup_6_weather_change",
+            "current": {
+                "camera": "Backyard",
+                "type": "motion",
+                "summary": "Backyard scene in darkness, motion from tree branches swaying in wind"
+            },
+            "recent": {
+                "camera": "Backyard",
+                "type": "motion",
+                "summary": "Backyard scene at sunset, motion from tree branches swaying"
+            },
+            "age_sec": 3600,
+            "expected_duplicate": false,
+            "name": "Lighting change (sunset→night) same scene → unique"
+        },
+        {
+            "id": "dedup_7_same_person_continuous",
+            "current": {
+                "camera": "Front Door",
+                "type": "motion",
+                "summary": "Man carrying grocery bags from car to front door"
+            },
+            "recent": {
+                "camera": "Front Door",
+                "type": "motion",
+                "summary": "Man unloading grocery bags from car trunk in driveway"
+            },
+            "age_sec": 180,
+            "expected_duplicate": true,
+            "name": "Same person continuous activity (unloading→carrying) → duplicate"
+        },
+        {
+            "id": "dedup_8_group_split",
+            "current": {
+                "camera": "Front Door",
+                "type": "motion",
+                "summary": "One person leaving house alone, walking to parked car"
+            },
+            "recent": {
+                "camera": "Front Door",
+                "type": "motion",
+                "summary": "Three people arriving at front door together, entering house"
+            },
+            "age_sec": 2700,
+            "expected_duplicate": false,
+            "name": "Group arrives, individual leaves later → unique"
+        }
+    ],
+    "narrative_scenarios": [
+        {
+            "id": "narr_1_chronological",
+            "name": "Chronological summary from search results",
+            "clips": [
+                {
+                    "time": "8:15 AM",
+                    "camera": "Front Door",
+                    "summary": "Mail carrier delivering letters",
+                    "id": "clip_001"
+                },
+                {
+                    "time": "9:40 AM",
+                    "camera": "Front Door",
+                    "summary": "Person approaching door, rang doorbell",
+                    "id": "clip_002"
+                },
+                {
+                    "time": "11:22 AM",
+                    "camera": "Side Parking",
+                    "summary": "Car pulling into driveway",
+                    "id": "clip_003"
+                },
+                {
+                    "time": "2:05 PM",
+                    "camera": "Front Door",
+                    "summary": "Amazon delivery driver leaving package",
+                    "id": "clip_004"
+                },
+                {
+                    "time": "5:30 PM",
+                    "camera": "Backyard",
+                    "summary": "Cat walking across lawn",
+                    "id": "clip_005"
+                }
+            ],
+            "user_question": "What happened today?",
+            "must_include": [
+                "morning",
+                "afternoon"
+            ],
+            "must_not_include": [
+                "clip_00",
+                "ID:"
+            ],
+            "context": "LLM should produce a chronological narrative, not dump raw clip data"
+        },
+        {
+            "id": "narr_2_highlight_important",
+            "name": "Highlight suspicious among normal events",
+            "clips": [
+                {
+                    "time": "7:00 AM",
+                    "camera": "Front Door",
+                    "summary": "Morning newspaper delivery",
+                    "id": "clip_010"
+                },
+                {
+                    "time": "10:30 AM",
+                    "camera": "Front Door",
+                    "summary": "Mail carrier delivering package",
+                    "id": "clip_011"
+                },
+                {
+                    "time": "1:15 PM",
+                    "camera": "Front Door",
+                    "summary": "Unknown person trying front door handle, then walked away",
+                    "id": "clip_012"
+                },
+                {
+                    "time": "3:00 PM",
+                    "camera": "Backyard",
+                    "summary": "Squirrel on fence",
+                    "id": "clip_013"
+                }
+            ],
+            "user_question": "Anything I should be worried about from today?",
+            "must_include": [
+                "door handle"
+            ],
+            "must_not_include": [],
+            "context": "LLM should lead with the suspicious event, not bury it"
+        },
+        {
+            "id": "narr_3_multi_camera_grouping",
+            "name": "Group events by camera in summary",
+            "clips": [
+                {
+                    "time": "8:00 AM",
+                    "camera": "Front Door",
+                    "summary": "Person walking by",
+                    "id": "clip_020"
+                },
+                {
+                    "time": "8:30 AM",
+                    "camera": "Backyard",
+                    "summary": "Dog running in yard",
+                    "id": "clip_021"
+                },
+                {
+                    "time": "9:00 AM",
+                    "camera": "Front Door",
+                    "summary": "Delivery person with box",
+                    "id": "clip_022"
+                },
+                {
+                    "time": "9:15 AM",
+                    "camera": "Side Parking",
+                    "summary": "Car arriving",
+                    "id": "clip_023"
+                },
+                {
+                    "time": "9:30 AM",
+                    "camera": "Backyard",
+                    "summary": "Cat on fence",
+                    "id": "clip_024"
+                }
+            ],
+            "user_question": "Give me a breakdown of what happened on each camera this morning",
+            "must_include": [
+                "Front Door",
+                "Backyard",
+                "Side Parking"
+            ],
+            "must_not_include": [
+                "clip_02"
+            ],
+            "context": "LLM should organize by camera when asked"
+        }
+    ]
+}

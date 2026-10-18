@@ -1,0 +1,65 @@
+# Coral TPU Detection Skill — Configuration Schema
+# Parsed by Aegis skill-registry-service.cjs → parseConfigYaml()
+# Format: params[] with key, type, label, default, description, options
+
+params:
+  - key: auto_start
+    label: Auto Start
+    type: boolean
+    default: false
+    description: "Start this skill automatically when Aegis launches"
+
+  - key: confidence
+    label: Confidence Threshold
+    type: number
+    default: 0.5
+    description: "Minimum detection confidence (0.1–1.0). Lower than GPU YOLO — Edge TPU INT8 quantization produces softer scores"
+
+  - key: fps
+    label: Frame Rate
+    type: select
+    default: 5
+    description: "Detection processing rate — Edge TPU is fast enough for real-time"
+    options:
+      - { value: 0.2, label: "Ultra Low (0.2 FPS)" }
+      - { value: 0.5, label: "Low (0.5 FPS)" }
+      - { value: 1, label: "Normal (1 FPS)" }
+      - { value: 3, label: "Active (3 FPS)" }
+      - { value: 5, label: "High (5 FPS)" }
+      - { value: 15, label: "Real-time (15 FPS)" }
+
+  - key: classes
+    label: Detection Classes
+    type: string
+    default: "person,car,dog,cat"
+    description: "Comma-separated COCO class names to detect"
+
+  - key: input_size
+    label: Input Resolution
+    type: select
+    default: 320
+    description: "Image size for inference — 320 fits fully on TPU (~4ms), 640 partially runs on CPU (~20ms)"
+    options:
+      - { value: 320, label: "320×320 (fastest, fully on-chip)" }
+      - { value: 640, label: "640×640 (more accurate, partially CPU)" }
+
+  - key: tpu_device
+    label: TPU Device
+    type: select
+    default: auto
+    description: "Which Edge TPU to use — 'auto' selects the first available device"
+    options:
+      - { value: auto, label: "Auto-detect (first available)" }
+      - { value: "0", label: "TPU 0" }
+      - { value: "1", label: "TPU 1" }
+      - { value: "2", label: "TPU 2" }
+      - { value: "3", label: "TPU 3" }
+
+  - key: clock_speed
+    label: TPU Clock Speed
+    type: select
+    default: standard
+    description: "Edge TPU operating frequency — 'max' is faster but runs hotter and needs cooling"
+    options:
+      - { value: standard, label: "Standard (lower power, cooler)" }
+      - { value: max, label: "Maximum (faster inference, needs cooling)" }

@@ -1,0 +1,639 @@
+#!/usr/bin/env python3
+"""
+Coral TPU Object Detection — JSONL stdin/stdout protocol
+Uses ai-edge-litert (LiteRT) with Edge TPU delegate for hardware acceleration.
+Same protocol as yolo-detection-2026/scripts/detect.py.
+
+Communication:
+  stdin:  {"event": "frame", "frame_id": N, "frame_path": "...", ...}
+  stdout: {"event": "detections", "frame_id": N, "objects": [...]}
+  stderr: Debug logs (ignored by Aegis parser)
+"""
+
+import json
+import os
+import sys
+import time
+import signal
+import threading
+from pathlib import Path
+from typing import Optional, Tuple, List, Dict, Any
+
+# ─── Windows DLL search path fix (MUST happen before any native import) ───────
+# Python 3.8+ no longer searches PATH for DLLs loaded by native C extensions.
+# We must register our local lib/ directory so that when ai_edge_litert loads
+# edgetpu.dll, Windows can also find libusb-1.0.dll in the same folder.
+# Native delegates loaded via C++ LoadLibrary also bypass Python's DLL directory,
+# so we must append it to the system PATH environment variable as well.
+_LIB_DIR = Path(__file__).parent.parent / "lib"
+if sys.platform == "win32" and _LIB_DIR.exists():
+    os.add_dll_directory(str(_LIB_DIR))
+    os.environ["PATH"] = str(_LIB_DIR) + os.pathsep + os.environ.get("PATH", "")
+
+import numpy as np
+from PIL import Image
+
+# ─── LiteRT imports (replaces archived pycoral + tflite-runtime) ─────────────
+# ai-edge-litert is the modern successor to tflite-runtime, supporting
+# Python 3.9–3.13 on all platforms. The Edge TPU is accessed via the
+# libedgetpu delegate (installed separately as a system library).
+
+HAS_LITERT = False
+HAS_EDGETPU_DELEGATE = False
+
+try:
+    from ai_edge_litert import interpreter as litert
+    HAS_LITERT = True
+except ImportError:
+    sys.stderr.write("[coral-detect] WARNING: ai-edge-litert not installed\n")
+
+
+def _edgetpu_lib_name():
+    """Return the platform-specific libedgetpu shared library name."""
+    import platform
+    system = platform.system()
+    if system == "Linux":
+        return "libedgetpu.so.1"
+    elif system == "Darwin":
+        return "libedgetpu.1.dylib"
+    elif system == "Windows":
+        # os.add_dll_directory() already registered our lib/ folder above,
+        # so Windows can resolve all transitive dependencies (libusb-1.0.dll etc.).
+        # Use just the bare name so load_delegate() finds it through the
+        # registered DLL directories rather than trying to parse a full path.
+        local_dll = _LIB_DIR / "edgetpu.dll"
+        if local_dll.exists():
+            return str(local_dll.resolve())
+        return "edgetpu.dll"
+    return "libedgetpu.so.1"
+
+
+# ─── COCO class names (80 classes) ───────────────────────────────────────────
+COCO_CLASSES = [
+    "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train",
+    "truck", "boat", "traffic light", "fire hydrant", "stop sign",
+    "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep",
+    "cow", "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella",
+    "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard",
+    "sports ball", "kite", "baseball bat", "baseball glove", "skateboard",
+    "surfboard", "tennis racket", "bottle", "wine glass", "cup", "fork",
+    "knife", "spoon", "bowl", "banana", "apple", "sandwich", "orange",
+    "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair",
+    "couch", "potted plant", "bed", "dining table", "toilet", "tv",
+    "laptop", "mouse", "remote", "keyboard", "cell phone", "microwave",
+    "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase",
+    "scissors", "teddy bear", "hair drier", "toothbrush"
+]
+
+
+class PerfTracker:
+    """Tracks per-frame timing and emits aggregate stats."""
+
+    def __init__(self, emit_interval=50):
+        self.emit_interval = emit_interval
+        self.timings = []
+        self.total_frames = 0
+
+    def record(self, timing_dict):
+        self.timings.append(timing_dict)
+        self.total_frames += 1
+
+    def should_emit(self):
+        return len(self.timings) >= self.emit_interval
+
+    def emit_and_reset(self):
+        if not self.timings:
+            return None
+
+        stats = {"event": "perf_stats", "total_frames": len(self.timings), "timings_ms": {}}
+        for key in self.timings[0]:
+            values = sorted([t[key] for t in self.timings])
+            n = len(values)
+            stats["timings_ms"][key] = {
+                "avg": round(sum(values) / n, 2),
+                "p50": round(values[n // 2], 2),
+                "p95": round(values[int(n * 0.95)], 2),
+                "p99": round(values[int(n * 0.99)], 2),
+            }
+        self.timings = []
+        return stats
+
+
+class TPUHealthWatchdog:
+    """
+    Detects two distinct TPU failure modes:
+
+    1. Inference hang: interpreter.invoke() takes longer than `invoke_timeout_s`.
+       This happens when the USB connection is lost or the TPU kernel driver locks.
+       We run invoke() on a daemon thread and join with a timeout.
+
+    2. Silent stall: The TPU keeps returning results (no hang) but every result
+       is empty (0 detections) for `stall_frames` consecutive frames, AFTER the
+       skill had at least `min_active_frames` successful frames earlier.
+       This catches thermal throttling where the TPU resets internally.
+    """
+
+    def __init__(self, invoke_timeout_s=10, stall_frames=30, min_active_frames=5):
+        self.invoke_timeout_s = invoke_timeout_s
+        self.stall_frames = stall_frames
+        self.min_active_frames = min_active_frames
+
+        self._consecutive_zero = 0
+        self._total_frames_with_detections = 0
+        self._invoke_exception: Optional[Exception] = None
+
+    def run_invoke(self, interpreter):
+        """Run interpreter.invoke() with a hard timeout. Raises RuntimeError on hang."""
+        self._invoke_exception = None
+        completed = [False]
+
+        def _invoke():
+            try:
+                interpreter.invoke()
+                completed[0] = True
+            except Exception as e:
+                self._invoke_exception = e
+
+        t = threading.Thread(target=_invoke, daemon=True)
+        t.start()
+        t.join(timeout=self.invoke_timeout_s)
+
+        if t.is_alive():
+            # Thread is still blocked inside invoke() — TPU USB hang
+            raise RuntimeError(
+                f"TPU invoke() timed out after {self.invoke_timeout_s}s — "
+                "USB connection may be lost or TPU is locked up"
+            )
+
+        if self._invoke_exception is not None:
+            raise self._invoke_exception
+
+    def record(self, n_detections):
+        """Call after each frame. Returns a health status string or None."""
+        if n_detections > 0:
+            self._total_frames_with_detections += 1
+            self._consecutive_zero = 0
+            return None
+
+        self._consecutive_zero += 1
+
+        # Only fire the stall alert after the TPU was genuinely producing results
+        if (self._total_frames_with_detections >= self.min_active_frames
+                and self._consecutive_zero >= self.stall_frames):
+            return "stall"
+
+        return None
+
+    def reset_stall(self):
+        self._consecutive_zero = 0
+
+
+class CoralDetector:
+    """Edge TPU object detector using ai-edge-litert with libedgetpu delegate."""
+
+    def __init__(self, params):
+        self.params = params
+        self.confidence = float(params.get("confidence", 0.5))
+        self.input_size = int(params.get("input_size", 320))
+        self.interpreter = None
+        self.tpu_count = 0
+        self.watchdog = TPUHealthWatchdog(
+            invoke_timeout_s=10,
+            stall_frames=30,
+            min_active_frames=5,
+        )
+
+        # Parse target classes
+        classes_str = params.get("classes", "person,car,dog,cat")
+        self.target_classes = set(c.strip().lower() for c in classes_str.split(","))
+
+        self._load_model()
+
+    def _find_model_path(self):
+        """Find the compiled Edge TPU model.
+
+        ultralytics format="edgetpu" produces:
+          <model>_saved_model/<model>_full_integer_quant_edgetpu.tflite
+        Our compile_model.py copies it to models/ so we look there first.
+        """
+        model_dir = Path("/app/models")
+        script_dir = Path(__file__).parent.parent / "models"
+
+        for d in [model_dir, script_dir]:
+            if not d.exists():
+                continue
+            # ultralytics edgetpu naming: *_full_integer_quant_edgetpu.tflite
+            for pattern in [
+                "*_full_integer_quant_edgetpu.tflite",
+                "*_edgetpu.tflite",
+                "*.tflite",
+            ]:
+                matches = list(d.glob(pattern))
+                if matches:
+                    return str(matches[0])
+
+        return None
+
+    def _load_model(self):
+        """Load model onto Edge TPU (or CPU fallback)."""
+        if not HAS_LITERT:
+            log("FATAL: ai-edge-litert not available. pip install ai-edge-litert")
+            emit_json({"event": "error", "message": "ai-edge-litert not installed", "retriable": False})
+            sys.exit(1)
+
+        model_path = self._find_model_path()
+        if not model_path:
+            log("ERROR: No .tflite model found in models/")
+            emit_json({"event": "error", "message": "No Edge TPU model found", "retriable": False})
+            sys.exit(1)
+
+        # Try loading with Edge TPU delegate
+        edgetpu_lib = _edgetpu_lib_name()
+        try:
+            # Squelch __del__ AttributeError bugs in ai-edge-litert when delegate fails to load
+            if hasattr(litert, 'Delegate'):
+                original_del = getattr(litert.Delegate, '__del__', None)
+                if original_del and not hasattr(litert.Delegate, '_patched_del'):
+                    def safe_del(self):
+                        try:
+                            original_del(self)
+                        except AttributeError:
+                            pass
+                    litert.Delegate.__del__ = safe_del
+                    litert.Delegate._patched_del = True
+
+            delegate = litert.load_delegate(edgetpu_lib)
+            self.interpreter = litert.Interpreter(
+                model_path=model_path,
+                experimental_delegates=[delegate],
+            )
+            self.interpreter.allocate_tensors()
+            self.device_name = "coral"
+            self.tpu_count = 1
+            log(f"Loaded model on Edge TPU: {model_path}")
+        except (ValueError, OSError) as e:
+            log(f"Edge TPU delegate not available: {e}")
+            log("Falling back to CPU inference")
+            self._load_cpu_fallback(model_path)
+
+    def _load_cpu_fallback(self, model_path):
+        """Fallback to CPU-only LiteRT interpreter."""
+        # Use a non-edgetpu model if available
+        cpu_path = model_path.replace("_edgetpu.tflite", ".tflite")
+        if not os.path.exists(cpu_path):
+            universal_fallback = os.path.join(os.path.dirname(model_path), "ssd_mobilenet_v2_coco_quant_postprocess.tflite")
+            if os.path.exists(universal_fallback):
+                log("Falling back to universal SSD MobileNet CPU model")
+                cpu_path = universal_fallback
+            elif "edgetpu" in model_path.lower():
+                log("FATAL: Cannot load Edge TPU compiled model on pure CPU, and no fallback model exists.")
+                emit_json({"event": "error", "message": "No Edge TPU plugged in and no pure-CPU fallback model found.", "retriable": False})
+                sys.exit(1)
+            else:
+                cpu_path = model_path
+
+        try:
+            self.interpreter = litert.Interpreter(model_path=cpu_path)
+            self.interpreter.allocate_tensors()
+            self.device_name = "cpu"
+            log(f"Loaded model on CPU: {cpu_path}")
+        except Exception as e:
+            log(f"FATAL: Cannot load model: {e}")
+            emit_json({"event": "error", "message": f"Cannot load model: {e}", "retriable": False})
+            sys.exit(1)
+
+    def detect_frame(self, frame_path):
+        """Run detection on a single frame. Returns list of detection dicts."""
+        t0 = time.perf_counter()
+
+        # Read and resize image
+        try:
+            img = Image.open(frame_path).convert("RGB")
+        except Exception as e:
+            log(f"ERROR reading frame: {e}")
+            return [], {}
+
+        t_read = time.perf_counter()
+
+        # Resize to model input size
+        input_details = self.interpreter.get_input_details()[0]
+        input_shape = input_details["shape"]
+        h, w = input_shape[1], input_shape[2]
+        orig_w, orig_h = img.size
+        img_resized = img.resize((w, h), Image.LANCZOS)
+
+        # Prepare input data according to required dtype
+        req_dtype = input_details["dtype"]
+        raw_img = np.array(img_resized, dtype=np.float32)
+        if req_dtype == np.int8:
+            # Shift 0-255 to -128-127 for INT8 models
+            input_data = np.expand_dims((raw_img - 128).astype(np.int8), axis=0)
+        else:
+            input_data = np.expand_dims(raw_img.astype(np.uint8), axis=0)
+            
+        self.interpreter.set_tensor(input_details["index"], input_data)
+
+        # Run inference with hard timeout via watchdog
+        t_pre = time.perf_counter()
+        try:
+            self.watchdog.run_invoke(self.interpreter)
+        except RuntimeError as e:
+            log(f"TPU invoke() failed: {e}")
+            return [], {}, "hang"
+        t_infer = time.perf_counter()
+
+        # Parse output tensors (works for both Edge TPU and CPU)
+        objects = []
+        output_details = self.interpreter.get_output_details()
+
+        if len(output_details) >= 4:
+            # SSD MobileNet-style output: boxes, classes, scores, count
+            boxes = self.interpreter.get_tensor(output_details[0]["index"])[0]
+            classes = self.interpreter.get_tensor(output_details[1]["index"])[0]
+            scores = self.interpreter.get_tensor(output_details[2]["index"])[0]
+            count = int(self.interpreter.get_tensor(output_details[3]["index"])[0])
+
+            for i in range(min(count, 25)):
+                score = float(scores[i])
+                if score < self.confidence:
+                    continue
+                class_id = int(classes[i])
+                if class_id < len(COCO_CLASSES):
+                    class_name = COCO_CLASSES[class_id]
+                else:
+                    class_name = f"class_{class_id}"
+
+                if self.target_classes and class_name not in self.target_classes:
+                    continue
+
+                y1, x1, y2, x2 = boxes[i]
+                objects.append({
+                    "class": class_name,
+                    "confidence": round(score, 3),
+                    "bbox": [
+                        int(x1 * orig_w), int(y1 * orig_h),
+                        int(x2 * orig_w), int(y2 * orig_h)
+                    ]
+                })
+        elif len(output_details) >= 1:
+            # YOLO-style output: single tensor with [1, num_classes + 4, num_anchors]
+            output = self.interpreter.get_tensor(output_details[0]["index"])
+            out_dtype = output_details[0]["dtype"]
+            q_scale, q_zero = output_details[0]["quantization"]
+            
+            # Dequantize if returning INT8
+            if out_dtype == np.int8 and q_scale > 0:
+                output = (output.astype(np.float32) - q_zero) * q_scale
+                
+            pred = output[0] # Shape: e.g. (84, 2100) or (2100, 84)
+            
+            # Ultralytics tends to output (num_classes + 4, num_anchors), so transpose if so
+            if pred.shape[0] == len(COCO_CLASSES) + 4:
+                pred = pred.transpose() # Now (num_anchors, 84)
+                
+            # Parse boxes and scores
+            boxes_cx = pred[:, 0]
+            boxes_cy = pred[:, 1]
+            boxes_w = pred[:, 2]
+            boxes_h = pred[:, 3]
+            
+            # Scores for all classes
+            class_scores = pred[:, 4:]
+            max_scores = np.max(class_scores, axis=1)
+            class_ids = np.argmax(class_scores, axis=1)
+            
+            # Filter by confidence
+            mask = max_scores >= self.confidence
+            
+            boxes_cx = boxes_cx[mask]
+            boxes_cy = boxes_cy[mask]
+            boxes_w = boxes_w[mask]
+            boxes_h = boxes_h[mask]
+            class_ids = class_ids[mask]
+            max_scores = max_scores[mask]
+            
+            # Convert cx, cy, w, h -> y1, x1, y2, x2
+            x1 = boxes_cx - boxes_w / 2
+            y1 = boxes_cy - boxes_h / 2
+            x2 = boxes_cx + boxes_w / 2
+            y2 = boxes_cy + boxes_h / 2
+            
+            # Very basic NMS
+            # First, filter to target classes
+            filtered_indices = []
+            for i in range(len(max_scores)):
+                cid = class_ids[i]
+                cname = COCO_CLASSES[cid] if cid < len(COCO_CLASSES) else f"class_{cid}"
+                if self.target_classes and cname not in self.target_classes:
+                    continue
+                filtered_indices.append(i)
+                
+            if len(filtered_indices) > 0:
+                x1_f = x1[filtered_indices]
+                y1_f = y1[filtered_indices]
+                x2_f = x2[filtered_indices]
+                y2_f = y2[filtered_indices]
+                scores_f = max_scores[filtered_indices]
+                class_ids_f = class_ids[filtered_indices]
+                
+                # Numpy NMS implementation
+                areas = (x2_f - x1_f) * (y2_f - y1_f)
+                order = scores_f.argsort()[::-1]
+                
+                keep = []
+                # Keep top 25 at most
+                while order.size > 0 and len(keep) < 25:
+                    i = order[0]
+                    keep.append(i)
+                    if order.size == 1:
+                        break
+                        
+                    xx1 = np.maximum(x1_f[i], x1_f[order[1:]])
+                    yy1 = np.maximum(y1_f[i], y1_f[order[1:]])
+                    xx2 = np.minimum(x2_f[i], x2_f[order[1:]])
+                    yy2 = np.minimum(y2_f[i], y2_f[order[1:]])
+                    
+                    w = np.maximum(0.0, xx2 - xx1)
+                    h = np.maximum(0.0, yy2 - yy1)
+                    inter = w * h
+                    iou = inter / (areas[i] + areas[order[1:]] - inter)
+                    
+                    inds = np.where(iou <= 0.45)[0] # NMS threshold
+                    order = order[inds + 1]
+                    
+                for k in keep:
+                    cid = class_ids_f[k]
+                    cname = COCO_CLASSES[cid] if cid < len(COCO_CLASSES) else f"class_{cid}"
+                    
+                    # Normalizing against original input resolution is done at UI or here
+                    # Typical YOLOv8 models output values scaled by input resolution (e.g. 0 to 320)
+                    # We normalize it to 0.0 - 1.0! 
+                    nx1 = float(x1_f[k]) / self.input_size
+                    ny1 = float(y1_f[k]) / self.input_size
+                    nx2 = float(x2_f[k]) / self.input_size
+                    ny2 = float(y2_f[k]) / self.input_size
+                    
+                    objects.append({
+                        "class": cname,
+                        "confidence": float(round(scores_f[k], 3)),
+                        "bbox": [
+                            int(nx1 * orig_w), int(ny1 * orig_h),
+                            int(nx2 * orig_w), int(ny2 * orig_h)
+                        ]
+                    })
+
+        t_post = time.perf_counter()
+
+        timings = {
+            "file_read": round((t_read - t0) * 1000, 2),
+            "preprocess": round((t_pre - t_read) * 1000, 2),
+            "inference": round((t_infer - t_pre) * 1000, 2),
+            "postprocess": round((t_post - t_infer) * 1000, 2),
+            "total": round((t_post - t0) * 1000, 2),
+        }
+
+        # Record with watchdog — returns "stall" if TPU has gone silent
+        health = self.watchdog.record(len(objects))
+
+        return objects, timings, health
+
+
+# ─── Helpers ──────────────────────────────────────────────────────────────────
+
+def log(msg):
+    """Write to stderr (ignored by Aegis parser)."""
+    sys.stderr.write(f"[coral-detect] {msg}\n")
+    sys.stderr.flush()
+
+
+def emit_json(obj):
+    """Emit JSONL to stdout."""
+    sys.stdout.write(json.dumps(obj) + "\n")
+    sys.stdout.flush()
+
+
+# ─── Main loop ───────────────────────────────────────────────────────────────
+
+def main():
+    # Parse params from environment
+    params_str = os.environ.get("AEGIS_SKILL_PARAMS", "{}")
+    try:
+        params = json.loads(params_str)
+    except json.JSONDecodeError:
+        params = {}
+
+    log(f"Starting with params: {json.dumps(params)}")
+
+    # Initialize detector
+    detector = CoralDetector(params)
+    perf = PerfTracker(emit_interval=50)
+
+    # Emit ready event
+    emit_json({
+        "event": "ready",
+        "model": "yolo26n_edgetpu",
+        "device": detector.device_name,
+        "format": "edgetpu_tflite" if detector.device_name == "coral" else "tflite_cpu",
+        "runtime": "ai-edge-litert",
+        "tpu_count": detector.tpu_count,
+        "classes": len(COCO_CLASSES),
+        "input_size": detector.input_size,
+        "fps": params.get("fps", 5),
+    })
+
+    # Handle graceful shutdown
+    running = True
+    def on_signal(sig, frame):
+        nonlocal running
+        running = False
+    signal.signal(signal.SIGTERM, on_signal)
+    signal.signal(signal.SIGINT, on_signal)
+
+    # JSONL request-response loop
+    log("Ready — waiting for frame events on stdin")
+    for line in sys.stdin:
+        if not running:
+            break
+
+        line = line.strip()
+        if not line:
+            continue
+
+        try:
+            msg = json.loads(line)
+        except json.JSONDecodeError:
+            log(f"Invalid JSON: {line[:100]}")
+            continue
+
+        # Handle stop command
+        if msg.get("command") == "stop" or msg.get("event") == "stop":
+            log("Received stop command")
+            break
+
+        # Handle frame event
+        if msg.get("event") == "frame":
+            frame_id = msg.get("frame_id", 0)
+            frame_path = msg.get("frame_path", "")
+            camera_id = msg.get("camera_id", "")
+            timestamp = msg.get("timestamp", "")
+
+            if not frame_path or not os.path.exists(frame_path):
+                log(f"Frame not found: {frame_path}")
+                emit_json({
+                    "event": "detections",
+                    "frame_id": frame_id,
+                    "camera_id": camera_id,
+                    "timestamp": timestamp,
+                    "objects": [],
+                })
+                continue
+
+            objects, timings, health = detector.detect_frame(frame_path)
+
+            # Check for TPU hang (invoke timeout)
+            if health == "hang":
+                emit_json({
+                    "event": "tpu_error",
+                    "frame_id": frame_id,
+                    "camera_id": camera_id,
+                    "error": "invoke_timeout",
+                    "message": "TPU invoke() timed out — USB connection may be lost",
+                    "retriable": True,
+                })
+                # Exit with code 1 so Aegis restarts us
+                sys.exit(1)
+
+            # Emit detections
+            emit_json({
+                "event": "detections",
+                "frame_id": frame_id,
+                "camera_id": camera_id,
+                "timestamp": timestamp,
+                "objects": objects,
+            })
+
+            # Check for silent stall (zero results for too long)
+            if health == "stall":
+                emit_json({
+                    "event": "tpu_error",
+                    "frame_id": frame_id,
+                    "camera_id": camera_id,
+                    "error": "stall",
+                    "message": "TPU has returned 0 detections for 30 consecutive frames — possible thermal throttle or silent reset",
+                    "retriable": True,
+                })
+                detector.watchdog.reset_stall()  # Prevent repeated spam; let Aegis decide to restart
+
+            # Track performance
+            if timings:
+                perf.record(timings)
+                if perf.should_emit():
+                    stats = perf.emit_and_reset()
+                    if stats:
+                        emit_json(stats)
+
+    log("Shutting down")
+
+
+if __name__ == "__main__":
+    main()

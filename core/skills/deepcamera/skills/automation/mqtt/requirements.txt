@@ -1,0 +1,2 @@
+# MQTT Automation
+paho-mqtt>=2.0.0

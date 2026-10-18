@@ -1,0 +1,11 @@
+# YOLO 2026 — CUDA (NVIDIA GPU) requirements
+# Installs PyTorch with CUDA 12.4 support
+--extra-index-url https://download.pytorch.org/whl/cu124
+torch>=2.4.0
+torchvision>=0.19.0
+ultralytics>=8.3.0
+tensorrt>=10.0
+numpy>=1.24.0
+opencv-python-headless>=4.8.0
+Pillow>=10.0.0
+

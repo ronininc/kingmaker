@@ -1,0 +1,446 @@
+"""HTML renderer (web-artifacts-builder + Shadcn path).
+
+Reads the four JSON files produced by data_materialization.py + prisma_s_logger,
+maps them into the schema expected by the React App.tsx, then injects them as
+`window.__REPORT_DATA__` into a pre-built bundle.html (shipped in assets/).
+
+Raises HtmlRenderError if the pre-built bundle is missing.
+
+Design notes (2026-05-23):
+  * No size-driven fallback. Earlier versions degraded to a leaner jinja2
+    template when the bundle exceeded a threshold — that created inconsistent
+    UX (same Skill produced two different visual reports depending on data
+    size). Removed entirely. Modern browsers open 10+ MB HTML files without
+    issue; a 1.7 MB self-contained academic report is well within comfort.
+  * No oversize sidecar advisories. Users don't care that a report is
+    "1.6 MB" — they care that it opens cleanly.
+"""
+
+from __future__ import annotations
+
+import json
+import logging
+import re
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+from .report_identity import build_report_identity, warn_about_title
+
+log = logging.getLogger(__name__)
+
+SKILL_ROOT = Path(__file__).resolve().parent.parent
+PREBUILT_BUNDLE = (
+    SKILL_ROOT / "assets" / "webartifacts_app" / "paper-report" / "bundle.html"
+)
+
+
+class HtmlRenderError(RuntimeError):
+    """Raised when the webartifacts pipeline cannot produce a valid HTML file."""
+
+
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
+
+def render_html_webartifacts(
+    materialized_data_dir: Path,
+    output_path: Path,
+    *,
+    user_query: str = "",
+    search_topic: str = "",
+    display_title: str = "",
+    language: Optional[str] = None,
+    rank_platform: Optional[str] = None,
+) -> Path:
+    """Render a Shadcn-styled HTML report by hydrating the pre-built bundle.
+
+    Strategy:
+      1. Read the four JSON files from materialized_data_dir.
+      2. Pass them through as the raw shape expected by React `normalize()`.
+      3. Read assets/webartifacts_app/paper-report/bundle.html (pre-built once).
+      4. Inject `<script>window.__REPORT_LANG__ = "..."</script>` AND
+         `<script>window.__REPORT_DATA__ = {...};</script>` before the first
+         existing <script> tag (the LANG one comes first so the React bundle's
+         `installLanguage()` call picks it up before any component renders).
+      5. Write to output_path.
+
+    Args:
+        materialized_data_dir: directory containing the four JSON files.
+        output_path: where to write the hydrated HTML.
+        user_query: original request fallback when metadata lacks one. It is
+            retained for audit and never promoted to the H1.
+        search_topic: normalized semantic retrieval topic fallback.
+        display_title: scholarly report-title fallback.
+        language: "en" or "zh". Resolution order:
+            (a) explicit `language` argument, (b) `metadata.language`,
+            (c) "en". Anything else falls back to "en" with a console warning
+            inside the React bundle. The bundle ships with both `STRINGS.en`
+            and `STRINGS.zh` dictionaries; this flag picks which one mounts.
+        rank_platform: the journal-rank platform the badges and zone filter
+            show ("cas" / "jcr" / "sjr"): this run's platform when it filtered on
+            one, else config ``rank.default_platform``, else JCR (the bundle's
+            default, injected as nothing).
+    """
+    materialized_data_dir = Path(materialized_data_dir)
+    output_path = Path(output_path)
+
+    if not PREBUILT_BUNDLE.exists():
+        raise HtmlRenderError(
+            f"Pre-built bundle not found at {PREBUILT_BUNDLE}. "
+            "Run web-artifacts-builder bundle-artifact.sh first."
+        )
+
+    metadata = _read_json(materialized_data_dir / "metadata.json")
+    paper_list = _read_json(materialized_data_dir / "paper_list.json")
+    chart_data = _read_json(materialized_data_dir / "chart_data.json")
+    prisma_log_raw = _read_json(materialized_data_dir / "prisma_log.json")
+    # delta6 (additive): STEP 11.5 writes search_strategies.json as a sibling
+    # in $SEARCH_DIR; absent -> None -> payload identical to pre-delta6 (R-19).
+    _ss_path = materialized_data_dir / "search_strategies.json"
+    search_strategies = _read_json(_ss_path) if _ss_path.exists() else None
+
+    # Resolve language: explicit > metadata.language > "en"
+    resolved_lang = _resolve_language(language, metadata)
+
+    report_data = _build_report_data(
+        metadata=metadata,
+        paper_list=paper_list,
+        chart_data=chart_data,
+        prisma_log_raw=prisma_log_raw,
+        user_query=user_query,
+        search_topic=search_topic,
+        display_title=display_title,
+        language=resolved_lang,
+        search_strategies=search_strategies,
+    )
+
+    bundle_html = PREBUILT_BUNDLE.read_text(encoding="utf-8")
+    # Inject DATA first then LANG, so LANG ends up FIRST in the HTML stream
+    # (each _inject_* helper inserts before the current first <script>; the
+    # second call therefore lands before the script written by the first
+    # call). This matches the docstring's claim that LANG comes first.
+    hydrated_html = _inject_report_data(bundle_html, report_data)
+    hydrated_html = _inject_language(hydrated_html, resolved_lang)
+    hydrated_html = _inject_rank_source(hydrated_html, _resolve_rank_platform(rank_platform))
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(hydrated_html, encoding="utf-8")
+
+    log.info(
+        "Webartifacts HTML rendered: %s (%.0f KB)",
+        output_path,
+        output_path.stat().st_size / 1024,
+    )
+    return output_path
+
+
+# ---------------------------------------------------------------------------
+# Mapping: paper-search-pro JSON  ->  App.tsx schema
+# ---------------------------------------------------------------------------
+
+def _build_report_data(
+    metadata: Dict[str, Any],
+    paper_list: List[Dict[str, Any]],
+    chart_data: Dict[str, Any],
+    prisma_log_raw: Dict[str, Any],
+    *,
+    user_query: str = "",
+    search_topic: str = "",
+    display_title: str = "",
+    language: Optional[str] = None,
+    search_strategies: Any = None,
+) -> Dict[str, Any]:
+    """Build the raw-shape payload that React's `normalize(raw)` expects.
+
+    React reads five top-level keys from `window.__REPORT_DATA__` (search_strategies is additive, delta6):
+    `{metadata, papers, chart_data, prisma_log}` — the same shape produced by
+    `data_materialization.py` and validated by the `sample-standard.json`
+    fixture in the React app's design assets. The earlier post-materialization
+    schema (`reportMeta` / `themes` / `prismaLog`) was a dead branch that
+    matched no React surface, leaving Hero / Methods / Audit blank on real
+    data even though Mock-data baseline rendered correctly.
+
+    Transformations applied here:
+      * `metadata` — pass through while separating the verbatim request,
+        normalized search topic, and scholarly display title. Legacy `query`
+        remains an audit-compatible alias and is never used as the H1.
+      * `papers` — pass through with ALL fields intact, including `abstract`
+        and `rcs_reasoning`. PaperSheet renders an Abstract section (collapsed
+        by default, expandable) and a "Why this paper" section (rcs_reasoning).
+        Earlier optimization stripped both to keep the hydrated bundle below a
+        1500 KB auto-fallback threshold, but two reviewers independently
+        confirmed it crippled the research workflow (TLDR is AI-generated,
+        not a substitute for the original abstract; rcs_reasoning has no
+        substitute). Bundle is now allowed to grow to ~1.6 MB on 250-paper
+        reports — within the new 2500 KB threshold.
+      * `chart_data` + `prisma_log` — pass through verbatim. React's
+        `parsePrismaPythonRepr` already handles Python-style dict repr
+        strings inside step values, and the dict-of-step-key shape matches
+        what `prisma_s_logger.build_prisma_s_log` emits.
+    """
+    # Legacy data dirs may carry only `query`. Preserve it as the verbatim
+    # request, but never use it as a title: a missing authored title receives a
+    # localized generic fallback instead.
+    meta_out: Dict[str, Any] = dict(metadata) if isinstance(metadata, dict) else {}
+    original = meta_out.get("original_user_query")
+    if original is None:
+        original = meta_out.get("query")
+    if original is None:
+        original = user_query
+    identity = build_report_identity(
+        original_user_query=original,
+        search_topic=search_topic or meta_out.get("search_topic", ""),
+        display_title=display_title or meta_out.get("display_title", ""),
+        language=language or meta_out.get("language"),
+    )
+    warn_about_title(identity)
+    meta_out.update(identity)
+
+    out: Dict[str, Any] = {
+        "metadata": meta_out,
+        "papers": list(paper_list) if isinstance(paper_list, list) else [],
+        "chart_data": chart_data if isinstance(chart_data, dict) else {},
+        "prisma_log": prisma_log_raw if isinstance(prisma_log_raw, dict) else {},
+    }
+    # delta6 (additive): only present when STEP 11.5 exported strategies —
+    # an absent key keeps the payload byte-identical to pre-delta6 (R-19).
+    if isinstance(search_strategies, dict) and search_strategies:
+        out["search_strategies"] = search_strategies
+    return out
+
+
+# ---------------------------------------------------------------------------
+# HTML hydration
+# ---------------------------------------------------------------------------
+
+_FIRST_SCRIPT_RE = re.compile(r"<script(\s|>)")
+_SCRIPT_JSON_ESCAPES = str.maketrans({
+    "<": "\\u003c",
+    ">": "\\u003e",
+    "&": "\\u0026",
+    "\u2028": "\\u2028",
+    "\u2029": "\\u2029",
+})
+
+
+def _escape_json_for_script(payload: str) -> str:
+    """Escape JSON characters that are unsafe in an HTML script-data context."""
+    return payload.translate(_SCRIPT_JSON_ESCAPES)
+
+
+def _inject_report_data(bundle_html: str, report_data: Dict[str, Any]) -> str:
+    """Insert `<script>window.__REPORT_DATA__ = ...</script>` before the first <script>."""
+    payload = json.dumps(
+        report_data,
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+    safe_payload = _escape_json_for_script(payload)
+    injection = (
+        f"<script>window.__REPORT_DATA__ = {safe_payload};</script>"
+    )
+
+    match = _FIRST_SCRIPT_RE.search(bundle_html)
+    if not match:
+        # No <script> in bundle? Append before </body>.
+        if "</body>" in bundle_html:
+            return bundle_html.replace("</body>", f"{injection}</body>", 1)
+        return bundle_html + injection
+    insert_at = match.start()
+    return bundle_html[:insert_at] + injection + bundle_html[insert_at:]
+
+
+def _resolve_language(
+    explicit: Optional[str],
+    metadata: Dict[str, Any],
+) -> str:
+    """Pick "en" or "zh" from explicit arg, metadata, or default "en".
+
+    Anything other than "en"/"zh" falls back to "en" with a stderr warning.
+    The React bundle's `installLanguage()` does an identical fallback, so
+    even a corrupted value can't crash rendering — but logging here lets a
+    main agent see something is up.
+    """
+    candidate = explicit or (
+        metadata.get("language") if isinstance(metadata, dict) else None
+    )
+    if candidate in ("en", "zh"):
+        return candidate
+    if candidate:
+        log.warning(
+            "Unknown language %r; falling back to 'en'. Acceptable values: en, zh.",
+            candidate,
+        )
+    return "en"
+
+
+def _inject_language(bundle_html: str, language: str) -> str:
+    """Insert `<script>window.__REPORT_LANG__ = "..."</script>` before the first <script>.
+
+    Placed BEFORE `__REPORT_DATA__` so that `installLanguage()` runs first
+    inside the React bundle and `window.S` is set before any component reads
+    a translation. The bundle's i18n.ts uses the same fallback chain (window
+    global → "en"), so a missing injection here is safe — but the explicit
+    injection makes the active language visible in the HTML source.
+    """
+    safe_lang = "zh" if language == "zh" else "en"
+    injection = f'<script>window.__REPORT_LANG__ = "{safe_lang}";</script>'
+
+    match = _FIRST_SCRIPT_RE.search(bundle_html)
+    if not match:
+        if "</body>" in bundle_html:
+            return bundle_html.replace("</body>", f"{injection}</body>", 1)
+        return bundle_html + injection
+    insert_at = match.start()
+    return bundle_html[:insert_at] + injection + bundle_html[insert_at:]
+
+
+def _resolve_rank_platform(explicit: Optional[str]) -> Optional[str]:
+    """The platform the rank badges show, or None for the bundle's default (JCR).
+
+    Explicit (this run's filter platform) > config ``rank.default_platform``.
+    JCR resolves to None so a JCR report is byte-identical to before."""
+    platform = (explicit or "").strip().lower() or None
+    if platform is None:
+        try:
+            from .config import load_config
+
+            rank_cfg = getattr(load_config(), "rank", None)
+            if isinstance(rank_cfg, dict) and rank_cfg.get("default_platform"):
+                platform = str(rank_cfg["default_platform"]).strip().lower()
+        except Exception:
+            platform = None
+    return platform if platform in ("cas", "sjr") else None
+
+
+def _inject_rank_source(bundle_html: str, platform: Optional[str]) -> str:
+    """Set `window.__rankSource__` (read by JournalRank / ZoneFilter) before the
+    first <script>. No platform -> HTML unchanged."""
+    if platform is None:
+        return bundle_html
+    injection = f'<script>window.__rankSource__ = "{platform}";</script>'
+    match = _FIRST_SCRIPT_RE.search(bundle_html)
+    if not match:
+        return bundle_html + injection
+    return bundle_html[: match.start()] + injection + bundle_html[match.start():]
+
+
+# ---------------------------------------------------------------------------
+# Size policy
+# ---------------------------------------------------------------------------
+
+def _read_json(path: Path) -> Any:
+    if not path.exists():
+        raise HtmlRenderError(f"Required input not found: {path}")
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+# =============================================================================
+# CLI
+# =============================================================================
+
+if __name__ == "__main__":
+    import argparse
+    import sys
+    import tempfile
+
+    parser = argparse.ArgumentParser(
+        description=(
+            "Render the HTML report (Shadcn webartifacts path) by hydrating "
+            "the pre-built React bundle with materialized JSON data."
+        )
+    )
+    parser.add_argument(
+        "--data",
+        type=Path,
+        help="Path to report_data.json (consolidated bundle).",
+    )
+    parser.add_argument(
+        "--materialized-dir",
+        type=Path,
+        help="Directory with chart_data/paper_list/metadata/prisma_log JSON siblings.",
+    )
+    parser.add_argument(
+        "--output",
+        required=True,
+        type=Path,
+        help="Where to write report.html.",
+    )
+    parser.add_argument(
+        "--query",
+        default="",
+        help="Optional original user request fallback (never the H1).",
+    )
+    parser.add_argument(
+        "--search-topic",
+        default="",
+        help="Optional normalized semantic retrieval topic fallback.",
+    )
+    parser.add_argument(
+        "--display-title",
+        default="",
+        help="Optional scholarly report title fallback.",
+    )
+    parser.add_argument(
+        "--language",
+        choices=("en", "zh"),
+        default=None,
+        help=(
+            "UI language for the rendered report. The bundle ships with both "
+            "English and Chinese dictionaries; this flag controls which one "
+            "mounts. Resolution order: explicit flag > metadata.language > 'en'. "
+            "Set this based on the user's query language: CJK characters → zh, "
+            "otherwise → en. (Paper data — titles, authors, abstracts — is "
+            "never translated; only the report's UI chrome.)"
+        ),
+    )
+    parser.add_argument(
+        "--rank-platform",
+        choices=("cas", "jcr", "sjr"),
+        default=None,
+        help=(
+            "Journal-rank platform for the badges and zone filter. Pass the platform "
+            "this run filtered on; omitted -> config rank.default_platform -> JCR."
+        ),
+    )
+    args = parser.parse_args()
+
+    if args.materialized_dir:
+        materialized_dir = args.materialized_dir
+    elif args.data and args.data.exists():
+        payload = json.loads(args.data.read_text(encoding="utf-8"))
+        tmp_dir = Path(tempfile.mkdtemp(prefix="html_webart_"))
+        (tmp_dir / "chart_data.json").write_text(
+            json.dumps(payload.get("chart_data", {}), ensure_ascii=False), encoding="utf-8"
+        )
+        (tmp_dir / "paper_list.json").write_text(
+            json.dumps(payload.get("paper_list", []), ensure_ascii=False), encoding="utf-8"
+        )
+        (tmp_dir / "metadata.json").write_text(
+            json.dumps(payload.get("metadata", {}), ensure_ascii=False), encoding="utf-8"
+        )
+        (tmp_dir / "prisma_log.json").write_text(
+            json.dumps(payload.get("prisma_log", {}), ensure_ascii=False), encoding="utf-8"
+        )
+        # delta6 (additive): forward the folded search_strategies key when present.
+        if payload.get("search_strategies"):
+            (tmp_dir / "search_strategies.json").write_text(
+                json.dumps(payload.get("search_strategies"), ensure_ascii=False), encoding="utf-8"
+            )
+        materialized_dir = tmp_dir
+    else:
+        sys.exit(
+            "html_renderer_webartifacts: provide --data report_data.json or "
+            "--materialized-dir"
+        )
+
+    out = render_html_webartifacts(
+        materialized_data_dir=materialized_dir,
+        output_path=args.output,
+        user_query=args.query,
+        search_topic=args.search_topic,
+        display_title=args.display_title,
+        language=args.language,
+        rank_platform=args.rank_platform,
+    )
+    print(f"html_renderer_webartifacts: wrote {out}")

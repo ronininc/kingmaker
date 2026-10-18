@@ -1,0 +1,23 @@
+node_modules/
+.DS_Store
+*.log
+dist/
+# An operator import's staging folder
+.*-import-*/
+
+# Built by scripts/build-ffmpeg.sh (LGPL ffmpeg for the app bundle); not kept in git
+app/Resources/bin/ffmpeg
+app/Resources/bin/ffprobe
+app/Resources/bin/uv
+app/Resources/bin/uvx
+
+# Local tool state and secrets: never committed
+.wrangler/
+.env
+.env.*
+!.env.example
+update-host/.wrangler/
+
+# Offline release-signing private key — must never be committed (lib/release-signing.mjs)
+*-release-private.pem
+kingmaker-release-private.pem

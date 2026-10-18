@@ -1,0 +1,96 @@
+/* ============================================================
+   a landscaping client — motion kit
+   Every animation/transition used on the site, extracted verbatim
+   and made reusable. Values match the live site exactly.
+
+   Tokens the rules below reference (from site.css / app.css):
+     --green-500: #4C7A56;   --green-700: #2C4633;
+     --sand: #D9CDB5;        --paper: #F6F4EF;
+     --line: rgba(14,17,13,.12);
+     --shadow-lg: 0 2px 4px rgba(14,17,13,.08), 0 24px 60px rgba(14,17,13,.16);
+   ============================================================ */
+
+/* ---- 1. Button — lift on hover, settle on press ---------- */
+.btn {
+  transition: transform .16s ease, background-color .16s ease,
+              border-color .16s ease, color .16s ease;
+}
+.btn:hover  { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+/* app-side variant presses slightly inward instead */
+.btn--press:active { transform: scale(.985); }
+
+/* ---- 2. Card — rise + deepen shadow on hover ------------- */
+.card {
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: transparent;
+}
+/* tappable card in the app shell nudges in on press */
+.card-tap { transition: transform .12s ease, box-shadow .15s ease; }
+.card-tap:active { transform: scale(.99); }
+
+/* ---- 3. Dropdown menu — fade + slide, with caret flip ---- */
+.menu {
+  opacity: 0; visibility: hidden;
+  transform: translateX(-50%) translateY(-6px);
+  transition: opacity .16s ease, transform .16s ease, visibility .16s;
+}
+.has-menu[data-open="true"] .menu {
+  opacity: 1; visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+.has-menu > button::after {            /* the caret */
+  transform: rotate(45deg) translate(-2px,-2px);
+  transition: transform .18s ease;
+}
+.has-menu[data-open="true"] > button::after {
+  transform: rotate(-135deg) translate(-3px,-3px);
+}
+
+/* ---- 4. Hamburger → X --------------------------------- */
+.nav-toggle span,
+.nav-toggle span::before,
+.nav-toggle span::after {
+  transition: transform .2s ease, opacity .2s ease;
+}
+.nav-toggle span::before { transform: translateY(-6px); }
+.nav-toggle span::after  { transform: translateY(4.2px); }
+body.nav-open .nav-toggle span         { background: transparent; }
+body.nav-open .nav-toggle span::before { transform: rotate(45deg); }
+body.nav-open .nav-toggle span::after  { transform: rotate(-45deg) translateY(-1.8px); }
+
+/* ---- 5. Progress bar — animates its own width ----------- */
+.bar > i {
+  display: block; height: 100%;
+  background: var(--green-500); border-radius: 999px;
+  transition: width .35s ease;
+}
+
+/* ---- 6. Spinner — the site's only @keyframes ------------ */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { animation: spin .7s linear infinite; }
+
+/* ---- 7. Slide-in detail drawer (admin) ------------------ */
+.sheet {
+  transform: translateX(100%);
+  transition: transform .24s cubic-bezier(.2,.7,.3,1);
+}
+.sheet.open { transform: translateX(0); }
+
+/* ---- 8. Input focus ------------------------------------- */
+.field-input {
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+
+/* ---- Accessibility: the site honors reduced-motion ------ */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: .001ms !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

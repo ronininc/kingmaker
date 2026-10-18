@@ -1,0 +1,730 @@
+{
+    "version": "1.0.0",
+    "description": "HomeSafe-Bench test scenarios — 40 indoor safety hazard tests across 5 categories",
+    "citation": "Inspired by HomeSafeBench (arXiv 2509.23690)",
+    "categories": [
+        {
+            "id": "fire",
+            "name": "Fire / Smoke",
+            "emoji": "🔥",
+            "description": "Fire hazards, smoke sources, and heat-related dangers in the home"
+        },
+        {
+            "id": "electrical",
+            "name": "Electrical",
+            "emoji": "⚡",
+            "description": "Electrical hazards including overloaded circuits, exposed wiring, and water proximity"
+        },
+        {
+            "id": "trip_fall",
+            "name": "Trip / Fall",
+            "emoji": "🚶",
+            "description": "Tripping hazards, fall risks, and pathway obstructions"
+        },
+        {
+            "id": "child_safety",
+            "name": "Child Safety",
+            "emoji": "👶",
+            "description": "Hazards specifically dangerous to children — chemicals, choking, sharp edges"
+        },
+        {
+            "id": "falling_objects",
+            "name": "Falling Objects",
+            "emoji": "📦",
+            "description": "Unstable items, precariously placed objects, and overhead risks"
+        }
+    ],
+    "scenarios": [
+        {
+            "id": "fire_01",
+            "category": "fire",
+            "name": "Smoke rising from stove",
+            "file": "fire_01_stove_smoke.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any safety hazards visible in this image. Focus on fire, heat, and smoke risks.",
+            "expectedKeywords": [
+                "smoke",
+                "stove",
+                "fire",
+                "cook",
+                "burn",
+                "hazard",
+                "kitchen"
+            ]
+        },
+        {
+            "id": "fire_02",
+            "category": "fire",
+            "name": "Candle near curtain",
+            "file": "fire_02_candle_curtain.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any safety hazards visible in this image. Focus on fire risks from open flames.",
+            "expectedKeywords": [
+                "candle",
+                "curtain",
+                "fire",
+                "flame",
+                "fabric",
+                "hazard",
+                "drape"
+            ]
+        },
+        {
+            "id": "fire_03",
+            "category": "fire",
+            "name": "Fireplace ember on rug",
+            "file": "fire_03_fireplace_ember.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any safety hazards visible in this image, especially near the fireplace.",
+            "expectedKeywords": [
+                "fireplace",
+                "ember",
+                "rug",
+                "spark",
+                "fire",
+                "carpet",
+                "burn",
+                "flame"
+            ]
+        },
+        {
+            "id": "fire_04",
+            "category": "fire",
+            "name": "Iron left face-down on board",
+            "file": "fire_04_iron_facedown.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any safety hazards visible in this image. Look for heat-producing appliances.",
+            "expectedKeywords": [
+                "iron",
+                "burn",
+                "hot",
+                "face-down",
+                "ironing",
+                "board",
+                "fire",
+                "heat",
+                "scorch"
+            ]
+        },
+        {
+            "id": "fire_05",
+            "category": "fire",
+            "name": "Space heater near drapes",
+            "file": "fire_05_heater_drapes.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any safety hazards, especially heating appliances near flammable materials.",
+            "expectedKeywords": [
+                "heater",
+                "drape",
+                "curtain",
+                "fire",
+                "space heater",
+                "fabric",
+                "hazard",
+                "close"
+            ]
+        },
+        {
+            "id": "fire_06",
+            "category": "fire",
+            "name": "Missing smoke detector",
+            "file": "fire_06_missing_detector.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Check for smoke and fire detection equipment. Is there a smoke detector visible on the ceiling?",
+            "expectedKeywords": [
+                "smoke detector",
+                "alarm",
+                "missing",
+                "ceiling",
+                "no",
+                "absent",
+                "detector",
+                "safety"
+            ]
+        },
+        {
+            "id": "fire_07",
+            "category": "fire",
+            "name": "Grease fire on cooktop",
+            "file": "fire_07_grease_fire.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any active fires or dangerous cooking situations.",
+            "expectedKeywords": [
+                "grease",
+                "fire",
+                "flame",
+                "cook",
+                "pan",
+                "kitchen",
+                "burn",
+                "oil",
+                "stove"
+            ]
+        },
+        {
+            "id": "fire_08",
+            "category": "fire",
+            "name": "Cigarette on couch arm",
+            "file": "fire_08_cigarette_couch.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any fire hazards, including smoking materials near upholstery.",
+            "expectedKeywords": [
+                "cigarette",
+                "couch",
+                "smoke",
+                "fire",
+                "sofa",
+                "ash",
+                "burn",
+                "fabric"
+            ]
+        },
+        {
+            "id": "electrical_01",
+            "category": "electrical",
+            "name": "Overloaded power strip",
+            "file": "electrical_01_overloaded_strip.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any electrical safety hazards, especially around power outlets and strips.",
+            "expectedKeywords": [
+                "overload",
+                "power strip",
+                "plug",
+                "outlet",
+                "electric",
+                "cord",
+                "too many",
+                "surge"
+            ]
+        },
+        {
+            "id": "electrical_02",
+            "category": "electrical",
+            "name": "Exposed wire near sink",
+            "file": "electrical_02_exposed_wire_sink.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any electrical hazards, especially wires near water sources.",
+            "expectedKeywords": [
+                "wire",
+                "exposed",
+                "sink",
+                "water",
+                "electric",
+                "shock",
+                "danger",
+                "bare"
+            ]
+        },
+        {
+            "id": "electrical_03",
+            "category": "electrical",
+            "name": "Frayed cord on appliance",
+            "file": "electrical_03_frayed_cord.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Check for damaged electrical cords or cables.",
+            "expectedKeywords": [
+                "fray",
+                "cord",
+                "damage",
+                "wire",
+                "electric",
+                "worn",
+                "cable",
+                "appliance"
+            ]
+        },
+        {
+            "id": "electrical_04",
+            "category": "electrical",
+            "name": "Extension cord under rug",
+            "file": "electrical_04_cord_under_rug.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any fire or electrical hazards related to cord placement.",
+            "expectedKeywords": [
+                "extension",
+                "cord",
+                "rug",
+                "under",
+                "carpet",
+                "fire",
+                "hazard",
+                "hidden"
+            ]
+        },
+        {
+            "id": "electrical_05",
+            "category": "electrical",
+            "name": "Wet hands near outlet",
+            "file": "electrical_05_wet_hands_outlet.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any electrical shock hazards, especially involving water and electricity.",
+            "expectedKeywords": [
+                "wet",
+                "water",
+                "outlet",
+                "hand",
+                "electric",
+                "shock",
+                "danger",
+                "plug"
+            ]
+        },
+        {
+            "id": "electrical_06",
+            "category": "electrical",
+            "name": "Ungrounded 3-to-2 adapter",
+            "file": "electrical_06_ungrounded_adapter.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Check for improper electrical connections or adapters.",
+            "expectedKeywords": [
+                "adapter",
+                "ground",
+                "plug",
+                "outlet",
+                "prong",
+                "electric",
+                "unsafe",
+                "converter"
+            ]
+        },
+        {
+            "id": "electrical_07",
+            "category": "electrical",
+            "name": "Damaged outlet cover",
+            "file": "electrical_07_damaged_outlet.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Check the condition of electrical outlets and covers.",
+            "expectedKeywords": [
+                "outlet",
+                "cover",
+                "damage",
+                "broken",
+                "crack",
+                "expose",
+                "plate",
+                "electric"
+            ]
+        },
+        {
+            "id": "electrical_08",
+            "category": "electrical",
+            "name": "Tangled cords behind desk",
+            "file": "electrical_08_tangled_cords.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any cable management hazards behind furniture.",
+            "expectedKeywords": [
+                "tangle",
+                "cord",
+                "cable",
+                "wire",
+                "mess",
+                "desk",
+                "behind",
+                "fire",
+                "hazard"
+            ]
+        },
+        {
+            "id": "trip_01",
+            "category": "trip_fall",
+            "name": "Toys scattered on staircase",
+            "file": "trip_01_toys_stairs.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any tripping or falling hazards, especially on stairs.",
+            "expectedKeywords": [
+                "toy",
+                "stair",
+                "trip",
+                "fall",
+                "hazard",
+                "block",
+                "step",
+                "obstruct"
+            ]
+        },
+        {
+            "id": "trip_02",
+            "category": "trip_fall",
+            "name": "Wet floor without sign",
+            "file": "trip_02_wet_floor.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any slip or fall hazards on the floor surface.",
+            "expectedKeywords": [
+                "wet",
+                "floor",
+                "slip",
+                "water",
+                "spill",
+                "puddle",
+                "slippery",
+                "fall"
+            ]
+        },
+        {
+            "id": "trip_03",
+            "category": "trip_fall",
+            "name": "Loose rug edge curled up",
+            "file": "trip_03_loose_rug.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Check for tripping hazards related to floor coverings.",
+            "expectedKeywords": [
+                "rug",
+                "loose",
+                "curl",
+                "trip",
+                "edge",
+                "fold",
+                "carpet",
+                "hazard",
+                "bunched"
+            ]
+        },
+        {
+            "id": "trip_04",
+            "category": "trip_fall",
+            "name": "Cluttered hallway",
+            "file": "trip_04_cluttered_hallway.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any pathway obstructions or tripping hazards.",
+            "expectedKeywords": [
+                "clutter",
+                "hallway",
+                "obstruct",
+                "trip",
+                "box",
+                "item",
+                "block",
+                "path",
+                "narrow"
+            ]
+        },
+        {
+            "id": "trip_05",
+            "category": "trip_fall",
+            "name": "Shoes piled in doorway",
+            "file": "trip_05_shoes_doorway.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any tripping hazards near doorways and entries.",
+            "expectedKeywords": [
+                "shoe",
+                "door",
+                "trip",
+                "entry",
+                "pile",
+                "obstruct",
+                "hazard",
+                "block"
+            ]
+        },
+        {
+            "id": "trip_06",
+            "category": "trip_fall",
+            "name": "Unlit stairwell",
+            "file": "trip_06_dark_stairwell.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Assess lighting conditions and visibility hazards, especially on stairs.",
+            "expectedKeywords": [
+                "dark",
+                "stair",
+                "light",
+                "dim",
+                "unlit",
+                "visibility",
+                "shadow",
+                "hazard"
+            ]
+        },
+        {
+            "id": "trip_07",
+            "category": "trip_fall",
+            "name": "Cables across walkway",
+            "file": "trip_07_cables_walkway.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any cords or cables creating tripping hazards.",
+            "expectedKeywords": [
+                "cable",
+                "cord",
+                "trip",
+                "wire",
+                "floor",
+                "across",
+                "walk",
+                "hazard"
+            ]
+        },
+        {
+            "id": "trip_08",
+            "category": "trip_fall",
+            "name": "Step stool near top of stairs",
+            "file": "trip_08_stool_stairs.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any unstable or misplaced furniture near stairs.",
+            "expectedKeywords": [
+                "stool",
+                "step",
+                "stair",
+                "fall",
+                "top",
+                "unstable",
+                "hazard",
+                "ladder"
+            ]
+        },
+        {
+            "id": "child_01",
+            "category": "child_safety",
+            "name": "Open cabinet with cleaning chemicals",
+            "file": "child_01_chemicals_cabinet.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any child safety hazards, especially toxic substances within reach.",
+            "expectedKeywords": [
+                "cabinet",
+                "chemical",
+                "clean",
+                "open",
+                "child",
+                "poison",
+                "toxic",
+                "reach",
+                "bottle"
+            ]
+        },
+        {
+            "id": "child_02",
+            "category": "child_safety",
+            "name": "Uncovered electrical outlet",
+            "file": "child_02_uncovered_outlet.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Check for child safety hazards related to electrical outlets.",
+            "expectedKeywords": [
+                "outlet",
+                "uncovered",
+                "child",
+                "electric",
+                "plug",
+                "cover",
+                "safety",
+                "exposed"
+            ]
+        },
+        {
+            "id": "child_03",
+            "category": "child_safety",
+            "name": "Blind cord hanging in reach",
+            "file": "child_03_blind_cord.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify strangulation or entanglement hazards for children.",
+            "expectedKeywords": [
+                "blind",
+                "cord",
+                "string",
+                "hang",
+                "child",
+                "strangle",
+                "window",
+                "reach",
+                "loop"
+            ]
+        },
+        {
+            "id": "child_04",
+            "category": "child_safety",
+            "name": "Sharp corner on coffee table",
+            "file": "child_04_sharp_corner.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any sharp edges or corners that could injure a child.",
+            "expectedKeywords": [
+                "sharp",
+                "corner",
+                "table",
+                "edge",
+                "child",
+                "bump",
+                "injury",
+                "point"
+            ]
+        },
+        {
+            "id": "child_05",
+            "category": "child_safety",
+            "name": "Small objects choking hazard",
+            "file": "child_05_choking_hazard.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any small objects that could be choking hazards for young children.",
+            "expectedKeywords": [
+                "small",
+                "choke",
+                "child",
+                "toy",
+                "marble",
+                "button",
+                "piece",
+                "swallow",
+                "hazard"
+            ]
+        },
+        {
+            "id": "child_06",
+            "category": "child_safety",
+            "name": "Unsecured tall bookshelf",
+            "file": "child_06_unsecured_bookshelf.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Check for furniture tip-over risks that could endanger children.",
+            "expectedKeywords": [
+                "bookshelf",
+                "unsecured",
+                "tip",
+                "fall",
+                "heavy",
+                "child",
+                "anchor",
+                "lean",
+                "unstable"
+            ]
+        },
+        {
+            "id": "child_07",
+            "category": "child_safety",
+            "name": "Stove knobs accessible to children",
+            "file": "child_07_stove_knobs.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any kitchen hazards accessible to small children.",
+            "expectedKeywords": [
+                "stove",
+                "knob",
+                "child",
+                "reach",
+                "gas",
+                "burner",
+                "kitchen",
+                "turn",
+                "accessible"
+            ]
+        },
+        {
+            "id": "child_08",
+            "category": "child_safety",
+            "name": "Open window without guard",
+            "file": "child_08_open_window.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Check for fall hazards from windows, especially for children.",
+            "expectedKeywords": [
+                "window",
+                "open",
+                "guard",
+                "child",
+                "fall",
+                "screen",
+                "height",
+                "safety"
+            ]
+        },
+        {
+            "id": "falling_01",
+            "category": "falling_objects",
+            "name": "Heavy items on high shelf",
+            "file": "falling_01_heavy_high_shelf.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any heavy objects stored unsafely at height.",
+            "expectedKeywords": [
+                "heavy",
+                "shelf",
+                "high",
+                "fall",
+                "weight",
+                "above",
+                "stack",
+                "danger",
+                "top"
+            ]
+        },
+        {
+            "id": "falling_02",
+            "category": "falling_objects",
+            "name": "Precariously stacked boxes",
+            "file": "falling_02_stacked_boxes.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Check for unstable stacking that could collapse.",
+            "expectedKeywords": [
+                "stack",
+                "box",
+                "unstable",
+                "fall",
+                "lean",
+                "collapse",
+                "precarious",
+                "pile"
+            ]
+        },
+        {
+            "id": "falling_03",
+            "category": "falling_objects",
+            "name": "Leaning bookshelf",
+            "file": "falling_03_leaning_bookshelf.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Check for furniture stability issues.",
+            "expectedKeywords": [
+                "bookshelf",
+                "lean",
+                "tilt",
+                "unstable",
+                "fall",
+                "tip",
+                "heavy",
+                "book"
+            ]
+        },
+        {
+            "id": "falling_04",
+            "category": "falling_objects",
+            "name": "Items on fridge top near edge",
+            "file": "falling_04_fridge_top.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Identify any objects that could fall from on top of appliances.",
+            "expectedKeywords": [
+                "fridge",
+                "top",
+                "edge",
+                "fall",
+                "item",
+                "refrigerator",
+                "above",
+                "precarious"
+            ]
+        },
+        {
+            "id": "falling_05",
+            "category": "falling_objects",
+            "name": "Tools on overhead rack",
+            "file": "falling_05_overhead_tools.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Check for overhead storage hazards.",
+            "expectedKeywords": [
+                "tool",
+                "overhead",
+                "rack",
+                "hang",
+                "fall",
+                "heavy",
+                "above",
+                "mount"
+            ]
+        },
+        {
+            "id": "falling_06",
+            "category": "falling_objects",
+            "name": "Unsecured wall-mount TV",
+            "file": "falling_06_unsecured_tv.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Check for improperly mounted electronics that could fall.",
+            "expectedKeywords": [
+                "tv",
+                "mount",
+                "wall",
+                "unsecured",
+                "television",
+                "fall",
+                "hang",
+                "loose",
+                "tilt"
+            ]
+        },
+        {
+            "id": "falling_07",
+            "category": "falling_objects",
+            "name": "Overloaded coat rack",
+            "file": "falling_07_overloaded_coatrack.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Check for overloaded freestanding furniture.",
+            "expectedKeywords": [
+                "coat",
+                "rack",
+                "overload",
+                "heavy",
+                "tip",
+                "fall",
+                "hang",
+                "lean",
+                "weight"
+            ]
+        },
+        {
+            "id": "falling_08",
+            "category": "falling_objects",
+            "name": "Ceiling fan with loose blade",
+            "file": "falling_08_loose_fan_blade.png",
+            "prompt": "You are a home safety inspector analyzing an indoor security camera frame. Check the ceiling fan for any maintenance issues.",
+            "expectedKeywords": [
+                "fan",
+                "blade",
+                "ceiling",
+                "loose",
+                "wobble",
+                "hang",
+                "detach",
+                "danger"
+            ]
+        }
+    ]
+}

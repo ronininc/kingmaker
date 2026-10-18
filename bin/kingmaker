@@ -1,0 +1,40 @@
+#!/bin/bash
+# Run Kingmaker (`sol-ghost` is a compatibility alias of this script). No window is ever opened. Which
+# engine runs, first match wins (lib/paths.mjs agrees):
+#   bundle  inside a Kingmaker.app that carries the engine: its own Contents/MacOS/Solomon as Node.
+#   fork    an operator checkout that carries the engine's source: this Mac's Node >=22.
+#   app     otherwise the installed Kingmaker.app's engine binary as Node (KINGMAKER_RUNTIME_APP); with none, this Mac's Node.
+# SOL_GHOST_RUNTIME=app skips fork mode.
+self="$0"
+while [ -L "$self" ]; do
+  link="$(readlink "$self")"
+  case "$link" in /*) self="$link" ;; *) self="$(dirname "$self")/$link" ;; esac
+done
+here="$(cd "$(dirname "$self")/.." && pwd -P)"
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+bundled="$here/../../MacOS/Solomon"
+if [ -x "$bundled" ] && [ -d "$here/../solomon-runtime" ]; then
+  bin="$(cd "$(dirname "$bundled")" && pwd -P)/$(basename "$bundled")"
+elif [ -f "$here/solomon/server/src/index.ts" ] && [ "${SOL_GHOST_RUNTIME:-}" != "app" ]; then
+  node_bin="$(command -v node || true)"
+  major="$([ -n "$node_bin" ] && "$node_bin" -p 'process.versions.node.split(".")[0]' 2>/dev/null || echo 0)"
+  if [ "$major" -ge 22 ] 2>/dev/null; then exec "$node_bin" "$here/lib/kingmaker.mjs" "$@"; fi
+  echo "kingmaker: Node 22 or newer is needed to run the engine from its source (brew install node)" >&2
+  exit 78
+else
+  app="${KINGMAKER_RUNTIME_APP:-/Applications/Kingmaker.app}"
+  bin="$app/Contents/MacOS/Solomon"
+  if [ ! -x "$bin" ]; then
+    # No engine here (the public checkout): this Mac's Node still runs every command that needs no engine
+    # (version, help, markets, …); `kingmaker start` and the rest say plainly that they need Kingmaker.app.
+    node_bin="$(command -v node || true)"
+    if [ -n "$node_bin" ]; then exec "$node_bin" "$here/lib/kingmaker.mjs" "$@"; fi
+    echo "kingmaker: no engine to run and no Node. Install Kingmaker (Kingmaker Installer), or set KINGMAKER_RUNTIME_APP (not found at $app)." >&2
+    exit 78
+  fi
+fi
+# Electron logs one ERROR line when a Terminal starts it as Node ("Node.js environment variables are
+# disabled because this process is invoked by other apps"): it drops NODE_* variables, which nothing here
+# uses. Only that line is dropped; every other stderr line passes through.
+exec 2> >(grep -v --line-buffered 'Node.js environment variables are disabled because this process is invoked by other apps' >&2)
+ELECTRON_RUN_AS_NODE=1 exec "$bin" "$here/lib/kingmaker.mjs" "$@"

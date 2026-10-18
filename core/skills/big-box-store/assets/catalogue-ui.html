@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{{STORE_NAME}} — Catalogue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+:root{--pine:{{BRAND_PRIMARY}};--pine-deep:{{BRAND_PRIMARY_DEEP}};--red:{{BRAND_ACCENT}};--ink:#000;--panel:#0b0b09;
+  --line:rgba(255,255,255,.10);--line2:rgba(255,255,255,.18);--muted:#948d7d;
+  --ui:'Outfit',system-ui,-apple-system,sans-serif;--max:1440px;
+  --pgal-bg:#f7f5f0;--pgal-accent:#df3b3c;--pgal-radius:2px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--ui);background:var(--ink);color:#fff;-webkit-font-smoothing:antialiased;line-height:1.55}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 clamp(16px,3vw,40px)}
+
+/* ---------- top ---------- */
+.topbar{background:var(--red);font-size:.72rem;font-weight:600;letter-spacing:.06em}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:34px;flex-wrap:wrap}
+.masthead{border-bottom:1px solid var(--line);background:rgba(0,0,0,.92);position:sticky;top:0;z-index:120;
+  backdrop-filter:blur(14px)}
+.masthead .wrap{display:flex;align-items:center;gap:clamp(12px,2vw,28px);min-height:72px;flex-wrap:wrap}
+.brand{font-weight:900;letter-spacing:-.03em;font-size:1.5rem;color:var(--pine);white-space:nowrap}
+.brand small{display:block;font-size:.6rem;letter-spacing:.16em;color:var(--red);font-weight:700;text-transform:uppercase}
+.count{margin-left:auto;font-size:.72rem;font-weight:700;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+
+/* ---------- dropdown category nav ---------- */
+.catnav{display:flex;gap:6px;flex-wrap:wrap;padding:12px 0}
+.cat{position:relative}
+.cat>button{background:transparent;border:1px solid var(--line2);color:#fff;padding:9px 15px;border-radius:2px;
+  font-size:.76rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;display:inline-flex;gap:8px;
+  align-items:center;transition:.22s}
+.cat>button:hover,.cat.open>button{background:var(--pine);color:#14120b;border-color:var(--pine)}
+.cat>button .n{opacity:.6;font-weight:600}
+.cat>button .cv{width:9px;height:9px;fill:currentColor;transition:.22s}
+.cat.open>button .cv{transform:rotate(180deg)}
+.menu{position:absolute;top:calc(100% + 6px);left:0;z-index:130;min-width:290px;max-height:56vh;overflow:auto;
+  background:#0c0c0a;border:1px solid var(--line2);padding:6px;display:none;
+  box-shadow:0 26px 60px rgba(0,0,0,.8)}
+.cat.open .menu{display:block}
+.menu button{display:flex;width:100%;justify-content:space-between;gap:12px;background:none;border:0;color:#ddd;
+  padding:9px 11px;font-size:.83rem;font-weight:600;text-align:left;border-radius:2px}
+.menu button:hover{background:rgba(255,255,255,.08);color:var(--pine)}
+.menu button.on{background:var(--pine);color:#14120b}
+.menu button i{font-style:normal;opacity:.5;font-size:.74rem}
+.menu .hd{padding:9px 11px 5px;font-size:.63rem;font-weight:800;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+
+/* ---------- toolbar ---------- */
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:0 0 16px}
+.tools input{flex:1 1 260px;min-width:0;background:#0c0c0a;border:1px solid var(--line2);color:#fff;
+  padding:11px 14px;border-radius:2px;font-size:.9rem}
+.tools input:focus{outline:none;border-color:var(--pine)}
+.tools select{background:#0c0c0a;border:1px solid var(--line2);color:#fff;padding:11px 12px;border-radius:2px;font-size:.82rem}
+.chip{background:rgba(254,224,110,.14);border:1px solid rgba(254,224,110,.45);color:var(--pine);
+  padding:8px 13px;border-radius:2px;font-size:.74rem;font-weight:700;letter-spacing:.06em;display:inline-flex;gap:9px;align-items:center}
+.chip button{background:none;border:0;color:inherit;font-size:1rem;line-height:1}
+
+/* ---------- grid ---------- */
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));padding-bottom:60px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:2px;overflow:hidden;display:flex;flex-direction:column}
+.card .pgal{height:238px;background:var(--pgal-bg)}
+.card .body{padding:13px 14px 15px;display:flex;flex-direction:column;gap:5px;flex:1}
+.card .sub{font-size:.6rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--pine)}
+.card h3{font-size:.93rem;font-weight:700;line-height:1.32;letter-spacing:-.01em}
+.card .meta{font-size:.71rem;color:var(--muted);margin-top:auto;display:flex;justify-content:space-between;gap:10px;padding-top:8px}
+.card .price{font-weight:800;color:#fff;font-size:.95rem}
+.card .ask{font-weight:700;color:var(--muted);font-size:.8rem}
+.stk{font-size:.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.stk.in{color:#5fcf90}.stk.no{color:#d4a840}
+.more{display:block;margin:0 auto 70px;background:transparent;border:1px solid var(--line2);color:#fff;
+  padding:14px 34px;border-radius:2px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:.78rem}
+.more:hover{background:var(--pine);color:#14120b;border-color:var(--pine)}
+.empty{padding:80px 20px;text-align:center;color:var(--muted)}
+.note{border-top:1px solid var(--line);padding:22px 0 60px;color:var(--muted);font-size:.79rem;line-height:1.7}
+.note b{color:var(--pine)}
+</style>
+<!--__GALLERY_KIT__-->
+</head>
+<body>
+
+<div class="topbar"><div class="wrap">
+  <span>{{STORE_ADDRESS}}</span>
+  <span>{{STORE_PHONE}}</span>
+</div></div>
+
+<header class="masthead"><div class="wrap">
+  <div class="brand">{{STORE_WORDMARK}}<small>{{STORE_TAGLINE}}</small></div>
+  <div class="count" id="count"></div>
+</div>
+<div class="wrap"><nav class="catnav" id="catnav"></nav></div>
+</header>
+
+<main class="wrap">
+  <div class="tools">
+    <input id="q" type="search" placeholder="Search the catalogue by name, SKU or brand…" />
+    <select id="sort">
+      <option value="name">Sort: name</option>
+      <option value="plow">Price: low to high</option>
+      <option value="phigh">Price: high to low</option>
+      <option value="stock">In stock first</option>
+    </select>
+    <select id="avail">
+      <option value="all">All items</option>
+      <option value="instock">In stock only</option>
+      <option value="priced">Priced only</option>
+    </select>
+    <span id="chip"></span>
+  </div>
+  <div class="grid" id="grid"></div>
+  <button class="more" id="more" hidden>Load more</button>
+  <div class="note" id="note"></div>
+</main>
+
+<script>/*__CATALOGUE__*/</script>
+<!--__FRAMES__-->
+<script>
+(function(){
+'use strict';
+var ITEMS=CATALOGUE.items, TREE=CATALOGUE.tree;
+var PAGE=60, shown=PAGE, filt={top:null,sub:null,q:'',sort:'name',avail:'all'};
+
+/* ---------- dropdown nav ---------- */
+var nav=document.getElementById('catnav');
+function buildNav(){
+  var h='<div class="cat"><button data-all>All items <span class="n">'+ITEMS.length+'</span></button></div>';
+  TREE.forEach(function(t){
+    h+='<div class="cat" data-top="'+t.slug+'"><button>'+t.en+' <span class="n">'+t.n+'</span>'+
+       '<svg class="cv" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>'+
+       '<div class="menu"><div class="hd">'+t.es+'</div>'+
+       '<button data-sub="" data-t="'+t.slug+'">All '+t.en.toLowerCase()+' <i>'+t.n+'</i></button>';
+    t.subs.forEach(function(s){
+      h+='<button data-sub="'+s.slug+'" data-t="'+t.slug+'">'+s.en+' <i>'+s.n+'</i></button>';
+    });
+    h+='</div></div>';
+  });
+  nav.innerHTML=h;
+}
+buildNav();
+
+nav.addEventListener('click',function(e){
+  var b=e.target.closest('button'); if(!b) return;
+  if(b.hasAttribute('data-all')){ filt.top=null; filt.sub=null; closeAll(); render(true); return; }
+  var cat=b.closest('.cat');
+  if(b.parentNode===cat){                       /* the top-level toggle */
+    var was=cat.classList.contains('open'); closeAll();
+    if(!was) cat.classList.add('open');
+    return;
+  }
+  filt.top=b.getAttribute('data-t');
+  filt.sub=b.getAttribute('data-sub')||null;
+  closeAll(); render(true);
+});
+function closeAll(){ nav.querySelectorAll('.cat').forEach(function(c){ c.classList.remove('open'); }); }
+document.addEventListener('click',function(e){ if(!e.target.closest('#catnav')) closeAll(); });
+addEventListener('keydown',function(e){ if(e.key==='Escape') closeAll(); });
+
+/* ---------- filtering ---------- */
+function matches(it){
+  if(filt.top && it.topSlug!==filt.top) return false;
+  if(filt.sub && it.subSlug!==filt.sub) return false;
+  if(filt.avail==='instock' && !(it.stock>0)) return false;
+  if(filt.avail==='priced'  && it.price==null) return false;
+  if(filt.q){
+    var q=filt.q.toLowerCase();
+    if((it.name+' '+it.sku+' '+it.brand+' '+it.sub+' '+it.subEn).toLowerCase().indexOf(q)<0) return false;
+  }
+  return true;
+}
+function sorted(list){
+  var s=filt.sort;
+  return list.slice().sort(function(a,b){
+    if(s==='plow')  return (a.price==null)-(b.price==null) || a.price-b.price;
+    if(s==='phigh') return (a.price==null)-(b.price==null) || b.price-a.price;
+    if(s==='stock') return (b.stock>0)-(a.stock>0) || a.name.localeCompare(b.name);
+    return a.name.localeCompare(b.name);
+  });
+}
+
+/* ---------- cards ---------- */
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+  .replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function card(it){
+  var frames=buildFrames(it);
+  var price = it.price!=null ? '<span class="price">$'+it.price.toFixed(2)+'</span>'
+                             : '<span class="ask">Ask in store</span>';
+  var stk = it.stock>0 ? '<span class="stk in">In stock</span>'
+                       : '<span class="stk no">Check</span>';
+  return '<article class="card">'+
+    '<div class="pgal" data-title="'+esc(it.name)+'" data-gal=\''+
+      JSON.stringify(frames).replace(/'/g,'&apos;')+'\'></div>'+
+    '<div class="body"><span class="sub">'+esc(it.subEn)+'</span>'+
+    '<h3>'+esc(it.name)+'</h3>'+
+    '<div class="meta">'+price+stk+'</div></div></article>';
+}
+
+var grid=document.getElementById('grid'), moreBtn=document.getElementById('more');
+var current=[];
+function render(reset){
+  if(reset) shown=PAGE;
+  current=sorted(ITEMS.filter(matches));
+  var slice=current.slice(0,shown);
+  grid.innerHTML = slice.length ? slice.map(card).join('')
+    : '<div class="empty">Nothing matches that. Try a different search or category.</div>';
+  mountGalleries(grid);
+  moreBtn.hidden = shown>=current.length;
+  moreBtn.textContent='Load more ('+(current.length-shown)+' left)';
+  document.getElementById('count').textContent=current.length+' of '+ITEMS.length+' items';
+  var c=document.getElementById('chip'), label=null;
+  if(filt.sub){
+    TREE.forEach(function(t){ t.subs.forEach(function(s){ if(s.slug===filt.sub && t.slug===filt.top) label=t.en+' › '+s.en; }); });
+  } else if(filt.top){ TREE.forEach(function(t){ if(t.slug===filt.top) label=t.en; }); }
+  c.innerHTML = label ? '<span class="chip">'+esc(label)+' <button aria-label="Clear">×</button></span>' : '';
+  var x=c.querySelector('button');
+  if(x) x.onclick=function(){ filt.top=null; filt.sub=null; render(true); };
+}
+moreBtn.addEventListener('click',function(){ shown+=PAGE; render(false); });
+
+var qi=document.getElementById('q'), t=null;
+qi.addEventListener('input',function(){ clearTimeout(t); t=setTimeout(function(){ filt.q=qi.value.trim(); render(true); },160); });
+document.getElementById('sort').addEventListener('change',function(){ filt.sort=this.value; render(true); });
+document.getElementById('avail').addEventListener('change',function(){ filt.avail=this.value; render(true); });
+
+/* ---------- honest footer ---------- */
+var priced=ITEMS.filter(function(i){return i.price!=null;}).length;
+var instock=ITEMS.filter(function(i){return i.stock>0;}).length;
+var real=0; for(var k in (window.PRODUCT_PHOTOS||{})) real+=window.PRODUCT_PHOTOS[k].length;
+document.getElementById('note').innerHTML=
+  '<b>'+ITEMS.length+'</b> active items parsed from the store’s own inventory export — '+
+  priced+' with a retail price, '+instock+' showing stock on hand. '+
+  'Names, SKUs, prices, brands and suppliers are the store’s data, unedited.<br>'+
+  '<b>Photos:</b> '+real+' real product photographs on file. Every other frame is <b>generated from '+
+  'the export</b> — pack size, specification and price cards, drawn in the browser at no hosting '+
+  'cost. They are drawings and data, never stand-ins for a photograph. Swipe any item to see them; '+
+  'drop a real photo in and it takes the front slot everywhere on the site.';
+
+render(true);
+})();
+</script>
+</body>
+</html>

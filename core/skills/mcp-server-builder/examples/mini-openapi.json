@@ -1,0 +1,32 @@
+{
+  "openapi": "3.0.3",
+  "info": {"title": "Billing API", "version": "1.0.0",
+           "description": "演示用最小计费 API：两个操作覆盖 GET 查询与 POST 创建。"},
+  "paths": {
+    "/invoices/{invoice_id}": {
+      "get": {
+        "operationId": "getInvoice",
+        "summary": "按 ID 查询发票详情",
+        "parameters": [
+          {"name": "invoice_id", "in": "path", "required": true,
+           "schema": {"type": "string"}, "description": "发票唯一标识"}
+        ],
+        "responses": {"200": {"description": "发票详情"}}
+      }
+    },
+    "/invoices": {
+      "post": {
+        "operationId": "createInvoice",
+        "summary": "创建一张新发票",
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"type": "object",
+            "properties": {"customer_id": {"type": "string", "description": "客户 ID"},
+                           "amount_cents": {"type": "integer", "description": "金额（分）"}},
+            "required": ["customer_id", "amount_cents"]}}}
+        },
+        "responses": {"201": {"description": "已创建"}}
+      }
+    }
+  }
+}

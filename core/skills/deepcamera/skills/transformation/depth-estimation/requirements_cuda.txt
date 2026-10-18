@@ -1,0 +1,14 @@
+# Depth Estimation — ONNX Runtime with CUDA Execution Provider (NVIDIA GPUs)
+# Installed by deploy.bat when nvidia-smi is detected.
+#
+# onnxruntime-gpu includes both CUDA and TensorRT execution providers.
+
+onnxruntime-gpu>=1.17.0
+nvidia-cudnn-cu12>=9.0
+
+# ── Common dependencies ─────────────────────────────────────────────
+huggingface_hub>=0.20.0
+numpy>=1.24.0
+opencv-python-headless>=4.8.0
+Pillow>=10.0.0
+matplotlib>=3.7.0

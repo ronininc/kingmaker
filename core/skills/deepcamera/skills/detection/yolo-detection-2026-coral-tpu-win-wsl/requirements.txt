@@ -1,0 +1,18 @@
+# Coral TPU Detection Skill — Python Dependencies
+#
+# Runtime: ai-edge-litert (LiteRT) — Google's modern TFLite runtime
+#   Supports Python 3.9–3.13. No pycoral required.
+#   detect.py uses the low-level ai-edge-litert API directly with
+#   libedgetpu as a delegate — this is faster and simpler than pycoral.
+#
+# Hardware driver: libedgetpu (system library, installed separately)
+#   Linux:   libedgetpu.so.1    (via apt: libedgetpu1-std)
+#   macOS:   libedgetpu.1.dylib (via deploy-macos.sh)
+#   Windows: edgetpu.dll        (via deploy.bat UAC install)
+
+# LiteRT runtime — loads Edge TPU delegate on all platforms
+ai-edge-litert>=2.1.0
+
+# Image processing
+numpy>=1.24.0,<2.0
+Pillow>=10.0.0

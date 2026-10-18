@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kingmaker — The Governed Mind | Ronin Inc</title>
+<meta name="description" content="An interactive AR schematic of Kingmaker. Select a region of the mind — it zooms in and its engine orb explains itself. Ask it anything; it shares what's governed and seals what isn't.">
+<!--
+  RONIN INC · KINGMAKER — AR brain schematic
+  Select a region → the mind zooms into it and its engine ORB reveals the explanation
+  (evidence + status; sealed = withheld). Governed Q&A fails closed on secrets.
+  HONEST SCOPE: front-end governed shell — set window.SOLOMON_ENDPOINT + sendToSolomon()
+  to wire the live runtime. No fabricated status.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400&family=Space+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#03050a;--panel:#0a0e14;--line:rgba(120,160,220,.16);--line2:rgba(120,160,220,.09);
+    --fg:#eaf2fb;--muted:#8b9bb0;--faint:#4f5d70;--cyan:#38e6d0;--blue:#5b8cff;--violet:#a884ff;--gold:#e7c78a;--crimson:#ff5d6c;
+    --head:'Space Grotesk',system-ui,sans-serif;--serif:'Fraunces',Georgia,serif;--mono:'JetBrains Mono',monospace;
+    --spectral:linear-gradient(90deg,var(--cyan),var(--blue),var(--violet));
+    --ok:#38e6d0;--hold:#5b8cff;--defer:#e7c78a;--sealed:#ff5d6c;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden;background:var(--ink);color:var(--fg);font-family:var(--head);font-weight:300}
+  body{position:fixed;inset:0}
+  .bg{position:fixed;inset:0;z-index:0;pointer-events:none;background:
+    radial-gradient(56vw 56vh at 50% 44%,rgba(91,140,255,.12),transparent 62%),
+    radial-gradient(40vw 40vh at 10% 94%,rgba(56,230,208,.08),transparent 60%),
+    radial-gradient(40vw 40vh at 90% 6%,rgba(168,132,255,.08),transparent 60%)}
+  /* AR grid floor + scanlines */
+  .floor{position:fixed;left:0;right:0;bottom:0;height:40vh;z-index:0;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(91,140,255,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(91,140,255,.10) 1px,transparent 1px);
+    background-size:60px 60px;transform:perspective(420px) rotateX(66deg);transform-origin:bottom;mask-image:linear-gradient(transparent,#000 70%)}
+  .scan{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:.35;background:repeating-linear-gradient(rgba(120,160,220,0) 0 2px,rgba(120,160,220,.04) 2px 3px)}
+  /* corner brackets */
+  .cnr{position:fixed;z-index:6;width:26px;height:26px;border:2px solid rgba(56,230,208,.4);pointer-events:none}
+  .cnr.tl{top:12px;left:12px;border-right:0;border-bottom:0}.cnr.tr{top:12px;right:12px;border-left:0;border-bottom:0}
+  .cnr.bl{bottom:12px;left:12px;border-right:0;border-top:0}.cnr.br{bottom:12px;right:12px;border-left:0;border-top:0}
+  a{color:inherit;text-decoration:none}
+
+  .hud{position:fixed;z-index:30;left:0;right:0;top:0;display:flex;align-items:center;justify-content:space-between;padding:16px 22px;pointer-events:none}
+  .brand{display:flex;align-items:center;gap:12px;pointer-events:auto}
+  .brand .mk{width:36px;height:36px;border:1px solid var(--line);border-radius:9px;display:flex;align-items:center;justify-content:center;background:#080c12}
+  .brand .mk svg{width:26px;height:26px}
+  .brand b{font-weight:600;letter-spacing:.18em;font-size:.98rem}
+  .brand small{display:block;font-size:.5rem;letter-spacing:.34em;color:var(--muted);margin-top:3px}
+  .status-pill{pointer-events:auto;display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:40px;padding:8px 14px;background:rgba(8,11,15,.55);backdrop-filter:blur(8px)}
+  .status-pill .live{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:blink 1.8s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+  .readout{position:fixed;z-index:20;left:22px;top:66px;font-family:var(--mono);font-size:.56rem;letter-spacing:.1em;color:var(--faint);line-height:1.9;pointer-events:none}
+  .readout b{color:var(--cyan)}
+
+  .lead{position:fixed;z-index:20;left:0;right:0;top:74px;text-align:center;pointer-events:none;padding:0 20px;transition:opacity .4s}
+  body.zoom .lead{opacity:0}
+  .lead .eyebrow{font-family:var(--mono);font-size:.6rem;letter-spacing:.34em;text-transform:uppercase;color:var(--cyan)}
+  .lead h1{font-family:var(--serif);font-weight:300;font-size:clamp(1.4rem,3.2vw,2.2rem);margin-top:9px}
+  .lead p{color:var(--muted);font-size:.82rem;margin-top:7px;max-width:54ch;margin-inline:auto}
+
+  #stage{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center}
+  #brainwrap{width:min(1060px,94vw);aspect-ratio:3/2;transform-origin:50% 50%;transition:transform 1.15s cubic-bezier(.62,0,.15,1);will-change:transform}
+  #brain{width:100%;height:100%;overflow:visible;display:block}
+  #shell{transform-origin:center;animation:breathe 7s ease-in-out infinite}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.012)}}
+  .region{cursor:pointer;transition:.25s;fill:rgba(56,230,208,.03);stroke:rgba(120,160,220,.16);stroke-width:1}
+  .region:hover{fill:rgba(56,230,208,.14);stroke:var(--cyan);stroke-width:1.4}
+  .region.center{stroke:rgba(56,230,208,.45)}
+  .zscrim{position:fixed;inset:0;z-index:12;pointer-events:none;opacity:0;transition:opacity .8s;background:radial-gradient(closest-side at var(--fx,50%) var(--fy,50%),transparent 22%,rgba(3,5,10,.72) 62%)}
+  body.zoom .zscrim{opacity:1;pointer-events:auto}
+  .lbl-t{font-family:var(--head);font-size:12.5px;fill:var(--fg);letter-spacing:.02em;pointer-events:none}
+  .lbl-s{font-family:var(--mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;fill:var(--muted);pointer-events:none}
+  .leader{stroke:rgba(120,160,220,.28);stroke-width:1}
+  body.zoom .lbl-t,body.zoom .lbl-s,body.zoom .leader{opacity:0;transition:opacity .3s}
+  @media(prefers-reduced-motion:reduce){#shell{animation:none}}
+
+  /* focus panel (AR card) */
+  #focus{position:fixed;z-index:40;right:4vw;top:50%;width:min(430px,92vw);transform:translateY(-50%) translateX(34px);opacity:0;pointer-events:none;transition:.5s cubic-bezier(.2,.7,.2,1)}
+  #focus.open{opacity:1;transform:translateY(-50%);pointer-events:auto}
+  .card{position:relative;background:linear-gradient(180deg,rgba(11,16,24,.92),rgba(6,9,15,.94));border:1px solid var(--line);border-radius:16px;padding:26px 26px 24px;backdrop-filter:blur(14px);box-shadow:0 30px 80px -30px rgba(0,0,0,.8),0 0 0 1px rgba(56,230,208,.05)}
+  .card .tick{position:absolute;width:14px;height:14px;border:2px solid var(--cyan);opacity:.6}
+  .card .tick.a{top:8px;left:8px;border-right:0;border-bottom:0}.card .tick.b{top:8px;right:8px;border-left:0;border-bottom:0}
+  .card .tick.c{bottom:8px;left:8px;border-right:0;border-top:0}.card .tick.d{bottom:8px;right:8px;border-left:0;border-top:0}
+  .fhead{display:flex;gap:16px;align-items:center}
+  .bigorb{width:70px;height:70px;flex:0 0 auto;border-radius:50%;position:relative;background:radial-gradient(circle at 36% 32%,#fff,var(--oc) 58%,#070b11 100%);box-shadow:0 0 30px var(--oc),inset 0 -6px 14px rgba(0,0,0,.5)}
+  .bigorb::before,.bigorb::after{content:'';position:absolute;inset:-9px;border-radius:50%;border:1px solid var(--oc);opacity:.5;animation:spin 5s linear infinite}
+  .bigorb::after{inset:-16px;border-style:dashed;opacity:.3;animation-duration:9s;animation-direction:reverse}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .fhead .tag{font-family:var(--mono);font-size:.54rem;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan)}
+  .fhead h2{font-family:var(--serif);font-weight:300;font-size:1.32rem;line-height:1.1;margin-top:4px}
+  .fhead .anat{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-top:5px}
+  .fstat{margin-top:14px;display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:30px;padding:6px 11px;color:var(--muted)}
+  .fstat i{width:8px;height:8px;border-radius:50%}
+  .fdesc{color:var(--muted);font-size:.9rem;line-height:1.6;margin-top:16px}
+  .sh{margin:18px 0 8px;font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:10px}
+  .sh::after{content:'';flex:1;height:1px;background:var(--line2)}
+  .ev{border-top:1px solid var(--line2);padding:10px 0;display:flex;justify-content:space-between;gap:12px;align-items:center}
+  .ev:last-child{border-bottom:1px solid var(--line2)}
+  .ev .k{font-size:.84rem}
+  .src{font-family:var(--mono);font-size:.5rem;letter-spacing:.08em;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:30px;padding:4px 8px;color:var(--muted);white-space:nowrap}
+  .src i{width:6px;height:6px;border-radius:50%}
+  .src.ok{color:var(--ok);border-color:rgba(56,230,208,.35)} .src.ok i{background:var(--ok)}
+  .src.hold{color:var(--hold);border-color:rgba(91,140,255,.35)} .src.hold i{background:var(--hold)}
+  .src.defer{color:var(--defer);border-color:rgba(231,199,138,.35)} .src.defer i{background:var(--defer)}
+  .sealed{margin-top:16px;border:1px dashed rgba(255,93,108,.4);border-radius:12px;padding:12px 14px;background:rgba(255,93,108,.05)}
+  .sealed b{color:var(--crimson);font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+  .sealed p{color:var(--muted);font-size:.78rem;margin-top:7px;line-height:1.55}
+  .frow{display:flex;gap:10px;margin-top:18px}
+  .fbtn{flex:1;font-family:var(--head);font-size:.72rem;letter-spacing:.04em;font-weight:500;padding:11px;border-radius:40px;border:1px solid var(--line);background:transparent;color:#fff;cursor:pointer;transition:.2s}
+  .fbtn:hover{background:rgba(255,255,255,.06)}
+  .fbtn.solid{background:var(--cyan);color:#04070a;border-color:transparent}
+  .fbtn.solid:hover{box-shadow:0 0 22px rgba(56,230,208,.4)}
+
+  /* Q&A console */
+  #console{position:fixed;z-index:35;left:50%;bottom:18px;transform:translateX(-50%);width:min(720px,92vw);transition:opacity .4s}
+  body.zoom #console{opacity:0;pointer-events:none}
+  .conv{max-height:28vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:10px;padding:2px}
+  .msg{max-width:86%;padding:12px 15px;border-radius:14px;font-size:.9rem;line-height:1.5;animation:rise .35s ease}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .msg.you{align-self:flex-end;background:var(--fg);color:var(--ink);border-bottom-right-radius:4px}
+  .msg.sol{align-self:flex-start;background:rgba(10,14,20,.92);border:1px solid var(--line);backdrop-filter:blur(8px);border-bottom-left-radius:4px}
+  .msg.sol .env{margin-top:9px;display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;border-radius:30px;padding:4px 9px;border:1px solid var(--line);color:var(--muted)}
+  .msg.sol .env i{width:7px;height:7px;border-radius:50%}
+  .env.share i{background:var(--ok)} .env.share{color:var(--ok);border-color:rgba(56,230,208,.35)}
+  .env.seal i{background:var(--sealed)} .env.seal{color:var(--sealed);border-color:rgba(255,93,108,.35)}
+  .suggest{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;justify-content:center}
+  .suggest button{font-family:var(--mono);font-size:.62rem;letter-spacing:.03em;color:var(--muted);border:1px solid var(--line);border-radius:40px;padding:8px 12px;background:rgba(8,11,15,.6);backdrop-filter:blur(8px);cursor:pointer;transition:.2s}
+  .suggest button:hover{color:var(--fg);border-color:var(--cyan)}
+  .bar{display:flex;gap:10px;align-items:center;background:rgba(10,14,20,.94);border:1px solid var(--line);border-radius:44px;padding:8px 8px 8px 20px;backdrop-filter:blur(12px)}
+  .bar input{flex:1;background:none;border:0;color:var(--fg);font-family:var(--head);font-size:.95rem;outline:none}
+  .bar input::placeholder{color:var(--faint)}
+  .bar button{width:44px;height:44px;border-radius:50%;border:0;background:var(--fg);color:var(--ink);cursor:pointer;font-size:1.1rem;transition:.2s;flex:0 0 auto}
+  .bar button:hover{background:var(--cyan);box-shadow:0 0 24px rgba(56,230,208,.4)}
+  .scope{text-align:center;font-family:var(--mono);font-size:.54rem;letter-spacing:.05em;color:var(--faint);margin-top:9px}
+  .scope b{color:var(--muted)}
+  .backbtn{position:fixed;z-index:41;left:22px;top:50%;transform:translateY(-50%);display:none;font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:rgba(10,14,20,.8);border:1px solid var(--line);border-radius:40px;padding:11px 16px;cursor:pointer;backdrop-filter:blur(8px)}
+  body.zoom .backbtn{display:block}
+  @media(max-width:820px){.lead p{display:none}.readout{display:none}#focus{right:50%;transform:translate(50%,60px);top:auto;bottom:96px;width:92vw}#focus.open{transform:translate(50%,0)}#console{bottom:10px}.conv{max-height:20vh}}
+</style>
+</head>
+<body>
+<div class="bg"></div><div class="floor"></div><div class="scan"></div>
+<div class="cnr tl"></div><div class="cnr tr"></div><div class="cnr bl"></div><div class="cnr br"></div>
+
+<div class="hud">
+  <a class="brand" href="./index.html">
+    <span class="mk"><svg viewBox="0 0 64 64"><defs><linearGradient id="gm" x1="8" y1="42" x2="56" y2="22" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#38e6d0"/><stop offset=".5" stop-color="#5b8cff"/><stop offset="1" stop-color="#a884ff"/></linearGradient></defs><path d="M10 44 L24 18 L32 34 L40 18 L54 44" fill="none" stroke="url(#gm)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="32" cy="46" r="3" fill="#38e6d0"/></svg></span>
+    <span><b>RONIN</b><small>KINGMAKER</small></span>
+  </a>
+  <div class="status-pill"><span class="live"></span> Governed mind · Truth Envelope active</div>
+</div>
+<div class="readout">SYS <b>KINGMAKER</b> // MIND-MAP<br>ENGINES <b>11</b> · ENVELOPE <b>ACTIVE</b><br>MODE <b>EXPLORE</b></div>
+
+<div class="lead">
+  <div class="eyebrow">The governed mind</div>
+  <h1 class="serif">Select a region to explain the engine.</h1>
+  <p>Kingmaker as a schematic mind — each region is an engine. Select one: the mind zooms in and its orb explains itself. Or ask below — it shares what's governed and seals what isn't.</p>
+</div>
+
+<div id="stage"><div id="brainwrap">
+  <svg id="brain" viewBox="0 0 960 640" role="img" aria-label="Interactive Kingmaker mind schematic">
+    <defs>
+      <linearGradient id="spec" x1="120" y1="460" x2="820" y2="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#38e6d0"/><stop offset=".5" stop-color="#5b8cff"/><stop offset="1" stop-color="#a884ff"/></linearGradient>
+      <radialGradient id="depth" cx="46%" cy="40%" r="62%"><stop offset="0" stop-color="#0f1a28"/><stop offset="1" stop-color="#060a10"/></radialGradient>
+      <radialGradient id="orbOk" cx="36%" cy="32%" r="70%"><stop offset="0" stop-color="#eafffb"/><stop offset=".5" stop-color="#38e6d0"/><stop offset="1" stop-color="#0a1f1c"/></radialGradient>
+      <radialGradient id="orbHold" cx="36%" cy="32%" r="70%"><stop offset="0" stop-color="#eef3ff"/><stop offset=".5" stop-color="#5b8cff"/><stop offset="1" stop-color="#0a1330"/></radialGradient>
+      <radialGradient id="orbDefer" cx="36%" cy="32%" r="70%"><stop offset="0" stop-color="#fff8ea"/><stop offset=".5" stop-color="#e7c78a"/><stop offset="1" stop-color="#2a2213"/></radialGradient>
+    </defs>
+    <g id="shell">
+      <path id="cerebrum" d="M150 322 C150 214 214 150 300 132 C356 120 402 128 452 132 C560 140 636 132 706 168 C772 202 812 250 800 306 C792 346 760 366 726 366 C700 402 672 424 612 428 C556 431 512 424 470 424 C398 424 336 434 286 420 C210 400 150 372 150 322 Z" fill="url(#depth)" stroke="url(#spec)" stroke-width="2.2" stroke-opacity=".85"/>
+      <path id="cerebellum" d="M726 366 C778 360 826 384 838 420 C848 452 826 486 782 494 C742 500 706 486 700 452 C696 424 704 388 726 366 Z" fill="url(#depth)" stroke="url(#spec)" stroke-width="2" stroke-opacity=".7"/>
+      <path id="stem" d="M604 424 C598 470 590 512 566 548 C556 562 544 566 536 560 C528 554 528 540 536 520 C552 480 560 452 566 420 Z" fill="url(#depth)" stroke="url(#spec)" stroke-width="2" stroke-opacity=".6"/>
+      <path d="M470 132 C452 210 486 250 470 316 C462 352 470 392 470 424" fill="none" stroke="rgba(120,160,220,.22)" stroke-width="1.4"/>
+      <path d="M250 250 C320 230 360 260 430 246 M300 190 C360 178 420 196 470 186 M520 170 C600 168 660 190 720 210 M540 250 C620 250 680 270 740 286 M300 350 C380 366 460 360 540 356" fill="none" stroke="rgba(120,160,220,.13)" stroke-width="1.2"/>
+      <path d="M726 372 C744 392 748 424 736 452 M756 372 C776 396 780 430 764 460 M700 400 C712 420 714 446 704 470" fill="none" stroke="rgba(120,160,220,.2)" stroke-width="1"/>
+    </g>
+    <g id="synapses"></g><g id="pulses"></g><g id="orbs"></g><g id="regions"></g><g id="labels"></g>
+  </svg>
+</div></div>
+<div class="zscrim" id="zscrim"></div>
+<button class="backbtn" id="backbtn">‹ Back to the mind</button>
+
+<div id="focus"><div class="card">
+  <span class="tick a"></span><span class="tick b"></span><span class="tick c"></span><span class="tick d"></span>
+  <div id="focusInner"></div>
+</div></div>
+
+<div id="console">
+  <div class="conv" id="conv"></div>
+  <div class="suggest" id="suggest"></div>
+  <div class="bar"><input id="ask" type="text" placeholder="Ask Kingmaker anything about how it works…" autocomplete="off"><button id="send" aria-label="Send">↑</button></div>
+  <div class="scope">Demo responder — a governed front-end shell. <b>Wire window.SOLOMON_ENDPOINT for real inference.</b> No answer is fabricated; secrets fail closed.</div>
+</div>
+
+<script>
+var NODES=[
+  {id:'decision',name:'Decision Engine / Truth Envelope',anat:'Prefrontal cortex',status:'ok',statusText:'Operational',cx:262,cy:210,rx:52,ry:44,lx:78,ly:150,a:'start',
+   desc:'Judgment. Every decision is wrapped with its claim, evidence, confidence and reversibility. A claim with no backing proof cannot be marked done — "no fake PASS."',
+   evidence:[{k:'Envelope schema',s:'proof-backed',st:'ok'},{k:'No-fake-PASS invariant',s:'enforced',st:'ok'}]},
+  {id:'codegen',name:'CodeGen',anat:'Motor / Broca’s area',status:'ok',statusText:'Proof-backed',cx:372,cy:172,rx:46,ry:40,lx:300,ly:92,a:'middle',
+   desc:'Expression in code. Generates and modifies code under governance — changes are proven against tests before they are claimed.',
+   evidence:[{k:'Generation proof',s:'test suite',st:'ok'}],sealed:'Generation prompts and model configuration are withheld.'},
+  {id:'fab',name:'Fabrication',anat:'Premotor cortex',status:'ok',statusText:'Proof-backed',cx:474,cy:166,rx:44,ry:40,lx:474,ly:78,a:'middle',
+   desc:'Turning intent into built artifacts, gated by the same evidence rules.',evidence:[{k:'Fabrication proof',s:'artifact check',st:'ok'}]},
+  {id:'twin',name:'Digital Twin Engine',anat:'Parietal lobe',status:'ok',statusText:'Operational',cx:592,cy:196,rx:52,ry:44,lx:700,ly:104,a:'start',
+   desc:'The spatial model of the world. Builds a live, queryable twin of a system so Kingmaker reasons over real state, not guesses.',evidence:[{k:'Twin build',s:'proof: twin',st:'ok'}]},
+  {id:'evidence',name:'Evidence & Screenshot',anat:'Occipital lobe',status:'ok',statusText:'Operational',cx:724,cy:268,rx:48,ry:44,lx:872,ly:236,a:'start',
+   desc:'Perception and record. Captures and hashes evidence for every claim — the audit trail that makes a status trustworthy.',evidence:[{k:'Evidence capture',s:'audit hash',st:'ok'}]},
+  {id:'buildtree',name:'Build Tree',anat:'Cerebellum',status:'ok',statusText:'Operational',cx:766,cy:432,rx:46,ry:40,lx:884,ly:452,a:'start',
+   desc:'Coordination and sequencing. The dependency-ordered map of what builds before what, so a clean clone is always reproducible.',evidence:[{k:'Clean-clone',s:'reproducible',st:'ok'}]},
+  {id:'runtime',name:'Kingmaker Runtime',anat:'Thalamic core',center:true,status:'ok',statusText:'Operational · governed',cx:452,cy:300,rx:60,ry:52,lx:452,ly:300,a:'middle',
+   desc:'The core that routes everything. Every request passes through policy and is wrapped in a Truth Envelope before any action. Nothing executes that a proof or an operator approval does not back.',
+   evidence:[{k:'Governance gate',s:'proof: governance',st:'ok'},{k:'Truth Envelope on every action',s:'invariant',st:'ok'}],sealed:'Internal policy weights, routing keys, and operator credentials are never disclosed.'},
+  {id:'internet',name:'Native Internet',anat:'Brainstem / sensory relay',status:'hold',statusText:'Native proven · external on config-hold',cx:588,cy:470,rx:40,ry:44,lx:720,ly:540,a:'start',
+   desc:'The gateway to the outside. Native device-network retrieval performs real operator-approved fetches and fails closed on unapproved targets. The external-provider lane is held at config-hold, not pretended active.',
+   evidence:[{k:'Native retrieval',s:'proof: internet',st:'ok'},{k:'External provider lane',s:'config-hold',st:'hold'}],sealed:'Approved endpoint lists and fetch credentials are not disclosed.'},
+  {id:'project',name:'Project Twin',anat:'Hippocampus',status:'ok',statusText:'Operational',cx:452,cy:372,rx:44,ry:34,lx:452,ly:614,a:'middle',
+   desc:'Memory of a project — its build tree, proofs and status — kept in sync with reality.',evidence:[{k:'Project state',s:'synced',st:'ok'}]},
+  {id:'crm',name:'CRM / Merchant',anat:'Temporal lobe',status:'ok',statusText:'Operational',cx:346,cy:352,rx:48,ry:38,lx:150,ly:420,a:'end',
+   desc:'The social and commercial faculty — governed operations across merchant and customer systems. Safe, approved actions only.',evidence:[{k:'Connector grants',s:'operator-approved',st:'ok'}]},
+  {id:'voice',name:'Voice',anat:'Auditory / Wernicke’s area',status:'defer',statusText:'Deferred — needs hardware proof',cx:262,cy:322,rx:44,ry:38,lx:78,ly:300,a:'end',
+   desc:'Hearing and speech — the intended primary interface (mic → recognition → governed runtime → Truth Envelope → speech). Honestly held DEFERRED until a real human-at-a-microphone proof exists. It must never auto-execute risky actions.',
+   evidence:[{k:'Automated coverage',s:'partial',st:'hold'},{k:'Manual hardware proof',s:'not yet run',st:'defer'}]}
+];
+var SVGNS='http://www.w3.org/2000/svg';
+var dotColor={ok:'#38e6d0',hold:'#5b8cff',defer:'#e7c78a'};
+var orbGrad={ok:'url(#orbOk)',hold:'url(#orbHold)',defer:'url(#orbDefer)'};
+function el(t,a){var e=document.createElementNS(SVGNS,t);for(var k in a)e.setAttribute(k,a[k]);return e;}
+
+var synG=document.getElementById('synapses'),pulG=document.getElementById('pulses'),orbG=document.getElementById('orbs'),regG=document.getElementById('regions'),labG=document.getElementById('labels');
+var pts=NODES.map(function(n){return [n.cx,n.cy];}).concat([[340,250],[560,270],[430,190],[640,340],[360,300],[520,360]]);
+var links=[[6,0],[6,3],[6,9],[6,10],[6,8],[0,1],[1,2],[2,3],[3,4],[4,5],[5,7],[7,8],[8,9],[9,10],[10,11],[0,11],[6,1],[6,4],[6,7]];
+links.forEach(function(L,i){var a=pts[L[0]],b=pts[L[1]];if(!a||!b)return;var mx=(a[0]+b[0])/2+(i%2?18:-18),my=(a[1]+b[1])/2+(i%3?-14:14);var d='M'+a[0]+' '+a[1]+' Q'+mx+' '+my+' '+b[0]+' '+b[1];
+  synG.appendChild(el('path',{d:d,fill:'none',stroke:'rgba(120,160,220,.14)','stroke-width':1}));
+  var p=el('path',{d:d,fill:'none',stroke:'rgba(56,230,208,.5)','stroke-width':1.4,'stroke-dasharray':'2 60','stroke-linecap':'round'});
+  p.appendChild(el('animate',{attributeName:'stroke-dashoffset',from:'0',to:'-62',dur:(2.4+i%5*0.4)+'s',repeatCount:'indefinite'}));pulG.appendChild(p);});
+
+/* orbs at each region */
+NODES.forEach(function(n){
+  var g=el('g',{style:'cursor:pointer'}); g.addEventListener('click',function(){select(n);});
+  var R=n.center?18:12;
+  var halo=el('circle',{cx:n.cx,cy:n.cy,r:R+11,fill:dotColor[n.status],opacity:.14});
+  halo.appendChild(el('animate',{attributeName:'r',values:(R+8)+';'+(R+15)+';'+(R+8),dur:'3s',repeatCount:'indefinite'}));
+  var ring=el('circle',{cx:n.cx,cy:n.cy,r:R+5,fill:'none',stroke:dotColor[n.status],'stroke-width':1,'stroke-dasharray':'2 5',opacity:.7});
+  ring.appendChild(el('animateTransform',{attributeName:'transform',type:'rotate',from:'0 '+n.cx+' '+n.cy,to:'360 '+n.cx+' '+n.cy,dur:(6+ (n.cx%5))+'s',repeatCount:'indefinite'}));
+  var core=el('circle',{cx:n.cx,cy:n.cy,r:R,fill:orbGrad[n.status],stroke:'rgba(255,255,255,.25)','stroke-width':.6});
+  g.appendChild(halo);g.appendChild(ring);g.appendChild(core);orbG.appendChild(g);
+});
+/* region hover zones + labels */
+NODES.forEach(function(n){
+  var r=el('ellipse',{cx:n.cx,cy:n.cy,rx:n.rx,ry:n.ry,class:'region'+(n.center?' center':'')});
+  r.addEventListener('click',function(){select(n);});regG.appendChild(r);
+  if(n.center){var tc=el('text',{x:n.cx,y:n.cy+40,'text-anchor':'middle',class:'lbl-t'});tc.textContent='Kingmaker Runtime';
+    var sc=el('text',{x:n.cx,y:n.cy+54,'text-anchor':'middle',class:'lbl-s'});sc.textContent='Thalamic core';labG.appendChild(tc);labG.appendChild(sc);return;}
+  labG.appendChild(el('line',{x1:n.lx,y1:n.ly+4,x2:n.cx,y2:n.cy,class:'leader'}));
+  var g=el('g',{style:'cursor:pointer'});g.addEventListener('click',function(){select(n);});
+  var t=el('text',{x:n.lx,y:n.ly,'text-anchor':n.a,class:'lbl-t'});t.textContent=n.name;
+  var s=el('text',{x:n.lx,y:n.ly+14,'text-anchor':n.a,class:'lbl-s'});s.textContent=n.statusText;
+  g.appendChild(t);g.appendChild(s);labG.appendChild(g);
+});
+
+/* ---- zoom + focus ---- */
+var wrap=document.getElementById('brainwrap'),focus=document.getElementById('focus'),fInner=document.getElementById('focusInner'),zscrim=document.getElementById('zscrim');
+function select(n){
+  var fx=n.cx/960, fy=n.cy/640;
+  zscrim.style.setProperty('--fx',(fx*100)+'%'); zscrim.style.setProperty('--fy',(fy*100)+'%');
+  document.body.classList.add('zoom');
+  var S=n.center?1.9:2.6;
+  wrap.style.transform='scale('+S+') translate('+((0.5-fx)*100)+'%,'+((0.5-fy)*100)+'%)';
+  fInner.innerHTML=
+    '<div class="fhead"><div class="bigorb" style="--oc:'+dotColor[n.status]+'"></div>'+
+    '<div><div class="tag">Engine · Kingmaker</div><h2 class="serif">'+n.name+'</h2><div class="anat">◈ '+n.anat+'</div></div></div>'+
+    '<span class="fstat"><i style="background:'+dotColor[n.status]+'"></i>'+n.statusText+'</span>'+
+    '<p class="fdesc">'+n.desc+'</p>'+
+    '<div class="sh">Evidence</div>'+
+    n.evidence.map(function(e){return '<div class="ev"><div class="k">'+e.k+'</div><span class="src '+e.st+'"><i></i>'+e.s+'</span></div>';}).join('')+
+    (n.sealed?'<div class="sealed"><b>◈ Sealed — governance-withheld</b><p>'+n.sealed+'</p></div>':'')+
+    '<div class="frow"><button class="fbtn" id="fBack">‹ Back</button><button class="fbtn solid" id="fAsk">Ask about this →</button></div>';
+  setTimeout(function(){focus.classList.add('open');},430);
+  document.getElementById('fBack').onclick=deselect;
+  document.getElementById('fAsk').onclick=function(){deselect();ask('How does '+n.name+' work?');};
+}
+function deselect(){focus.classList.remove('open');document.body.classList.remove('zoom');wrap.style.transform='';}
+document.getElementById('backbtn').onclick=deselect;
+zscrim.addEventListener('click',deselect);
+addEventListener('keydown',function(e){if(e.key==='Escape')deselect();});
+
+/* ---- governed Q&A ---- */
+window.SOLOMON_ENDPOINT=window.SOLOMON_ENDPOINT||null;
+var SECRET=/\b(weights?|api ?keys?|password|credential|secret|private key|token|source code|training data|model file|prompt|proprietary|\.env|env var|how were you (built|trained))\b/i;
+var KB=[
+  {re:/truth envelope|governance|govern/i,a:'Every action is wrapped in a Truth Envelope: claim, evidence, confidence, reversibility. No proof, no "done" — the "no fake PASS" doctrine. That faculty lives in the prefrontal region.'},
+  {re:/voice/i,a:'Voice is the intended primary interface but honestly held DEFERRED until a real hardware proof (a human at a microphone) exists. Even live, it never auto-executes a risky action. It maps to the auditory/language region.'},
+  {re:/internet|online|fetch|web/i,a:'Native internet retrieval is proven: real operator-approved fetches over the device network, failing closed on unapproved targets. The external-provider lane is held at config-hold. Brainstem/sensory-relay region.'},
+  {re:/proof|proven|test|pass|verify/i,a:'A capability is only claimed once a proof backs it. Proofs run in build order and report real PASS/FAIL/DEFERRED — never a guessed status.'},
+  {re:/twin|state|model of/i,a:'The Digital Twin (parietal region) builds a live, queryable model of a system so Kingmaker reasons over real state instead of guesses.'},
+  {re:/what (are|is) you|who are you|kingmaker/i,a:'I am Kingmaker — a governed intelligence runtime by Ronin Inc. Think of me as a mind: each region is an engine. I reason over real state, act only through approved connectors, and record evidence for everything I claim.'},
+  {re:/codegen|code|build|fabricat/i,a:'CodeGen (motor region) and Fabrication generate and build under governance — proven against tests before anything is claimed, and a clean clone must stay reproducible.'},
+  {re:/evidence|audit|screenshot|memory|remember/i,a:'Evidence & Screenshot (occipital) captures and hashes proof for every claim; Project Twin (hippocampus) holds a project’s memory. Together they are why a status is trustworthy, not optimistic.'}
+];
+function respond(q){q=(q||'').trim();if(!q)return null;
+  if(SECRET.test(q))return {seal:true,text:'That touches sealed internals — model weights, keys, credentials, or proprietary configuration. By governance I answer what is safe to share and never disclose secrets. Ask me what a region *does* and I’ll explain it plainly.'};
+  for(var i=0;i<KB.length;i++){if(KB[i].re.test(q))return {seal:false,text:KB[i].a};}
+  return {seal:false,text:'I answer how Kingmaker works and what each region does. Try the Truth Envelope, native internet, voice, or proofs — or select any region of the mind above. (Governed demo responder — wire the live runtime for full reasoning.)'};}
+var conv=document.getElementById('conv');
+function push(cls,html){var m=document.createElement('div');m.className='msg '+cls;m.innerHTML=html;conv.appendChild(m);conv.scrollTop=conv.scrollHeight;return m;}
+function ask(q){push('you',q.replace(/</g,'&lt;'));var t=push('sol','<span style="opacity:.6">Consulting the governed knowledge base…</span>');
+  setTimeout(function(){if(window.SOLOMON_ENDPOINT&&window.sendToSolomon){window.sendToSolomon(q).then(function(r){t.innerHTML=r.text+chip(r.seal);});return;}var r=respond(q);t.innerHTML=r.text+chip(r.seal);},420);}
+function chip(seal){return seal?'<div class="env seal"><i></i>Truth Envelope · Sealed — withheld</div>':'<div class="env share"><i></i>Truth Envelope · Governed — shareable</div>';}
+var input=document.getElementById('ask'),send=document.getElementById('send');
+function submit(){var v=input.value;if(!v.trim())return;input.value='';ask(v);}
+send.onclick=submit;input.addEventListener('keydown',function(e){if(e.key==='Enter')submit();});
+['What is the Truth Envelope?','Is voice working yet?','Can Kingmaker browse the internet?','Show me your source code'].forEach(function(s){var b=document.createElement('button');b.textContent=s;b.onclick=function(){ask(s);};document.getElementById('suggest').appendChild(b);});
+</script>
+</body>
+</html>

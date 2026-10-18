@@ -1,0 +1,5 @@
+A first thing to say to Kingmaker once it is awake:
+
+"What can you drive?"
+
+It answers in one short spoken reply: the apps and tools it can use on this Mac, and the tools it proposes for the apps it can't drive yet. Nothing is installed or changed by asking. To see what is waiting for your word, run `kingmaker status` in a terminal.

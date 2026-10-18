@@ -1,0 +1,17 @@
+{
+  "server_name": "billing-mcp",
+  "language": "python",
+  "tools": [
+    {"name": "get_invoice",
+     "description": "按 ID 查询发票详情，返回发票对象（含金额与状态）。",
+     "inputSchema": {"type": "object",
+       "properties": {"invoice_id": {"type": "string", "description": "发票唯一标识"}},
+       "required": ["invoice_id"]}},
+    {"name": "create_invoice",
+     "description": "创建一张新发票，返回生成的发票 ID。",
+     "inputSchema": {"type": "object",
+       "properties": {"customer_id": {"type": "string", "description": "客户 ID"},
+                      "amount_cents": {"type": "integer", "description": "金额（分）"}},
+       "required": ["customer_id", "amount_cents"]}}
+  ]
+}

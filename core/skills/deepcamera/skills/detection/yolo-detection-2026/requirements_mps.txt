@@ -1,0 +1,8 @@
+# YOLO 2026 — MPS (Apple Silicon) requirements
+# Uses ONNX Runtime + CoreML EP for GPU/ANE acceleration.
+# Pre-built yolo26n.onnx is shipped in the repo, so torch/ultralytics
+# are NOT needed at runtime — only onnxruntime for inference.
+onnxruntime>=1.19.0
+numpy>=1.24.0,<2.0.0
+opencv-python-headless>=4.8.0
+Pillow>=10.0.0

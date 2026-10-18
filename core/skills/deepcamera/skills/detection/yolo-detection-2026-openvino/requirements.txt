@@ -1,0 +1,9 @@
+# Container dependencies for OpenVINO Detection
+# openvino-runtime is pre-installed in the base image
+
+# Ultralytics for model loading and OpenVINO export
+ultralytics>=8.3.0
+
+# Image processing
+numpy>=1.24.0,<2.0
+Pillow>=10.0.0

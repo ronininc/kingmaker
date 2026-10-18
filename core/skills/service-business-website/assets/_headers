@@ -1,0 +1,20 @@
+# Cloudflare Pages headers — security + caching.
+# Replace SUPABASE_URL with your project origin (e.g. https://abcd.supabase.co).
+# Docs: https://developers.cloudflare.com/pages/configuration/headers/
+
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=()
+  Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' SUPABASE_URL; frame-ancestors 'self'; base-uri 'self'; object-src 'none'
+
+/admin/*
+  X-Robots-Tag: noindex, nofollow
+/crew/*
+  X-Robots-Tag: noindex, nofollow
+/portal.html
+  X-Robots-Tag: noindex, nofollow
+
+/assets/*
+  Cache-Control: public, max-age=86400

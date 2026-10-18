@@ -1,0 +1,2 @@
+# Signal Channel
+# signal-cli must be installed separately: https://github.com/AsamK/signal-cli

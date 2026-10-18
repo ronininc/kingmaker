@@ -1,0 +1,14 @@
+{
+  "currency": "usd",
+  "note": "Prices are in CENTS. 1299 = $12.99. This is the server-side source of truth — the site never sets prices.",
+  "items": [
+    { "id": "la-casa-roll",   "name": "La Casa Roll",          "price": 1599 },
+    { "id": "spicy-tuna",     "name": "Spicy Tuna Roll",       "price": 1299 },
+    { "id": "guero-banado",   "name": "El Güero Bañado",       "price": 1899 },
+    { "id": "aguachile",      "name": "Aguachile de Camarón",  "price": 1699 },
+    { "id": "shrimp-tacos",   "name": "Shrimp Tacos",          "price": 1299 },
+    { "id": "gorditas",       "name": "Gorditas",              "price": 999  },
+    { "id": "menudo",         "name": "Menudo",                "price": 1399 },
+    { "id": "pina-lemonade",  "name": "Pineapple Lemonade",    "price": 599  }
+  ]
+}

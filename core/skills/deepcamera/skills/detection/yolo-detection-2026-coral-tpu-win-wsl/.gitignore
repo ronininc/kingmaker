@@ -1,0 +1,53 @@
+# ─── Python ───────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+.eggs/
+.venv/
+venv/
+env/
+
+# ─── ML Models & Data ────────────────────────────────
+*.pt
+*.pth
+*.onnx
+*.tflite
+*.pb
+*.h5
+*.safetensors
+model/
+model.tgz
+*.tgz
+weights/
+runs/
+
+# ─── Build ────────────────────────────────────────────
+build/build/*
+build/dist/*
+build/runtime_arch
+build/*
+runtime
+
+# ─── Node ─────────────────────────────────────────────
+node_modules/
+
+# ─── Docker ───────────────────────────────────────────
+docker/db
+volumes
+
+# ─── IDE & OS ─────────────────────────────────────────
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.env.local
+
+# ─── Project Specific ────────────────────────────────
+src/yolov7_reid/src/models/mgn_R50-ibn.onnx
+*.tflite

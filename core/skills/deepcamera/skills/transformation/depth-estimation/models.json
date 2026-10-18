@@ -1,0 +1,156 @@
+{
+  "studio": {
+    "title": "3D Depth Vision Studio",
+    "subtitle": "Convert 2D video to 3D depth maps • Privacy-first scene understanding",
+    "icon": "layers"
+  },
+  "models_dir": "~/.aegis-ai/models/feature-extraction",
+  "models": {
+    "depth-anything-v2-small": {
+      "name": "Depth Anything V2 Small",
+      "type": "depth_estimation",
+      "description": "Real-time monocular depth estimation — Apple Neural Engine optimized",
+      "input_size": [518, 392],
+      "platforms": {
+        "darwin": {
+          "repository": "apple/coreml-depth-anything-v2-small",
+          "format": "mlpackage",
+          "variants": {
+            "DepthAnythingV2SmallF16": {
+              "precision": "float16",
+              "size_mb": 49.8,
+              "description": "Float16 — optimized for Neural Engine"
+            },
+            "DepthAnythingV2SmallF16INT8": {
+              "precision": "float16_int8",
+              "size_mb": 25.0,
+              "description": "Float16 + INT8 quantization — smallest"
+            },
+            "DepthAnythingV2SmallF32": {
+              "precision": "float32",
+              "size_mb": 99.2,
+              "description": "Float32 — highest precision"
+            },
+            "DepthAnythingV2SmallF16P6": {
+              "precision": "float16_p6",
+              "size_mb": 18.0,
+              "description": "Float16 palettized 6-bit"
+            },
+            "DepthAnythingV2SmallF16P8": {
+              "precision": "float16_p8",
+              "size_mb": 24.0,
+              "description": "Float16 palettized 8-bit"
+            },
+            "DepthAnythingV2SmallF32INT8": {
+              "precision": "float32_int8",
+              "size_mb": 24.0,
+              "description": "Float32 + INT8 quantization"
+            },
+            "DepthAnythingV2SmallF32P6": {
+              "precision": "float32_p6",
+              "size_mb": 18.0,
+              "description": "Float32 palettized 6-bit"
+            },
+            "DepthAnythingV2SmallF32P8": {
+              "precision": "float32_p8",
+              "size_mb": 24.0,
+              "description": "Float32 palettized 8-bit"
+            }
+          }
+        },
+        "linux": {
+          "repository": "onnx-community/depth-anything-v2-small",
+          "format": "onnx",
+          "variants": {
+            "model": {
+              "precision": "float32",
+              "size_mb": 98.0,
+              "description": "ONNX — CUDA/TensorRT/CPU"
+            },
+            "model_quantized": {
+              "precision": "int8",
+              "size_mb": 25.0,
+              "description": "ONNX INT8 quantized — smallest, fastest"
+            }
+          }
+        },
+        "win32": {
+          "repository": "onnx-community/depth-anything-v2-small",
+          "format": "onnx",
+          "variants": {
+            "model": {
+              "precision": "float32",
+              "size_mb": 98.0,
+              "description": "ONNX — CUDA/TensorRT/DirectML/CPU"
+            },
+            "model_quantized": {
+              "precision": "int8",
+              "size_mb": 25.0,
+              "description": "ONNX INT8 quantized — smallest, fastest"
+            }
+          }
+        }
+      }
+    },
+    "depth-anything-v2-base": {
+      "name": "Depth Anything V2 Base",
+      "type": "depth_estimation",
+      "description": "Higher accuracy depth estimation — larger model",
+      "input_size": [518, 392],
+      "platforms": {
+        "linux": {
+          "repository": "onnx-community/depth-anything-v2-base",
+          "format": "onnx",
+          "variants": {
+            "model": {
+              "precision": "float32",
+              "size_mb": 390.0,
+              "description": "ONNX — CUDA/TensorRT/CPU"
+            }
+          }
+        },
+        "win32": {
+          "repository": "onnx-community/depth-anything-v2-base",
+          "format": "onnx",
+          "variants": {
+            "model": {
+              "precision": "float32",
+              "size_mb": 390.0,
+              "description": "ONNX — CUDA/TensorRT/DirectML/CPU"
+            }
+          }
+        }
+      }
+    },
+    "depth-anything-v2-large": {
+      "name": "Depth Anything V2 Large",
+      "type": "depth_estimation",
+      "description": "Highest accuracy depth estimation — largest model",
+      "input_size": [518, 392],
+      "platforms": {
+        "linux": {
+          "repository": "onnx-community/depth-anything-v2-large",
+          "format": "onnx",
+          "variants": {
+            "model": {
+              "precision": "float32",
+              "size_mb": 1280.0,
+              "description": "ONNX — CUDA/TensorRT/CPU"
+            }
+          }
+        },
+        "win32": {
+          "repository": "onnx-community/depth-anything-v2-large",
+          "format": "onnx",
+          "variants": {
+            "model": {
+              "precision": "float32",
+              "size_mb": 1280.0,
+              "description": "ONNX — CUDA/TensorRT/DirectML/CPU"
+            }
+          }
+        }
+      }
+    }
+  }
+}

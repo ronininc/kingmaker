@@ -1,0 +1,1147 @@
+// MOCK_RAW — fallback dataset used when no window.__REPORT_DATA__ is injected.
+//
+// Shape matches the raw pipeline output (sample-standard.json schema):
+//   { metadata, papers, chart_data, prisma_log }
+//
+// Theme: "Working memory training in older adults" — chosen so the data feels
+// real (it is the kind of query the Skill is built to answer) without
+// pulling the entire 696 KB sample-standard fixture into the bundle.
+
+export const MOCK_RAW = {
+  metadata: {
+    search_id: "mock_20260522_wm_training_older_adults",
+    original_user_query:
+      "Find literature on working-memory training in older adults, use the standard tier, and make me a report.",
+    query:
+      "Find literature on working-memory training in older adults, use the standard tier, and make me a report.",
+    search_topic: "working memory training in older adults",
+    display_title:
+      "Working memory training in older adults — transfer effects, neural plasticity, and longitudinal RCT evidence",
+    // Paired demo-only identities let one fixture preview both report languages.
+    display_title_zh:
+      "老年人工作记忆训练 — 迁移效应、神经可塑性与纵向 RCT 证据",
+    search_topic_zh: "老年人工作记忆训练",
+    tier: "standard",
+    wall_clock_total_s: 412,
+    papers_evaluated: 187,
+    papers_in_kg: 142,
+    highly_relevant_count: 12,
+    closely_related_count: 24,
+    coverage_estimate: 0.91,
+    coverage_ci: [0.83, 0.96],
+    generated_at: "2026-05-22T10:14:08.523000",
+    skill_version: "paper-search-pro/2.5.0",
+    stop_reason: null,
+  },
+
+  papers: [
+    // --- Foundational (rcs >= 9) — 3 papers
+    {
+      paper_id: "10.1126/science.1230579",
+      journal_rank: {"cas": {"tier": 1, "rank": "2/118", "top": true, "minor": [{"category": "MULTIDISCIPLINARY SCIENCES 综合性期刊", "tier": 1, "rank": "2/131"}], "source_year": 2025}, "jcr": {"quartile": "Q1", "impact_factor": 45.8, "rank": "3/135", "category": "MULTIDISCIPLINARY SCIENCES(SCIE)", "source_year": 2024}, "sjr": {"best_quartile": "Q1", "sjr": 10.416, "per_category": [{"category": "History and Philosophy of Science", "quartile": "Q1"}, {"category": "Multidisciplinary", "quartile": "Q1"}], "source_year": 2024}, "openalex": null, "matched_issn": "0036-8075", "matched_platforms": ["cas", "jcr", "sjr"]},
+      journal_rank_attribution: "Data: 中科院文献情报中心期刊分区表 (CAS Journal Ranking). For personal/non-commercial use; 勿公开传播.  Data: Journal Citation Reports (Clarivate). Impact Factor and JCR quartiles are © Clarivate; for reference only.  Data: SCImago Journal Rank, scimagojr.com — non-commercial use as long as it is cited (SCImago custom terms; NOT a Creative Commons licence).",
+      title:
+        "Putting Brain Training to the Test: Adaptive Working Memory Training in Healthy Older Adults",
+      authors_short: "Owen et al.",
+      authors_full: [
+        "Adrian M. Owen",
+        "Adam Hampshire",
+        "Jessica A. Grahn",
+        "Robert Stenton",
+        "Said Dajani",
+        "Alistair S. Burns",
+      ],
+      year: 2014,
+      venue: "Science",
+      doi: "10.1126/science.1230579",
+      doi_url: "https://doi.org/10.1126/science.1230579",
+      abstract:
+        "Cognitive training has been touted as a means to slow age-related decline. We report a large-scale, multi-site, adaptive working memory training trial with 11,430 older adults randomized to one of three intervention arms and a no-contact control. Adaptive n-back training produced robust gains on the trained task but did not transfer to untrained tests of working memory, fluid reasoning, or everyday function over a six-month follow-up.",
+      tldr:
+        "Working memory training improves the trained task but does not produce far transfer to other cognitive abilities in healthy older adults.",
+      rcs: 10,
+      rcs_reasoning:
+        "Field-defining adaptive WM training RCT in older adults (Science, n=11,430). The canonical null-transfer reference cited in every meta-analysis since 2014.",
+      rcs_flag: null,
+      citation_count: 1842,
+      influential_citation_count: 187,
+      discovery_path: "seed",
+      sources: ["openalex", "semantic_scholar"],
+      is_oa: true,
+    },
+    {
+      paper_id: "10.1037/a0028228",
+      journal_rank: {"cas": {"tier": 2, "rank": "71/657", "top": true, "minor": [{"category": "PSYCHOLOGY, DEVELOPMENTAL 心理学：发育", "tier": 2, "rank": "18/91"}], "source_year": 2025}, "jcr": {"quartile": "Q2", "impact_factor": 3.1, "rank": "27/94", "category": "PSYCHOLOGY, DEVELOPMENTAL(SSCI)", "source_year": 2024}, "sjr": {"best_quartile": "Q1", "sjr": 1.567, "per_category": [{"category": "Demography", "quartile": "Q1"}, {"category": "Developmental and Educational Psychology", "quartile": "Q1"}, {"category": "Life-span and Life-course Studies", "quartile": "Q1"}], "source_year": 2024}, "openalex": null, "matched_issn": "0012-1649", "matched_platforms": ["cas", "jcr", "sjr"]},
+      journal_rank_attribution: "Data: 中科院文献情报中心期刊分区表 (CAS Journal Ranking). For personal/non-commercial use; 勿公开传播.  Data: Journal Citation Reports (Clarivate). Impact Factor and JCR quartiles are © Clarivate; for reference only.  Data: SCImago Journal Rank, scimagojr.com — non-commercial use as long as it is cited (SCImago custom terms; NOT a Creative Commons licence).",
+      title:
+        "The cognitive plasticity of adaptive working memory training: a meta-analysis",
+      authors_short: "Melby-Lervåg & Hulme",
+      authors_full: ["Monica Melby-Lervåg", "Charles Hulme"],
+      year: 2013,
+      venue: "Developmental Psychology",
+      doi: "10.1037/a0028228",
+      doi_url: "https://doi.org/10.1037/a0028228",
+      abstract:
+        "We meta-analyzed 23 studies of adaptive working memory training across the lifespan. Effects on the trained tasks were large and reliable; near-transfer effects to similar untrained tasks were small; and far-transfer effects to fluid reasoning, attention control, or academic achievement were not detectable after correcting for active-control comparison and selective reporting.",
+      tldr:
+        "WM training reliably improves the trained task but produces no detectable far transfer once active controls and reporting bias are accounted for.",
+      rcs: 9,
+      rcs_reasoning:
+        "The canonical meta-analysis of WM training transfer; required reading for any review and cited in every subsequent transfer debate.",
+      rcs_flag: null,
+      citation_count: 1410,
+      influential_citation_count: 142,
+      discovery_path: "seed",
+      sources: ["openalex"],
+      is_oa: false,
+    },
+    {
+      paper_id: "10.1073/pnas.0801268105",
+      journal_rank: {"cas": {"tier": 1, "rank": "6/118", "top": true, "minor": [{"category": "MULTIDISCIPLINARY SCIENCES 综合性期刊", "tier": 1, "rank": "6/131"}], "source_year": 2025}, "jcr": {"quartile": "Q1", "impact_factor": 9.1, "rank": "14/135", "category": "MULTIDISCIPLINARY SCIENCES(SCIE)", "source_year": 2024}, "sjr": {"best_quartile": "Q1", "sjr": 3.414, "per_category": [{"category": "Multidisciplinary", "quartile": "Q1"}], "source_year": 2024}, "openalex": null, "matched_issn": "0027-8424", "matched_platforms": ["cas", "jcr", "sjr"]},
+      journal_rank_attribution: "Data: 中科院文献情报中心期刊分区表 (CAS Journal Ranking). For personal/non-commercial use; 勿公开传播.  Data: Journal Citation Reports (Clarivate). Impact Factor and JCR quartiles are © Clarivate; for reference only.  Data: SCImago Journal Rank, scimagojr.com — non-commercial use as long as it is cited (SCImago custom terms; NOT a Creative Commons licence).",
+      title:
+        "Improving fluid intelligence with training on working memory",
+      authors_short: "Jaeggi et al.",
+      authors_full: [
+        "Susanne M. Jaeggi",
+        "Martin Buschkuehl",
+        "John Jonides",
+        "Walter J. Perrig",
+      ],
+      year: 2008,
+      venue: "PNAS",
+      doi: "10.1073/pnas.0801268105",
+      doi_url: "https://doi.org/10.1073/pnas.0801268105",
+      abstract:
+        "We trained young adults on a dual n-back working memory task and observed dose-dependent gains on Raven's Advanced Progressive Matrices, a measure of fluid intelligence (Gf). Improvements scaled with training duration across four groups (8, 12, 17, and 19 days).",
+      tldr:
+        "Adaptive n-back training improved fluid intelligence in a dose-dependent fashion in young adults.",
+      rcs: 9,
+      rcs_reasoning:
+        "The original positive-transfer claim that catalyzed the entire WM-training literature; foundational regardless of subsequent replication failures.",
+      rcs_flag: "Original positive claim — replication-contested",
+      citation_count: 2103,
+      influential_citation_count: 264,
+      discovery_path: "seed",
+      sources: ["openalex", "semantic_scholar"],
+      is_oa: true,
+    },
+
+    // --- High (7 <= rcs < 8.5) — 3 papers
+    {
+      paper_id: "10.1037/a0029082",
+      journal_rank: {"cas": {"tier": 1, "rank": "8/657", "top": true, "minor": [{"category": "PSYCHOLOGY 心理学", "tier": 1, "rank": "3/92"}, {"category": "PSYCHOLOGY, MULTIDISCIPLINARY 心理学：综合", "tier": 1, "rank": "4/219"}], "source_year": 2025}, "jcr": {"quartile": "Q1", "impact_factor": 19.8, "rank": "3/221", "category": "PSYCHOLOGY(SCIE);PSYCHOLOGY, MULTIDISCIPLINARY(SSCI)", "source_year": 2024}, "sjr": {"best_quartile": "Q1", "sjr": 8.696, "per_category": [{"category": "History and Philosophy of Science", "quartile": "Q1"}], "source_year": 2024}, "openalex": null, "matched_issn": "0033-2909", "matched_platforms": ["cas", "jcr", "sjr"]},
+      journal_rank_attribution: "Data: 中科院文献情报中心期刊分区表 (CAS Journal Ranking). For personal/non-commercial use; 勿公开传播.  Data: Journal Citation Reports (Clarivate). Impact Factor and JCR quartiles are © Clarivate; for reference only.  Data: SCImago Journal Rank, scimagojr.com — non-commercial use as long as it is cited (SCImago custom terms; NOT a Creative Commons licence).",
+      title:
+        "Is working memory training effective? A meta-analytic review",
+      authors_short: "Shipstead, Redick, & Engle",
+      authors_full: [
+        "Zach Shipstead",
+        "Thomas S. Redick",
+        "Randall W. Engle",
+      ],
+      year: 2012,
+      venue: "Psychological Bulletin",
+      doi: "10.1037/a0029082",
+      doi_url: "https://doi.org/10.1037/a0029082",
+      abstract:
+        "We critically reviewed published evaluations of working memory training programs. We found weak support for transfer to general fluid abilities; most apparently-supportive studies suffered from passive-control designs and weak measurement of the construct purportedly transferred-to.",
+      tldr:
+        "WM training shows weak evidence of transfer; many positive studies are confounded by methodological choices.",
+      rcs: 8,
+      rcs_reasoning:
+        "Influential critical methodological review of the early WM-training literature; central in any high-tier discussion of construct validity.",
+      rcs_flag: null,
+      citation_count: 901,
+      influential_citation_count: 75,
+      discovery_path: "openalex_search",
+      sources: ["openalex"],
+      is_oa: false,
+    },
+    {
+      paper_id: "10.1037/a0035144",
+      journal_rank: {"cas": {"tier": 3, "rank": "204/657", "top": false, "minor": [{"category": "PSYCHOLOGY, EXPERIMENTAL 心理学：实验", "tier": 3, "rank": "41/99"}], "source_year": 2025}, "jcr": {"quartile": "Q2", "impact_factor": 2.1, "rank": "46/102", "category": "PSYCHOLOGY, EXPERIMENTAL(SSCI)", "source_year": 2024}, "sjr": {"best_quartile": "Q1", "sjr": 1.149, "per_category": [{"category": "Experimental and Cognitive Psychology", "quartile": "Q1"}, {"category": "Neuropsychology and Physiological Psychology", "quartile": "Q1"}], "source_year": 2024}, "openalex": null, "matched_issn": "0090-502X", "matched_platforms": ["cas", "jcr", "sjr"]},
+      journal_rank_attribution: "Data: 中科院文献情报中心期刊分区表 (CAS Journal Ranking). For personal/non-commercial use; 勿公开传播.  Data: Journal Citation Reports (Clarivate). Impact Factor and JCR quartiles are © Clarivate; for reference only.  Data: SCImago Journal Rank, scimagojr.com — non-commercial use as long as it is cited (SCImago custom terms; NOT a Creative Commons licence).",
+      title:
+        "The role of individual differences in cognitive training and transfer",
+      authors_short: "Jaeggi, Buschkuehl, Shah, & Jonides",
+      authors_full: [
+        "Susanne M. Jaeggi",
+        "Martin Buschkuehl",
+        "Priti Shah",
+        "John Jonides",
+      ],
+      year: 2014,
+      venue: "Memory & Cognition",
+      doi: "10.1037/a0035144",
+      doi_url: "https://doi.org/10.1037/a0035144",
+      abstract:
+        "Across four training studies, we examined how baseline performance, motivation, expectancy, and personality predict cognitive training gains and transfer. Individual differences accounted for substantial variance in transfer outcomes, suggesting one-size-fits-all training is unlikely to succeed.",
+      tldr:
+        "Transfer depends heavily on individual differences in baseline performance, motivation, and expectations.",
+      rcs: 8,
+      rcs_reasoning:
+        "Pivotal paper reframing the transfer debate around moderators; highly cited in the contemporary individual-differences turn of the field.",
+      rcs_flag: null,
+      citation_count: 487,
+      influential_citation_count: 42,
+      discovery_path: "openalex_search",
+      sources: ["openalex", "semantic_scholar"],
+      is_oa: true,
+    },
+    {
+      paper_id: "10.1016/j.tics.2013.05.009",
+      journal_rank: {"cas": {"tier": 1, "rank": "2/657", "top": true, "minor": [{"category": "BEHAVIORAL SCIENCES 行为科学", "tier": 1, "rank": "1/55"}, {"category": "NEUROSCIENCES 神经科学", "tier": 1, "rank": "2/309"}, {"category": "PSYCHOLOGY, EXPERIMENTAL 心理学：实验", "tier": 1, "rank": "1/99"}], "source_year": 2025}, "jcr": {"quartile": "Q1", "impact_factor": 17.2, "rank": "1/102", "category": "BEHAVIORAL SCIENCES(SCIE);NEUROSCIENCES(SCIE);PSYCHOLOGY, EXPERIMENTAL(SSCI)", "source_year": 2024}, "sjr": {"best_quartile": "Q1", "sjr": 4.506, "per_category": [{"category": "Cognitive Neuroscience", "quartile": "Q1"}, {"category": "Experimental and Cognitive Psychology", "quartile": "Q1"}, {"category": "Neuropsychology and Physiological Psychology", "quartile": "Q1"}], "source_year": 2024}, "openalex": null, "matched_issn": "1364-6613", "matched_platforms": ["cas", "jcr", "sjr"]},
+      journal_rank_attribution: "Data: 中科院文献情报中心期刊分区表 (CAS Journal Ranking). For personal/non-commercial use; 勿公开传播.  Data: Journal Citation Reports (Clarivate). Impact Factor and JCR quartiles are © Clarivate; for reference only.  Data: SCImago Journal Rank, scimagojr.com — non-commercial use as long as it is cited (SCImago custom terms; NOT a Creative Commons licence).",
+      title:
+        "Working memory training in healthy older adults: a longitudinal MRI study",
+      authors_short: "Brehmer, Westerberg, & Bäckman",
+      authors_full: ["Yvonne Brehmer", "Helena Westerberg", "Lars Bäckman"],
+      year: 2013,
+      venue: "Trends in Cognitive Sciences",
+      doi: "10.1016/j.tics.2013.05.009",
+      doi_url: "https://doi.org/10.1016/j.tics.2013.05.009",
+      abstract:
+        "We followed 80 healthy older adults across 5 weeks of adaptive WM training plus a 6-month follow-up. Behavioral gains were accompanied by changes in fronto-parietal activation patterns measured with fMRI, suggesting neural correlates of training-related plasticity.",
+      tldr:
+        "WM training in older adults produces both behavioral and fronto-parietal neural changes that persist 6 months.",
+      rcs: 7,
+      rcs_reasoning:
+        "Directly on-target longitudinal MRI study; combines the neural plasticity and transfer themes asked by the query.",
+      rcs_flag: null,
+      citation_count: 318,
+      influential_citation_count: 28,
+      discovery_path: "openalex_search",
+      sources: ["openalex"],
+      is_oa: false,
+    },
+
+    // --- Moderate (5.5 <= rcs < 7) — 3 papers
+    {
+      paper_id: "10.1037/a0030986",
+      journal_rank: {"cas": {"tier": 2, "rank": "66/657", "top": true, "minor": [{"category": "GERONTOLOGY 老年医学（社科）", "tier": 1, "rank": "1/48"}, {"category": "PSYCHOLOGY, DEVELOPMENTAL 心理学：发育", "tier": 2, "rank": "16/91"}], "source_year": 2025}, "jcr": {"quartile": "Q1", "impact_factor": 3.5, "rank": "8/48", "category": "GERONTOLOGY(SSCI);PSYCHOLOGY, DEVELOPMENTAL(SSCI)", "source_year": 2024}, "sjr": {"best_quartile": "Q1", "sjr": 1.585, "per_category": [{"category": "Aging", "quartile": "Q1"}, {"category": "Geriatrics and Gerontology", "quartile": "Q1"}, {"category": "Social Psychology", "quartile": "Q1"}], "source_year": 2024}, "openalex": null, "matched_issn": "0882-7974", "matched_platforms": ["cas", "jcr", "sjr"]},
+      journal_rank_attribution: "Data: 中科院文献情报中心期刊分区表 (CAS Journal Ranking). For personal/non-commercial use; 勿公开传播.  Data: Journal Citation Reports (Clarivate). Impact Factor and JCR quartiles are © Clarivate; for reference only.  Data: SCImago Journal Rank, scimagojr.com — non-commercial use as long as it is cited (SCImago custom terms; NOT a Creative Commons licence).",
+      title:
+        "Mediators of training-related transfer: a five-month randomized trial in older adults",
+      authors_short: "Karbach et al.",
+      authors_full: [
+        "Julia Karbach",
+        "Maximilian Mang",
+        "Jutta Kray",
+      ],
+      year: 2015,
+      venue: "Psychology and Aging",
+      doi: "10.1037/a0030986",
+      doi_url: "https://doi.org/10.1037/a0030986",
+      abstract:
+        "We tested 120 older adults (60-80y) in a 5-month adaptive WM training RCT against an active control. Modest near-transfer effects emerged for tasks tapping similar processing demands; far transfer to everyday function was not detected.",
+      tldr:
+        "WM training in older adults yields modest near transfer but not far transfer to daily function.",
+      rcs: 6,
+      rcs_reasoning:
+        "Sound longitudinal RCT that informs the moderate-effect range debate; adjacent rather than central to the canonical foundational set.",
+      rcs_flag: null,
+      citation_count: 156,
+      influential_citation_count: 12,
+      discovery_path: "openalex_search",
+      sources: ["openalex"],
+      is_oa: false,
+    },
+    {
+      paper_id: "10.1037/aap0000094",
+      journal_rank: {"cas": {"tier": 1, "rank": "12/657", "top": true, "minor": [{"category": "PSYCHOLOGY, MULTIDISCIPLINARY 心理学：综合", "tier": 1, "rank": "6/219"}], "source_year": 2025}, "jcr": {"quartile": "Q1", "impact_factor": 8.4, "rank": "8/221", "category": "PSYCHOLOGY, MULTIDISCIPLINARY(SSCI)", "source_year": 2024}, "sjr": {"best_quartile": "Q1", "sjr": 5.393, "per_category": [], "source_year": 2024}, "openalex": null, "matched_issn": "1745-6916", "matched_platforms": ["cas", "jcr", "sjr"]},
+      journal_rank_attribution: "Data: 中科院文献情报中心期刊分区表 (CAS Journal Ranking). For personal/non-commercial use; 勿公开传播.  Data: Journal Citation Reports (Clarivate). Impact Factor and JCR quartiles are © Clarivate; for reference only.  Data: SCImago Journal Rank, scimagojr.com — non-commercial use as long as it is cited (SCImago custom terms; NOT a Creative Commons licence).",
+      title:
+        "Active versus passive control comparisons in cognitive training research",
+      authors_short: "Boot, Simons, & Stothart",
+      authors_full: [
+        "Walter R. Boot",
+        "Daniel J. Simons",
+        "Cary Stothart",
+        "Cassie Stutts",
+      ],
+      year: 2013,
+      venue: "Perspectives on Psychological Science",
+      doi: "10.1037/aap0000094",
+      doi_url: "https://doi.org/10.1037/aap0000094",
+      abstract:
+        "We argue that placebo-control deficits explain a substantial portion of apparent transfer effects in the cognitive training literature, including studies on WM training. We outline minimum design standards to disentangle real training effects from expectancy and demand effects.",
+      tldr:
+        "Many reported training transfer effects may reflect placebo effects rather than genuine cognitive change.",
+      rcs: 6,
+      rcs_reasoning:
+        "Influential methodological critique relevant to interpreting most WM training findings; not on-query directly but consequential.",
+      rcs_flag: null,
+      citation_count: 612,
+      influential_citation_count: 51,
+      discovery_path: "citation_search",
+      sources: ["semantic_scholar"],
+      is_oa: false,
+    },
+    {
+      paper_id: "10.3389/fnagi.2014.00063",
+      journal_rank: {"cas": {"tier": 3, "rank": "1281/5603", "top": false, "minor": [{"category": "GERIATRICS & GERONTOLOGY 老年医学", "tier": 3, "rank": "26/72"}, {"category": "NEUROSCIENCES 神经科学", "tier": 3, "rank": "105/309"}], "source_year": 2025}, "jcr": {"quartile": "Q1", "impact_factor": 4.5, "rank": "13/73", "category": "GERIATRICS & GERONTOLOGY(SCIE);NEUROSCIENCES(SCIE)", "source_year": 2024}, "sjr": {"best_quartile": "Q1", "sjr": 1.479, "per_category": [{"category": "Cognitive Neuroscience", "quartile": "Q1"}, {"category": "Aging", "quartile": "Q2"}], "source_year": 2024}, "openalex": null, "matched_issn": "1663-4365", "matched_platforms": ["cas", "jcr", "sjr"]},
+      journal_rank_attribution: "Data: 中科院文献情报中心期刊分区表 (CAS Journal Ranking). For personal/non-commercial use; 勿公开传播.  Data: Journal Citation Reports (Clarivate). Impact Factor and JCR quartiles are © Clarivate; for reference only.  Data: SCImago Journal Rank, scimagojr.com — non-commercial use as long as it is cited (SCImago custom terms; NOT a Creative Commons licence).",
+      title:
+        "Computerized cognitive training in healthy older adults: a systematic review and meta-analysis",
+      authors_short: "Lampit, Hallock, & Valenzuela",
+      authors_full: [
+        "Amit Lampit",
+        "Harry Hallock",
+        "Michael Valenzuela",
+      ],
+      year: 2014,
+      venue: "Frontiers in Aging Neuroscience",
+      doi: "10.3389/fnagi.2014.00063",
+      doi_url: "https://doi.org/10.3389/fnagi.2014.00063",
+      abstract:
+        "We meta-analyzed 51 RCTs of computerized cognitive training in healthy older adults (mean age 71). Small-to-moderate effect sizes emerged across multiple cognitive domains including WM. Effects were stronger for training that was supervised, of moderate intensity, and delivered <3 sessions per week.",
+      tldr:
+        "Computerized cognitive training in older adults yields small-to-moderate gains; supervision and moderate dose matter.",
+      rcs: 6,
+      rcs_reasoning:
+        "On-target meta-analysis in older adults specifically; provides effect-size benchmarks for the moderate-effect range.",
+      rcs_flag: null,
+      citation_count: 542,
+      influential_citation_count: 41,
+      discovery_path: "openalex_search",
+      sources: ["openalex"],
+      is_oa: true,
+    },
+
+    // --- Emerging (4.5 <= rcs < 5.5) — 2 papers
+    {
+      paper_id: "10.1038/nrn3884",
+      journal_rank: {"cas": {"tier": 1, "rank": "11/5603", "top": true, "minor": [{"category": "NEUROSCIENCES 神经科学", "tier": 1, "rank": "1/309"}], "source_year": 2025}, "jcr": {"quartile": "Q1", "impact_factor": 26.7, "rank": "1/314", "category": "NEUROSCIENCES(SCIE)", "source_year": 2024}, "sjr": {"best_quartile": "Q1", "sjr": 9.331, "per_category": [], "source_year": 2024}, "openalex": null, "matched_issn": "1471-003X", "matched_platforms": ["cas", "jcr", "sjr"]},
+      journal_rank_attribution: "Data: 中科院文献情报中心期刊分区表 (CAS Journal Ranking). For personal/non-commercial use; 勿公开传播.  Data: Journal Citation Reports (Clarivate). Impact Factor and JCR quartiles are © Clarivate; for reference only.  Data: SCImago Journal Rank, scimagojr.com — non-commercial use as long as it is cited (SCImago custom terms; NOT a Creative Commons licence).",
+      title:
+        "Aging, cognitive reserve, and the architecture of working memory",
+      authors_short: "Reuter-Lorenz & Park",
+      authors_full: [
+        "Patricia A. Reuter-Lorenz",
+        "Denise C. Park",
+      ],
+      year: 2014,
+      venue: "Nature Reviews Neuroscience",
+      doi: "10.1038/nrn3884",
+      doi_url: "https://doi.org/10.1038/nrn3884",
+      abstract:
+        "We review the architecture of working memory across the adult lifespan and consider how cognitive reserve interacts with training-related plasticity. We outline a scaffolding theory linking compensation processes to potential intervention targets.",
+      tldr:
+        "Cognitive reserve and scaffolding processes shape who benefits from WM training in late life.",
+      rcs: 5,
+      rcs_reasoning:
+        "Adjacent theoretical review on WM architecture and aging; relevant context but not direct intervention evidence.",
+      rcs_flag: null,
+      citation_count: 423,
+      influential_citation_count: 18,
+      discovery_path: "citation_search",
+      sources: ["openalex"],
+      is_oa: false,
+    },
+    {
+      paper_id: "10.1037/0894-4105.22.5.567",
+      journal_rank: {"cas": {"tier": 3, "rank": "287/657", "top": false, "minor": [{"category": "NEUROSCIENCES 神经科学", "tier": 3, "rank": "152/309"}, {"category": "PSYCHOLOGY 心理学", "tier": 3, "rank": "38/92"}, {"category": "PSYCHOLOGY, CLINICAL 心理学：临床", "tier": 4, "rank": "84/179"}], "source_year": 2025}, "jcr": {"quartile": "Q1", "impact_factor": 3.0, "rank": "41/185", "category": "NEUROSCIENCES(SCIE);PSYCHOLOGY(SCIE);PSYCHOLOGY, CLINICAL(SSCI)", "source_year": 2024}, "sjr": {"best_quartile": "Q1", "sjr": 1.002, "per_category": [{"category": "Neuropsychology and Physiological Psychology", "quartile": "Q1"}], "source_year": 2024}, "openalex": null, "matched_issn": "0894-4105", "matched_platforms": ["cas", "jcr", "sjr"]},
+      journal_rank_attribution: "Data: 中科院文献情报中心期刊分区表 (CAS Journal Ranking). For personal/non-commercial use; 勿公开传播.  Data: Journal Citation Reports (Clarivate). Impact Factor and JCR quartiles are © Clarivate; for reference only.  Data: SCImago Journal Rank, scimagojr.com — non-commercial use as long as it is cited (SCImago custom terms; NOT a Creative Commons licence).",
+      title:
+        "Working memory and aging: a review of the literature on capacity, complexity, and control",
+      authors_short: "Park & Reuter-Lorenz",
+      authors_full: ["Denise C. Park", "Patricia A. Reuter-Lorenz"],
+      year: 2008,
+      venue: "Neuropsychology",
+      doi: "10.1037/0894-4105.22.5.567",
+      doi_url: "https://doi.org/10.1037/0894-4105.22.5.567",
+      abstract:
+        "We review behavioral and neuroimaging evidence on age-related changes in WM capacity, processing complexity, and cognitive control. We propose specific interfaces where targeted intervention could rebuild lost capacity.",
+      tldr:
+        "Aging alters WM capacity and control; specific interfaces may be the targets for intervention.",
+      rcs: 5,
+      rcs_reasoning:
+        "Older theoretical review of WM aging; useful context but not on the intervention/RCT axis the query emphasizes.",
+      rcs_flag: null,
+      citation_count: 287,
+      influential_citation_count: 14,
+      discovery_path: "citation_search",
+      sources: ["openalex"],
+      is_oa: false,
+    },
+
+    // --- Peripheral (rcs < 4.5) — 1 paper
+    {
+      paper_id: "10.1038/nature11704",
+      journal_rank: {"cas": {"tier": 1, "rank": "1/118", "top": true, "minor": [{"category": "MULTIDISCIPLINARY SCIENCES 综合性期刊", "tier": 1, "rank": "1/131"}], "source_year": 2025}, "jcr": {"quartile": "Q1", "impact_factor": 48.5, "rank": "2/135", "category": "MULTIDISCIPLINARY SCIENCES(SCIE)", "source_year": 2024}, "sjr": {"best_quartile": "Q1", "sjr": 18.288, "per_category": [{"category": "Multidisciplinary", "quartile": "Q1"}], "source_year": 2024}, "openalex": null, "matched_issn": "0028-0836", "matched_platforms": ["cas", "jcr", "sjr"]},
+      journal_rank_attribution: "Data: 中科院文献情报中心期刊分区表 (CAS Journal Ranking). For personal/non-commercial use; 勿公开传播.  Data: Journal Citation Reports (Clarivate). Impact Factor and JCR quartiles are © Clarivate; for reference only.  Data: SCImago Journal Rank, scimagojr.com — non-commercial use as long as it is cited (SCImago custom terms; NOT a Creative Commons licence).",
+      title:
+        "Visual short-term memory and the operation of attention",
+      authors_short: "Vogel & Awh",
+      authors_full: ["Edward K. Vogel", "Edward Awh"],
+      year: 2012,
+      venue: "Nature",
+      doi: "10.1038/nature11704",
+      doi_url: "https://doi.org/10.1038/nature11704",
+      abstract:
+        "We review the literature on visual short-term memory and its interaction with selective attention. We argue that VSTM capacity reflects flexible attentional weighting rather than fixed storage slots.",
+      tldr:
+        "VSTM capacity is shaped by attentional weighting rather than fixed slots.",
+      rcs: 4,
+      rcs_reasoning:
+        "Surfaced via citation snowballing; mostly about young-adult VSTM mechanisms — peripheral to the older-adults intervention query.",
+      rcs_flag: null,
+      citation_count: 198,
+      influential_citation_count: 9,
+      discovery_path: "citation_search",
+      sources: ["semantic_scholar"],
+      is_oa: false,
+    },
+  ],
+
+  chart_data: {
+    publication_year: {
+      bins: [
+        { year: 2008, total: 4, highly_relevant: 1 },
+        { year: 2009, total: 6, highly_relevant: 0 },
+        { year: 2010, total: 8, highly_relevant: 0 },
+        { year: 2011, total: 9, highly_relevant: 0 },
+        { year: 2012, total: 14, highly_relevant: 1 },
+        { year: 2013, total: 18, highly_relevant: 2 },
+        { year: 2014, total: 23, highly_relevant: 3 },
+        { year: 2015, total: 21, highly_relevant: 1 },
+        { year: 2016, total: 19, highly_relevant: 1 },
+        { year: 2017, total: 16, highly_relevant: 0 },
+        { year: 2018, total: 14, highly_relevant: 1 },
+        { year: 2019, total: 11, highly_relevant: 1 },
+        { year: 2020, total: 9, highly_relevant: 0 },
+        { year: 2021, total: 7, highly_relevant: 1 },
+        { year: 2022, total: 4, highly_relevant: 0 },
+        { year: 2023, total: 3, highly_relevant: 0 },
+        { year: 2024, total: 1, highly_relevant: 0 },
+      ],
+      year_min: 2008,
+      year_max: 2024,
+      // OpenAlex title+abstract matches for the demo query over the same years
+      // (openalex_helper count, 2026-10-01).
+      pool: { count: 1136, year_min: 2008, year_max: 2024 },
+    },
+    relevance_score: {
+      bins: [
+        { rcs: 0, count: 28 },
+        { rcs: 1, count: 22 },
+        { rcs: 2, count: 18 },
+        { rcs: 3, count: 21 },
+        { rcs: 4, count: 19 },
+        { rcs: 5, count: 17 },
+        { rcs: 6, count: 14 },
+        { rcs: 7, count: 11 },
+        { rcs: 8, count: 8 },
+        { rcs: 9, count: 5 },
+        { rcs: 10, count: 4 },
+      ],
+      mean: 4.5,
+      ci_low: 3.1,
+      ci_high: 5.8,
+      n: 167,
+    },
+    discovery_curve: {
+      tau: 24.3,
+      coverage_estimate: 0.91,
+      ci_low: 0.83,
+      ci_high: 0.96,
+      estimated_total_relevant: 13.5,
+      summary:
+        "Saturation reached by ~150 screened papers; remaining yield is < 1 highly-relevant paper per 25 screened.",
+      points: [
+        { papers_screened: 10, found: 2 },
+        { papers_screened: 25, found: 4 },
+        { papers_screened: 50, found: 7 },
+        { papers_screened: 80, found: 9 },
+        { papers_screened: 110, found: 10 },
+        { papers_screened: 140, found: 11 },
+        { papers_screened: 170, found: 12 },
+        { papers_screened: 187, found: 12 },
+      ],
+    },
+    citation_network: {
+      nodes: [
+        {
+          id: "10.1126/science.1230579",
+          year: 2014,
+          citation_count: 1842,
+          rcs: 10,
+          title:
+            "Putting Brain Training to the Test",
+          authors_short: "Owen et al.",
+          venue: "Science",
+        },
+        {
+          id: "10.1037/a0028228",
+          year: 2013,
+          citation_count: 1410,
+          rcs: 9,
+          title: "Cognitive plasticity meta-analysis",
+          authors_short: "Melby-Lervåg & Hulme",
+          venue: "Developmental Psychology",
+        },
+        {
+          id: "10.1073/pnas.0801268105",
+          year: 2008,
+          citation_count: 2103,
+          rcs: 9,
+          title: "Improving fluid intelligence",
+          authors_short: "Jaeggi et al.",
+          venue: "PNAS",
+        },
+        {
+          id: "10.1037/a0029082",
+          year: 2012,
+          citation_count: 901,
+          rcs: 8,
+          title: "Is WM training effective?",
+          authors_short: "Shipstead et al.",
+          venue: "Psychological Bulletin",
+        },
+        {
+          id: "10.1037/a0035144",
+          year: 2014,
+          citation_count: 487,
+          rcs: 8,
+          title: "Individual differences in training",
+          authors_short: "Jaeggi et al.",
+          venue: "Memory & Cognition",
+        },
+        {
+          id: "10.1016/j.tics.2013.05.009",
+          year: 2013,
+          citation_count: 318,
+          rcs: 7,
+          title: "Longitudinal MRI study",
+          authors_short: "Brehmer et al.",
+          venue: "Trends in Cognitive Sciences",
+        },
+        {
+          id: "10.1037/a0030986",
+          year: 2015,
+          citation_count: 156,
+          rcs: 6,
+          title: "Mediators of training transfer",
+          authors_short: "Karbach et al.",
+          venue: "Psychology and Aging",
+        },
+        {
+          id: "10.1037/aap0000094",
+          year: 2013,
+          citation_count: 612,
+          rcs: 6,
+          title: "Active vs passive controls",
+          authors_short: "Boot et al.",
+          venue: "Perspectives on Psychological Science",
+        },
+        {
+          id: "10.3389/fnagi.2014.00063",
+          year: 2014,
+          citation_count: 542,
+          rcs: 6,
+          title: "Meta-analysis of computerized training",
+          authors_short: "Lampit et al.",
+          venue: "Frontiers in Aging Neuroscience",
+        },
+        {
+          id: "10.1038/nrn3884",
+          year: 2014,
+          citation_count: 423,
+          rcs: 5,
+          title: "Cognitive reserve and WM",
+          authors_short: "Reuter-Lorenz & Park",
+          venue: "Nature Reviews Neuroscience",
+        },
+        {
+          id: "10.1037/0894-4105.22.5.567",
+          year: 2008,
+          citation_count: 287,
+          rcs: 5,
+          title: "WM and aging review",
+          authors_short: "Park & Reuter-Lorenz",
+          venue: "Neuropsychology",
+        },
+        {
+          id: "10.1038/nature11704",
+          year: 2012,
+          citation_count: 198,
+          rcs: 4,
+          title: "VSTM and attention",
+          authors_short: "Vogel & Awh",
+          venue: "Nature",
+        },
+      ],
+      node_count: 12,
+      edge_count: 0,
+    },
+    // Topic clusters (delta2 change 5, 2026-05-24). Matches the shape emitted by
+    // `scripts/data_materialization.py::_build_themes()`: each theme has
+    // a title-cased `name`, a `value` (paper count), and `paper_ids` (top-N
+    // DOIs of papers in that cluster). Slice-and-dice carves the largest
+    // cluster off as a full-edge strip so the visual hierarchy is obvious.
+    theme_treemap: {
+      themes: [
+        {
+          name: "Working Memory Training",
+          value: 6,
+          paper_ids: [
+            "10.1126/science.1230579",
+            "10.1037/a0028228",
+            "10.1073/pnas.0801268105",
+          ],
+        },
+        {
+          name: "Cognitive Plasticity",
+          value: 4,
+          paper_ids: ["10.1037/a0029082", "10.1037/a0035144"],
+        },
+        {
+          name: "Older Adults Cognition",
+          value: 3,
+          paper_ids: ["10.1037/0882-7974.16.4.529"],
+        },
+        {
+          name: "Meta Analysis",
+          value: 3,
+          paper_ids: ["10.1037/a0028228"],
+        },
+        {
+          name: "Fluid Intelligence",
+          value: 2,
+          paper_ids: ["10.1073/pnas.0801268105"],
+        },
+        {
+          name: "N-Back Tasks",
+          value: 2,
+          paper_ids: ["10.1073/pnas.0801268105"],
+        },
+      ],
+      total_papers: 12,
+    },
+  },
+
+  prisma_log: {
+    "1_database_information": {
+      databases: ["openalex", "semantic_scholar"],
+      primary: "OpenAlex",
+      note:
+        "OpenAlex polite pool + Semantic Scholar (supplement). PubMed not queried at standard tier.",
+    },
+    "2_multi_database_searching": {
+      performed: true,
+      rationale:
+        "Two databases queried in parallel to reduce single-source bias (Bramer 2018).",
+      databases: ["openalex", "semantic_scholar"],
+    },
+    "3_study_registries": {
+      queried: false,
+      note:
+        "Not queried at standard tier. Available via audit-tier add-on (Cochrane, ClinicalTrials.gov).",
+    },
+    "4_online_resources_browsing": {
+      performed: false,
+      rationale:
+        "Skipped at standard tier; included in audit tier when grey-literature surfacing is required.",
+    },
+    "5_citation_searching": {
+      performed: true,
+      method: "forward + backward via OpenAlex referenced_works / cited_by",
+      depth: 2,
+      seeds: 3,
+    },
+    "6_contacts": {
+      performed: false,
+      note: "Author/expert contact not part of automated pipeline.",
+    },
+    "7_other_methods": {
+      methods: ["LLM-assisted query expansion", "iterative re-ranking"],
+      note:
+        "Two passes of LLM expansion produced 14 additional queries; final relevance scoring used a single Sonnet 4 pass.",
+    },
+    "8_full_search_strategies": {
+      queries: [
+        "working memory training older adults RCT",
+        "n-back training transfer aging",
+        "cognitive training fluid intelligence elderly",
+        "computerized brain training older adults systematic review",
+      ],
+      query_count: 4,
+    },
+    "9_limits_and_restrictions": {
+      filters_applied: ["year:>=2008", "lang:en", "type:article OR review"],
+      rationale:
+        "Year floor reflects post-Jaeggi-2008 inflection in WM training literature.",
+    },
+    "10_search_filters": {
+      filters_applied: ["peer-reviewed", "English"],
+      note: "Preprints from arXiv not included at standard tier.",
+    },
+    "11_prior_work": {
+      performed: true,
+      tool: "OpenAlex citation graph",
+      seeds: 3,
+      rationale:
+        "Seeded with canonical Owen 2014, Melby-Lervåg 2013, and Jaeggi 2008 to anchor the snowball.",
+    },
+    "12_updates": {
+      performed: false,
+      note:
+        "Single-shot run. Re-run scheduling not part of standard tier; available via audit tier.",
+    },
+    "13_dates_of_searches": {
+      search_date: "2026-05-22",
+      cutoff: "2026-05-20",
+    },
+    "14_total_records": {
+      records_screened: 187,
+      records_in_kg: 142,
+      highly_relevant: 12,
+      closely_related: 24,
+    },
+    "15_deduplication": {
+      performed: true,
+      tool: "DOI + title cosine similarity (≥ 0.92)",
+      duplicates_removed: 23,
+    },
+    "16_record_management": {
+      format: "JSON + HTML report",
+      outputs_produced: ["report.html", "papers.json", "audit_log.json"],
+      search_id: "mock_20260522_wm_training_older_adults",
+    },
+  },
+
+  // v2.4 search-strategy export, so the demo shows the Extensions tab. Real output of
+  // scripts.search_export.generate for this topic (PubMed / Cochrane MeSH verified live;
+  // Emtree / APA / CINAHL / CMeSH flagged for manual checking), trimmed to the fields
+  // SearchStrategyEntry reads. Order follows the generator's platform order.
+  search_strategies: {
+    "topic": "working memory training in older adults",
+    "language_space": "both",
+    "quality_claim": "professional first draft with flagged review points",
+    "strategies": [
+      {
+        "platform": "PubMed",
+        "host": "NLM / pubmed.ncbi.nlm.nih.gov",
+        "access": "free",
+        "strategy_string": "(\"Aged\"[mh] OR \"Aged, 80 and over\"[mh] OR \"older adults\"[tiab] OR \"older people\"[tiab] OR \"older persons\"[tiab] OR elderly[tiab] OR seniors[tiab] OR \"late life\"[tiab])\nAND\n(\"Cognitive Training\"[mh] OR \"working memory training\"[tiab] OR \"working-memory training\"[tiab] OR \"working memory intervention\"[tiab] OR \"n-back training\"[tiab] OR Cogmed[tiab] OR \"memory training\"[tiab] OR \"cognitive training\"[tiab] OR \"brain training\"[tiab])",
+        "strategy_lines": [
+          "#1 \"Aged\"[mh] OR \"Aged, 80 and over\"[mh] OR \"older adults\"[tiab] OR \"older people\"[tiab] OR \"older persons\"[tiab] OR elderly[tiab] OR seniors[tiab] OR \"late life\"[tiab]",
+          "#2 \"Cognitive Training\"[mh] OR \"working memory training\"[tiab] OR \"working-memory training\"[tiab] OR \"working memory intervention\"[tiab] OR \"n-back training\"[tiab] OR Cogmed[tiab] OR \"memory training\"[tiab] OR \"cognitive training\"[tiab] OR \"brain training\"[tiab]",
+          "#3 #1 AND #2"
+        ],
+        "deep_link": {
+          "platform": "pubmed",
+          "tier": "A",
+          "url_kind": "prefill",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/?term=%28%22Aged%22%5Bmh%5D+OR+%22Aged%2C+80+and+over%22%5Bmh%5D+OR+%22older+adults%22%5Btiab%5D+OR+%22older+people%22%5Btiab%5D+OR+%22older+persons%22%5Btiab%5D+OR+elderly%5Btiab%5D+OR+seniors%5Btiab%5D+OR+%22late+life%22%5Btiab%5D%29%0AAND%0A%28%22Cognitive+Training%22%5Bmh%5D+OR+%22working+memory+training%22%5Btiab%5D+OR+%22working-memory+training%22%5Btiab%5D+OR+%22working+memory+intervention%22%5Btiab%5D+OR+%22n-back+training%22%5Btiab%5D+OR+Cogmed%5Btiab%5D+OR+%22memory+training%22%5Btiab%5D+OR+%22cognitive+training%22%5Btiab%5D+OR+%22brain+training%22%5Btiab%5D%29",
+          "api_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=%28%22Aged%22%5Bmh%5D+OR+%22Aged%2C+80+and+over%22%5Bmh%5D+OR+%22older+adults%22%5Btiab%5D+OR+%22older+people%22%5Btiab%5D+OR+%22older+persons%22%5Btiab%5D+OR+elderly%5Btiab%5D+OR+seniors%5Btiab%5D+OR+%22late+life%22%5Btiab%5D%29%0AAND%0A%28%22Cognitive+Training%22%5Bmh%5D+OR+%22working+memory+training%22%5Btiab%5D+OR+%22working-memory+training%22%5Btiab%5D+OR+%22working+memory+intervention%22%5Btiab%5D+OR+%22n-back+training%22%5Btiab%5D+OR+Cogmed%5Btiab%5D+OR+%22memory+training%22%5Btiab%5D+OR+%22cognitive+training%22%5Btiab%5D+OR+%22brain+training%22%5Btiab%5D%29",
+          "verified_http": null,
+          "verified_date": null,
+          "pattern_verified_date": "2026-07-16",
+          "note": "A 档：?term= 服务器端渲染结果页；编程核验走 E-utilities esearch.fcgi (<Count>)。方括号已编码为 %5B%5D。"
+        },
+        "review_points": [],
+        "controlled_vocab_terms": [
+          {
+            "term": "Aged",
+            "vocab": "MeSH",
+            "status": "verified",
+            "descriptor_ui": "D000368",
+            "explode": true,
+            "verification_method": "free_api",
+            "review_point": null,
+            "note": "NCBI esearch db=mesh Count=1",
+            "verified_date": "2026-09-30"
+          },
+          {
+            "term": "Aged, 80 and over",
+            "vocab": "MeSH",
+            "status": "verified",
+            "descriptor_ui": "D000369",
+            "explode": true,
+            "verification_method": "free_api",
+            "review_point": null,
+            "note": "NCBI esearch db=mesh Count=1",
+            "verified_date": "2026-09-30"
+          },
+          {
+            "term": "Cognitive Training",
+            "vocab": "MeSH",
+            "status": "verified",
+            "descriptor_ui": null,
+            "explode": true,
+            "verification_method": "free_api",
+            "review_point": null,
+            "note": "NCBI esearch db=mesh Count=1",
+            "verified_date": "2026-09-30"
+          }
+        ],
+        "vocab_verification_status": "机械已验"
+      },
+      {
+        "platform": "Web of Science Core Collection",
+        "host": "Clarivate / webofscience.com",
+        "access": "subscription",
+        "strategy_string": "TS=(\n  (\"older adult*\" OR \"older people\" OR \"older person*\" OR elderly OR senior* OR \"late life\")\n  AND (\"working memory training\" OR \"working-memory training\" OR \"working memory intervention\" OR \"n-back training\" OR Cogmed OR \"memory training\" OR \"cognitive training\" OR \"brain training\")\n)",
+        "strategy_lines": [
+          "#1 TS=(\"older adult*\" OR \"older people\" OR \"older person*\" OR elderly OR senior* OR \"late life\")",
+          "#2 TS=(\"working memory training\" OR \"working-memory training\" OR \"working memory intervention\" OR \"n-back training\" OR Cogmed OR \"memory training\" OR \"cognitive training\" OR \"brain training\")",
+          "#3 #1 AND #2"
+        ],
+        "deep_link": {
+          "platform": "wos",
+          "tier": "C",
+          "url_kind": "paste_only",
+          "url": null,
+          "url_template": "https://www.webofscience.com/wos/woscc/advanced-search",
+          "verified_http": null,
+          "verified_date": null,
+          "pattern_verified_date": null,
+          "note": "C 档：登录墙 / 会话态 / 验证码墙。交付形态=可粘贴进目标库检索框的检索式本身；URL 结构（若有）见 url_template，机构登录后可试。绝不绕登录/验证码/签名（C-14）。"
+        },
+        "review_points": [],
+        "controlled_vocab_terms": [],
+        "vocab_verification_status": "结构参考"
+      },
+      {
+        "platform": "Scopus",
+        "host": "Elsevier / scopus.com",
+        "access": "subscription",
+        "strategy_string": "TITLE-ABS-KEY(\n  (\"older adult*\" OR \"older people\" OR \"older person*\" OR elderly OR senior* OR \"late life\")\n  AND (\"working memory training\" OR \"working-memory training\" OR \"working memory intervention\" OR \"n-back training\" OR Cogmed OR \"memory training\" OR \"cognitive training\" OR \"brain training\")\n)",
+        "strategy_lines": [
+          "#1 TITLE-ABS-KEY(\"older adult*\" OR \"older people\" OR \"older person*\" OR elderly OR senior* OR \"late life\")",
+          "#2 TITLE-ABS-KEY(\"working memory training\" OR \"working-memory training\" OR \"working memory intervention\" OR \"n-back training\" OR Cogmed OR \"memory training\" OR \"cognitive training\" OR \"brain training\")",
+          "#3 #1 AND #2"
+        ],
+        "deep_link": {
+          "platform": "scopus",
+          "tier": "C",
+          "url_kind": "paste_only",
+          "url": null,
+          "url_template": "https://www.scopus.com/search/form.uri?display=advanced",
+          "verified_http": null,
+          "verified_date": null,
+          "pattern_verified_date": null,
+          "note": "C 档：登录墙 / 会话态 / 验证码墙。交付形态=可粘贴进目标库检索框的检索式本身；URL 结构（若有）见 url_template，机构登录后可试。绝不绕登录/验证码/签名（C-14）。"
+        },
+        "review_points": [],
+        "controlled_vocab_terms": [],
+        "vocab_verification_status": "结构参考"
+      },
+      {
+        "platform": "Embase (embase.com)",
+        "host": "Elsevier / embase.com",
+        "access": "subscription",
+        "strategy_string": "('aged'/exp OR 'older adult*' OR 'older people' OR 'older person*' OR elderly OR senior* OR 'late life') AND ('cognitive training'/exp OR 'working memory training' OR 'working-memory training' OR 'working memory intervention' OR 'n-back training' OR Cogmed OR 'memory training' OR 'cognitive training' OR 'brain training')",
+        "strategy_lines": null,
+        "deep_link": {
+          "platform": "embase_com",
+          "tier": "C",
+          "url_kind": "paste_only",
+          "url": null,
+          "url_template": "https://www.embase.com/#advancedSearch",
+          "verified_http": null,
+          "verified_date": null,
+          "pattern_verified_date": null,
+          "note": "C 档：登录墙 / 会话态 / 验证码墙。交付形态=可粘贴进目标库检索框的检索式本身；URL 结构（若有）见 url_template，机构登录后可试。绝不绕登录/验证码/签名（C-14）。"
+        },
+        "review_points": [
+          "[Emtree] aged: Emtree 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+          "[Emtree] cognitive training: Emtree 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+          "语法已验·词表待核：无免费 API 的受控词须人工核对；受控词状态戳机械已核（L11）；主题词相关性/爆炸/副主题需 LLM 判断。"
+        ],
+        "controlled_vocab_terms": [
+          {
+            "term": "aged",
+            "vocab": "Emtree",
+            "status": "pending_manual",
+            "descriptor_ui": null,
+            "explode": null,
+            "verification_method": "llm_suggest_only",
+            "review_point": "Emtree 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+            "note": null,
+            "verified_date": "2026-09-30"
+          },
+          {
+            "term": "cognitive training",
+            "vocab": "Emtree",
+            "status": "pending_manual",
+            "descriptor_ui": null,
+            "explode": null,
+            "verification_method": "llm_suggest_only",
+            "review_point": "Emtree 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+            "note": null,
+            "verified_date": "2026-09-30"
+          }
+        ],
+        "vocab_verification_status": "语法已验·词表待核"
+      },
+      {
+        "platform": "Cochrane Library / CENTRAL",
+        "host": "Wiley / cochranelibrary.com",
+        "access": "mixed",
+        "strategy_string": "(\"older adult*\":ti,ab OR \"older people\":ti,ab OR \"older person*\":ti,ab OR elderly:ti,ab OR senior*:ti,ab OR \"late life\":ti,ab)\nAND\n(\"working memory training\":ti,ab OR \"working-memory training\":ti,ab OR \"working memory intervention\":ti,ab OR \"n-back training\":ti,ab OR Cogmed:ti,ab OR \"memory training\":ti,ab OR \"cognitive training\":ti,ab OR \"brain training\":ti,ab)",
+        "strategy_lines": [
+          "#1 \"older adult*\":ti,ab OR \"older people\":ti,ab OR \"older person*\":ti,ab OR elderly:ti,ab OR senior*:ti,ab OR \"late life\":ti,ab",
+          "#2 \"working memory training\":ti,ab OR \"working-memory training\":ti,ab OR \"working memory intervention\":ti,ab OR \"n-back training\":ti,ab OR Cogmed:ti,ab OR \"memory training\":ti,ab OR \"cognitive training\":ti,ab OR \"brain training\":ti,ab",
+          "#3 #1 AND #2"
+        ],
+        "deep_link": {
+          "platform": "cochrane_central",
+          "tier": "B",
+          "url_kind": "browser",
+          "url": null,
+          "url_template": "https://www.cochranelibrary.com/search?q={urlenc}",
+          "verified_http": null,
+          "verified_date": null,
+          "pattern_verified_date": null,
+          "note": "B 档：URL 有效但结果客户端渲染 / bot 被拦。交付形态=浏览器内可用的检索式；不构造脚本层直达链接。"
+        },
+        "review_points": [
+          "受控词候选未写入检索串：本宿主的受控词语法无法机械模板化（D-d 绝不输出非法语法）——请按语法卡 cochrane_central.md 人工组装受控词子句"
+        ],
+        "controlled_vocab_terms": [
+          {
+            "term": "Aged",
+            "vocab": "MeSH",
+            "status": "verified",
+            "descriptor_ui": "D000368",
+            "explode": true,
+            "verification_method": "free_api",
+            "review_point": null,
+            "note": "NCBI esearch db=mesh Count=1",
+            "verified_date": "2026-09-30"
+          },
+          {
+            "term": "Aged, 80 and over",
+            "vocab": "MeSH",
+            "status": "verified",
+            "descriptor_ui": "D000369",
+            "explode": true,
+            "verification_method": "free_api",
+            "review_point": null,
+            "note": "NCBI esearch db=mesh Count=1",
+            "verified_date": "2026-09-30"
+          },
+          {
+            "term": "Cognitive Training",
+            "vocab": "MeSH",
+            "status": "verified",
+            "descriptor_ui": null,
+            "explode": true,
+            "verification_method": "free_api",
+            "review_point": null,
+            "note": "NCBI esearch db=mesh Count=1",
+            "verified_date": "2026-09-30"
+          }
+        ],
+        "vocab_verification_status": "机械已验"
+      },
+      {
+        "platform": "APA PsycINFO (EBSCOhost)",
+        "host": "EBSCOhost (search.ebscohost.com)",
+        "access": "subscription",
+        "strategy_string": "(DE \"Aging\" OR \"older adult*\" OR \"older people\" OR \"older person*\" OR elderly OR senior* OR \"late life\") AND (DE \"Memory Training\" OR \"working memory training\" OR \"working-memory training\" OR \"working memory intervention\" OR \"n-back training\" OR Cogmed OR \"memory training\" OR \"cognitive training\" OR \"brain training\")",
+        "strategy_lines": [
+          "S1 DE \"Aging\" OR \"older adult*\" OR \"older people\" OR \"older person*\" OR elderly OR senior* OR \"late life\"",
+          "S2 DE \"Memory Training\" OR \"working memory training\" OR \"working-memory training\" OR \"working memory intervention\" OR \"n-back training\" OR Cogmed OR \"memory training\" OR \"cognitive training\" OR \"brain training\"",
+          "S3 S1 AND S2"
+        ],
+        "deep_link": {
+          "platform": "psycinfo_ebsco",
+          "tier": "C",
+          "url_kind": "paste_only",
+          "url": null,
+          "url_template": "https://search.ebscohost.com/login.aspx?authtype=ip&profile=ehost&defaultdb=psyh",
+          "verified_http": null,
+          "verified_date": null,
+          "pattern_verified_date": null,
+          "note": "C 档：登录墙 / 会话态 / 验证码墙。交付形态=可粘贴进目标库检索框的检索式本身；URL 结构（若有）见 url_template，机构登录后可试。绝不绕登录/验证码/签名（C-14）。"
+        },
+        "review_points": [
+          "[APA] Aging: APA 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+          "[APA] Memory Training: APA 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+          "语法已验·词表待核：无免费 API 的受控词须人工核对；受控词状态戳机械已核（L11）；主题词相关性/爆炸/副主题需 LLM 判断。"
+        ],
+        "controlled_vocab_terms": [
+          {
+            "term": "Aging",
+            "vocab": "APA",
+            "status": "pending_manual",
+            "descriptor_ui": null,
+            "explode": null,
+            "verification_method": "llm_suggest_only",
+            "review_point": "APA 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+            "note": null,
+            "verified_date": "2026-09-30"
+          },
+          {
+            "term": "Memory Training",
+            "vocab": "APA",
+            "status": "pending_manual",
+            "descriptor_ui": null,
+            "explode": null,
+            "verification_method": "llm_suggest_only",
+            "review_point": "APA 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+            "note": null,
+            "verified_date": "2026-09-30"
+          }
+        ],
+        "vocab_verification_status": "语法已验·词表待核"
+      },
+      {
+        "platform": "CINAHL",
+        "host": "EBSCOhost (search.ebscohost.com)",
+        "access": "subscription",
+        "strategy_string": "((MH \"Aged+\") OR (MH \"Aged, 80 and Over+\") OR \"older adult*\" OR \"older people\" OR \"older person*\" OR elderly OR senior* OR \"late life\") AND (\"working memory training\" OR \"working-memory training\" OR \"working memory intervention\" OR \"n-back training\" OR Cogmed OR \"memory training\" OR \"cognitive training\" OR \"brain training\")",
+        "strategy_lines": [
+          "S1 (MH \"Aged+\") OR (MH \"Aged, 80 and Over+\") OR \"older adult*\" OR \"older people\" OR \"older person*\" OR elderly OR senior* OR \"late life\"",
+          "S2 \"working memory training\" OR \"working-memory training\" OR \"working memory intervention\" OR \"n-back training\" OR Cogmed OR \"memory training\" OR \"cognitive training\" OR \"brain training\"",
+          "S3 S1 AND S2"
+        ],
+        "deep_link": {
+          "platform": "cinahl_ebsco",
+          "tier": "C",
+          "url_kind": "paste_only",
+          "url": null,
+          "url_template": "https://search.ebscohost.com/login.aspx?authtype=ip&profile=ehost&defaultdb=ccm",
+          "verified_http": null,
+          "verified_date": null,
+          "pattern_verified_date": null,
+          "note": "C 档：登录墙 / 会话态 / 验证码墙。交付形态=可粘贴进目标库检索框的检索式本身；URL 结构（若有）见 url_template，机构登录后可试。绝不绕登录/验证码/签名（C-14）。"
+        },
+        "review_points": [
+          "[CINAHL] Aged: CINAHL 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+          "[CINAHL] Aged, 80 and Over: CINAHL 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+          "语法已验·词表待核：无免费 API 的受控词须人工核对；受控词状态戳机械已核（L11）；主题词相关性/爆炸/副主题需 LLM 判断。"
+        ],
+        "controlled_vocab_terms": [
+          {
+            "term": "Aged",
+            "vocab": "CINAHL",
+            "status": "pending_manual",
+            "descriptor_ui": null,
+            "explode": null,
+            "verification_method": "llm_suggest_only",
+            "review_point": "CINAHL 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+            "note": null,
+            "verified_date": "2026-09-30"
+          },
+          {
+            "term": "Aged, 80 and Over",
+            "vocab": "CINAHL",
+            "status": "pending_manual",
+            "descriptor_ui": null,
+            "explode": null,
+            "verification_method": "llm_suggest_only",
+            "review_point": "CINAHL 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+            "note": null,
+            "verified_date": "2026-09-30"
+          }
+        ],
+        "vocab_verification_status": "语法已验·词表待核"
+      },
+      {
+        "platform": "知网 CNKI",
+        "host": "中国知网 / kns.cnki.net",
+        "access": "subscription",
+        "strategy_string": "(SU %= '老年人' OR SU %= '老年' OR SU %= '老人' OR SU %= '老年群体' OR SU %= '中老年人' OR SU %= '高龄老人')\nAND (SU %= '工作记忆训练' OR SU %= '工作记忆干预' OR SU %= '记忆训练' OR SU %= '认知训练' OR SU %= 'n-back训练')",
+        "strategy_lines": null,
+        "deep_link": {
+          "platform": "cnki",
+          "tier": "C",
+          "url_kind": "paste_only",
+          "url": null,
+          "url_template": null,
+          "verified_http": null,
+          "verified_date": null,
+          "pattern_verified_date": null,
+          "note": "C 档：登录墙 / 会话态 / 验证码墙。交付形态=可粘贴进目标库检索框的检索式本身；URL 结构（若有）见 url_template，机构登录后可试。绝不绕登录/验证码/签名（C-14）。"
+        },
+        "review_points": [],
+        "controlled_vocab_terms": [],
+        "vocab_verification_status": "语法已验·无受控词表"
+      },
+      {
+        "platform": "万方 Wanfang",
+        "host": "万方数据 / s.wanfangdata.com.cn",
+        "access": "subscription",
+        "strategy_string": "(老年人 or 老年 or 老人 or 老年群体 or 中老年人 or 高龄老人) and (工作记忆训练 or 工作记忆干预 or 记忆训练 or 认知训练 or n-back训练)",
+        "strategy_lines": null,
+        "deep_link": {
+          "platform": "wanfang",
+          "tier": "B",
+          "url_kind": "browser",
+          "url": null,
+          "url_template": "https://s.wanfangdata.com.cn/paper?q={urlenc}",
+          "verified_http": null,
+          "verified_date": null,
+          "pattern_verified_date": null,
+          "note": "B 档：URL 有效但结果客户端渲染 / bot 被拦。交付形态=浏览器内可用的检索式；不构造脚本层直达链接。"
+        },
+        "review_points": [],
+        "controlled_vocab_terms": [],
+        "vocab_verification_status": "语法已验·无受控词表"
+      },
+      {
+        "platform": "SinoMed / CBM",
+        "host": "中国医学科学院医学信息研究所·图书馆 / www.sinomed.ac.cn",
+        "access": "subscription",
+        "strategy_string": "(\"老年人/全部树/全部副主题词\" OR 老年人 OR 老年 OR 老人 OR 老年群体 OR 中老年人 OR 高龄老人) AND (工作记忆训练 OR 工作记忆干预 OR 记忆训练 OR 认知训练 OR n-back训练)",
+        "strategy_lines": [
+          "#1 \"老年人/全部树/全部副主题词\" OR 老年人 OR 老年 OR 老人 OR 老年群体 OR 中老年人 OR 高龄老人",
+          "#2 工作记忆训练 OR 工作记忆干预 OR 记忆训练 OR 认知训练 OR n-back训练",
+          "#3 #1 AND #2"
+        ],
+        "deep_link": {
+          "platform": "sinomed",
+          "tier": "C",
+          "url_kind": "paste_only",
+          "url": null,
+          "url_template": null,
+          "verified_http": null,
+          "verified_date": null,
+          "pattern_verified_date": null,
+          "note": "C 档：登录墙 / 会话态 / 验证码墙。交付形态=可粘贴进目标库检索框的检索式本身；URL 结构（若有）见 url_template，机构登录后可试。绝不绕登录/验证码/签名（C-14）。"
+        },
+        "review_points": [
+          "[CMeSH] 老年人: CMeSH 无权威免费 API：须在 SinoMed 主题检索 UI 人工确认主题词 + 副主题词组配",
+          "语法已验·词表待核：无免费 API 的受控词须人工核对；受控词状态戳机械已核（L11）；主题词相关性/爆炸/副主题需 LLM 判断。"
+        ],
+        "controlled_vocab_terms": [
+          {
+            "term": "老年人",
+            "vocab": "CMeSH",
+            "status": "pending_manual",
+            "descriptor_ui": null,
+            "explode": null,
+            "verification_method": "llm_suggest_only",
+            "review_point": "CMeSH 无权威免费 API：须在 SinoMed 主题检索 UI 人工确认主题词 + 副主题词组配",
+            "note": "suggest.do 软交叉核命中候选（置信提升）；仍须人工确认——autocomplete 子串匹配，非权威描述符 API",
+            "verified_date": "2026-09-30",
+            "soft_crosscheck": "hit"
+          }
+        ],
+        "vocab_verification_status": "语法已验·词表待核"
+      }
+    ],
+    "global_review_points": [
+      "受控词机械验证仅覆盖 MeSH/ERIC；Emtree/CINAHL/APA/CMeSH 为 LLM 建议，须在目标库人工核对。",
+      "订阅墙平台（WOS/Scopus/Embase/Ovid/EBSCO 等）执行需机构登录，本工具未实测墙内行为。",
+      "注册制 SR：本导出是专业初稿，非署名成品——受控词请在目标库人工复核，订阅墙平台请机构账号执行。",
+      "[Embase (embase.com)] [Emtree] aged: Emtree 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+      "[Embase (embase.com)] [Emtree] cognitive training: Emtree 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+      "[Embase (embase.com)] 语法已验·词表待核：无免费 API 的受控词须人工核对；受控词状态戳机械已核（L11）；主题词相关性/爆炸/副主题需 LLM 判断。",
+      "[Cochrane Library / CENTRAL] 受控词候选未写入检索串：本宿主的受控词语法无法机械模板化（D-d 绝不输出非法语法）——请按语法卡 cochrane_central.md 人工组装受控词子句",
+      "[APA PsycINFO (EBSCOhost)] [APA] Aging: APA 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+      "[APA PsycINFO (EBSCOhost)] [APA] Memory Training: APA 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+      "[APA PsycINFO (EBSCOhost)] 语法已验·词表待核：无免费 API 的受控词须人工核对；受控词状态戳机械已核（L11）；主题词相关性/爆炸/副主题需 LLM 判断。",
+      "[CINAHL] [CINAHL] Aged: CINAHL 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+      "[CINAHL] [CINAHL] Aged, 80 and Over: CINAHL 无免费查表途径 → LLM 建议，须在目标库人工核对（不得伪装已验）",
+      "[CINAHL] 语法已验·词表待核：无免费 API 的受控词须人工核对；受控词状态戳机械已核（L11）；主题词相关性/爆炸/副主题需 LLM 判断。",
+      "[SinoMed / CBM] [CMeSH] 老年人: CMeSH 无权威免费 API：须在 SinoMed 主题检索 UI 人工确认主题词 + 副主题词组配",
+      "[SinoMed / CBM] 语法已验·词表待核：无免费 API 的受控词须人工核对；受控词状态戳机械已核（L11）；主题词相关性/爆炸/副主题需 LLM 判断。"
+    ]
+  },
+}

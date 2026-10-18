@@ -1,0 +1,25 @@
+params:
+  - key: mode
+    label: Evaluation Mode
+    type: select
+    options: [subset, full]
+    default: subset
+    description: "Which clips to evaluate: subset (~50 videos) or full (all ~105 curated clips)"
+
+  - key: maxVideos
+    label: Max Videos
+    type: number
+    default: 50
+    description: Maximum number of videos to evaluate (overrides mode)
+
+  - key: categories
+    label: Categories
+    type: text
+    default: all
+    description: "Comma-separated category filter, e.g. Wildlife,Security (default: all)"
+
+  - key: noOpen
+    label: Don't auto-open report
+    type: boolean
+    default: false
+    description: Skip opening the HTML report in browser after completion

@@ -1,0 +1,66 @@
+# YOLO 2026 Detection Skill — Configuration Schema
+# Parsed by Aegis skill-registry-service.cjs → parseConfigYaml()
+# Format: params[] with key, type, label, default, description, options
+
+params:
+  - key: auto_start
+    label: Auto Start
+    type: boolean
+    default: true
+    description: "Start this skill automatically when Aegis launches"
+
+  - key: model_size
+    label: Model Size
+    type: select
+    default: nano
+    description: "YOLO26 model variant — larger = more accurate but slower"
+    options:
+      - { value: nano, label: "Nano (fastest, ~2ms)" }
+      - { value: small, label: "Small (balanced, ~5ms)" }
+      - { value: medium, label: "Medium (accurate, ~12ms)" }
+      - { value: large, label: "Large (most accurate, ~25ms)" }
+
+  - key: confidence
+    label: Confidence Threshold
+    type: number
+    default: 0.8
+    description: "Minimum detection confidence (0.1–1.0)"
+
+  - key: fps
+    label: Frame Rate
+    type: select
+    default: 5
+    description: "Detection processing rate — higher = more CPU/GPU usage"
+    options:
+      - { value: 0.2, label: "Ultra Low (0.2 FPS)" }
+      - { value: 0.5, label: "Low (0.5 FPS)" }
+      - { value: 1, label: "Normal (1 FPS)" }
+      - { value: 3, label: "Active (3 FPS)" }
+      - { value: 5, label: "High (5 FPS)" }
+      - { value: 15, label: "Real-time (15 FPS)" }
+
+  - key: classes
+    label: Detection Classes
+    type: string
+    default: "person,car,dog,cat"
+    description: "Comma-separated COCO class names to detect"
+
+  - key: device
+    label: Inference Device
+    type: select
+    default: auto
+    description: "Compute backend for inference"
+    options:
+      - { value: auto, label: "Auto-detect" }
+      - { value: cpu, label: "CPU" }
+      - { value: cuda, label: "NVIDIA CUDA" }
+      - { value: mps, label: "Apple Silicon (MPS)" }
+      - { value: rocm, label: "AMD ROCm" }
+
+  - key: use_optimized
+    label: Hardware Acceleration
+    type: boolean
+    default: true
+    description: "Auto-convert model to optimized format (TensorRT/CoreML/OpenVINO/ONNX) for faster inference"
+
+

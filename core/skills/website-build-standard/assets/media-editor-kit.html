@@ -1,0 +1,235 @@
+<!--
+============================================================
+MEDIA EDITOR KIT — paste-in, validated, site-agnostic
+============================================================
+Drop the <style> block into your site's <head> (or main style tag) and the
+<script> block just before </body>. Then follow the WIRING CONVENTIONS below.
+This gives every site: builder-only drag-drop media swap (photo OR MP4),
+Export Files, a click-to-zoom/rotate image inspector, and 3D tilt on cards.
+
+WIRING CONVENTIONS (the JS auto-discovers slots from your markup — no per-slot config):
+
+1) IMAGE SLOTS — any element with class "frame" that contains an <img> whose src
+   points at ./assets/<name> becomes a swappable slot. The asset filename is derived
+   from the img src, so name your files meaningfully (uniform-home.jpg, etc.).
+     <div class="frame">
+       <img src="./assets/uniform-home.jpg" alt="..." onerror="this.style.display='none'">
+       <div class="fallback"><span>Home</span></div>   <!-- branded placeholder -->
+     </div>
+
+2) HERO VIDEO — a container with class "hero-vid" holding a <video><source src="./assets/hero.mp4"></video>
+   plus a ".hero-fallback" becomes the hero swap slot (accepts image OR mp4).
+
+3) LOGO — wrap the nav logo <img> in <span class="logo-slot"><img class="crest" src="./assets/logo.svg"></span>.
+
+4) INSPECTOR — add class "inspectable" + data-src + data-title to a card that holds a .frame:
+     <div class="kit inspectable tilt" data-title="Home Kit" data-src="./assets/uniform-home.jpg"> ... </div>
+   Add "tilt" for the 3D hover effect (optional).
+
+Colors below use CSS variables (--orange, --line, --head, etc.) — set these to the
+site's palette or replace inline. The kit does not depend on any specific palette.
+============================================================
+-->
+
+<style>
+  /* image frame + branded fallback */
+  .frame{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:linear-gradient(160deg,#12100c,#0a0908)}
+  .frame > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}
+  .frame .fallback{z-index:1;text-align:center;opacity:.5;padding:20px}
+  .frame .fallback span{font-family:var(--head,sans-serif);letter-spacing:.24em;text-transform:uppercase;font-size:.66rem;color:#8a94a0;display:block}
+
+  /* interactive: tilt + inspect */
+  .tilt{transform-style:preserve-3d;transition:transform .18s ease;will-change:transform}
+  .inspectable{cursor:zoom-in}
+  .inspect-hint{position:absolute;bottom:12px;right:12px;z-index:6;font-family:var(--head,sans-serif);text-transform:uppercase;letter-spacing:.16em;font-size:.6rem;color:#fff;background:rgba(10,12,14,.72);border:1px solid var(--line,rgba(255,255,255,.12));border-radius:40px;padding:7px 12px;opacity:0;transition:.25s;pointer-events:none}
+  .inspectable:hover .inspect-hint{opacity:1}
+  .glare{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;transition:opacity .2s;background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,.16),transparent 45%)}
+  .tilt:hover .glare{opacity:1}
+
+  /* inspector modal (viewer — stays on for visitors) */
+  .inspector{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(4,6,8,.93);backdrop-filter:blur(10px)}
+  .inspector.open{display:flex}
+  .insp-stage{position:relative;width:100%;height:100%;overflow:hidden;display:flex;align-items:center;justify-content:center;touch-action:none}
+  .insp-stage img{max-width:82vw;max-height:82vh;user-select:none;-webkit-user-drag:none;border-radius:6px;transition:transform .05s linear;cursor:grab}
+  .insp-stage.grabbing img{cursor:grabbing;transition:none}
+  .insp-empty{color:#8a94a0;font-family:var(--head,sans-serif);letter-spacing:.2em;text-transform:uppercase;text-align:center;padding:30px;max-width:420px}
+  .insp-title{position:fixed;top:22px;left:26px;z-index:210;font-family:var(--head,sans-serif);text-transform:uppercase;letter-spacing:.18em;font-size:.82rem;color:#fff;max-width:70vw}
+  .insp-controls{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:210;display:flex;gap:8px;background:rgba(10,12,14,.82);border:1px solid var(--line,rgba(255,255,255,.12));border-radius:50px;padding:8px;backdrop-filter:blur(8px)}
+  .insp-controls button{min-width:44px;height:44px;padding:0 12px;border-radius:40px;border:1px solid var(--line,rgba(255,255,255,.12));background:#141a20;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;font-family:var(--head,sans-serif);letter-spacing:.1em;font-size:.72rem}
+  .insp-controls button:hover{background:var(--orange,#ff6a1a);color:#0a0a0a;border-color:var(--orange,#ff6a1a)}
+  .insp-controls button svg{width:19px;height:19px;fill:currentColor}
+  .insp-close{position:fixed;top:18px;right:20px;z-index:210;width:46px;height:46px;border-radius:50%;border:1px solid var(--line,rgba(255,255,255,.12));background:rgba(10,12,14,.82);color:#fff;cursor:pointer;font-size:1.4rem;display:flex;align-items:center;justify-content:center;transition:.2s}
+  .insp-close:hover{background:var(--orange,#ff6a1a);color:#0a0a0a}
+  .insp-tip{position:fixed;bottom:86px;left:50%;transform:translateX(-50%);z-index:210;color:#8a94a0;font-size:.74rem}
+
+  /* media editor (builder-only) */
+  .swap-badge{position:absolute;inset:0;z-index:20;display:none;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:rgba(8,10,10,.6);border:2px dashed rgba(255,106,26,.75);border-radius:inherit;color:#fff;text-align:center;padding:14px;pointer-events:none}
+  .swap-badge b{font-family:var(--head,sans-serif);text-transform:uppercase;letter-spacing:.12em;font-size:.66rem;word-break:break-all}
+  .swap-badge small{color:#cfe3d4;font-size:.6rem;letter-spacing:.08em;font-family:var(--head,sans-serif);text-transform:uppercase}
+  .swap-badge svg{width:28px;height:28px;fill:var(--orange,#ff6a1a)}
+  body.editing .swap-badge{display:flex}
+  body.editing .swap-target{cursor:pointer}
+  .swap-target.drag-over .swap-badge{background:rgba(255,106,26,.32);border-color:#fff;border-style:solid}
+  .logo-slot{position:relative;display:inline-flex;align-items:center;border-radius:8px}
+  .logo-slot .swap-badge b,.logo-slot .swap-badge small{display:none}
+  .logo-slot .swap-badge{padding:2px;border-radius:8px}
+  .logo-slot .swap-badge svg{width:18px;height:18px}
+  .editbar{position:fixed;left:16px;bottom:16px;z-index:300;display:flex;gap:8px;align-items:center;background:rgba(10,12,10,.92);border:1px solid var(--line,rgba(255,255,255,.12));border-radius:50px;padding:8px 10px;backdrop-filter:blur(10px)}
+  .editbar button{font-family:var(--head,sans-serif);text-transform:uppercase;letter-spacing:.12em;font-size:.66rem;border-radius:40px;border:1px solid var(--line,rgba(255,255,255,.12));background:#141a10;color:#fff;padding:10px 15px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+  .editbar button:hover{background:var(--orange,#ff6a1a);color:#0a0a0a;border-color:var(--orange,#ff6a1a)}
+  .editbar button.on{background:var(--orange,#ff6a1a);color:#0a0a0a}
+  .editbar .lbl{font-family:var(--head,sans-serif);text-transform:uppercase;letter-spacing:.14em;font-size:.58rem;color:var(--orange,#ff6a1a);padding-right:6px}
+  .editbar .x{display:none}
+  body.editing .editbar .x{display:inline-flex}
+  .edit-toast{position:fixed;left:16px;bottom:72px;z-index:300;background:rgba(10,12,10,.96);border:1px solid var(--line,rgba(255,255,255,.12));border-radius:10px;padding:13px 15px;color:#dbe7dd;font-size:.8rem;line-height:1.5;max-width:320px;display:none}
+  .edit-toast b{color:#fff}
+</style>
+
+<!-- INSPECTOR markup — place once, anywhere before </body> -->
+<div class="inspector" id="inspector" aria-hidden="true">
+  <div class="insp-title" id="inspTitle"></div>
+  <button class="insp-close" id="inspClose" aria-label="Close">&times;</button>
+  <div class="insp-stage" id="inspStage"></div>
+  <div class="insp-tip" id="inspTip">Drag to move · scroll to zoom</div>
+  <div class="insp-controls">
+    <button data-act="zoomout" aria-label="Zoom out"><svg viewBox="0 0 24 24"><path d="M5 11h14v2H5z"/></svg></button>
+    <button data-act="zoomin" aria-label="Zoom in"><svg viewBox="0 0 24 24"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg></button>
+    <button data-act="rotl">⟲</button>
+    <button data-act="rotr">⟳</button>
+    <button data-act="reset">Reset</button>
+  </div>
+</div>
+
+<script>
+/* ---- 3D tilt ---- */
+(function(){
+  var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  if(reduce) return;
+  document.querySelectorAll('.tilt').forEach(function(card){
+    card.addEventListener('mousemove', function(e){
+      if(document.body.classList.contains('editing'))return;
+      var r=card.getBoundingClientRect(), px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
+      card.style.transform='rotateX('+((py-.5)*-12)+'deg) rotateY('+((px-.5)*14)+'deg)';
+      var g=card.querySelector('.glare'); if(g){g.style.setProperty('--gx',px*100+'%');g.style.setProperty('--gy',py*100+'%');}
+    });
+    card.addEventListener('mouseleave', function(){ card.style.transform=''; });
+  });
+})();
+
+/* ---- Inspector (zoom / pan / rotate) — viewer, on for everyone ---- */
+(function(){
+  var inspector=document.getElementById('inspector'); if(!inspector) return;
+  var inspStage=document.getElementById('inspStage'), inspTitle=document.getElementById('inspTitle'), inspTip=document.getElementById('inspTip');
+  var iScale=1,iRot=0,iX=0,iY=0,iImg=null,dragging=false,sx=0,sy=0;
+  function applyT(){ if(iImg) iImg.style.transform='translate('+iX+'px,'+iY+'px) scale('+iScale+') rotate('+iRot+'deg)'; }
+  function resetT(){ iScale=1;iRot=0;iX=0;iY=0;applyT(); }
+  function open(src,title,loaded){
+    inspStage.innerHTML=''; inspTitle.innerHTML=title||'';
+    if(loaded){ iImg=document.createElement('img'); iImg.src=src; inspStage.appendChild(iImg); inspTip.style.display=''; resetT(); }
+    else { iImg=null; inspTip.style.display='none'; inspStage.innerHTML='<div class="insp-empty">Image not added yet.<br>Drop <b>'+(src.split('/').pop())+'</b> into /assets and this becomes a full zoom &amp; rotate inspector.</div>'; }
+    inspector.classList.add('open'); inspector.setAttribute('aria-hidden','false');
+  }
+  function close(){ inspector.classList.remove('open'); inspector.setAttribute('aria-hidden','true'); iImg=null; }
+  document.querySelectorAll('.inspectable').forEach(function(el){
+    var hint=document.createElement('div'); hint.className='inspect-hint'; hint.textContent='⤢ Inspect';
+    (el.querySelector('.frame')||el).appendChild(hint);
+    el.addEventListener('click', function(){
+      if(document.body.classList.contains('editing'))return;
+      var img=el.querySelector('.frame img');
+      var loaded = img && img.complete && img.naturalWidth>0 && img.style.display!=='none';
+      open(el.getAttribute('data-src')||'', el.getAttribute('data-title')||'', loaded);
+    });
+  });
+  document.getElementById('inspClose').addEventListener('click', close);
+  inspector.addEventListener('click', function(e){ if(e.target===inspector||e.target===inspStage) close(); });
+  addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+  document.querySelectorAll('.insp-controls button').forEach(function(b){
+    b.addEventListener('click', function(){ var a=b.dataset.act;
+      if(a==='zoomin')iScale=Math.min(6,iScale*1.25); else if(a==='zoomout')iScale=Math.max(.4,iScale/1.25);
+      else if(a==='rotl')iRot-=90; else if(a==='rotr')iRot+=90; else if(a==='reset'){resetT();return;} applyT();
+    });
+  });
+  inspStage.addEventListener('wheel', function(e){ if(!iImg)return; e.preventDefault(); iScale=Math.min(6,Math.max(.4,iScale*(e.deltaY<0?1.12:1/1.12))); applyT(); }, {passive:false});
+  inspStage.addEventListener('pointerdown', function(e){ if(!iImg)return; dragging=true;inspStage.classList.add('grabbing'); sx=e.clientX-iX;sy=e.clientY-iY; inspStage.setPointerCapture(e.pointerId); });
+  inspStage.addEventListener('pointermove', function(e){ if(!dragging)return; iX=e.clientX-sx;iY=e.clientY-sy;applyT(); });
+  inspStage.addEventListener('pointerup', function(){ dragging=false;inspStage.classList.remove('grabbing'); });
+})();
+
+/* ---- Media Editor — BUILDER-ONLY (hidden on hosted site) ---- */
+(function(){
+  var host=location.hostname;
+  var isLocal = location.protocol==='file:' || /^(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])$/.test(host) || host.endsWith('.local');
+  var unlocked = (location.hash+location.search).toLowerCase().indexOf('studio')>=0;
+  if(!isLocal && !unlocked) return;   // hosted & locked → no editor at all
+
+  var store={};
+  function basename(u){ if(!u) return ''; var p=u.split('/').pop().split('?')[0]; return p.indexOf('.')>=0?p:''; }
+  function editing(){ return document.body.classList.contains('editing'); }
+  function register(el,name){
+    if(!name || el.dataset.asset) return;
+    el.classList.add('swap','swap-target'); el.dataset.asset=name;
+    var badge=document.createElement('div'); badge.className='swap-badge';
+    badge.innerHTML='<svg viewBox="0 0 24 24"><path d="M12 3l4 4h-3v6h-2V7H8l4-4zM5 14v5h14v-5h2v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5h2z"/></svg><b>'+name+'</b><small>Drop photo or MP4 · or click</small>';
+    el.appendChild(badge);
+    el.addEventListener('dragover', function(e){ if(!editing())return; e.preventDefault(); el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', function(){ el.classList.remove('drag-over'); });
+    el.addEventListener('drop', function(e){ if(!editing())return; e.preventDefault(); e.stopPropagation(); el.classList.remove('drag-over'); var f=e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) loadFile(name,f); });
+    el.addEventListener('click', function(e){ if(!editing())return; e.preventDefault(); e.stopPropagation(); pickFor(name); });
+  }
+  var heroVid=document.querySelector('.hero-vid');
+  if(heroVid){ var s=heroVid.querySelector('source'); register(heroVid, basename(s&&s.getAttribute('src'))||'hero.mp4'); }
+  document.querySelectorAll('.frame').forEach(function(fr){ var img=fr.querySelector('img'); if(img) register(fr, basename(img.getAttribute('src'))); });
+  document.querySelectorAll('.logo-slot').forEach(function(el){ register(el,'logo.svg'); });
+
+  var input=document.createElement('input'); input.type='file'; input.accept='image/*,video/*'; input.style.display='none'; document.body.appendChild(input);
+  var pend=null;
+  function pickFor(name){ pend=name; input.value=''; input.click(); }
+  input.addEventListener('change', function(){ var f=input.files[0]; if(f&&pend) loadFile(pend,f); });
+
+  function toastMsg(h){ toast.style.display='block'; toast.innerHTML=h; }
+  function loadFile(name,file){
+    store[name]=file; var url=URL.createObjectURL(file), isVid=(file.type||'').indexOf('video')===0;
+    document.querySelectorAll('.swap').forEach(function(el){ if(el.dataset.asset===name){ isVid?applyVideo(el,url):applyImage(el,url); } });
+    count();
+    if(isVid){ var mb=file.size/1048576, tmp=document.createElement('video'); tmp.preload='metadata';
+      tmp.onloadedmetadata=function(){ var d=tmp.duration||0;
+        if(d>22||mb>18) toastMsg('<b>Heads up:</b> '+Math.round(d)+'s · '+mb.toFixed(1)+'MB. Background loops run smoothest at <b>10–20s</b> and under ~15MB — zero load-lag. Bigger works, just a slower first load.');
+        else toastMsg('<b>'+Math.round(d)+'s · '+mb.toFixed(1)+'MB</b> — perfect, loads instantly.'); };
+      tmp.src=url;
+    }
+  }
+  function applyImage(el,url){
+    if(el.classList.contains('logo-slot')){ var l=el.querySelector('img'); if(l)l.src=url; return; }
+    if(el.classList.contains('hero-vid')){ var v=el.querySelector('video'); if(v)v.style.display='none'; var im=el.querySelector('img.editimg'); if(!im){im=document.createElement('img');im.className='editimg';im.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2';el.appendChild(im);} im.src=url; var hf=el.querySelector('.hero-fallback'); if(hf)hf.style.display='none'; return; }
+    var vid=el.querySelector('video.editvid'); if(vid)vid.style.display='none';
+    var img=el.querySelector('img'); if(!img){img=document.createElement('img');img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2';el.insertBefore(img,el.firstChild);} img.style.display='block'; img.src=url;
+    var fb=el.querySelector('.fallback'); if(fb)fb.style.display='none';
+  }
+  function applyVideo(el,url){
+    if(el.classList.contains('hero-vid')){ var v=el.querySelector('video'), so=v.querySelector('source'); so.src=url; v.load(); v.play&&v.play().catch(function(){}); v.style.display='block'; var im=el.querySelector('img.editimg'); if(im)im.style.display='none'; var hf=el.querySelector('.hero-fallback'); if(hf)hf.style.display='none'; return; }
+    var img=el.querySelector('img'); if(img)img.style.display='none';
+    var vv=el.querySelector('video.editvid'); if(!vv){vv=document.createElement('video');vv.className='editvid';vv.muted=true;vv.loop=true;vv.autoplay=true;vv.playsInline=true;vv.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2';el.insertBefore(vv,el.firstChild);} vv.src=url; vv.style.display='block'; vv.play&&vv.play().catch(function(){});
+    var fb=el.querySelector('.fallback'); if(fb)fb.style.display='none';
+  }
+
+  var bar=document.createElement('div'); bar.className='editbar';
+  bar.innerHTML='<span class="lbl x" id="edCount"></span><button id="edToggle">✎ Edit Media</button><button id="edExport" class="x">⭳ Export Files</button><button id="edDone" class="x">Done</button>';
+  document.body.appendChild(bar);
+  var toast=document.createElement('div'); toast.className='edit-toast'; document.body.appendChild(toast);
+  var tgl=bar.querySelector('#edToggle'), exp=bar.querySelector('#edExport'), done=bar.querySelector('#edDone'), cEl=bar.querySelector('#edCount');
+  function count(){ var n=Object.keys(store).length; cEl.textContent=n?(n+' swapped'):''; }
+  function enter(){ document.body.classList.add('editing'); tgl.classList.add('on'); tgl.textContent='✎ Editing…'; toastMsg('<b>Edit mode on.</b> Drag a photo or MP4 onto any highlighted slot — or click it. Changes preview live. When done, hit <b>Export Files</b> to save them named correctly for your <b>/assets</b> folder.'); }
+  function exit(){ document.body.classList.remove('editing'); tgl.classList.remove('on'); tgl.textContent='✎ Edit Media'; toast.style.display='none'; }
+  tgl.addEventListener('click', function(){ editing()?exit():enter(); });
+  done.addEventListener('click', exit);
+  exp.addEventListener('click', function(){
+    var names=Object.keys(store);
+    if(!names.length){ toastMsg('Nothing to export yet — drop a photo or MP4 on a slot first.'); return; }
+    names.forEach(function(n,i){ var file=store[n], dropExt=(file.name.split('.').pop()||'').toLowerCase(), base=n.replace(/\.[^.]+$/,''), ext=dropExt||((file.type||'').indexOf('video')===0?'mp4':'jpg');
+      var a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=base+'.'+ext; document.body.appendChild(a); setTimeout(function(){a.click();a.remove();}, i*280); });
+    toastMsg('<b>Exporting '+names.length+' file(s).</b> Move them into the site\'s <b>/assets</b> folder (keep the names), then re-upload to your host.');
+  });
+  count();
+  ['dragover','drop'].forEach(function(ev){ window.addEventListener(ev, function(e){ if(e.target.closest&&e.target.closest('.swap-target'))return; e.preventDefault(); }); });
+})();
+</script>

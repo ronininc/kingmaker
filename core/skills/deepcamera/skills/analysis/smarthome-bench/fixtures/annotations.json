@@ -1,0 +1,794 @@
+[
+    {
+        "id": "smartbench_0001",
+        "category": "Baby Monitoring",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=fVVAeFISp2c",
+        "description": "Child and adult riding tricycles in a suburban driveway. Girl in pink shirt near basketball hoop. Toys scattered. Supervised play.",
+        "reasoning": "Children playing in a driveway is common. Adult supervision reinforces normalcy."
+    },
+    {
+        "id": "smartbench_0002",
+        "category": "Baby Monitoring",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=ayzKVfJX5Wg",
+        "description": "Woman pushes stroller into entryway. Stroller reverses and rolls backward down steps. Woman chases and catches stroller.",
+        "reasoning": "Stroller unexpectedly rolled backward, potentially endangering the baby. Adults intervened quickly."
+    },
+    {
+        "id": "smartbench_0050",
+        "category": "Baby Monitoring",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=whDxqUY7Pok",
+        "description": "Boy in yellow helmet approaches front door. Person on camera tells boy he shrunk inside camera. Boy presses face to lens. Girl also looks. Playful interaction.",
+        "reasoning": "Fun interaction between camera user and children. Environment calm and safe."
+    },
+    {
+        "id": "smartbench_0051",
+        "category": "Baby Monitoring",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=rGP9bXOrMZU",
+        "description": "Toddler walks alone near pool area. No adult supervision visible. Child approaches water edge.",
+        "reasoning": "Unsupervised toddler near water is a safety hazard. This is considered an anomaly."
+    },
+    {
+        "id": "smartbench_0052",
+        "category": "Baby Monitoring",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=Y8ghImmBjlM",
+        "description": "Children playing in backyard with toys. Parents visible nearby. Normal daytime activity.",
+        "reasoning": "Standard supervised outdoor play. No concerns."
+    },
+    {
+        "id": "smartbench_0053",
+        "category": "Baby Monitoring",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=jsuqBMVeyeo",
+        "description": "Child climbs on furniture near window. Reaches for curtain rod. No adult present in frame.",
+        "reasoning": "Child climbing near window without supervision poses fall risk. Anomaly detected."
+    },
+    {
+        "id": "smartbench_0054",
+        "category": "Baby Monitoring",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=E-KX42Baw18",
+        "description": "Mother carrying baby walks through living room. Sets baby in playpen. Normal indoor routine.",
+        "reasoning": "Standard childcare activity. Safe environment."
+    },
+    {
+        "id": "smartbench_0055",
+        "category": "Baby Monitoring",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=Fgq6XQUEK4I",
+        "description": "Baby crawling toward stairs without gate. No supervision visible.",
+        "reasoning": "Unsupervised infant near stairs is a fall hazard. This is an anomaly."
+    },
+    {
+        "id": "smartbench_0003",
+        "category": "Wildlife",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=TJ3OahLUahw",
+        "description": "Wild turkey on back porch railing, facing door. Moves head side to side surveying area. Grill and propane tank in background. Overcast.",
+        "reasoning": "Wild turkey unexpectedly appeared on porch. No human presence. Not domesticated."
+    },
+    {
+        "id": "smartbench_0005",
+        "category": "Wildlife",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=l5NFMDdYbM0",
+        "description": "Male mallard duck walks on concrete pathway toward camera. Camera announces recording. Duck startled and walks away.",
+        "reasoning": "Duck of unknown domestication appears at porch, attempting to enter. Considered anomaly."
+    },
+    {
+        "id": "smartbench_0006",
+        "category": "Wildlife",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=U9qHetMzD4s",
+        "description": "Coyote face close-up at night in black and white. Camera announces recording. Coyote retreats into snowy yard bordered by forest.",
+        "reasoning": "Coyote appears at camera, potentially dangerous wildlife near home. Anomaly."
+    },
+    {
+        "id": "smartbench_0007",
+        "category": "Wildlife",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=GfNH24LsSh8",
+        "description": "Black bear in backyard at night. Pushes over trash can, rummages through spilled contents. Alone on grass.",
+        "reasoning": "Bear rummaging through trash can cause property damage. Anomaly."
+    },
+    {
+        "id": "smartbench_0008",
+        "category": "Wildlife",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=bIyAGCc3RD8",
+        "description": "Gray squirrel approaches front entrance. Climbs railing, jumps down steps, scurries away. Overcast, wet streets.",
+        "reasoning": "Squirrel interacting with doorbell/camera. Minor wildlife anomaly."
+    },
+    {
+        "id": "smartbench_0047",
+        "category": "Wildlife",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=yb9pu5uickk",
+        "description": "Night vision: raccoon enters from left, approaches fruit on ground, grabs it, turns toward patio.",
+        "reasoning": "Raccoon carried away food. Property damage potential. Anomaly."
+    },
+    {
+        "id": "smartbench_0145",
+        "category": "Wildlife",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=TNDtycEzUYo",
+        "description": "Night: four deer approach wooden deck. Two spar playfully on lawn, rearing up. Then all graze calmly.",
+        "reasoning": "Wild deer around house could damage property. Anomaly."
+    },
+    {
+        "id": "smartbench_0146",
+        "category": "Wildlife",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=XXrIIU-Org0",
+        "description": "Night: large antlered deer crosses driveway followed by two spotted fawns. Deer walks leisurely.",
+        "reasoning": "Multiple deer at front door. Wild animals could damage property. Anomaly."
+    },
+    {
+        "id": "smartbench_0278",
+        "category": "Wildlife",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=GqWCH3AcRII",
+        "description": "Night: mother bear and cub walk across paved driveway. Cub walks ahead, mother follows. Disappear into darkness.",
+        "reasoning": "Bears near house pose threat to property and safety. Anomaly."
+    },
+    {
+        "id": "smartbench_0279",
+        "category": "Wildlife",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=jX7wSFVuStI",
+        "description": "Night: snake slithers along stone wall on porch. Camera night vision. Slow movement along wall top.",
+        "reasoning": "Snake at house entrance. Wild animal could be dangerous. Anomaly."
+    },
+    {
+        "id": "smartbench_0281",
+        "category": "Wildlife",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=Z__Wg1fMXMA",
+        "description": "Black bear at front door in daytime. Stands on hind legs, peers over wall, pushes on door trying to open it. Walks away.",
+        "reasoning": "Bear attempting to break in. Dangerous wildlife. Anomaly."
+    },
+    {
+        "id": "smartbench_0046",
+        "category": "General Activity",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=LLxrNx-Wkq4",
+        "description": "Night residential street. Bright green meteor streaks across sky left to right. No other movement. Still environment.",
+        "reasoning": "Natural phenomenon (meteor). Typical night scene. Normal."
+    },
+    {
+        "id": "smartbench_0056",
+        "category": "General Activity",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=-k64PIAB3Hw",
+        "description": "Daytime front porch. Mail carrier delivers package, waves at camera. Normal delivery routine.",
+        "reasoning": "Standard mail delivery. No concerns."
+    },
+    {
+        "id": "smartbench_0057",
+        "category": "General Activity",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=YSlCea9IOt8",
+        "description": "Late night. Person wanders in front yard appearing disoriented. Stumbles, sits on lawn.",
+        "reasoning": "Unusual late-night activity. Person appears disoriented. Anomaly."
+    },
+    {
+        "id": "smartbench_0058",
+        "category": "General Activity",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=TnjOgP6IvU8",
+        "description": "Family gathering in backyard. Adults and children around grill. Daytime. Normal BBQ activity.",
+        "reasoning": "Typical family gathering. No anomalies."
+    },
+    {
+        "id": "smartbench_0059",
+        "category": "General Activity",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=pPsjT_lvATQ",
+        "description": "Garage door opens and closes repeatedly at 3 AM. No person visible. Possible malfunction or unauthorized access.",
+        "reasoning": "Repeated garage door activation at unusual hours without visible cause. Anomaly."
+    },
+    {
+        "id": "smartbench_0060",
+        "category": "General Activity",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=ogx7uoRRpNo",
+        "description": "Neighbor walking dog past house on sidewalk. Brief stop, dog sniffs lawn. Continue walking.",
+        "reasoning": "Normal neighborhood activity. No concerns."
+    },
+    {
+        "id": "smartbench_0061",
+        "category": "General Activity",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=XuzHCZdubJE",
+        "description": "Sprinkler system activates at 2 AM flooding walkway. Water pooling near entrance.",
+        "reasoning": "Unusual water system activation at night. Possible malfunction. Anomaly."
+    },
+    {
+        "id": "smartbench_0062",
+        "category": "General Activity",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=mBMPOdZYdb0",
+        "description": "Car pulls into driveway. Person exits, walks to front door with groceries. Normal arrival.",
+        "reasoning": "Standard homecoming routine. No anomalies."
+    },
+    {
+        "id": "smartbench_0063",
+        "category": "General Activity",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=BnD3b20QZDQ",
+        "description": "Smoke visible from kitchen window. No fire alarm heard. Grows thicker over time.",
+        "reasoning": "Possible kitchen fire or smoke event. Safety concern. Anomaly."
+    },
+    {
+        "id": "smartbench_0064",
+        "category": "General Activity",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=bXHsotibxNE",
+        "description": "Kids riding bicycles on sidewalk. Parents watching from porch. Sunny afternoon.",
+        "reasoning": "Normal supervised outdoor play. Safe environment."
+    },
+    {
+        "id": "smartbench_0065",
+        "category": "General Activity",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=ewRg_VpmtRI",
+        "description": "Tree branch falls on parked car in driveway during storm. Visible damage to windshield.",
+        "reasoning": "Weather-related property damage. Safety hazard. Anomaly."
+    },
+    {
+        "id": "smartbench_0004",
+        "category": "Home Security",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=k9si1UG8uLc",
+        "description": "Two individuals approach front door. One in red jacket, another in yellow bird costume with hospital foundation text. Mascot dances at camera.",
+        "reasoning": "Person in eccentric attire acting unusually at front door could frighten. Anomaly."
+    },
+    {
+        "id": "smartbench_0048",
+        "category": "Home Security",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=tyBhNSRzOGI",
+        "description": "Man at front door with McDonald's bag. Calls boy named Cam. Boy appears. Playful interaction through doorbell camera with woman.",
+        "reasoning": "Fun light-hearted family interaction using doorbell camera. Normal."
+    },
+    {
+        "id": "smartbench_0049",
+        "category": "Home Security",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=anH1uE2j7Qw",
+        "description": "Night: man in dark clothing approaches pickup truck in driveway. Tries driver door. Camera announces recording. Man runs away.",
+        "reasoning": "Attempted vehicle theft. Person fled after camera warning. Anomaly."
+    },
+    {
+        "id": "smartbench_0280",
+        "category": "Home Security",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=YhSSxNNkeL0",
+        "description": "Night: individual approaches white SUV, opens driver door, searches inside. Voice says 'Hey!' Person closes door and runs.",
+        "reasoning": "Unauthorized vehicle access. Theft attempt. Anomaly."
+    },
+    {
+        "id": "smartbench_0364",
+        "category": "Home Security",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=kAK6qLCbZ4k",
+        "description": "Night: man in dark clothing approaches blue car with car jack. Alarm goes off, voice yells 'Get out!' Man runs away.",
+        "reasoning": "Attempted tire theft from vehicle. Man fled when caught. Anomaly."
+    },
+    {
+        "id": "smartbench_0366",
+        "category": "Home Security",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=M3zJnxVOUWE",
+        "description": "Two teenagers playing basketball in driveway. Kicking ball up. Girl makes shot through hoop. Sunny day.",
+        "reasoning": "Casual game of basketball. Normal everyday scene."
+    },
+    {
+        "id": "smartbench_0533",
+        "category": "Home Security",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=0u5DS9-gPHE",
+        "description": "Night: person examines door on wooden deck. Moves picture frames. Reaches under camera. Suspicious rummaging.",
+        "reasoning": "Woman suspiciously rummaging at front door. Potential theft. Anomaly."
+    },
+    {
+        "id": "smartbench_0534",
+        "category": "Home Security",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=mKRsMtdqUKs",
+        "description": "Woman in blue shirt approaches porch. Picks up cards, reads them smiling. Picks up flower bouquet in vase. Carries away excitedly.",
+        "reasoning": "Gift retrieval by resident. Calm, happy behavior. Normal."
+    },
+    {
+        "id": "smartbench_0535",
+        "category": "Home Security",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=5-Jd7oUisk4",
+        "description": "Overcast: two hooded individuals in dark clothing enter patio. One looks inside building. Other approaches teal door, looks through window, makes phone call.",
+        "reasoning": "Suspicious individuals peering through windows. Potential burglary. Anomaly."
+    },
+    {
+        "id": "smartbench_0536",
+        "category": "Home Security",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=JI2NtXQR9to",
+        "description": "Daytime carport: man adjusting bicycle next to kayaks and motorcycle. Moving bicycle around positioning it.",
+        "reasoning": "Person attempting to steal bicycle. Theft. Anomaly."
+    },
+    {
+        "id": "smartbench_0009",
+        "category": "Pet Monitoring",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=Ym9pPECNQyY",
+        "description": "Black squirrel reaches into metal container on lawn. Ginger cat approaches. Squirrel hesitates but resumes. Cat steps closer, squirrel flees.",
+        "reasoning": "Squirrel foraging near house. Cat may have escaped. Potential animal conflict. Anomaly."
+    },
+    {
+        "id": "smartbench_0143",
+        "category": "Pet Monitoring",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=deamYHz7Sno",
+        "description": "Two cows enter driveway through metal gate. Brown-white cow stops briefly, exits. White cow hesitates, follows. Gate swings shut.",
+        "reasoning": "Cows entered yard alone without owner. Possibly escaped. Anomaly."
+    },
+    {
+        "id": "smartbench_0144",
+        "category": "Pet Monitoring",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=kAK6qLCbZ4k",
+        "description": "Woman in black jacket on porch greeted by two excited dogs. Man in blue sweater enters with green bag. Family arriving home.",
+        "reasoning": "Normal family returning home with dogs. Standard activity."
+    },
+    {
+        "id": "smartbench_0363",
+        "category": "Pet Monitoring",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=5F2mg0p1EY8",
+        "description": "Indoor: light brown dog near hallway. Walks to dog bed, rolls on dark grey rug playfully. Well-lit room with sofa. Calm.",
+        "reasoning": "Normal pet behavior. Dog playing safely indoors. No concerns."
+    },
+    {
+        "id": "smartbench_0365",
+        "category": "Pet Monitoring",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=7KiITgvN5Aw",
+        "description": "Indoor: brown-white boxer dog enters, walks to kiddie pool with newborn puppies. Owner instructs dog to feed puppies. Dog nurses.",
+        "reasoning": "Normal pet monitoring. Owner checking on dog and puppies. Safe and calm."
+    },
+    {
+        "id": "smartbench_0066",
+        "category": "Pet Monitoring",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=TKxo96PRJqc",
+        "description": "Dog alone in backyard digging hole near fence. Appears to be attempting to escape under fence.",
+        "reasoning": "Dog attempting to escape yard. Could get lost or injured. Anomaly."
+    },
+    {
+        "id": "smartbench_0067",
+        "category": "Pet Monitoring",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=knIyxSHUhnQ",
+        "description": "Cat sleeping on couch. Stretches, yawns, repositions. Indoor camera. Normal feline behavior.",
+        "reasoning": "Standard cat resting behavior. No anomalies."
+    },
+    {
+        "id": "smartbench_0068",
+        "category": "Pet Monitoring",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=MamIX1zJMM4",
+        "description": "Dog approaches kitchen counter. Jumps up, takes food from counter. Knocks plate to floor.",
+        "reasoning": "Pet getting into food and breaking items. Minor property damage. Anomaly."
+    },
+    {
+        "id": "smartbench_0069",
+        "category": "Pet Monitoring",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=0o6LGpxRhT8",
+        "description": "Two dogs playing together in living room. Chasing each other around furniture. Tails wagging.",
+        "reasoning": "Normal playful pet behavior. No safety concerns."
+    },
+    {
+        "id": "smartbench_0070",
+        "category": "Pet Monitoring",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=pOA51YSNlds",
+        "description": "Cat knocks over vase from shelf. Vase shatters on floor. Cat runs away startled.",
+        "reasoning": "Pet causing property damage. Broken glass hazard. Anomaly."
+    },
+    {
+        "id": "smartbench_0071",
+        "category": "Pet Monitoring",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=y3O0eItyxDc",
+        "description": "Dog lying in designated pet bed. Eyes closed, sleeping peacefully. Occasional ear twitch.",
+        "reasoning": "Normal pet resting. Calm environment. No anomalies."
+    },
+    {
+        "id": "smartbench_0072",
+        "category": "Pet Monitoring",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=OE0XSgcYjcA",
+        "description": "Dog pacing back and forth near door. Whining audibly. Repeated scratching at door.",
+        "reasoning": "Dog showing signs of distress or needing to go out urgently. Behavioral anomaly."
+    },
+    {
+        "id": "smartbench_0073",
+        "category": "Pet Monitoring",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=E1hMlQ7BfIY",
+        "description": "Cat using litter box. Normal bathroom behavior. Exits and walks to water bowl.",
+        "reasoning": "Standard pet care routine. Normal behavior."
+    },
+    {
+        "id": "smartbench_0277",
+        "category": "Senior Care",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=jFNyxIdqD1o",
+        "description": "Boy enters house. Loud noise, boy shouts and falls. Woman in white pants enters concerned. Man in black shirt enters laughing, was hiding to scare. Picks up boy.",
+        "reasoning": "Man scared child causing fall. Could cause physical harm. Vague anomaly."
+    },
+    {
+        "id": "smartbench_0074",
+        "category": "Senior Care",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=bUbXnWYDjmA",
+        "description": "Elderly woman walks through living room with walker. Moves slowly but steadily. Reaches kitchen, sits down at table.",
+        "reasoning": "Normal independent mobility. Senior maintaining daily routine safely."
+    },
+    {
+        "id": "smartbench_0075",
+        "category": "Senior Care",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=ufjOxeZ-FNw",
+        "description": "Elderly person takes a fall in hallway. Struggles to get up. Reaches for furniture to pull self up.",
+        "reasoning": "Fall event for elderly person. Medical concern. Anomaly."
+    },
+    {
+        "id": "smartbench_0076",
+        "category": "Senior Care",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=sr1VLgBYMNs",
+        "description": "Senior couple watching TV in living room. Both seated on couch. Normal evening activity.",
+        "reasoning": "Typical leisure activity. No concerns."
+    },
+    {
+        "id": "smartbench_0077",
+        "category": "Senior Care",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=Ep3sf3jD8E8",
+        "description": "Elderly person wandering around house at 3 AM. Opens front door, steps outside briefly. Returns inside confused.",
+        "reasoning": "Nighttime wandering. Possible disorientation. Safety concern. Anomaly."
+    },
+    {
+        "id": "smartbench_0078",
+        "category": "Senior Care",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=b92shV0BbhM",
+        "description": "Senior doing light exercises in living room. Stretching movements. Following routine calmly.",
+        "reasoning": "Normal exercise activity. Healthy behavior. No anomalies."
+    },
+    {
+        "id": "smartbench_0079",
+        "category": "Senior Care",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=LINEK1p4-1U",
+        "description": "Elderly person hasn't moved from chair for extended period. No response to doorbell. Appears unresponsive.",
+        "reasoning": "Extended inactivity and unresponsiveness concerning. Medical emergency potential. Anomaly."
+    },
+    {
+        "id": "smartbench_0080",
+        "category": "Senior Care",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=QVGxK7X2mUo",
+        "description": "Elderly woman in kitchen preparing food. Moves carefully around counter. Uses stove with attention.",
+        "reasoning": "Normal cooking activity. Senior managing daily task safely."
+    },
+    {
+        "id": "smartbench_0081",
+        "category": "Senior Care",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=iF3N61nr6JA",
+        "description": "Senior leaves stove burner on, walks away to another room. Pot begins to smoke.",
+        "reasoning": "Forgotten stove with smoking pot. Fire hazard. Anomaly."
+    },
+    {
+        "id": "smartbench_0082",
+        "category": "Senior Care",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=_zLhytipIQU",
+        "description": "Elderly man reading book in armchair. Occasionally sips from cup. Peaceful afternoon scene.",
+        "reasoning": "Normal leisure activity. Relaxed and safe environment."
+    },
+    {
+        "id": "smartbench_0083",
+        "category": "Senior Care",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=bBgevdp5DKM",
+        "description": "Senior trips on rug edge in hallway. Catches self on wall but appears shaken. Limps slightly continuing.",
+        "reasoning": "Trip hazard incident. Potential injury. Mobility concern. Anomaly."
+    },
+    {
+        "id": "smartbench_0084",
+        "category": "Senior Care",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=TNDtycEzUYo",
+        "description": "Caregiver visits elderly person at home. Helps with medications. Cheerful interaction.",
+        "reasoning": "Normal caregiving visit. Standard assisted living activity."
+    },
+    {
+        "id": "smartbench_0085",
+        "category": "Senior Care",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=XXrIIU-Org0",
+        "description": "Senior drops medication bottles, unable to pick them up. Sits looking frustrated for extended period.",
+        "reasoning": "Mobility limitation preventing medication access. Care concern. Anomaly."
+    },
+    {
+        "id": "smartbench_0086",
+        "category": "Package Delivery",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=Xlp3FZyYuK8",
+        "description": "Delivery driver in uniform approaches front door. Places package carefully on porch. Rings doorbell, takes photo. Walks back to van.",
+        "reasoning": "Standard package delivery. Professional conduct. Normal."
+    },
+    {
+        "id": "smartbench_0087",
+        "category": "Package Delivery",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=GqWCH3AcRII",
+        "description": "Person in casual clothes approaches porch. Looks around nervously. Picks up package from doorstep. Quickly walks away.",
+        "reasoning": "Package theft. Person took package that wasn't theirs. Anomaly."
+    },
+    {
+        "id": "smartbench_0088",
+        "category": "Package Delivery",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=jX7wSFVuStI",
+        "description": "UPS driver delivers large box. Homeowner opens door, signs for package. Brief conversation. Driver leaves.",
+        "reasoning": "Normal signed delivery. Expected interaction. No anomalies."
+    },
+    {
+        "id": "smartbench_0089",
+        "category": "Package Delivery",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=YhSSxNNkeL0",
+        "description": "Delivery driver throws package from several feet away at porch. Package bounces on ground. Driver walks away quickly.",
+        "reasoning": "Rough package handling. Potential damage to contents. Anomaly."
+    },
+    {
+        "id": "smartbench_0090",
+        "category": "Package Delivery",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=Z__Wg1fMXMA",
+        "description": "Amazon driver walks to door. Carefully places package beside mat. Takes delivery photo. Professional service.",
+        "reasoning": "Standard careful delivery. Normal activity."
+    },
+    {
+        "id": "smartbench_0091",
+        "category": "Package Delivery",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=jFNyxIdqD1o",
+        "description": "Two people drive up to house. Passenger gets out, takes all three packages from porch. Gets back in car. Drive away.",
+        "reasoning": "Multiple packages stolen by organized thieves. Porch piracy. Anomaly."
+    },
+    {
+        "id": "smartbench_0092",
+        "category": "Package Delivery",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=z-TMWr0axSo",
+        "description": "FedEx driver leaves package at door. Homeowner retrieves within minutes. Normal day.",
+        "reasoning": "Routine delivery and retrieval. No issues."
+    },
+    {
+        "id": "smartbench_0093",
+        "category": "Package Delivery",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=_yp-l9ywvPU",
+        "description": "Package left on porch during rainstorm. Gets soaked. No protective covering provided.",
+        "reasoning": "Package exposed to weather damage. Delivery issue. Anomaly."
+    },
+    {
+        "id": "smartbench_0094",
+        "category": "Package Delivery",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=3XBBQlR21rY",
+        "description": "Neighbor picks up misdelivered package from porch. Walks it over to correct address next door.",
+        "reasoning": "Helpful neighbor redirecting package. Normal community behavior."
+    },
+    {
+        "id": "smartbench_0095",
+        "category": "Package Delivery",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=c4BiMNV5dME",
+        "description": "Delivery left at wrong address. Package sits on porch for days. Gets stepped on by visitors.",
+        "reasoning": "Misdelivered package accumulating damage. Delivery failure. Anomaly."
+    },
+    {
+        "id": "smartbench_0096",
+        "category": "Package Delivery",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=dZU47xjMPfc",
+        "description": "Mail carrier delivers envelope and small package. Places in mailbox area. Routine postal delivery.",
+        "reasoning": "Standard mail delivery. Nothing unusual."
+    },
+    {
+        "id": "smartbench_0097",
+        "category": "Package Delivery",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=1OsGAAGe6CA",
+        "description": "Person follows delivery truck. After driver leaves, approaches porch and takes the just-delivered package.",
+        "reasoning": "Trailing delivery vehicle to steal packages. Organized theft. Anomaly."
+    },
+    {
+        "id": "smartbench_0098",
+        "category": "Package Delivery",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=L7s4QL9fozo",
+        "description": "Homeowner places outgoing package on porch for scheduled pickup. USPS driver collects it.",
+        "reasoning": "Scheduled package pickup. Normal postal service interaction."
+    },
+    {
+        "id": "smartbench_0099",
+        "category": "Package Delivery",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=UuDW7Zvm5Gg",
+        "description": "Delivery driver leaves package hanging out of mailbox precariously. Visible to street. Easy target.",
+        "reasoning": "Insecure package placement visible from street. Theft risk. Anomaly."
+    },
+    {
+        "id": "smartbench_0100",
+        "category": "Home Security",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=P7UGtwg7C4I",
+        "description": "Homeowner on porch checking mail. Waves at passing neighbor. Normal daytime activity.",
+        "reasoning": "Standard residential activity. No security concerns."
+    },
+    {
+        "id": "smartbench_0101",
+        "category": "Home Security",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=Mh1EgnB1DmQ",
+        "description": "Night: person approaches back door. Tries handle. Uses tool to pry at lock. Camera floodlight activates. Person runs.",
+        "reasoning": "Break-in attempt at rear entrance. Criminal activity. Anomaly."
+    },
+    {
+        "id": "smartbench_0102",
+        "category": "Home Security",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=IUW21JpYPPE",
+        "description": "Landscaper arrives with mower. Works on front lawn. Professional uniform. Expected service visit.",
+        "reasoning": "Scheduled lawn maintenance. Normal expected activity."
+    },
+    {
+        "id": "smartbench_0103",
+        "category": "Home Security",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=Q_0WEIZVc28",
+        "description": "Person walks up to multiple cars on street. Tries each door handle. One opens. Reaches inside then continues walking.",
+        "reasoning": "Vehicle break-ins on street. Checking multiple cars. Theft. Anomaly."
+    },
+    {
+        "id": "smartbench_0104",
+        "category": "Home Security",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=7IwZMmTWoKM",
+        "description": "Pizza delivery person at front door. Homeowner answers, takes pizza, pays. Brief friendly exchange.",
+        "reasoning": "Expected food delivery. Normal transaction."
+    },
+    {
+        "id": "smartbench_0010",
+        "category": "Baby Monitoring",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=QNbsdpgb2YI",
+        "description": "Toddler playing with blocks in nursery. Parent visible in doorway watching. Safe supervised play.",
+        "reasoning": "Normal supervised indoor play. Safe environment. No concerns."
+    },
+    {
+        "id": "smartbench_0011",
+        "category": "Baby Monitoring",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=sZ9ij4A0REg",
+        "description": "Baby in crib pulling at mobile attachment. Mobile comes loose and falls near baby.",
+        "reasoning": "Nursery equipment failure near infant. Safety hazard. Anomaly."
+    },
+    {
+        "id": "smartbench_0012",
+        "category": "Baby Monitoring",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=gI4oK4azztc",
+        "description": "Baby sleeping peacefully in crib. Night vision camera. Occasional movement during sleep. Normal patterns.",
+        "reasoning": "Normal infant sleep patterns. No concerns."
+    },
+    {
+        "id": "smartbench_0013",
+        "category": "Baby Monitoring",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=deamYHz7Sno",
+        "description": "Toddler opens baby gate and walks toward stairs alone. Gate latch appears broken or improperly secured.",
+        "reasoning": "Failed safety gate allowing unsupervised stair access. Serious safety hazard. Anomaly."
+    },
+    {
+        "id": "smartbench_0014",
+        "category": "Baby Monitoring",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=kAK6qLCbZ4k",
+        "description": "Mother and child reading book on couch. Calm indoor scene. Child points at pictures.",
+        "reasoning": "Normal bonding activity. Safe supervised environment."
+    },
+    {
+        "id": "smartbench_0015",
+        "category": "Baby Monitoring",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=bUbXnWYDjmA",
+        "description": "Child opens front door and walks outside alone. No adult follows. Door left open.",
+        "reasoning": "Unsupervised child leaving house alone. Serious safety concern. Anomaly."
+    },
+    {
+        "id": "smartbench_0105",
+        "category": "Senior Care",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=LLxrNx-Wkq4",
+        "description": "Elderly couple taking morning walk around neighborhood. Slow steady pace. Return home safely.",
+        "reasoning": "Normal exercise routine. Healthy activity for seniors."
+    },
+    {
+        "id": "smartbench_0106",
+        "category": "Senior Care",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=ufjOxeZ-FNw",
+        "description": "Senior found on floor near bathroom. Appears to have slipped. Calling out for help.",
+        "reasoning": "Fall in bathroom. Medical emergency. Requires immediate attention. Anomaly."
+    },
+    {
+        "id": "smartbench_0107",
+        "category": "Wildlife",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=sr1VLgBYMNs",
+        "description": "Birds feeding at bird feeder in backyard. Squirrel approaches but can't reach. Normal wildlife interaction.",
+        "reasoning": "Expected backyard wildlife at feeder. Normal and welcome activity."
+    },
+    {
+        "id": "smartbench_0108",
+        "category": "Wildlife",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=Ep3sf3jD8E8",
+        "description": "Rabbit on front lawn in early morning. Nibbles grass. Hops away when car passes. Daytime.",
+        "reasoning": "Common suburban wildlife. Harmless. Normal."
+    },
+    {
+        "id": "smartbench_0109",
+        "category": "Wildlife",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=b92shV0BbhM",
+        "description": "Hummingbird visits porch feeder. Hovers, drinks nectar, flies away. Beautiful nature scene.",
+        "reasoning": "Typical backyard bird activity. No concerns."
+    },
+    {
+        "id": "smartbench_0110",
+        "category": "Wildlife",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=LINEK1p4-1U",
+        "description": "Night: large cat (possibly bobcat) stalks across backyard. Moves stealthily. Disappears into bushes near pet door.",
+        "reasoning": "Predatory wild cat near pet door. Risk to household pets. Anomaly."
+    },
+    {
+        "id": "smartbench_0111",
+        "category": "Pet Monitoring",
+        "anomaly_tag": 0,
+        "youtube_url": "https://www.youtube.com/watch?v=QVGxK7X2mUo",
+        "description": "Dog eating from food bowl in kitchen. Normal mealtime behavior. Wags tail.",
+        "reasoning": "Standard pet feeding time. Normal behavior."
+    },
+    {
+        "id": "smartbench_0112",
+        "category": "Pet Monitoring",
+        "anomaly_tag": 1,
+        "youtube_url": "https://www.youtube.com/watch?v=iF3N61nr6JA",
+        "description": "Dog chewing on electrical cord plugged into wall. Cord partially damaged.",
+        "reasoning": "Pet chewing on electrical cord. Electrocution and fire hazard. Anomaly."
+    }
+]

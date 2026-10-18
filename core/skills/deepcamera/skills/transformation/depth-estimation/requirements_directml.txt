@@ -1,0 +1,13 @@
+# Depth Estimation — ONNX Runtime with DirectML Execution Provider
+# Installed by deploy.bat when AMD/Intel GPU detected (no NVIDIA).
+#
+# DirectML provides GPU acceleration for AMD, Intel, and Qualcomm GPUs on Windows.
+
+onnxruntime-directml>=1.17.0
+
+# ── Common dependencies ─────────────────────────────────────────────
+huggingface_hub>=0.20.0
+numpy>=1.24.0
+opencv-python-headless>=4.8.0
+Pillow>=10.0.0
+matplotlib>=3.7.0

@@ -1,0 +1,94 @@
+<!--
+============================================================
+ROLLOUT INTRO — house standard build animation (paste-in)
+------------------------------------------------------------
+The premium "curtain rollout" that opens every big-box-store site:
+a gold-drawn brand wordmark + a loading bar, then two curtains part
+to reveal the page, while page blocks fade/slide up on scroll.
+
+HOW TO USE
+1) Put the <style> block in <head> (or your main style tag).
+2) Put the #rollout markup as the FIRST thing inside <body>.
+3) Put the <script> before </body>.
+4) Add class="reveal" to sections/blocks you want to fade up on scroll.
+5) Set the brand name in the SVG <text> and, optionally, the tagline.
+
+CONFIG
+- Palette comes from CSS variables (--ink, --whiskey, --gold, --gold-lite).
+  Set them to the store's palette; the animation inherits it.
+- LANGUAGE (optional Spanish): set <html lang="es"> OR add
+  data-lang="es" to #rollout. The tagline + a11y label switch to Spanish.
+  Any other value stays English. Add more languages in ROLLOUT_STRINGS.
+============================================================
+-->
+<style>
+  :root{ /* fallbacks — override with the store palette */
+    --ink:#09080A; --whiskey:#D8976B; --gold:#C9A56A; --gold-lite:#E7C78A;
+    --line:rgba(216,151,107,.15);
+  }
+  #rollout{position:fixed;inset:0;z-index:9999;background:var(--ink);display:flex;align-items:center;justify-content:center;overflow:hidden}
+  #rollout .curtain{position:absolute;top:0;height:100%;width:52%;background:linear-gradient(180deg,var(--ink),#000);z-index:2;transition:transform 1.25s cubic-bezier(.76,0,.24,1)}
+  #rollout .curtain.l{left:0} #rollout .curtain.r{right:0}
+  #rollout .seam{position:absolute;top:0;height:100%;width:1px;left:50%;background:linear-gradient(180deg,transparent,var(--gold),transparent);z-index:3;opacity:.5;transition:opacity .6s}
+  #rollout .mono{position:relative;z-index:4;text-align:center;transition:opacity .8s,transform .8s}
+  #rollout .mono .mk{width:min(420px,74vw);height:auto}
+  #rollout .mono .tl{font-family:var(--display,'Cinzel',serif);letter-spacing:.5em;text-transform:uppercase;font-size:.6rem;color:var(--gold-lite);margin-top:20px;opacity:0;animation:ro_fade 1s .5s forwards}
+  #rollout .barline{position:absolute;left:50%;bottom:64px;transform:translateX(-50%);z-index:4;width:150px;height:1px;background:var(--line)}
+  #rollout .barline i{position:absolute;left:0;top:0;height:100%;width:0;background:linear-gradient(90deg,var(--whiskey),var(--gold-lite));animation:ro_load 1.9s ease forwards}
+  @keyframes ro_load{to{width:100%}}
+  @keyframes ro_fade{to{opacity:1}}
+  @keyframes ro_draw{to{stroke-dashoffset:0}}
+  body.revealed #rollout{pointer-events:none;transition:opacity .5s .9s,visibility 0s 1.4s;opacity:0;visibility:hidden}
+  body.revealed #rollout .mono{opacity:0;transform:scale(1.04)}
+  body.revealed #rollout .curtain.l{transform:translateX(-100%)}
+  body.revealed #rollout .curtain.r{transform:translateX(100%)}
+  body.revealed #rollout .seam{opacity:0}
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){
+    #rollout .mono .tl,#rollout .barline i{animation:none}
+    #rollout text{stroke-dashoffset:0 !important;animation:none !important}
+    .reveal{opacity:1;transform:none;transition:none}
+  }
+</style>
+
+<!-- FIRST inside <body> — set the brand name in <text> -->
+<div id="rollout" data-lang="">
+  <div class="curtain l"></div>
+  <div class="curtain r"></div>
+  <div class="seam"></div>
+  <div class="mono">
+    <svg class="mk" viewBox="0 0 720 150" role="img" aria-label="Loading">
+      <defs>
+        <linearGradient id="ro_gold" x1="0" y1="0" x2="720" y2="0" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="var(--gold,#C9A56A)"/><stop offset=".5" stop-color="var(--gold-lite,#E7C78A)"/><stop offset="1" stop-color="var(--gold,#C9A56A)"/>
+        </linearGradient>
+      </defs>
+      <text x="360" y="104" text-anchor="middle" font-family="Cinzel, Georgia, serif" font-weight="500"
+            font-size="112" letter-spacing="18" fill="none" stroke="url(#ro_gold)" stroke-width="1.1"
+            style="stroke-dasharray:2400;stroke-dashoffset:2400;animation:ro_draw 2s .1s ease forwards">BRAND</text>
+    </svg>
+    <div class="tl" id="roTag"></div>
+  </div>
+  <div class="barline"><i></i></div>
+</div>
+
+<script>
+/* rollout language + trigger */
+(function(){
+  var ROLLOUT_STRINGS={
+    en:{tag:'Established · Crafted to last', aria:'Loading'},
+    es:{tag:'Tradición · Hecho para durar',  aria:'Cargando'}
+  };
+  var ro=document.getElementById('rollout');
+  var lang=(ro.getAttribute('data-lang')||document.documentElement.lang||'en').slice(0,2).toLowerCase();
+  var S=ROLLOUT_STRINGS[lang]||ROLLOUT_STRINGS.en;
+  var tag=document.getElementById('roTag'); if(tag && !tag.textContent) tag.textContent=S.tag;
+  var svg=ro.querySelector('svg'); if(svg) svg.setAttribute('aria-label',S.aria);
+  /* reveal-on-scroll */
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+  /* part the curtains once loaded */
+  window.addEventListener('load',function(){setTimeout(function(){document.body.classList.add('revealed');},1900);});
+})();
+</script>

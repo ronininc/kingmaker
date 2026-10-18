@@ -1,0 +1,13 @@
+{
+  "name": "Scan Mode — Audit all installed skills",
+  "description": "Tests Claude Code Skillforge's ability to discover and audit all installed skills across both ecosystems.",
+  "prompt": "Scan my skills",
+  "expected_behaviors": [
+    "Scans ~/.claude/skills/ and ~/.gemini/antigravity/skills/ directories",
+    "Lists all discovered SKILL.md files",
+    "Runs key checks on each skill: front matter size, standard fields, name constraints, description format, line count, imperative verbs",
+    "Outputs a health report table with columns: Skill, Ecosystem, Checks Passed, Issues, Top Issue",
+    "Sorts results by most issues first",
+    "Suggests running Upgrade on the most critical skill"
+  ]
+}

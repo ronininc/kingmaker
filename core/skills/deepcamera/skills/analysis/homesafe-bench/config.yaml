@@ -1,0 +1,13 @@
+params:
+  - key: mode
+    label: Test Mode
+    type: select
+    options: [full, quick]
+    default: full
+    description: "Which test mode: full (40 tests) or quick (10 tests — 2 per category)"
+
+  - key: noOpen
+    label: Don't auto-open report
+    type: boolean
+    default: false
+    description: Skip opening the HTML report in browser after completion

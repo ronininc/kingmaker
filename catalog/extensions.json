@@ -1,0 +1,118 @@
+{
+  "_comment": "Kingmaker's extension directory (lib/extensions.mjs). Every entry is checked by hand against the maker's own page; a bundle carries its sha256. Keys are never here: each key names the page where it is made, and Kingmaker opens that page beside the bar.",
+  "schema": "kingmaker.extensions/1",
+  "updated": "2026-10-15",
+  "extensions": [
+    {
+      "id": "blender",
+      "name": "Blender",
+      "maker": "Blender Lab",
+      "makerUrl": "https://www.blender.org/lab/",
+      "verified": true,
+      "summary": "Natural language interface with the Python API and documentation",
+      "description": "Blender MCP offers a natural language interface with Blender's Python API, improving access to documentation, and allowing users to explore and understand complex setups.",
+      "version": "1.0.3",
+      "added": "2026-04",
+      "license": "GPL-3.0-or-later",
+      "homepage": "https://www.blender.org/lab/mcp-server/",
+      "support": "https://projects.blender.org/lab/blender_mcp/issues/",
+      "privacy": "https://www.blender.org/privacy-policy/",
+      "install": {
+        "type": "mcpb",
+        "url": "https://projects.blender.org/lab/blender_mcp/releases/download/v1.0.3/blender-1.0.3.mcpb",
+        "sha256": "d6fe04dd17767f7c7fb452142f1f0e6787db575db49f3976a166142683b5b97e"
+      },
+      "requires": [
+        {
+          "kind": "app",
+          "name": "Blender",
+          "minVersion": "5.1",
+          "bundleId": "org.blenderfoundation.blender",
+          "getUrl": "https://www.blender.org/download/",
+          "addon": {
+            "name": "Blender MCP add-on",
+            "url": "https://projects.blender.org/lab/blender_mcp/releases/download/v1.0.3/mcp-1.0.3.zip",
+            "steps": "In Blender: drag the add-on zip onto the window (or Edit → Preferences → Add-ons → Install from Disk), then turn it on."
+          }
+        }
+      ],
+      "keys": [],
+      "warning": "Blender's makers warn that this runs AI-written code in Blender without guards. Use it on files you can afford to lose, and keep backups."
+    },
+    {
+      "id": "cloudflare",
+      "name": "Cloudflare",
+      "maker": "Cloudflare",
+      "makerUrl": "https://www.cloudflare.com/",
+      "verified": true,
+      "summary": "Your Cloudflare account: Workers, DNS, R2, D1 and the rest of the API",
+      "description": "Cloudflare's own MCP server reaches the whole Cloudflare API: deploy and inspect Workers, manage DNS, storage and databases, and read logs.",
+      "version": "remote",
+      "added": "2026-10",
+      "homepage": "https://developers.cloudflare.com/agents/model-context-protocol/mcp-servers-for-cloudflare/",
+      "support": "https://github.com/cloudflare/mcp-server-cloudflare/issues",
+      "privacy": "https://www.cloudflare.com/privacypolicy/",
+      "install": { "type": "remote", "url": "https://mcp.cloudflare.com/mcp", "auth": "bearer" },
+      "requires": [],
+      "keys": [
+        {
+          "id": "cloudflare",
+          "label": "Cloudflare API token",
+          "getUrl": "https://dash.cloudflare.com/profile/api-tokens",
+          "help": "Create Token → pick only the permissions this needs → copy it once, then paste it into Kingmaker's key box.",
+          "multi": true
+        }
+      ]
+    },
+    {
+      "id": "github",
+      "name": "GitHub",
+      "maker": "GitHub",
+      "makerUrl": "https://github.com/",
+      "verified": true,
+      "summary": "Repositories, issues, pull requests and Actions",
+      "description": "GitHub's own MCP server: read code, open and review pull requests, manage issues and check Actions runs.",
+      "version": "remote",
+      "added": "2026-10",
+      "homepage": "https://github.com/github/github-mcp-server",
+      "support": "https://github.com/github/github-mcp-server/issues",
+      "privacy": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+      "install": { "type": "remote", "url": "https://api.githubcopilot.com/mcp/", "auth": "bearer" },
+      "requires": [],
+      "keys": [
+        {
+          "id": "github",
+          "label": "GitHub personal access token",
+          "getUrl": "https://github.com/settings/personal-access-tokens/new",
+          "help": "A fine-grained token, limited to the repositories this should reach. Copy it once, then paste it into Kingmaker's key box.",
+          "multi": true
+        }
+      ]
+    },
+    {
+      "id": "postiz",
+      "name": "Postiz",
+      "maker": "Postiz",
+      "makerUrl": "https://postiz.com/",
+      "verified": true,
+      "summary": "Every social media account in one place: schedule and publish posts",
+      "description": "Postiz connects X, LinkedIn, Instagram, Facebook, TikTok, YouTube and more. Through one key Kingmaker sees every account connected to that Postiz workspace and drafts and schedules posts for them; posting waits for your OK.",
+      "version": "remote",
+      "added": "2026-10",
+      "homepage": "https://postiz.com/",
+      "support": "https://github.com/gitroomhq/postiz-app/issues",
+      "privacy": "https://postiz.com/privacy",
+      "install": { "type": "remote", "url": "https://api.postiz.com/mcp", "auth": "bearer" },
+      "requires": [],
+      "keys": [
+        {
+          "id": "postiz",
+          "label": "Postiz API key",
+          "getUrl": "https://platform.postiz.com/settings",
+          "help": "In Postiz: Settings → Developers → Public API → copy the key. One key covers every social account in that workspace; add another key for another workspace.",
+          "multi": true
+        }
+      ]
+    }
+  ]
+}

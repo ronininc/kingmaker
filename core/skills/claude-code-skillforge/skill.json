@@ -1,0 +1,36 @@
+{
+  "id": "claude-code-skillforge",
+  "version": "5.11.0",
+  "homepage": "https://lijinnair.com",
+  "repository": "https://github.com/lijinnair/claude-code-skillforge",
+  "category": "ai",
+  "keywords": ["claude-code", "antigravity", "skill", "skill-builder", "meta-skill", "skill-upgrader", "skill-scanner", "prompt-engineering", "agent", "automation", "progressive-disclosure"],
+  "dependencies": {
+    "required": ["claude-code"],
+    "recommended": ["claude-code"],
+    "complements": ["claude-command-builder", "claude-settings-expert"]
+  },
+  "docs": null,
+  "semanticTags": {
+    "primary": ["skill_creation", "skill_builder", "expertise_packaging"],
+    "secondary": ["skill_structure", "activation_keywords", "documentation"],
+    "domains": ["ai", "development", "tools", "automation"]
+  },
+  "capabilities": {
+    "inputs": ["skill_requirements", "expertise_domain"],
+    "outputs": ["skill_files", "skill_documentation", "activation_patterns"],
+    "actions": ["create_skill", "upgrade_skill", "audit_skill", "scan_skills", "structure_skill", "define_keywords", "write_documentation", "test_activation"]
+  },
+  "orchestration": {
+    "priority": 7,
+    "cooperationLevel": "high",
+    "parallelizable": true,
+    "estimatedTokens": 1800,
+    "activationThreshold": 0.7
+  },
+  "collaboration": {
+    "canProvideDataTo": ["claude-code"],
+    "canConsumeDataFrom": ["claude-code"],
+    "sharedContext": ["skill_structure", "keywords", "documentation"]
+  }
+}

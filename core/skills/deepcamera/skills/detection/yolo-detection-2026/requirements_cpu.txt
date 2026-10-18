@@ -1,0 +1,11 @@
+# YOLO 2026 — CPU-only requirements
+# Smallest install — no GPU acceleration
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.4.0
+torchvision>=0.19.0
+ultralytics>=8.3.0
+onnxruntime>=1.18
+numpy>=1.24.0
+opencv-python-headless>=4.8.0
+Pillow>=10.0.0
+

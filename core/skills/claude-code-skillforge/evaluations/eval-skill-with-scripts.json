@@ -1,0 +1,19 @@
+{
+  "name": "Skill with scripts and dependencies",
+  "skills": ["claude-code-skillforge"],
+  "query": "Build an Antigravity skill that validates JSON schema files against a dataset, with a Python validation script in scripts/. Category: data.",
+  "expected_behavior": [
+    "Name uses gerund form, kebab-case, ≤64 chars, lowercase+hyphens only, no reserved words",
+    "Description starts with 3rd-person verb and includes 'Use when' with 3+ trigger phrases",
+    "Front matter uses ONLY standard fields — no custom fields",
+    "Body is under 500 lines with all steps starting with imperative verbs",
+    "Output includes correct mkdir path for Antigravity ecosystem (~/.gemini/antigravity/skills/)",
+    "Scripts are placed in scripts/ directory with deterministic logic offloaded",
+    "Scripts handle errors explicitly — no punting to Claude (try/except with helpful messages)",
+    "Configuration constants are documented with justification (no voodoo constants)",
+    "Required packages listed with install commands (e.g., pip install jsonschema)",
+    "All file paths use forward slashes only (no backslashes)",
+    "Includes a feedback loop: validate → fix errors → re-validate",
+    "Validation/verification steps present for the critical schema-checking operation"
+  ]
+}

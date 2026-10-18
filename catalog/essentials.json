@@ -1,0 +1,14 @@
+{
+  "why": "The best local models with no abliterated build worth having, or where abliteration means nothing (embeddings). Kept in the catalog beside the abliterated ones, marked essential. Checked against https://www.local-llm.net/models/ on 2026-10-15; families that already have an abliterated/Heretic build in the catalog are not repeated here.",
+  "essentials": [
+    { "id": "hf-model-lmstudio-community-devstral-small-2507-gguf", "role": "coding agent", "note": "Mistral's open model for coding agents (24B); no abliterated build exists." },
+    { "id": "hf-model-bartowski-deepcogito-cogito-v1-preview-qwen-14b-gguf", "role": "hybrid reasoning + tools", "note": "Cogito 14B: thinks or answers fast, strong tool use; no abliterated build exists." },
+    { "id": "hf-model-nomic-ai-nomic-embed-text-v2-moe-gguf", "role": "embeddings", "note": "Search over the owner's own files (RAG); the default embedder for many local pipelines." },
+    { "id": "hf-model-ggml-org-bge-m3-q8-0-gguf", "role": "embeddings (multilingual)", "note": "Multilingual search (Spanish and 100+ languages)." }
+  ],
+  "considered": {
+    "too big for a 24 GB Mac": ["QwQ 32B (abliterated build needs ~24 GB)", "Llama 3.3 70B", "Llama 4", "DeepSeek V3", "GLM-5.x", "Kimi K2.x", "MiniMax M2/M3", "Mistral Large", "Nemotron 3 Super", "Command R 35B"],
+    "not hosted on Hugging Bay": ["Moondream", "StarCoder2"],
+    "covered by better picks": ["LLaVA, Llama 3.2 Vision (Qwen3-VL and Gemma 4 do vision)", "Code Llama, DeepSeek Coder (Qwen3-Coder)", "TinyLlama, Falcon 3 (Qwen3.5 2B/4B, LFM2.5)"]
+  }
+}

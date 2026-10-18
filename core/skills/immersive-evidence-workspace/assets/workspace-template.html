@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evidence Workspace — Wavelygth Equities</title>
+<meta name="description" content="An immersive evidence workspace. Select a listing to focus it and surface its evidence.">
+<!--
+  ============================================================
+  EVIDENCE WORKSPACE  (reusable pattern — "the same way")
+  ------------------------------------------------------------
+  • Listings live in a spatial AR-style canvas.
+  • SELECT a listing → it focuses and its EVIDENCE surfaces
+    (Kingmaker pattern: every figure carries a source + status).
+  • BUILDER MODE (this machine / #edit link only): add, remove,
+    edit listings and drop photos/videos per slot, then EXPORT
+    a listings.js manifest + named media. Deploy = locked:
+    visitors can explore + read evidence, never edit.
+  • Data-driven: everything comes from the LISTINGS array below
+    (or an external ./listings.js that sets window.LISTINGS).
+  ============================================================
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#05070a;--panel:#0a0e13;--panel2:#0d1219;--line:rgba(255,255,255,.10);--line2:rgba(255,255,255,.06);
+    --fg:#eef2f6;--muted:#8b97a6;--faint:#586472;--cyan:#38e6d0;--blue:#5b8cff;--violet:#a884ff;--gold:#e7c78a;
+    --head:'Space Grotesk',system-ui,sans-serif;--serif:'Fraunces',Georgia,serif;--spectral:linear-gradient(90deg,var(--cyan),var(--blue),var(--violet));
+    --verified:#38e6d0;--modeled:#5b8cff;--pending:#e7c78a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden;background:var(--ink);color:var(--fg);font-family:var(--head);font-weight:300}
+  body{position:fixed;inset:0}
+  .bg{position:fixed;inset:0;z-index:0;pointer-events:none;background:
+     radial-gradient(60vw 60vh at 78% -8%,rgba(91,140,255,.12),transparent 60%),
+     radial-gradient(52vw 50vh at 4% 6%,rgba(56,230,208,.10),transparent 60%),
+     radial-gradient(40vw 40vh at 90% 100%,rgba(168,132,255,.08),transparent 60%)}
+  .grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35;background-image:linear-gradient(var(--line2) 1px,transparent 1px),linear-gradient(90deg,var(--line2) 1px,transparent 1px);background-size:52px 52px;mask-image:radial-gradient(90% 80% at 50% 40%,#000,transparent 90%)}
+  a{color:inherit;text-decoration:none}
+
+  /* ---------- top HUD ---------- */
+  .hud{position:fixed;z-index:20;left:0;right:0;top:0;display:flex;align-items:center;justify-content:space-between;padding:16px 22px;pointer-events:none}
+  .brand{display:flex;align-items:center;gap:11px;pointer-events:auto}
+  .brand svg{width:34px;height:34px}
+  .brand b{font-weight:500;font-size:.96rem;letter-spacing:.02em}
+  .brand small{display:block;font-size:.5rem;letter-spacing:.34em;color:var(--muted);margin-top:2px}
+  .hud .title{text-align:right;pointer-events:auto}
+  .hud .title b{font-family:var(--serif);font-weight:400;font-size:1rem}
+  .hud .title small{display:block;font-size:.54rem;letter-spacing:.26em;text-transform:uppercase;color:var(--cyan);margin-top:3px}
+
+  /* ---------- filters ---------- */
+  #filters{position:fixed;z-index:20;left:50%;top:64px;transform:translateX(-50%);display:flex;gap:8px;flex-wrap:wrap;justify-content:center;pointer-events:auto}
+  .chip{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:40px;padding:8px 14px;cursor:pointer;background:rgba(8,11,15,.5);backdrop-filter:blur(8px);transition:.2s}
+  .chip:hover{color:var(--fg)}
+  .chip.on{background:var(--cyan);color:#04070a;border-color:transparent}
+
+  /* ---------- spatial stage ---------- */
+  #stage{position:fixed;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;perspective:1400px}
+  #field{display:grid;gap:26px;padding:120px 40px 60px;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.7,.2,1);max-width:1180px;width:100%}
+  #field.cols4{grid-template-columns:repeat(4,1fr)}
+  #field.cols3{grid-template-columns:repeat(3,1fr)}
+  #field.cols2{grid-template-columns:repeat(2,1fr)}
+
+  .card{position:relative;border:1px solid var(--line2);border-radius:16px;overflow:hidden;background:var(--panel);cursor:pointer;transform-style:preserve-3d;transition:transform .4s cubic-bezier(.2,.7,.2,1),border-color .3s,box-shadow .3s,opacity .4s;min-height:300px;display:flex;flex-direction:column;justify-content:flex-end;will-change:transform}
+  .card:hover{border-color:var(--line);box-shadow:0 30px 70px -30px rgba(56,230,208,.35);z-index:3}
+  .card .media{position:absolute;inset:0;z-index:0}
+  .card .media img,.card .media video{width:100%;height:100%;object-fit:cover;opacity:.6;transition:opacity .4s,transform .8s}
+  .card:hover .media img,.card:hover .media video{opacity:.78;transform:scale(1.05)}
+  .card .fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#10151c,#080c11);color:var(--faint);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase}
+  .card .veil{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(5,7,10,.1),rgba(5,7,10,.9) 82%)}
+  .card .cbody{position:relative;z-index:2;padding:20px}
+  .card .tagrow{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+  .mtag{font-size:.54rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);border:1px solid rgba(56,230,208,.3);border-radius:30px;padding:4px 9px}
+  .mtag.m{color:var(--muted);border-color:var(--line)}
+  .card h3{font-family:var(--serif);font-weight:400;font-size:1.32rem;line-height:1.1}
+  .card .sub{color:var(--muted);font-size:.76rem;margin-top:6px;letter-spacing:.02em}
+  .card .kpi{margin-top:12px;display:flex;align-items:baseline;gap:8px}
+  .card .kpi b{font-family:var(--serif);font-size:1.4rem;color:#fff}
+  .card .kpi span{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+  .card .sel{position:absolute;top:14px;right:14px;z-index:3;font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;color:#fff;background:rgba(5,7,10,.6);border:1px solid var(--line);border-radius:30px;padding:6px 10px;opacity:0;transition:.25s}
+  .card:hover .sel{opacity:1}
+  .card .rm{position:absolute;top:12px;left:12px;z-index:6;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);background:rgba(5,7,10,.7);color:#ff8080;display:none;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem}
+  body.edit .card .rm{display:flex}
+  body.edit .card [contenteditable]{outline:1px dashed rgba(56,230,208,.4);outline-offset:3px;border-radius:3px}
+
+  /* focus mode */
+  body.focus #field{filter:blur(9px) brightness(.5);transform:scale(1.04);pointer-events:none}
+
+  /* ---------- evidence drawer ---------- */
+  #focusView{position:fixed;inset:0;z-index:40;display:none;align-items:stretch;justify-content:flex-end;pointer-events:none}
+  #focusView.open{display:flex}
+  .fv-scrim{position:absolute;inset:0;background:rgba(4,6,10,.5);pointer-events:auto}
+  .drawer{position:relative;width:min(560px,94vw);height:100%;background:linear-gradient(180deg,#0b0f15,#070b11);border-left:1px solid var(--line);box-shadow:-30px 0 80px -30px rgba(0,0,0,.8);pointer-events:auto;overflow-y:auto;transform:translateX(40px);opacity:0;transition:transform .45s cubic-bezier(.2,.7,.2,1),opacity .45s}
+  #focusView.open .drawer{transform:none;opacity:1}
+  .dv-hero{position:relative;height:280px;background:#0a0e13}
+  .dv-hero img,.dv-hero video{width:100%;height:100%;object-fit:cover}
+  .dv-hero .fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;background:linear-gradient(160deg,#10151c,#080c11)}
+  .dv-hero .grad{position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(11,15,21,.95))}
+  .dv-close{position:absolute;top:16px;right:16px;z-index:5;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:rgba(5,7,10,.6);color:#fff;font-size:1.3rem;cursor:pointer;backdrop-filter:blur(6px)}
+  .dv-close:hover{background:var(--cyan);color:#04070a}
+  .dv-body{padding:24px 28px 40px}
+  .dv-tags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+  .dv-body h2{font-family:var(--serif);font-weight:300;font-size:2rem;line-height:1.05}
+  .dv-loc{color:var(--muted);font-size:.82rem;margin-top:8px;letter-spacing:.02em}
+  .thumbs{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+  .thumbs .t{width:76px;height:56px;border-radius:8px;overflow:hidden;border:1px solid var(--line2);cursor:zoom-in;background:#0a0e13;position:relative}
+  .thumbs .t img,.thumbs .t video{width:100%;height:100%;object-fit:cover}
+  .thumbs .t .fb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:.5rem;letter-spacing:.14em;text-transform:uppercase}
+
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:22px}
+  .stile{border:1px solid var(--line2);border-radius:12px;padding:14px 15px;background:rgba(255,255,255,.015)}
+  .stile .v{font-family:var(--serif);font-size:1.35rem}
+  .stile .l{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-top:5px}
+
+  .ev-h{margin:28px 0 12px;font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:10px}
+  .ev-h::after{content:'';flex:1;height:1px;background:var(--line2)}
+  .ev{border-top:1px solid var(--line2);padding:14px 0;display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+  .ev:last-child{border-bottom:1px solid var(--line2)}
+  .ev .k{font-size:.9rem}
+  .ev .k small{display:block;color:var(--muted);font-size:.74rem;margin-top:3px;font-weight:300}
+  .ev .r{text-align:right;white-space:nowrap}
+  .ev .val{font-family:var(--serif);font-size:1.05rem}
+  .src{margin-top:6px;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:30px;padding:4px 9px;color:var(--muted)}
+  .src .dot{width:7px;height:7px;border-radius:50%}
+  .src.verified{color:var(--verified);border-color:rgba(56,230,208,.35)} .src.verified .dot{background:var(--verified)}
+  .src.modeled{color:var(--modeled);border-color:rgba(91,140,255,.35)} .src.modeled .dot{background:var(--modeled)}
+  .src.pending{color:var(--pending);border-color:rgba(231,199,138,.35)} .src.pending .dot{background:var(--pending)}
+  .dv-cta{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap}
+  .btn{font-family:var(--head);font-size:.76rem;letter-spacing:.04em;font-weight:500;padding:12px 18px;border-radius:40px;border:1px solid var(--line);color:var(--fg);background:transparent;cursor:pointer;transition:.25s;display:inline-flex;align-items:center;gap:7px}
+  .btn:hover{background:rgba(255,255,255,.06)}
+  .btn.solid{background:var(--fg);color:var(--ink);border-color:transparent}
+  .btn.solid:hover{background:var(--cyan);box-shadow:0 0 26px rgba(56,230,208,.35)}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:16px;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+  /* ---------- builder toolbar (gated) ---------- */
+  #builder{position:fixed;z-index:60;left:16px;bottom:16px;display:none;gap:8px;align-items:center;background:rgba(8,11,10,.92);border:1px solid var(--line);border-radius:50px;padding:8px 10px;backdrop-filter:blur(10px)}
+  body.builder #builder{display:flex}
+  #builder .lbl{font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);padding:0 6px}
+  #builder button{font-family:var(--head);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:#0c1410;border:1px solid var(--line);border-radius:40px;padding:10px 14px;cursor:pointer;transition:.2s}
+  #builder button:hover{background:var(--cyan);color:#04070a;border-color:transparent}
+  #builder button.on{background:var(--cyan);color:#04070a}
+
+  /* lightbox */
+  #lb{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(3,5,8,.94);backdrop-filter:blur(10px)}
+  #lb.open{display:flex}
+  #lb img,#lb video{max-width:88vw;max-height:88vh;border-radius:8px}
+  #lb .x{position:fixed;top:18px;right:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(8,11,15,.7);color:#fff;font-size:1.3rem;cursor:pointer}
+
+  /* media boot-prompt (builder multi-listing uploader) */
+  #boot{position:fixed;inset:0;z-index:70;display:none;align-items:flex-start;justify-content:center;overflow:auto;background:rgba(4,6,10,.88);backdrop-filter:blur(10px);padding:40px 18px}
+  #boot.open{display:flex}
+  .boot-panel{max-width:920px;width:100%;background:linear-gradient(180deg,#0b0f14,#070b11);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+  .boot-head{padding:26px 30px 18px;border-bottom:1px solid var(--line2);position:relative}
+  .boot-head h2{font-family:var(--serif);font-weight:300;font-size:1.7rem}
+  .boot-head p{color:var(--muted);font-size:.9rem;margin-top:8px;max-width:60ch}
+  .boot-x{position:absolute;top:20px;right:22px;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:transparent;color:#fff;font-size:1.2rem;cursor:pointer}
+  .boot-group{padding:8px 30px}
+  .boot-group h4{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin:18px 0 10px}
+  .boot-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .bslot{border:1px solid var(--line2);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:.2s;position:relative}
+  .bslot.drag{border-color:var(--cyan);background:rgba(56,230,208,.06)}
+  .bslot.done{border-color:rgba(56,230,208,.4)}
+  .bslot .th{height:70px;border-radius:8px;overflow:hidden;background:linear-gradient(160deg,#10151c,#0a0e13);display:flex;align-items:center;justify-content:center;border:1px dashed var(--line);color:var(--faint);font-size:1.1rem}
+  .bslot .th img,.bslot .th video{width:100%;height:100%;object-fit:cover}
+  .bslot .nm{font-size:.66rem;letter-spacing:.06em;color:var(--muted)}
+  .bslot.done .nm{color:var(--cyan)}
+  .boot-foot{padding:18px 30px 26px;border-top:1px solid var(--line2);display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .boot-foot .p{flex:1;min-width:160px;font-size:.72rem;color:var(--muted)}
+
+  .hint{position:fixed;z-index:20;left:50%;bottom:20px;transform:translateX(-50%);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);pointer-events:none;transition:opacity .4s}
+  body.focus .hint,body.builder .hint{opacity:0}
+  @media(max-width:960px){#field.cols4,#field.cols3{grid-template-columns:repeat(2,1fr)}.boot-slots{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:640px){#field{grid-template-columns:1fr!important;padding-top:150px}.boot-slots{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="bg"></div><div class="grid-bg"></div>
+
+<div class="hud">
+  <a class="brand" href="./index.html">
+    <svg viewBox="0 0 64 64"><defs><linearGradient id="g" x1="8" y1="40" x2="56" y2="24" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#38e6d0"/><stop offset=".5" stop-color="#5b8cff"/><stop offset="1" stop-color="#a884ff"/></linearGradient></defs><circle cx="32" cy="32" r="30" fill="none" stroke="url(#g)" stroke-width="1.4" stroke-opacity=".7"/><path d="M6 34C12 34 13 20 19 20S26 44 32 44 39 20 45 20 52 34 58 34" fill="none" stroke="url(#g)" stroke-width="2.6" stroke-linecap="round"/></svg>
+    <span><b>Wavelygth</b><small>EQUITIES</small></span>
+  </a>
+  <div class="title"><b>Evidence Workspace</b><small>Select a position to inspect</small></div>
+</div>
+
+<div id="filters"></div>
+<div id="stage"><div id="field"></div></div>
+<div class="hint">Click a listing to focus its evidence · Esc to return</div>
+
+<div id="focusView"><div class="fv-scrim"></div><div class="drawer" id="drawer"></div></div>
+
+<div id="builder">
+  <span class="lbl">Builder</span>
+  <button id="bEdit">✎ Edit</button>
+  <button id="bAdd">＋ Listing</button>
+  <button id="bMedia">▣ Media</button>
+  <button id="bExport">⭳ Export</button>
+</div>
+
+<div id="boot"><div class="boot-panel">
+  <div class="boot-head"><h2 class="serif">Add media to every listing</h2><p>Drop a photo or video onto each slot. The workspace updates live. When done, Export saves a listings.js manifest and your media named for /assets.</p><button class="boot-x" id="bootX">&times;</button></div>
+  <div class="boot-group" id="bootGroups"></div>
+  <div class="boot-foot"><div class="p" id="bootP">0 added</div><button class="btn solid" id="bootExport">⭳ Export workspace</button></div>
+</div></div>
+
+<div id="lb"><button class="x" id="lbX">&times;</button></div>
+
+<script>
+/* external manifest override: create ./listings.js with window.LISTINGS=[...] to replace */
+window.LISTINGS = window.LISTINGS || [
+  {id:'camelback',name:'Camelback Assemblage',strategy:'Estates',market:'Arizona',
+   location:'Paradise Valley · Camelback corridor',kpi:{v:'$48.0M',l:'Gross value'},
+   media:{hero:'assets/pos-camelback.jpg',gallery:['assets/mandate-estates.jpg','assets/intelligence.jpg']},
+   stats:[{v:'12,400 sf',l:'Improved area'},{v:'2.1 ac',l:'Assemblage'},{v:'14.2%',l:'Target IRR'},{v:'8 yr',l:'Hold'}],
+   evidence:[
+     {k:'Acquisition basis',s:'Recorded deed · Maricopa County',status:'verified',val:'$31.6M'},
+     {k:'Stabilized value',s:'Third-party appraisal · 2026',status:'verified',val:'$48.0M'},
+     {k:'Construction cost',s:'GMP contract · signed',status:'verified',val:'$9.4M'},
+     {k:'Projected IRR',s:'Underwriting model v3',status:'modeled',val:'14.2%'},
+     {k:'Exit timing',s:'Business plan · under review',status:'pending',val:'2034'}
+   ]},
+  {id:'cumberland',name:'Cumberland Exchange',strategy:'Multifamily',market:'Texas',
+   location:'Austin · East Riverside',kpi:{v:'318 units',l:'Scaled community'},
+   media:{hero:'assets/pos-cumberland.jpg',gallery:['assets/mandate-multifamily.jpg']},
+   stats:[{v:'318',l:'Units'},{v:'94.6%',l:'Occupancy'},{v:'5.4%',l:'In-place cap'},{v:'Value-add',l:'Profile'}],
+   evidence:[
+     {k:'In-place NOI',s:'T-12 operating statement',status:'verified',val:'$6.9M'},
+     {k:'Occupancy',s:'Rent roll · current',status:'verified',val:'94.6%'},
+     {k:'Post-reno rent lift',s:'Renovation model',status:'modeled',val:'+$210/mo'},
+     {k:'Refi proceeds',s:'Lender term sheet · draft',status:'pending',val:'$14M'}
+   ]},
+  {id:'coral',name:'Coral Line',strategy:'Development',market:'Florida',
+   location:'Miami · Little River',kpi:{v:'$120M',l:'Ground-up GDV'},
+   media:{hero:'assets/pos-coral.jpg',gallery:['assets/mandate-development.jpg']},
+   stats:[{v:'240 keys',l:'Program'},{v:'2.8x',l:'Equity multiple'},{v:'Q3 2028',l:'Delivery'},{v:'Ground-up',l:'Stage'}],
+   evidence:[
+     {k:'Entitlement status',s:'City approval · recorded',status:'verified',val:'Approved'},
+     {k:'Land basis',s:'Closing statement',status:'verified',val:'$22M'},
+     {k:'Total dev cost',s:'Cost model · pre-GMP',status:'modeled',val:'$86M'},
+     {k:'Equity multiple',s:'Sponsor projection',status:'modeled',val:'2.8x'},
+     {k:'Construction loan',s:'Not yet closed',status:'pending',val:'$58M'}
+   ]},
+  {id:'pacific',name:'Pacific Mezzanine',strategy:'Credit',market:'California',
+   location:'San Diego · UTC',kpi:{v:'11.5%',l:'Coupon'},
+   media:{hero:'assets/pos-pacific.jpg',gallery:[]},
+   stats:[{v:'$18M',l:'Position'},{v:'68%',l:'Attach LTV'},{v:'82%',l:'Detach LTV'},{v:'36 mo',l:'Term'}],
+   evidence:[
+     {k:'Coupon',s:'Executed note',status:'verified',val:'11.5%'},
+     {k:'Collateral value',s:'Appraisal · 2026',status:'verified',val:'$26.4M'},
+     {k:'Attachment point',s:'Cap-stack model',status:'modeled',val:'68% LTV'},
+     {k:'Downside recovery',s:'Stress scenario',status:'modeled',val:'1.0x'}
+   ]}
+];
+
+(function(){
+  var host=location.hostname, q=(location.hash+location.search).toLowerCase();
+  var isLocal=location.protocol==='file:'||/^(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])$/.test(host)||host.endsWith('.local');
+  var BUILDER = isLocal || q.indexOf('edit')>=0 || q.indexOf('studio')>=0; // builder-only; deploy = locked
+  if(BUILDER) document.body.classList.add('builder');
+
+  var model = JSON.parse(JSON.stringify(window.LISTINGS));
+  var mediaStore = {}; // assetName -> File
+  var field=document.getElementById('field'), filters=document.getElementById('filters');
+  var activeFilter='All';
+
+  function statusClass(s){return s==='verified'?'verified':s==='modeled'?'modeled':'pending';}
+  function mediaEl(src,cls){ // returns markup that shows media or fallback
+    if(!src) return '<div class="fallback">No media</div>';
+    var isVid=/\.(mp4|webm|mov)$/i.test(src);
+    if(isVid) return '<video src="'+src+'" muted loop autoplay playsinline onerror="this.style.display=\'none\'"></video>';
+    return '<img src="'+src+'" alt="" onerror="this.parentNode.innerHTML=\'<div class=\\\'fallback\\\'>No media</div>\'">';
+  }
+
+  function strategies(){var s=['All'];model.forEach(function(l){if(s.indexOf(l.strategy)<0)s.push(l.strategy);});return s;}
+  function renderFilters(){
+    filters.innerHTML='';
+    strategies().forEach(function(s){var c=document.createElement('div');c.className='chip'+(s===activeFilter?' on':'');c.textContent=s;c.onclick=function(){activeFilter=s;renderFilters();renderCards();};filters.appendChild(c);});
+  }
+
+  function renderCards(){
+    var list=model.filter(function(l){return activeFilter==='All'||l.strategy===activeFilter;});
+    field.className=list.length>=4?'cols4':list.length===3?'cols3':list.length<=1?'cols2':'cols'+list.length;
+    if(list.length<=2) field.classList.add('cols2');
+    field.innerHTML='';
+    list.forEach(function(l,i){
+      var idx=model.indexOf(l);
+      var card=document.createElement('article'); card.className='card'; card.dataset.i=idx; card.style.transform='translateZ('+((i%3)-1)*14+'px)';
+      card.innerHTML=
+        '<div class="media">'+mediaEl(l.media&&l.media.hero)+'</div><div class="veil"></div>'+
+        '<div class="rm" title="Remove">&times;</div>'+
+        '<div class="sel">◈ Inspect evidence</div>'+
+        '<div class="cbody"><div class="tagrow"><span class="mtag" '+ed()+'>'+esc(l.strategy)+'</span><span class="mtag m" '+ed()+'>'+esc(l.market)+'</span></div>'+
+        '<h3 '+ed()+'>'+esc(l.name)+'</h3><div class="sub" '+ed()+'>'+esc(l.location||'')+'</div>'+
+        '<div class="kpi"><b '+ed()+'>'+esc(l.kpi.v)+'</b><span '+ed()+'>'+esc(l.kpi.l)+'</span></div></div>';
+      field.appendChild(card);
+      // wire
+      card.querySelector('.rm').onclick=function(e){e.stopPropagation();if(confirm('Remove '+l.name+'?')){model.splice(idx,1);renderFilters();renderCards();}};
+      card.onclick=function(e){ if(document.body.classList.contains('edit'))return; focus(idx); };
+      if(document.body.classList.contains('edit')) bindEdits(card,l);
+    });
+  }
+  function ed(){return document.body.classList.contains('edit')?'contenteditable':'';}
+  function esc(s){return (s==null?'':(''+s)).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+  function bindEdits(card,l){
+    var map=[['h3','name'],['.sub','location'],['.kpi b','kpi.v'],['.kpi span','kpi.l']];
+    card.querySelectorAll('.tagrow .mtag').forEach(function(el,k){el.addEventListener('input',function(){ (k===0?l.strategy=el.textContent:l.market=el.textContent); });});
+    map.forEach(function(m){var el=card.querySelector(m[0]);if(!el)return;el.addEventListener('input',function(){setPath(l,m[1],el.textContent);});});
+  }
+  function setPath(o,p,v){var a=p.split('.');while(a.length>1)o=o[a.shift()];o[a[0]]=v;}
+
+  /* ---------- focus / evidence ---------- */
+  var fv=document.getElementById('focusView'), drawer=document.getElementById('drawer');
+  function focus(i){
+    var l=model[i]; if(!l)return; location.hash=l.id;
+    document.body.classList.add('focus');
+    var g=(l.media&&l.media.gallery)||[];
+    drawer.innerHTML=
+      '<div class="dv-hero">'+mediaEl(l.media&&l.media.hero)+'<div class="grad"></div><button class="dv-close" id="dvClose">&times;</button></div>'+
+      '<div class="dv-body"><div class="dv-tags"><span class="mtag">'+esc(l.strategy)+'</span><span class="mtag m">'+esc(l.market)+'</span></div>'+
+      '<h2 class="serif">'+esc(l.name)+'</h2><div class="dv-loc">'+esc(l.location||'')+'</div>'+
+      (g.length?'<div class="thumbs">'+g.map(function(s){return '<div class="t" data-src="'+s+'">'+mediaEl(s)+'</div>';}).join('')+'</div>':'')+
+      '<div class="stats">'+(l.stats||[]).map(function(s){return '<div class="stile"><div class="v">'+esc(s.v)+'</div><div class="l">'+esc(s.l)+'</div></div>';}).join('')+'</div>'+
+      '<div class="ev-h">Evidence</div>'+
+      (l.evidence||[]).map(function(e){return '<div class="ev"><div class="k">'+esc(e.k)+(e.note?'<small>'+esc(e.note)+'</small>':'')+'</div><div class="r"><div class="val">'+esc(e.val)+'</div><span class="src '+statusClass(e.status)+'"><span class="dot"></span>'+esc(e.s)+'</span></div></div>';}).join('')+
+      '<div class="legend"><span><i style="background:var(--verified)"></i>Verified</span><span><i style="background:var(--modeled)"></i>Modeled</span><span><i style="background:var(--pending)"></i>Pending</span></div>'+
+      '<div class="dv-cta"><a class="btn solid" href="./index.html#access">Request full data room →</a><a class="btn" href="./explore.html">◈ Walk the estate</a></div></div>';
+    fv.classList.add('open');
+    drawer.querySelector('#dvClose').onclick=unfocus;
+    drawer.querySelectorAll('.thumbs .t').forEach(function(t){t.onclick=function(){openLB(t.getAttribute('data-src'));};});
+  }
+  function unfocus(){document.body.classList.remove('focus');fv.classList.remove('open');if(location.hash)history.replaceState(null,'',location.pathname+location.search);}
+  document.querySelector('.fv-scrim').onclick=unfocus;
+  addEventListener('keydown',function(e){if(e.key==='Escape'){if(document.getElementById('lb').classList.contains('open'))closeLB();else unfocus();}});
+
+  /* lightbox */
+  var lb=document.getElementById('lb');
+  function openLB(src){lb.querySelectorAll('img,video').forEach(function(n){n.remove();});lb.insertAdjacentHTML('afterbegin',mediaEl(src));lb.classList.add('open');}
+  function closeLB(){lb.classList.remove('open');}
+  document.getElementById('lbX').onclick=closeLB; lb.onclick=function(e){if(e.target===lb)closeLB();};
+
+  /* parallax */
+  var stage=document.getElementById('stage');
+  addEventListener('mousemove',function(e){ if(document.body.classList.contains('focus'))return; var x=(e.clientX/innerWidth-.5),y=(e.clientY/innerHeight-.5); field.style.transform='rotateY('+x*5+'deg) rotateX('+(-y*4)+'deg)'; });
+
+  /* ---------- builder actions ---------- */
+  document.getElementById('bEdit').onclick=function(){document.body.classList.toggle('edit');this.classList.toggle('on',document.body.classList.contains('edit'));renderCards();};
+  document.getElementById('bAdd').onclick=function(){
+    var n=model.length+1;
+    model.push({id:'listing-'+n+'-'+Math.floor(performance.now()),name:'New Listing '+n,strategy:'Estates',market:'Market',location:'Location',kpi:{v:'$0M',l:'Value'},media:{hero:'',gallery:[]},stats:[{v:'—',l:'Metric'}],evidence:[{k:'Claim',s:'Source',status:'pending',val:'—'}]});
+    activeFilter='All';renderFilters();renderCards();
+  };
+  document.getElementById('bMedia').onclick=openBoot;
+  document.getElementById('bExport').onclick=exportAll;
+
+  /* ---------- media boot-prompt (multi-listing) ---------- */
+  var boot=document.getElementById('boot');
+  function slotsFor(l){ // asset name convention: <id>-hero.jpg, <id>-1.jpg ...
+    var arr=[{name:l.id+'-hero',label:'Hero',key:'hero'}];
+    var gcount=Math.max(2,((l.media&&l.media.gallery)||[]).length);
+    for(var i=0;i<gcount;i++) arr.push({name:l.id+'-'+(i+1),label:'Gallery '+(i+1),key:'g'+i});
+    return arr;
+  }
+  function openBoot(){
+    var host=document.getElementById('bootGroups'); host.innerHTML='';
+    model.forEach(function(l){
+      var g=document.createElement('div'); g.innerHTML='<h4>'+esc(l.name)+'</h4>'; var wrap=document.createElement('div');wrap.className='boot-slots';
+      slotsFor(l).forEach(function(sl){
+        var cell=document.createElement('label');cell.className='bslot';
+        cell.innerHTML='<div class="th">'+(mediaHas(l,sl)?mediaEl(mediaHas(l,sl)):'▲')+'</div><div class="nm">'+sl.label+'</div>';
+        var inp=document.createElement('input');inp.type='file';inp.accept='image/*,video/*';inp.style.display='none';cell.appendChild(inp);
+        cell.addEventListener('dragover',function(e){e.preventDefault();cell.classList.add('drag');});
+        cell.addEventListener('dragleave',function(){cell.classList.remove('drag');});
+        cell.addEventListener('drop',function(e){e.preventDefault();cell.classList.remove('drag');var f=e.dataTransfer.files[0];if(f)takeMedia(l,sl,f,cell);});
+        inp.addEventListener('change',function(){var f=inp.files[0];if(f)takeMedia(l,sl,f,cell);});
+        if(mediaHas(l,sl))cell.classList.add('done');
+        wrap.appendChild(cell);
+      });
+      g.appendChild(wrap); host.appendChild(g);
+    });
+    updateBootP(); boot.classList.add('open');
+  }
+  function mediaHas(l,sl){ if(sl.key==='hero')return l.media.hero; var gi=parseInt(sl.key.slice(1),10); return (l.media.gallery||[])[gi]; }
+  function takeMedia(l,sl,file,cell){
+    var ext=(file.name.split('.').pop()||'').toLowerCase()||((file.type||'').indexOf('video')===0?'mp4':'jpg');
+    var asset='assets/'+sl.name+'.'+ext; var url=URL.createObjectURL(file); mediaStore[sl.name+'.'+ext]=file;
+    if(sl.key==='hero'){l.media.hero=url;} else {var gi=parseInt(sl.key.slice(1),10);l.media.gallery=l.media.gallery||[];l.media.gallery[gi]=url;}
+    // record intended deploy path on a shadow field for export
+    l._exp=l._exp||{}; l._exp[sl.key]=asset;
+    var th=cell.querySelector('.th');th.innerHTML='';var isV=(file.type||'').indexOf('video')===0;var el=document.createElement(isV?'video':'img');el.src=url;if(isV){el.muted=el.loop=el.autoplay=el.playsInline=true;}th.appendChild(el);
+    cell.classList.add('done'); updateBootP(); renderCards();
+  }
+  function updateBootP(){var n=Object.keys(mediaStore).length;document.getElementById('bootP').textContent=n+' file'+(n===1?'':'s')+' added';}
+  document.getElementById('bootX').onclick=function(){boot.classList.remove('open');};
+  document.getElementById('bootExport').onclick=exportAll;
+
+  /* ---------- export manifest + media ---------- */
+  function exportAll(){
+    // build clean manifest with deploy asset paths
+    var out=model.map(function(l){
+      var m={id:l.id,name:l.name,strategy:l.strategy,market:l.market,location:l.location,kpi:l.kpi,stats:l.stats,evidence:l.evidence,media:{hero:'',gallery:[]}};
+      m.media.hero = (l._exp&&l._exp.hero) || (typeof l.media.hero==='string'&&l.media.hero.indexOf('blob:')<0?l.media.hero:'');
+      var g=[]; ((l.media&&l.media.gallery)||[]).forEach(function(src,i){ var key='g'+i; g.push((l._exp&&l._exp[key])|| (typeof src==='string'&&src.indexOf('blob:')<0?src:'')); });
+      m.media.gallery=g.filter(Boolean);
+      return m;
+    });
+    var js='window.LISTINGS = '+JSON.stringify(out,null,2)+';\n';
+    dl(new Blob([js],{type:'text/javascript'}),'listings.js');
+    var names=Object.keys(mediaStore);
+    names.forEach(function(n,i){setTimeout(function(){dl(mediaStore[n],n);},(i+1)*250);});
+    alert('Exporting listings.js'+(names.length?' + '+names.length+' media file(s)':'')+'.\n\n1) Put listings.js next to workspace.html\n2) Put the media files in /assets (keep names)\n3) Add <script src="./listings.js"><\/script> before workspace.html\'s own script, then redeploy.');
+  }
+  function dl(blob,name){var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){a.remove();},100);}
+
+  /* init */
+  renderFilters(); renderCards();
+  if(location.hash){var id=location.hash.slice(1);var i=model.findIndex(function(l){return l.id===id;});if(i>=0)setTimeout(function(){focus(i);},250);}
+})();
+</script>
+</body>
+</html>

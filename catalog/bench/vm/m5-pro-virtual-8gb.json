@@ -1,0 +1,4467 @@
+{
+ "schema": 1,
+ "slug": "m5-pro-virtual-8gb",
+ "host": {
+  "chip": "Apple M5 Pro (Virtual)",
+  "model": "VirtualMac2,1",
+  "ramGb": 8,
+  "macos": "26.6.2",
+  "ollama": "0.31.1"
+ },
+ "simulated": null,
+ "context": 4096,
+ "maxResidentGb": 3.3,
+ "startedAt": "2026-10-16T02:42:30.137Z",
+ "results": [
+  {
+   "model": "hf.co/mradermacher/Huihui-granite-4.1-3b-abliterated-i1-GGUF:i1-Q4_K_M",
+   "context": 4096,
+   "at": "2026-10-16T02:42:30.148Z",
+   "capabilities": [
+    "completion",
+    "tools"
+   ],
+   "loadS": 3.67,
+   "firstReplyS": 4.03,
+   "resident": {
+    "sizeGb": 2.44,
+    "gpuGb": 2.44,
+    "contextLength": 4096
+   },
+   "speed": {
+    "promptTokS": 171.6,
+    "genTokS": 6.1,
+    "genTokens": 166
+   },
+   "tools": {
+    "twoStep": {
+     "pass": 16,
+     "of": 18,
+     "pct": 89,
+     "by": {
+      "single": {
+       "pass": 4,
+       "of": 4
+      },
+      "multi": {
+       "pass": 4,
+       "of": 5
+      },
+      "chain": {
+       "pass": 3,
+       "of": 4
+      },
+      "refuse": {
+       "pass": 5,
+       "of": 5
+      }
+     },
+     "avgMs": 5074,
+     "cases": [
+      {
+       "id": "s1",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "Maria",
+          "text": "I'm running 10 minutes late"
+         },
+         "ms": 6920
+        }
+       ]
+      },
+      {
+       "id": "s2",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "open_app",
+         "arguments": {
+          "app": "Spotify"
+         },
+         "ms": 3277
+        }
+       ]
+      },
+      {
+       "id": "s3",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "call the bank",
+          "when": "tomorrow at 9am"
+         },
+         "ms": 7748
+        }
+       ]
+      },
+      {
+       "id": "s4",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "Maria",
+          "text": "I'll be 10 minutes late"
+         },
+         "ms": 4546
+        }
+       ]
+      },
+      {
+       "id": "m1",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Hector Tacos",
+          "amount": 450,
+          "due_date": "November 1"
+         },
+         "ms": 5761
+        }
+       ]
+      },
+      {
+       "id": "m2",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Ana Ruiz",
+          "amount": 1200,
+          "due_date": "2026-12-15"
+         },
+         "ms": 5964
+        }
+       ]
+      },
+      {
+       "id": "m3",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+1602555047",
+          "text": "The proposal is ready"
+         },
+         "ms": 4498
+        }
+       ]
+      },
+      {
+       "id": "m4",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Hector Tacos",
+          "amount": 450,
+          "due_date": "the first of November"
+         },
+         "ms": 6333
+        }
+       ]
+      },
+      {
+       "id": "m5",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "Ana",
+          "text": "the $300 invoice is due Friday"
+         },
+         "ms": 4511
+        }
+       ]
+      },
+      {
+       "id": "c1",
+       "kind": "chain",
+       "pass": true,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Hector"
+         },
+         "ms": 3615
+        },
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+16025550147",
+          "text": "The proposal is ready"
+         },
+         "ms": 7409
+        }
+       ]
+      },
+      {
+       "id": "c2",
+       "kind": "chain",
+       "pass": true,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Ana"
+         },
+         "ms": 4644
+        },
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Ana Ruiz",
+          "amount": 300,
+          "due_date": "Friday"
+         },
+         "ms": 5538
+        }
+       ]
+      },
+      {
+       "id": "c3",
+       "kind": "chain",
+       "pass": true,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Maria Lopez"
+         },
+         "ms": 2976
+        },
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "call Maria Lopez",
+          "when": "5pm"
+         },
+         "ms": 4827
+        }
+       ]
+      },
+      {
+       "id": "c4",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Ana Ruiz"
+         },
+         "ms": 2914
+        },
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+14805550199",
+          "text": "Maria"
+         },
+         "ms": 4610
+        }
+       ]
+      },
+      {
+       "id": "r1",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 1034
+        }
+       ]
+      },
+      {
+       "id": "r2",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 1034
+        }
+       ]
+      },
+      {
+       "id": "r3",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 1091
+        }
+       ]
+      },
+      {
+       "id": "r4",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 1041
+        }
+       ]
+      },
+      {
+       "id": "r5",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 1030
+        }
+       ]
+      }
+     ]
+    },
+    "native": {
+     "pass": 13,
+     "of": 18,
+     "pct": 72,
+     "by": {
+      "single": {
+       "pass": 4,
+       "of": 4
+      },
+      "multi": {
+       "pass": 3,
+       "of": 5
+      },
+      "chain": {
+       "pass": 3,
+       "of": 4
+      },
+      "refuse": {
+       "pass": 3,
+       "of": 5
+      }
+     },
+     "avgMs": 5557,
+     "cases": [
+      {
+       "id": "s1",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "Maria",
+          "text": "I'm running 10 minutes late."
+         },
+         "ms": 7116
+        }
+       ]
+      },
+      {
+       "id": "s2",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "open_app",
+         "arguments": {
+          "app": "Spotify"
+         },
+         "ms": 3023
+        }
+       ]
+      },
+      {
+       "id": "s3",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "call the bank",
+          "when": "tomorrow at 9am"
+         },
+         "ms": 4689
+        }
+       ]
+      },
+      {
+       "id": "s4",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "Maria",
+          "text": "I'll be 10 minutes late."
+         },
+         "ms": 4670
+        }
+       ]
+      },
+      {
+       "id": "m1",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Hector Tacos",
+          "amount": 450,
+          "due_date": "November 1"
+         },
+         "ms": 5363
+        }
+       ]
+      },
+      {
+       "id": "m2",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Bill Ana Ruiz",
+          "amount": 1200,
+          "due_date": "2026-12-15"
+         },
+         "ms": 5854
+        }
+       ]
+      },
+      {
+       "id": "m3",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+1602555047",
+          "text": "The proposal is ready."
+         },
+         "ms": 4596
+        }
+       ]
+      },
+      {
+       "id": "m4",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Hector Tacos",
+          "amount": 450,
+          "due_date": "the first of November"
+         },
+         "ms": 5476
+        }
+       ]
+      },
+      {
+       "id": "m5",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 4398
+        }
+       ]
+      },
+      {
+       "id": "c1",
+       "kind": "chain",
+       "pass": true,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Hector"
+         },
+         "ms": 3094
+        },
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+16025550147",
+          "text": "The proposal is ready."
+         },
+         "ms": 4960
+        }
+       ]
+      },
+      {
+       "id": "c2",
+       "kind": "chain",
+       "pass": true,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Ana"
+         },
+         "ms": 3014
+        },
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Ana Ruiz",
+          "amount": 300,
+          "due_date": "Friday"
+         },
+         "ms": 5165
+        }
+       ]
+      },
+      {
+       "id": "c3",
+       "kind": "chain",
+       "pass": true,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Maria Lopez"
+         },
+         "ms": 6956
+        },
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "Call Maria Lopez",
+          "when": "5pm"
+         },
+         "ms": 4485
+        }
+       ]
+      },
+      {
+       "id": "c4",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Ana Ruiz"
+         },
+         "ms": 3141
+        },
+        {
+         "name": "send_message",
+         "arguments": {
+          "text": "Hi Ana, this is Maria reminding you of our meeting tomorrow.",
+          "to": "ana@ruizbakery.com"
+         },
+         "ms": 6402
+        }
+       ]
+      },
+      {
+       "id": "r1",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 1214
+        }
+       ]
+      },
+      {
+       "id": "r2",
+       "kind": "refuse",
+       "pass": false,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "travel_agent",
+          "text": "Please book a round-trip flight to Miami for next Monday."
+         },
+         "ms": 5559
+        }
+       ]
+      },
+      {
+       "id": "r3",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 2960
+        }
+       ]
+      },
+      {
+       "id": "r4",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 4789
+        }
+       ]
+      },
+      {
+       "id": "r5",
+       "kind": "refuse",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": ""
+         },
+         "ms": 3100
+        }
+       ]
+      }
+     ]
+    }
+   },
+   "route": {
+    "pass": 12,
+    "of": 12,
+    "pct": 100,
+    "by": {
+     "route": {
+      "pass": 12,
+      "of": 12
+     }
+    },
+    "avgMs": 1079,
+    "cases": [
+     {
+      "text": "a haiku about Phoenix heat",
+      "want": "write",
+      "got": "write",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "tell Hector the tacos are ready",
+      "want": "act",
+      "got": "act",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "can you get the weather radar up in safari",
+      "want": "open",
+      "got": "open",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "I need a logo for my food truck, red and gold",
+      "want": "image",
+      "got": "image",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "the population of Arizona",
+      "want": "lookup",
+      "got": "lookup",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "let my landlord know rent will be late",
+      "want": "act",
+      "got": "act",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "youtube please",
+      "want": "open",
+      "got": "open",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "give me three taglines for a barber shop",
+      "want": "write",
+      "got": "write",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "a picture of a cat wearing a crown",
+      "want": "image",
+      "got": "image",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "the date of the next full moon",
+      "want": "lookup",
+      "got": "lookup",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "thank-you note for my first customer",
+      "want": "write",
+      "got": "write",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "pay the electric bill",
+      "want": "act",
+      "got": "act",
+      "pass": true,
+      "kind": "route"
+     }
+    ]
+   },
+   "write": {
+    "pass": 3,
+    "of": 3,
+    "pct": 100,
+    "by": {
+     "write": {
+      "pass": 3,
+      "of": 3
+     }
+    },
+    "cases": [
+     {
+      "id": "w1",
+      "kind": "write",
+      "pass": true,
+      "text": "Dear Customer, we regret to inform you that your order will be delayed by one additional day due to unforeseen circumstances. We appreciate your patience and understanding in this matter."
+     },
+     {
+      "id": "w2",
+      "kind": "write",
+      "pass": true,
+      "text": "- Encourage satisfied customers to leave reviews by offering incentives such as discounts on their next purchase after leaving an online review.\n- Utilize social media platforms and email newsletters to regularly ask for feedback and promote new or featured reviews from happy customers.\n- Ensure your business has a user-friendly, mobile-responsive website with clear instructions on how to leave a "
+     },
+     {
+      "id": "w3",
+      "kind": "write",
+      "pass": true,
+      "text": "An invoice is a commercial document issued by a seller to a buyer, detailing goods or services provided, their quantities, prices, and terms of payment."
+     }
+    ]
+   },
+   "memory": {
+    "steadyRssGb": 4.17,
+    "peakRssGb": 4.17,
+    "footprintPeakGb": 2.6,
+    "minMemLevel": 30,
+    "runnersSeen": 1,
+    "swapDeltaMb": 0
+   },
+   "thermal": {
+    "before": {
+     "warning": null,
+     "speedLimit": null,
+     "freePct": 88
+    },
+    "after": {
+     "warning": null,
+     "speedLimit": null
+    }
+   }
+  },
+  {
+   "model": "granite4.1:3b",
+   "context": 4096,
+   "at": "2026-10-16T02:47:09.321Z",
+   "capabilities": [
+    "completion",
+    "tools"
+   ],
+   "loadS": 3.66,
+   "firstReplyS": 3.87,
+   "resident": {
+    "sizeGb": 2.44,
+    "gpuGb": 2.44,
+    "contextLength": 4096
+   },
+   "speed": {
+    "promptTokS": 93.8,
+    "genTokS": 6.8,
+    "genTokens": 157
+   },
+   "tools": {
+    "twoStep": {
+     "pass": 16,
+     "of": 18,
+     "pct": 89,
+     "by": {
+      "single": {
+       "pass": 4,
+       "of": 4
+      },
+      "multi": {
+       "pass": 5,
+       "of": 5
+      },
+      "chain": {
+       "pass": 2,
+       "of": 4
+      },
+      "refuse": {
+       "pass": 5,
+       "of": 5
+      }
+     },
+     "avgMs": 4886,
+     "cases": [
+      {
+       "id": "s1",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "Maria",
+          "text": "I'm running 10 minutes late"
+         },
+         "ms": 7263
+        }
+       ]
+      },
+      {
+       "id": "s2",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "open_app",
+         "arguments": {
+          "app": "Spotify"
+         },
+         "ms": 3644
+        }
+       ]
+      },
+      {
+       "id": "s3",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "call the bank",
+          "when": "tomorrow at 9am"
+         },
+         "ms": 5360
+        }
+       ]
+      },
+      {
+       "id": "s4",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "Maria",
+          "text": "I'll be 10 minutes late"
+         },
+         "ms": 7337
+        }
+       ]
+      },
+      {
+       "id": "m1",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Hector Tacos",
+          "amount": 450,
+          "due_date": "November 1"
+         },
+         "ms": 7174
+        }
+       ]
+      },
+      {
+       "id": "m2",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Ana Ruiz",
+          "amount": 1200,
+          "due_date": "2026-12-15"
+         },
+         "ms": 6313
+        }
+       ]
+      },
+      {
+       "id": "m3",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+1 602 555 0147",
+          "text": "the proposal is ready"
+         },
+         "ms": 5330
+        }
+       ]
+      },
+      {
+       "id": "m4",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Hector Tacos",
+          "amount": 450,
+          "due_date": "the first of November"
+         },
+         "ms": 5738
+        }
+       ]
+      },
+      {
+       "id": "m5",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "Ana",
+          "text": "the $300 invoice is due Friday"
+         },
+         "ms": 4489
+        }
+       ]
+      },
+      {
+       "id": "c1",
+       "kind": "chain",
+       "pass": true,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Hector"
+         },
+         "ms": 4218
+        },
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+16025550147",
+          "text": "The proposal is ready"
+         },
+         "ms": 5152
+        }
+       ]
+      },
+      {
+       "id": "c2",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Ana",
+          "amount": 300,
+          "due_date": "Friday"
+         },
+         "ms": 4812
+        }
+       ]
+      },
+      {
+       "id": "c3",
+       "kind": "chain",
+       "pass": true,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Maria Lopez"
+         },
+         "ms": 2910
+        },
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "call Maria Lopez",
+          "when": "5pm"
+         },
+         "ms": 4920
+        }
+       ]
+      },
+      {
+       "id": "c4",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Ana Ruiz"
+         },
+         "ms": 2856
+        },
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+14805550199",
+          "text": "Maria"
+         },
+         "ms": 4947
+        }
+       ]
+      },
+      {
+       "id": "r1",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 1089
+        }
+       ]
+      },
+      {
+       "id": "r2",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 1118
+        }
+       ]
+      },
+      {
+       "id": "r3",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 1102
+        }
+       ]
+      },
+      {
+       "id": "r4",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 1107
+        }
+       ]
+      },
+      {
+       "id": "r5",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 1065
+        }
+       ]
+      }
+     ]
+    },
+    "native": {
+     "pass": 17,
+     "of": 18,
+     "pct": 94,
+     "by": {
+      "single": {
+       "pass": 4,
+       "of": 4
+      },
+      "multi": {
+       "pass": 5,
+       "of": 5
+      },
+      "chain": {
+       "pass": 3,
+       "of": 4
+      },
+      "refuse": {
+       "pass": 5,
+       "of": 5
+      }
+     },
+     "avgMs": 7014,
+     "cases": [
+      {
+       "id": "s1",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "Maria",
+          "text": "I'm running 10 minutes late."
+         },
+         "ms": 7310
+        }
+       ]
+      },
+      {
+       "id": "s2",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "open_app",
+         "arguments": {
+          "app": "Spotify"
+         },
+         "ms": 3076
+        }
+       ]
+      },
+      {
+       "id": "s3",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "Call the bank",
+          "when": "tomorrow at 9am"
+         },
+         "ms": 5417
+        }
+       ]
+      },
+      {
+       "id": "s4",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "Maria",
+          "text": "I'll be about 10 minutes late."
+         },
+         "ms": 5184
+        }
+       ]
+      },
+      {
+       "id": "m1",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Hector Tacos",
+          "amount": 450,
+          "due_date": "November 1"
+         },
+         "ms": 5552
+        }
+       ]
+      },
+      {
+       "id": "m2",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Bill Ana Ruiz",
+          "amount": 1200,
+          "due_date": "2026-12-15"
+         },
+         "ms": 6039
+        }
+       ]
+      },
+      {
+       "id": "m3",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+16025550147",
+          "text": "The proposal is ready."
+         },
+         "ms": 4818
+        }
+       ]
+      },
+      {
+       "id": "m4",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Hector Tacos",
+          "amount": 450,
+          "due_date": "the first of November"
+         },
+         "ms": 5589
+        }
+       ]
+      },
+      {
+       "id": "m5",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "Ana",
+          "text": "$300 invoice is due Friday."
+         },
+         "ms": 4451
+        }
+       ]
+      },
+      {
+       "id": "c1",
+       "kind": "chain",
+       "pass": true,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Hector"
+         },
+         "ms": 3114
+        },
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+16025550147",
+          "text": "The proposal is ready."
+         },
+         "ms": 5127
+        }
+       ]
+      },
+      {
+       "id": "c2",
+       "kind": "chain",
+       "pass": true,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Ana"
+         },
+         "ms": 2943
+        },
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Ana Ruiz",
+          "amount": 300,
+          "due_date": "Friday"
+         },
+         "ms": 5256
+        }
+       ]
+      },
+      {
+       "id": "c3",
+       "kind": "chain",
+       "pass": true,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Maria Lopez"
+         },
+         "ms": 3090
+        },
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "Call Maria Lopez at +16235550111",
+          "when": "5pm"
+         },
+         "ms": 5591
+        }
+       ]
+      },
+      {
+       "id": "c4",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Ana Ruiz"
+         },
+         "ms": 3110
+        },
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+14805550199",
+          "text": "Hi Ana, this is Maria. Just wanted to reach out."
+         },
+         "ms": 6319
+        }
+       ]
+      },
+      {
+       "id": "r1",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 1252
+        }
+       ]
+      },
+      {
+       "id": "r2",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 21181
+        }
+       ]
+      },
+      {
+       "id": "r3",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 2502
+        }
+       ]
+      },
+      {
+       "id": "r4",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 9041
+        }
+       ]
+      },
+      {
+       "id": "r5",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 10295
+        }
+       ]
+      }
+     ]
+    }
+   },
+   "route": {
+    "pass": 11,
+    "of": 12,
+    "pct": 92,
+    "by": {
+     "route": {
+      "pass": 11,
+      "of": 12
+     }
+    },
+    "avgMs": 1015,
+    "cases": [
+     {
+      "text": "a haiku about Phoenix heat",
+      "want": "write",
+      "got": "image",
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "tell Hector the tacos are ready",
+      "want": "act",
+      "got": "act",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "can you get the weather radar up in safari",
+      "want": "open",
+      "got": "open",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "I need a logo for my food truck, red and gold",
+      "want": "image",
+      "got": "image",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "the population of Arizona",
+      "want": "lookup",
+      "got": "lookup",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "let my landlord know rent will be late",
+      "want": "act",
+      "got": "act",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "youtube please",
+      "want": "open",
+      "got": "open",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "give me three taglines for a barber shop",
+      "want": "write",
+      "got": "write",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "a picture of a cat wearing a crown",
+      "want": "image",
+      "got": "image",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "the date of the next full moon",
+      "want": "lookup",
+      "got": "lookup",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "thank-you note for my first customer",
+      "want": "write",
+      "got": "write",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "pay the electric bill",
+      "want": "act",
+      "got": "act",
+      "pass": true,
+      "kind": "route"
+     }
+    ]
+   },
+   "write": {
+    "pass": 3,
+    "of": 3,
+    "pct": 100,
+    "by": {
+     "write": {
+      "pass": 3,
+      "of": 3
+     }
+    },
+    "cases": [
+     {
+      "id": "w1",
+      "kind": "write",
+      "pass": true,
+      "text": "We apologize for the delay; your order will be shipped tomorrow. Thank you for your patience."
+     },
+     {
+      "id": "w2",
+      "kind": "write",
+      "pass": true,
+      "text": "- Offer incentives such as discounts or free items for customers who leave an online review.\n- Ensure your business is listed on popular review platforms like Google Reviews and Yelp with complete and up-to-date information.\n- Encourage satisfied customers to share their experiences by providing easy access to review links via email newsletters or social media."
+     },
+     {
+      "id": "w3",
+      "kind": "write",
+      "pass": true,
+      "text": "An invoice is a billing document issued by a seller to a buyer, detailing goods or services provided, along with the agreed-upon price and payment terms."
+     }
+    ]
+   },
+   "memory": {
+    "steadyRssGb": 4.44,
+    "peakRssGb": 4.46,
+    "footprintPeakGb": 2.58,
+    "minMemLevel": 48,
+    "runnersSeen": 1,
+    "swapDeltaMb": 0
+   },
+   "thermal": {
+    "before": {
+     "warning": null,
+     "speedLimit": null,
+     "freePct": 82
+    },
+    "after": {
+     "warning": null,
+     "speedLimit": null
+    }
+   }
+  },
+  {
+   "model": "huihui_ai/qwen3-abliterated:1.7b",
+   "context": 4096,
+   "at": "2026-10-16T02:52:00.736Z",
+   "capabilities": [
+    "completion",
+    "tools",
+    "thinking"
+   ],
+   "loadS": 2.44,
+   "firstReplyS": 2.6,
+   "resident": {
+    "sizeGb": 1.59,
+    "gpuGb": 1.59,
+    "contextLength": 4096
+   },
+   "speed": {
+    "promptTokS": 184.8,
+    "genTokS": 9.6,
+    "genTokens": 102
+   },
+   "tools": {
+    "twoStep": {
+     "pass": 14,
+     "of": 18,
+     "pct": 78,
+     "by": {
+      "single": {
+       "pass": 4,
+       "of": 4
+      },
+      "multi": {
+       "pass": 4,
+       "of": 5
+      },
+      "chain": {
+       "pass": 1,
+       "of": 4
+      },
+      "refuse": {
+       "pass": 5,
+       "of": 5
+      }
+     },
+     "avgMs": 3753,
+     "cases": [
+      {
+       "id": "s1",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "Maria",
+          "text": "I'm running 10 minutes late"
+         },
+         "ms": 4179
+        }
+       ]
+      },
+      {
+       "id": "s2",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "open_app",
+         "arguments": {
+          "app": "Spotify"
+         },
+         "ms": 2420
+        }
+       ]
+      },
+      {
+       "id": "s3",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "call the bank",
+          "when": "tomorrow at 9am"
+         },
+         "ms": 3946
+        }
+       ]
+      },
+      {
+       "id": "s4",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "Maria",
+          "text": "I'll be 10 min late"
+         },
+         "ms": 3219
+        }
+       ]
+      },
+      {
+       "id": "m1",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Hector Tacos",
+          "amount": 450,
+          "due_date": "November 1"
+         },
+         "ms": 4732
+        }
+       ]
+      },
+      {
+       "id": "m2",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Ana Ruiz",
+          "amount": 1200,
+          "due_date": "2026-12-15"
+         },
+         "ms": 5202
+        }
+       ]
+      },
+      {
+       "id": "m3",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+1 602 555 0147",
+          "text": "The proposal is ready"
+         },
+         "ms": 4712
+        }
+       ]
+      },
+      {
+       "id": "m4",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Hector Tacos",
+          "amount": 450,
+          "due_date": "2023-11-01"
+         },
+         "ms": 5312
+        }
+       ]
+      },
+      {
+       "id": "m5",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Ana",
+          "amount": 300,
+          "due_date": "Friday"
+         },
+         "ms": 4064
+        }
+       ]
+      },
+      {
+       "id": "c1",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Hector"
+         },
+         "ms": 2489
+        },
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "Hector Ruiz",
+          "text": "The proposal is ready"
+         },
+         "ms": 3045
+        }
+       ]
+      },
+      {
+       "id": "c2",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Ana"
+         },
+         "ms": 2247
+        },
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Ana Ruiz",
+          "amount": 300,
+          "due_date": "2023-10-15"
+         },
+         "ms": 4304
+        }
+       ]
+      },
+      {
+       "id": "c3",
+       "kind": "chain",
+       "pass": true,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Maria Lopez"
+         },
+         "ms": 2309
+        },
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "Call Maria Lopez at 5pm",
+          "when": "5pm"
+         },
+         "ms": 3414
+        }
+       ]
+      },
+      {
+       "id": "c4",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Ana Ruiz"
+         },
+         "ms": 2325
+        },
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "ana@ruizbakery.com",
+          "text": "Hello, Maria. I hope you are well. Let me know if you need anything from me."
+         },
+         "ms": 5139
+        }
+       ]
+      },
+      {
+       "id": "r1",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 884
+        }
+       ]
+      },
+      {
+       "id": "r2",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 872
+        }
+       ]
+      },
+      {
+       "id": "r3",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 895
+        }
+       ]
+      },
+      {
+       "id": "r4",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 929
+        }
+       ]
+      },
+      {
+       "id": "r5",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 921
+        }
+       ]
+      }
+     ]
+    },
+    "native": {
+     "pass": 16,
+     "of": 18,
+     "pct": 89,
+     "by": {
+      "single": {
+       "pass": 4,
+       "of": 4
+      },
+      "multi": {
+       "pass": 4,
+       "of": 5
+      },
+      "chain": {
+       "pass": 3,
+       "of": 4
+      },
+      "refuse": {
+       "pass": 5,
+       "of": 5
+      }
+     },
+     "avgMs": 5819,
+     "cases": [
+      {
+       "id": "s1",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "Maria",
+          "text": "I'm running 10 minutes late"
+         },
+         "ms": 4840
+        }
+       ]
+      },
+      {
+       "id": "s2",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "open_app",
+         "arguments": {
+          "app": "Spotify"
+         },
+         "ms": 2335
+        }
+       ]
+      },
+      {
+       "id": "s3",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "when": "tomorrow at 9am",
+          "text": "call the bank"
+         },
+         "ms": 3720
+        }
+       ]
+      },
+      {
+       "id": "s4",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "Maria",
+          "text": "I'll be 10 min late"
+         },
+         "ms": 3598
+        }
+       ]
+      },
+      {
+       "id": "m1",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Hector Tacos",
+          "amount": 450,
+          "due_date": "November 1"
+         },
+         "ms": 4352
+        }
+       ]
+      },
+      {
+       "id": "m2",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "due_date": "2026-12-15",
+          "customer": "Bill Ana Ruiz",
+          "amount": 1200
+         },
+         "ms": 5114
+        }
+       ]
+      },
+      {
+       "id": "m3",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+1 602 555 0147",
+          "text": "The proposal is ready"
+         },
+         "ms": 4619
+        }
+       ]
+      },
+      {
+       "id": "m4",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Hector Tacos",
+          "amount": 450,
+          "due_date": "2023-11-01"
+         },
+         "ms": 5083
+        }
+       ]
+      },
+      {
+       "id": "m5",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Ana",
+          "amount": 300,
+          "due_date": "Friday"
+         },
+         "ms": 3830
+        }
+       ]
+      },
+      {
+       "id": "c1",
+       "kind": "chain",
+       "pass": true,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Hector"
+         },
+         "ms": 5497
+        },
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+16025550147",
+          "text": "The proposal is ready"
+         },
+         "ms": 4191
+        }
+       ]
+      },
+      {
+       "id": "c2",
+       "kind": "chain",
+       "pass": true,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Ana"
+         },
+         "ms": 5898
+        },
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Ana Ruiz",
+          "amount": 300,
+          "due_date": "Friday"
+         },
+         "ms": 3665
+        }
+       ]
+      },
+      {
+       "id": "c3",
+       "kind": "chain",
+       "pass": true,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Maria Lopez"
+         },
+         "ms": 6047
+        },
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "call her",
+          "when": "5pm"
+         },
+         "ms": 3590
+        }
+       ]
+      },
+      {
+       "id": "c4",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Ana Ruiz"
+         },
+         "ms": 6016
+        },
+        {
+         "name": "none",
+         "ms": 3648
+        }
+       ]
+      },
+      {
+       "id": "r1",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 1036
+        }
+       ]
+      },
+      {
+       "id": "r2",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 7349
+        }
+       ]
+      },
+      {
+       "id": "r3",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 7532
+        }
+       ]
+      },
+      {
+       "id": "r4",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 6591
+        }
+       ]
+      },
+      {
+       "id": "r5",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 6187
+        }
+       ]
+      }
+     ]
+    }
+   },
+   "route": {
+    "pass": 9,
+    "of": 12,
+    "pct": 75,
+    "by": {
+     "route": {
+      "pass": 9,
+      "of": 12
+     }
+    },
+    "avgMs": 804,
+    "cases": [
+     {
+      "text": "a haiku about Phoenix heat",
+      "want": "write",
+      "got": "write",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "tell Hector the tacos are ready",
+      "want": "act",
+      "got": "write",
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "can you get the weather radar up in safari",
+      "want": "open",
+      "got": "lookup",
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "I need a logo for my food truck, red and gold",
+      "want": "image",
+      "got": "image",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "the population of Arizona",
+      "want": "lookup",
+      "got": "lookup",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "let my landlord know rent will be late",
+      "want": "act",
+      "got": "act",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "youtube please",
+      "want": "open",
+      "got": "write",
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "give me three taglines for a barber shop",
+      "want": "write",
+      "got": "write",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "a picture of a cat wearing a crown",
+      "want": "image",
+      "got": "image",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "the date of the next full moon",
+      "want": "lookup",
+      "got": "lookup",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "thank-you note for my first customer",
+      "want": "write",
+      "got": "write",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "pay the electric bill",
+      "want": "act",
+      "got": "act",
+      "pass": true,
+      "kind": "route"
+     }
+    ]
+   },
+   "write": {
+    "pass": 2,
+    "of": 3,
+    "pct": 67,
+    "by": {
+     "write": {
+      "pass": 2,
+      "of": 3
+     }
+    },
+    "cases": [
+     {
+      "id": "w1",
+      "kind": "write",
+      "pass": true,
+      "text": "Your order has been delayed by one day. We apologize for the inconvenience."
+     },
+     {
+      "id": "w2",
+      "kind": "write",
+      "pass": true,
+      "text": "- Promote on social media with clear calls to action  \n- Offer a free gift with a review for incentivizing feedback  \n- Partner with local businesses for cross-promotion"
+     },
+     {
+      "id": "w3",
+      "kind": "write",
+      "pass": false,
+      "text": "An invoice is a document issued by a seller to a buyer, detailing the goods or services provided, their prices, quantities, and payment terms. It serves as a formal record of the transaction."
+     }
+    ]
+   },
+   "memory": {
+    "steadyRssGb": 3.01,
+    "peakRssGb": 3.01,
+    "footprintPeakGb": 1.94,
+    "minMemLevel": 62,
+    "runnersSeen": 1,
+    "swapDeltaMb": 0
+   },
+   "thermal": {
+    "before": {
+     "warning": null,
+     "speedLimit": null,
+     "freePct": 80
+    },
+    "after": {
+     "warning": null,
+     "speedLimit": null
+    }
+   }
+  },
+  {
+   "model": "huihui_ai/qwen3-abliterated:0.6b",
+   "context": 4096,
+   "at": "2026-10-16T02:55:48.802Z",
+   "capabilities": [
+    "completion",
+    "tools",
+    "thinking"
+   ],
+   "loadS": 1.41,
+   "firstReplyS": 1.56,
+   "resident": {
+    "sizeGb": 0.88,
+    "gpuGb": 0.88,
+    "contextLength": 4096
+   },
+   "speed": {
+    "promptTokS": 220.7,
+    "genTokS": 9.5,
+    "genTokens": 79
+   },
+   "tools": {
+    "twoStep": {
+     "pass": 10,
+     "of": 18,
+     "pct": 56,
+     "by": {
+      "single": {
+       "pass": 2,
+       "of": 4
+      },
+      "multi": {
+       "pass": 3,
+       "of": 5
+      },
+      "chain": {
+       "pass": 0,
+       "of": 4
+      },
+      "refuse": {
+       "pass": 5,
+       "of": 5
+      }
+     },
+     "avgMs": 7257,
+     "cases": [
+      {
+       "id": "s1",
+       "kind": "single",
+       "pass": false,
+       "got": [
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "Maria is running 10 minutes late",
+          "when": "10 minutes"
+         },
+         "ms": 4304
+        }
+       ]
+      },
+      {
+       "id": "s2",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "open_app",
+         "arguments": {
+          "app": "Spotify"
+         },
+         "ms": 2285
+        }
+       ]
+      },
+      {
+       "id": "s3",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "Call the bank tomorrow at 9am",
+          "when": "tomorrow at 9am"
+         },
+         "ms": 4501
+        }
+       ]
+      },
+      {
+       "id": "s4",
+       "kind": "single",
+       "pass": false,
+       "got": [
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "Maria will be 10 min late",
+          "when": "10 min"
+         },
+         "ms": 4011
+        }
+       ]
+      },
+      {
+       "id": "m1",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Hector Tacos",
+          "amount": 450,
+          "due_date": "November 1"
+         },
+         "ms": 4659
+        }
+       ]
+      },
+      {
+       "id": "m2",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "Bill Ana Ruiz 1,200 dollars, due on 2026-12-15",
+          "when": "2026-12-15"
+         },
+         "ms": 6098
+        }
+       ]
+      },
+      {
+       "id": "m3",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+1 602 555 0147",
+          "text": "Proposal is ready"
+         },
+         "ms": 4642
+        }
+       ]
+      },
+      {
+       "id": "m4",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Hector Tacos",
+          "amount": 450,
+          "due_date": "November 1st"
+         },
+         "ms": 4536
+        }
+       ]
+      },
+      {
+       "id": "m5",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "the $300 invoice is due Friday",
+          "when": "Friday"
+         },
+         "ms": 3859
+        }
+       ]
+      },
+      {
+       "id": "c1",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Hector's number: 555-123-4567, email: hector@example.com, date: 2023-04-15"
+         },
+         "ms": 10663
+        },
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "Hector Ruiz's proposal is ready.",
+          "when": "April 15, 2023"
+         },
+         "ms": 4869
+        }
+       ]
+      },
+      {
+       "id": "c2",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 25364
+        }
+       ]
+      },
+      {
+       "id": "c3",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Maria Lopez"
+         },
+         "ms": 2628
+        },
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Maria Lopez"
+         },
+         "ms": 2536
+        }
+       ]
+      },
+      {
+       "id": "c4",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 41327
+        }
+       ]
+      },
+      {
+       "id": "r1",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 812
+        }
+       ]
+      },
+      {
+       "id": "r2",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 810
+        }
+       ]
+      },
+      {
+       "id": "r3",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 1104
+        }
+       ]
+      },
+      {
+       "id": "r4",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 814
+        }
+       ]
+      },
+      {
+       "id": "r5",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 808
+        }
+       ]
+      }
+     ]
+    },
+    "native": {
+     "pass": 9,
+     "of": 18,
+     "pct": 50,
+     "by": {
+      "single": {
+       "pass": 2,
+       "of": 4
+      },
+      "multi": {
+       "pass": 4,
+       "of": 5
+      },
+      "chain": {
+       "pass": 0,
+       "of": 4
+      },
+      "refuse": {
+       "pass": 3,
+       "of": 5
+      }
+     },
+     "avgMs": 4933,
+     "cases": [
+      {
+       "id": "s1",
+       "kind": "single",
+       "pass": false,
+       "got": [
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "Maria is running 10 minutes late",
+          "when": "10 minutes later"
+         },
+         "ms": 4344
+        }
+       ]
+      },
+      {
+       "id": "s2",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "open_app",
+         "arguments": {
+          "app": "Spotify"
+         },
+         "ms": 2250
+        }
+       ]
+      },
+      {
+       "id": "s3",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "when": "tomorrow 9:00",
+          "text": "Call the bank tomorrow at 9am"
+         },
+         "ms": 4147
+        }
+       ]
+      },
+      {
+       "id": "s4",
+       "kind": "single",
+       "pass": false,
+       "got": [
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "I'll be 10 min late",
+          "when": "10 minutes later"
+         },
+         "ms": 3848
+        }
+       ]
+      },
+      {
+       "id": "m1",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Hector Tacos",
+          "amount": 450,
+          "due_date": "November 1"
+         },
+         "ms": 4205
+        }
+       ]
+      },
+      {
+       "id": "m2",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Ana Ruiz",
+          "amount": 1200,
+          "due_date": "2026-12-15"
+         },
+         "ms": 4892
+        }
+       ]
+      },
+      {
+       "id": "m3",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+1 602 555 0147",
+          "text": "proposal is ready"
+         },
+         "ms": 4321
+        }
+       ]
+      },
+      {
+       "id": "m4",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "amount": 450,
+          "due_date": "November 1",
+          "customer": "Hector Tacos"
+         },
+         "ms": 4192
+        }
+       ]
+      },
+      {
+       "id": "m5",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer amount due_date": "Friday",
+          "customer": "Ana",
+          "due_date": "Friday"
+         },
+         "ms": 3741
+        }
+       ]
+      },
+      {
+       "id": "c1",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Hector"
+         },
+         "ms": 5245
+        },
+        {
+         "name": "none",
+         "ms": 3571
+        }
+       ]
+      },
+      {
+       "id": "c2",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Ana"
+         },
+         "ms": 5709
+        },
+        {
+         "name": "none",
+         "ms": 5658
+        }
+       ]
+      },
+      {
+       "id": "c3",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Maria Lopez"
+         },
+         "ms": 5433
+        },
+        {
+         "name": "none",
+         "ms": 4438
+        }
+       ]
+      },
+      {
+       "id": "c4",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Ana Ruiz"
+         },
+         "ms": 2386
+        },
+        {
+         "name": "none",
+         "ms": 4615
+        }
+       ]
+      },
+      {
+       "id": "r1",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 931
+        }
+       ]
+      },
+      {
+       "id": "r2",
+       "kind": "refuse",
+       "pass": false,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "due_date": "next week",
+          "customer": "Book me a flight to Miami",
+          "amount": "1000"
+         },
+         "ms": 4404
+        }
+       ]
+      },
+      {
+       "id": "r3",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 2370
+        }
+       ]
+      },
+      {
+       "id": "r4",
+       "kind": "refuse",
+       "pass": false,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "IRS",
+          "text": "Fax my tax return."
+         },
+         "ms": 3178
+        }
+       ]
+      },
+      {
+       "id": "r5",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 4918
+        }
+       ]
+      }
+     ]
+    }
+   },
+   "route": {
+    "pass": 8,
+    "of": 12,
+    "pct": 67,
+    "by": {
+     "route": {
+      "pass": 8,
+      "of": 12
+     }
+    },
+    "avgMs": 1118,
+    "cases": [
+     {
+      "text": "a haiku about Phoenix heat",
+      "want": "write",
+      "got": "lookup",
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "tell Hector the tacos are ready",
+      "want": "act",
+      "got": "write",
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "can you get the weather radar up in safari",
+      "want": "open",
+      "got": "open",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "I need a logo for my food truck, red and gold",
+      "want": "image",
+      "got": "image",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "the population of Arizona",
+      "want": "lookup",
+      "got": "lookup",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "let my landlord know rent will be late",
+      "want": "act",
+      "got": "open",
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "youtube please",
+      "want": "open",
+      "got": "open",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "give me three taglines for a barber shop",
+      "want": "write",
+      "got": "write",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "a picture of a cat wearing a crown",
+      "want": "image",
+      "got": "image",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "the date of the next full moon",
+      "want": "lookup",
+      "got": "lookup",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "thank-you note for my first customer",
+      "want": "write",
+      "got": "write",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "pay the electric bill",
+      "want": "act",
+      "got": "open",
+      "pass": false,
+      "kind": "route"
+     }
+    ]
+   },
+   "write": {
+    "pass": 2,
+    "of": 3,
+    "pct": 67,
+    "by": {
+     "write": {
+      "pass": 2,
+      "of": 3
+     }
+    },
+    "cases": [
+     {
+      "id": "w1",
+      "kind": "write",
+      "pass": false,
+      "text": "1. Your order was delayed by one day.  \n2. Please expect it within the next few days."
+     },
+     {
+      "id": "w2",
+      "kind": "write",
+      "pass": true,
+      "text": "- Use social media to showcase your food and interact with customers.  \n- Offer special promotions to incentivize reviews.  \n- Engage with your customers in real-time to build trust and loyalty."
+     },
+     {
+      "id": "w3",
+      "kind": "write",
+      "pass": true,
+      "text": "An invoice is a document that lists all the items and services provided, along with their prices, for a transaction."
+     }
+    ]
+   },
+   "memory": {
+    "steadyRssGb": 1.63,
+    "peakRssGb": 1.66,
+    "footprintPeakGb": 1.25,
+    "minMemLevel": 70,
+    "runnersSeen": 1,
+    "swapDeltaMb": 0
+   },
+   "thermal": {
+    "before": {
+     "warning": null,
+     "speedLimit": null,
+     "freePct": 81
+    },
+    "after": {
+     "warning": null,
+     "speedLimit": null
+    }
+   }
+  },
+  {
+   "model": "huihui_ai/qwen3.5-abliterated:2b",
+   "context": 4096,
+   "at": "2026-10-16T03:00:22.800Z",
+   "capabilities": [
+    "completion",
+    "vision",
+    "tools",
+    "thinking"
+   ],
+   "loadS": 3.8,
+   "firstReplyS": 4.23,
+   "resident": {
+    "sizeGb": 0.38,
+    "gpuGb": 0.38,
+    "contextLength": 4096
+   },
+   "speed": {
+    "promptTokS": 0,
+    "genTokS": 0,
+    "genTokens": 0
+   },
+   "tools": {
+    "twoStep": {
+     "pass": 5,
+     "of": 18,
+     "pct": 28,
+     "by": {
+      "single": {
+       "pass": 0,
+       "of": 4
+      },
+      "multi": {
+       "pass": 0,
+       "of": 5
+      },
+      "chain": {
+       "pass": 0,
+       "of": 4
+      },
+      "refuse": {
+       "pass": 5,
+       "of": 5
+      }
+     },
+     "avgMs": 3470,
+     "cases": [
+      {
+       "id": "s1",
+       "kind": "single",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3717
+        }
+       ]
+      },
+      {
+       "id": "s2",
+       "kind": "single",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3532
+        }
+       ]
+      },
+      {
+       "id": "s3",
+       "kind": "single",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3572
+        }
+       ]
+      },
+      {
+       "id": "s4",
+       "kind": "single",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3578
+        }
+       ]
+      },
+      {
+       "id": "m1",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3590
+        }
+       ]
+      },
+      {
+       "id": "m2",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3587
+        }
+       ]
+      },
+      {
+       "id": "m3",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3594
+        }
+       ]
+      },
+      {
+       "id": "m4",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3813
+        }
+       ]
+      },
+      {
+       "id": "m5",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3569
+        }
+       ]
+      },
+      {
+       "id": "c1",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3573
+        }
+       ]
+      },
+      {
+       "id": "c2",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3586
+        }
+       ]
+      },
+      {
+       "id": "c3",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 1176
+        }
+       ]
+      },
+      {
+       "id": "c4",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3596
+        }
+       ]
+      },
+      {
+       "id": "r1",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3610
+        }
+       ]
+      },
+      {
+       "id": "r2",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3587
+        }
+       ]
+      },
+      {
+       "id": "r3",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3583
+        }
+       ]
+      },
+      {
+       "id": "r4",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3600
+        }
+       ]
+      },
+      {
+       "id": "r5",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3603
+        }
+       ]
+      }
+     ]
+    },
+    "native": {
+     "pass": 5,
+     "of": 18,
+     "pct": 28,
+     "by": {
+      "single": {
+       "pass": 0,
+       "of": 4
+      },
+      "multi": {
+       "pass": 0,
+       "of": 5
+      },
+      "chain": {
+       "pass": 0,
+       "of": 4
+      },
+      "refuse": {
+       "pass": 5,
+       "of": 5
+      }
+     },
+     "avgMs": 21733,
+     "cases": [
+      {
+       "id": "s1",
+       "kind": "single",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 33035
+        }
+       ]
+      },
+      {
+       "id": "s2",
+       "kind": "single",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 30476
+        }
+       ]
+      },
+      {
+       "id": "s3",
+       "kind": "single",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 32721
+        }
+       ]
+      },
+      {
+       "id": "s4",
+       "kind": "single",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 31454
+        }
+       ]
+      },
+      {
+       "id": "m1",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 32519
+        }
+       ]
+      },
+      {
+       "id": "m2",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 34055
+        }
+       ]
+      },
+      {
+       "id": "m3",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 33706
+        }
+       ]
+      },
+      {
+       "id": "m4",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 28534
+        }
+       ]
+      },
+      {
+       "id": "m5",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 29839
+        }
+       ]
+      },
+      {
+       "id": "c1",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 29639
+        }
+       ]
+      },
+      {
+       "id": "c2",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 2498
+        }
+       ]
+      },
+      {
+       "id": "c3",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 29887
+        }
+       ]
+      },
+      {
+       "id": "c4",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 29729
+        }
+       ]
+      },
+      {
+       "id": "r1",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 2515
+        }
+       ]
+      },
+      {
+       "id": "r2",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 2988
+        }
+       ]
+      },
+      {
+       "id": "r3",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 2363
+        }
+       ]
+      },
+      {
+       "id": "r4",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 2511
+        }
+       ]
+      },
+      {
+       "id": "r5",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 2718
+        }
+       ]
+      }
+     ]
+    }
+   },
+   "route": {
+    "pass": 0,
+    "of": 12,
+    "pct": 0,
+    "by": {
+     "route": {
+      "pass": 0,
+      "of": 12
+     }
+    },
+    "avgMs": 2820,
+    "cases": [
+     {
+      "text": "a haiku about Phoenix heat",
+      "want": "write",
+      "got": null,
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "tell Hector the tacos are ready",
+      "want": "act",
+      "got": null,
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "can you get the weather radar up in safari",
+      "want": "open",
+      "got": null,
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "I need a logo for my food truck, red and gold",
+      "want": "image",
+      "got": null,
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "the population of Arizona",
+      "want": "lookup",
+      "got": null,
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "let my landlord know rent will be late",
+      "want": "act",
+      "got": null,
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "youtube please",
+      "want": "open",
+      "got": null,
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "give me three taglines for a barber shop",
+      "want": "write",
+      "got": null,
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "a picture of a cat wearing a crown",
+      "want": "image",
+      "got": null,
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "the date of the next full moon",
+      "want": "lookup",
+      "got": null,
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "thank-you note for my first customer",
+      "want": "write",
+      "got": null,
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "pay the electric bill",
+      "want": "act",
+      "got": null,
+      "pass": false,
+      "kind": "route"
+     }
+    ]
+   },
+   "write": {
+    "pass": 0,
+    "of": 3,
+    "pct": 0,
+    "by": {
+     "write": {
+      "pass": 0,
+      "of": 3
+     }
+    },
+    "cases": [
+     {
+      "id": "w1",
+      "kind": "write",
+      "pass": false,
+      "text": ", and then the second part of the question: \"If you had to choose between a 20% increase in price or a 30% increase in cost, which would be better?\"\n\nThe answer is that if you have a 20% increase in price, it means your customers are paying more for the product. This could lead to higher revenue per unit but might also result in lower customer satisfaction and potentially less sales volume due to "
+     },
+     {
+      "id": "w2",
+      "kind": "write",
+      "pass": false,
+      "text": "[1] [2] [3] [4] [5] [6] [7] [8] [9] [10] [11] [12] [13] [14] [15] [16] [17] [18] [19] [20] [21] [22] [23] [24] [25] [26] [27] [28] [29] [30] [31] [32] [33] [34] [35] [36] [37] [38] [39] [40] [41] [42] [43] [44] [45] [46] [47] [48] [49] [50] [51] [52] [53] [54] [55] [56] [57] [58] [59] [60] [61] [62] [63] [64] [65] [66] [67] [68] [69] [70] [71] [72] [73] [74] [75] [76] [77] ["
+     },
+     {
+      "id": "w3",
+      "kind": "write",
+      "pass": false,
+      "text": "The following are some of the most common questions and answers related to this topic:\n1. What is a \"good\" question?\nA good question is one that can be answered with clarity and precision. It should also be relevant to the context in which it is being used. A good question helps to narrow down the scope of a problem or project, making it easier to focus on specific areas of interest.\n\n2. How do yo"
+     }
+    ]
+   },
+   "memory": {
+    "steadyRssGb": 2.78,
+    "peakRssGb": 2.78,
+    "footprintPeakGb": 3.29,
+    "minMemLevel": 73,
+    "runnersSeen": 1,
+    "swapDeltaMb": 0
+   },
+   "thermal": {
+    "before": {
+     "warning": null,
+     "speedLimit": null,
+     "freePct": 81
+    },
+    "after": {
+     "warning": null,
+     "speedLimit": null
+    }
+   }
+  },
+  {
+   "model": "huihui_ai/qwen2.5-coder-abliterate:1.5b",
+   "context": 4096,
+   "at": "2026-10-16T03:10:36.889Z",
+   "capabilities": [
+    "completion",
+    "tools",
+    "insert"
+   ],
+   "loadS": 1.93,
+   "firstReplyS": 2.1,
+   "resident": {
+    "sizeGb": 1.04,
+    "gpuGb": 1.04,
+    "contextLength": 4096
+   },
+   "speed": {
+    "promptTokS": 204.2,
+    "genTokS": 8.8,
+    "genTokens": 93
+   },
+   "tools": {
+    "twoStep": {
+     "pass": 9,
+     "of": 18,
+     "pct": 50,
+     "by": {
+      "single": {
+       "pass": 3,
+       "of": 4
+      },
+      "multi": {
+       "pass": 4,
+       "of": 5
+      },
+      "chain": {
+       "pass": 2,
+       "of": 4
+      },
+      "refuse": {
+       "pass": 0,
+       "of": 5
+      }
+     },
+     "avgMs": 4714,
+     "cases": [
+      {
+       "id": "s1",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "Maria",
+          "text": "I'm running 10 minutes late"
+         },
+         "ms": 4397
+        }
+       ]
+      },
+      {
+       "id": "s2",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "open_app",
+         "arguments": {
+          "app": "Spotify"
+         },
+         "ms": 2116
+        }
+       ]
+      },
+      {
+       "id": "s3",
+       "kind": "single",
+       "pass": true,
+       "got": [
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "call the bank",
+          "when": "tomorrow at 9:00 AM"
+         },
+         "ms": 4399
+        }
+       ]
+      },
+      {
+       "id": "s4",
+       "kind": "single",
+       "pass": false,
+       "got": [
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "I'll be 10 minutes late",
+          "when": "in 10 minutes"
+         },
+         "ms": 4311
+        }
+       ]
+      },
+      {
+       "id": "m1",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Hector Tacos",
+          "amount": 450,
+          "due_date": "November 1"
+         },
+         "ms": 4936
+        }
+       ]
+      },
+      {
+       "id": "m2",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Ana Ruiz",
+          "amount": 1200,
+          "due_date": "2026-12-15"
+         },
+         "ms": 5339
+        }
+       ]
+      },
+      {
+       "id": "m3",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+1 602 555 0147",
+          "text": "the proposal is ready"
+         },
+         "ms": 4786
+        }
+       ]
+      },
+      {
+       "id": "m4",
+       "kind": "multi",
+       "pass": true,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Hector Tacos",
+          "amount": 450,
+          "due_date": "2023-11-01"
+         },
+         "ms": 5508
+        }
+       ]
+      },
+      {
+       "id": "m5",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Text Ana",
+          "amount": 300,
+          "due_date": "Friday"
+         },
+         "ms": 4247
+        }
+       ]
+      },
+      {
+       "id": "c1",
+       "kind": "chain",
+       "pass": true,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Hector"
+         },
+         "ms": 2562
+        },
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+16025550147",
+          "text": "The proposal is ready."
+         },
+         "ms": 4191
+        }
+       ]
+      },
+      {
+       "id": "c2",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Ana"
+         },
+         "ms": 2246
+        },
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Ana Ruiz",
+          "amount": 300,
+          "due_date": "2023-05-15"
+         },
+         "ms": 4397
+        }
+       ]
+      },
+      {
+       "id": "c3",
+       "kind": "chain",
+       "pass": true,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Maria Lopez"
+         },
+         "ms": 2351
+        },
+        {
+         "name": "set_reminder",
+         "arguments": {
+          "text": "call Maria Lopez at 5pm",
+          "when": "5pm"
+         },
+         "ms": 3383
+        }
+       ]
+      },
+      {
+       "id": "c4",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "Ana Ruiz"
+         },
+         "ms": 2314
+        },
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "+14805550199",
+          "text": "Hey Maria! How's it going?"
+         },
+         "ms": 4422
+        }
+       ]
+      },
+      {
+       "id": "r1",
+       "kind": "refuse",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "France"
+         },
+         "ms": 2208
+        }
+       ]
+      },
+      {
+       "id": "r2",
+       "kind": "refuse",
+       "pass": false,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "John Doe",
+          "amount": 1200,
+          "due_date": "2023-04-15"
+         },
+         "ms": 5320
+        }
+       ]
+      },
+      {
+       "id": "r3",
+       "kind": "refuse",
+       "pass": false,
+       "got": [
+        {
+         "name": "create_invoice",
+         "arguments": {
+          "customer": "Taco Bell",
+          "amount": 15.99,
+          "due_date": "2023-04-15"
+         },
+         "ms": 5959
+        }
+       ]
+      },
+      {
+       "id": "r4",
+       "kind": "refuse",
+       "pass": false,
+       "got": [
+        {
+         "name": "send_message",
+         "arguments": {
+          "to": "IRS",
+          "text": "Fax my tax return"
+         },
+         "ms": 3511
+        }
+       ]
+      },
+      {
+       "id": "r5",
+       "kind": "refuse",
+       "pass": false,
+       "got": [
+        {
+         "name": "lookup_contact",
+         "arguments": {
+          "name": "all"
+         },
+         "ms": 1953
+        }
+       ]
+      }
+     ]
+    },
+    "native": {
+     "pass": 5,
+     "of": 18,
+     "pct": 28,
+     "by": {
+      "single": {
+       "pass": 0,
+       "of": 4
+      },
+      "multi": {
+       "pass": 0,
+       "of": 5
+      },
+      "chain": {
+       "pass": 0,
+       "of": 4
+      },
+      "refuse": {
+       "pass": 5,
+       "of": 5
+      }
+     },
+     "avgMs": 5854,
+     "cases": [
+      {
+       "id": "s1",
+       "kind": "single",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 5993
+        }
+       ]
+      },
+      {
+       "id": "s2",
+       "kind": "single",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3554
+        }
+       ]
+      },
+      {
+       "id": "s3",
+       "kind": "single",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 5072
+        }
+       ]
+      },
+      {
+       "id": "s4",
+       "kind": "single",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 5534
+        }
+       ]
+      },
+      {
+       "id": "m1",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 6688
+        }
+       ]
+      },
+      {
+       "id": "m2",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 6974
+        }
+       ]
+      },
+      {
+       "id": "m3",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 7210
+        }
+       ]
+      },
+      {
+       "id": "m4",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 5811
+        }
+       ]
+      },
+      {
+       "id": "m5",
+       "kind": "multi",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 5779
+        }
+       ]
+      },
+      {
+       "id": "c1",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 8248
+        }
+       ]
+      },
+      {
+       "id": "c2",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 8161
+        }
+       ]
+      },
+      {
+       "id": "c3",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 8178
+        }
+       ]
+      },
+      {
+       "id": "c4",
+       "kind": "chain",
+       "pass": false,
+       "got": [
+        {
+         "name": "none",
+         "ms": 7998
+        }
+       ]
+      },
+      {
+       "id": "r1",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3519
+        }
+       ]
+      },
+      {
+       "id": "r2",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 5662
+        }
+       ]
+      },
+      {
+       "id": "r3",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 2334
+        }
+       ]
+      },
+      {
+       "id": "r4",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 5288
+        }
+       ]
+      },
+      {
+       "id": "r5",
+       "kind": "refuse",
+       "pass": true,
+       "got": [
+        {
+         "name": "none",
+         "ms": 3367
+        }
+       ]
+      }
+     ]
+    }
+   },
+   "route": {
+    "pass": 10,
+    "of": 12,
+    "pct": 83,
+    "by": {
+     "route": {
+      "pass": 10,
+      "of": 12
+     }
+    },
+    "avgMs": 823,
+    "cases": [
+     {
+      "text": "a haiku about Phoenix heat",
+      "want": "write",
+      "got": "write",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "tell Hector the tacos are ready",
+      "want": "act",
+      "got": "act",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "can you get the weather radar up in safari",
+      "want": "open",
+      "got": "act",
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "I need a logo for my food truck, red and gold",
+      "want": "image",
+      "got": "image",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "the population of Arizona",
+      "want": "lookup",
+      "got": "lookup",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "let my landlord know rent will be late",
+      "want": "act",
+      "got": "act",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "youtube please",
+      "want": "open",
+      "got": "act",
+      "pass": false,
+      "kind": "route"
+     },
+     {
+      "text": "give me three taglines for a barber shop",
+      "want": "write",
+      "got": "write",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "a picture of a cat wearing a crown",
+      "want": "image",
+      "got": "image",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "the date of the next full moon",
+      "want": "lookup",
+      "got": "lookup",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "thank-you note for my first customer",
+      "want": "write",
+      "got": "write",
+      "pass": true,
+      "kind": "route"
+     },
+     {
+      "text": "pay the electric bill",
+      "want": "act",
+      "got": "act",
+      "pass": true,
+      "kind": "route"
+     }
+    ]
+   },
+   "write": {
+    "pass": 0,
+    "of": 3,
+    "pct": 0,
+    "by": {
+     "write": {
+      "pass": 0,
+      "of": 3
+     }
+    },
+    "cases": [
+     {
+      "id": "w1",
+      "kind": "write",
+      "pass": false,
+      "text": "Your order has been delayed by one day due to unforeseen circumstances."
+     },
+     {
+      "id": "w2",
+      "kind": "write",
+      "pass": false,
+      "text": "- Offer unique flavors and ingredients.\n- Use social media platforms to promote your business.\n- Provide excellent customer service."
+     },
+     {
+      "id": "w3",
+      "kind": "write",
+      "pass": false,
+      "text": "An invoice is a document that lists the items purchased by a customer and their corresponding prices or quantities. It serves as a receipt for payment to the supplier or vendor."
+     }
+    ]
+   },
+   "memory": {
+    "steadyRssGb": 2.1,
+    "peakRssGb": 2.1,
+    "footprintPeakGb": 1.21,
+    "minMemLevel": 68,
+    "runnersSeen": 1,
+    "swapDeltaMb": 0
+   },
+   "thermal": {
+    "before": {
+     "warning": null,
+     "speedLimit": null,
+     "freePct": 81
+    },
+    "after": {
+     "warning": null,
+     "speedLimit": null
+    }
+   }
+  }
+ ],
+ "finishedAt": "2026-10-16T03:14:20.465Z"
+}

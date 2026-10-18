@@ -1,0 +1,24 @@
+params:
+  - key: providers
+    label: Provider Filter
+    type: string
+    default: "all"
+    description: "Comma-separated provider IDs to test, or 'all'"
+
+  - key: skipJson
+    label: Skip JSON test
+    type: boolean
+    default: false
+    description: Skip the JSON output test
+
+  - key: skipStream
+    label: Skip streaming test
+    type: boolean
+    default: false
+    description: Skip the SSE streaming test
+
+  - key: timeout
+    label: Request Timeout (ms)
+    type: number
+    default: 30000
+    description: Per-request timeout in milliseconds

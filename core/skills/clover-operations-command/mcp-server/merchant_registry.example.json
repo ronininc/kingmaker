@@ -1,0 +1,13 @@
+{
+  "example-restaurant-sandbox": {
+    "display_name": "La Carreta Sandbox",
+    "merchant_id": "REPLACE_WITH_MERCHANT_ID",
+    "access_token": "REPLACE_WITH_SANDBOX_TOKEN",
+    "refresh_token": null,
+    "access_token_expiration": null,
+    "client_id": null,
+    "client_secret": null,
+    "region": "NA",
+    "environment": "sandbox"
+  }
+}

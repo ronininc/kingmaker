@@ -1,0 +1,5 @@
+ultralytics>=8.3.0
+torch>=2.0.0
+coremltools>=7.0; sys_platform == 'darwin'
+onnx>=1.14.0
+onnxruntime>=1.16.0

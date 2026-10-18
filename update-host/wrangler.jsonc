@@ -1,0 +1,8 @@
+{
+  "name": "kingmaker-updates",
+  "main": "worker.js",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "r2_buckets": [{ "binding": "RELEASES", "bucket_name": "kingmaker-releases" }],
+  "kv_namespaces": [{ "binding": "DEVICES", "id": "e08bbab74ec941059f6b6570d8795232" }]
+}

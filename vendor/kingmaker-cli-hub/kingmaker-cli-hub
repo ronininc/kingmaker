@@ -1,0 +1,11 @@
+#!/bin/sh
+# Kingmaker CLI Hub: Ronin Inc's copy of CLI-Anything's cli-hub (MIT, see LICENSE-MIT and NOTICE). Runs on the first
+# Python that has click and requests: KINGMAKER_CLI_HUB_PYTHON, Kingmaker's own venv, then python3 on PATH.
+here="$(cd "$(dirname "$0")" && pwd -P)"
+for py in "${KINGMAKER_CLI_HUB_PYTHON:-}" "$HOME/Library/Application Support/sol-ghost/cli-hub/venv/bin/python3" python3; do
+  [ -n "$py" ] || continue
+  if "$py" -c 'import click, requests' >/dev/null 2>&1; then
+    PYTHONPATH="$here${PYTHONPATH:+:$PYTHONPATH}" exec "$py" -c 'import sys; from cli_hub.cli import main; sys.argv[0] = "kingmaker-cli-hub"; main()' "$@"
+  fi
+done
+echo "Kingmaker CLI Hub needs a Python with click and requests (set KINGMAKER_CLI_HUB_PYTHON)." >&2; exit 69

@@ -1,0 +1,8 @@
+[coral-detect] Starting with params: {}
+[coral-detect] Edge TPU delegate not available: Failed to load delegate from C:\Users\work\.aegis-ai\skills\yolo-detection-2026-coral-tpu\lib\edgetpu.dll
+
+[coral-detect] Falling back to CPU inference
+[coral-detect] Falling back to universal SSD MobileNet CPU model
+[coral-detect] Loaded model on CPU: C:\Users\work\.aegis-ai\skills\yolo-detection-2026-coral-tpu\models\ssd_mobilenet_v2_coco_quant_postprocess.tflite
+{"event": "ready", "model": "yolo26n_edgetpu", "device": "cpu", "format": "edgetpu_tflite", "runtime": "ai-edge-litert", "tpu_count": 0, "classes": 80, "input_size": 320, "fps": 5}
+[coral-detect] Ready — waiting for frame events on stdin
