@@ -61,6 +61,9 @@ Nine new modules, measured:
 - **Universal file handler** — encounters unknown file types, converts locally via system tools
 - **Model ingestion pipeline** — deterministic discovery → triage → scan → your tap → ingestion → fleet distribution; Edge0 streaming MoE runs 35B-class models in ~3GB RAM
 - **K-Bucks UBI** — every install carries a pre-loaded grant; one verified identity, one grant, signed and audited
+- **Compute governor** — 10th governance module: resident/stream/refused load decisions graded on the active set, not weight bytes
+- **Model condense** — points the compute program at the model: FP8 dense / MXFP4 experts, expert residency, KV budget
+- **Runtime degrade** — try full, fall back on resource exhaustion only; lazy residency, maximum throughput
 
 Full changelog with benchmarks ships with the release.
 
