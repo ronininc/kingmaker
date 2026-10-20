@@ -59,6 +59,203 @@ That's it. No terminal. No config files. One button.
 
 ---
 
+## By the numbers
+
+| | |
+|---|---|
+| Modules in `lib/` | 146 files |
+| Skills | 174 (169 in `core/skills`, 5 vendored) |
+| Test files | 105 |
+| MCP tools | 16 (7 core + 9 iPhone bridge) |
+| Brains | Local, Claude, Grok, ChatGPT |
+
+## Skills
+
+106 top-level packs in `core/skills`, plus nested sub-skills and 5 vendored cli-hub skills. Skills are how Kingmaker learns: the files hold the methods, the router picks the skill, the brain executes.
+
+<details>
+<summary>All 174 skills (click to expand)</summary>
+
+- `aaa-modeling`
+- `agent-self-scheduling`
+- `ai-search-ranking`
+- `algo-trading`
+- `algorithmic-art`
+- `app-remake-belt`
+- `axis-projection`
+- `big-box-store`
+- `blender-3d-asset-generation`
+- `business-name-fit`
+- `business-profile-recon`
+- `claude-code-skillforge`
+- `claude-code-skillforge/examples/auditing-seo`
+- `claude-code-skillforge/examples/formatting-commits`
+- `cli-anything`
+- `cli-anything-blender`
+- `cli-anything-comfyui`
+- `cli-anything-freecad`
+- `cli-anything-godot`
+- `cli-anything-hermes`
+- `cli-hub-meta-skill`
+- `clone`
+- `clone/references/cli-anything`
+- `clone/references/graphify`
+- `clone/references/reverse-engineer-anything`
+- `cloudflare-ordering-worker`
+- `clover-operations-command`
+- `codex-handoff`
+- `coding-gen`
+- `comfyui`
+- `contract-and-proposal-writer`
+- `copy-editing`
+- `copywriting`
+- `create-skill-gen`
+- `custom-tool-builder`
+- `customer-research`
+- `dagster-expert`
+- `data-visualization`
+- `debugging-and-error-recovery`
+- `deep-research`
+- `deepcamera`
+- `deepcamera/skills/analysis/cloud-provider-regression`
+- `deepcamera/skills/analysis/home-security-benchmark`
+- `deepcamera/skills/analysis/homesafe-bench`
+- `deepcamera/skills/analysis/smarthome-bench`
+- `deepcamera/skills/annotation/dataset-annotation`
+- `deepcamera/skills/annotation/dataset-management`
+- `deepcamera/skills/automation/ha-trigger`
+- `deepcamera/skills/automation/mqtt`
+- `deepcamera/skills/automation/webhook`
+- `deepcamera/skills/camera-providers/eufy`
+- `deepcamera/skills/camera-providers/reolink`
+- `deepcamera/skills/camera-providers/tapo`
+- `deepcamera/skills/channels/line`
+- `deepcamera/skills/channels/matrix`
+- `deepcamera/skills/channels/signal`
+- `deepcamera/skills/detection/yolo-detection-2026`
+- `deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos`
+- `deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl`
+- `deepcamera/skills/detection/yolo-detection-2026-openvino`
+- `deepcamera/skills/integrations/homeassistant-bridge`
+- `deepcamera/skills/segmentation/sam2-segmentation`
+- `deepcamera/skills/streaming/go2rtc-cameras`
+- `deepcamera/skills/training/model-training`
+- `deepcamera/skills/transformation/depth-estimation`
+- `docker-build-strategies`
+- `docker-compose-patterns`
+- `docker-destructive-guardrails`
+- `docker-project-foundations`
+- `emails`
+- `fastmcp`
+- `ffmpeg-skill`
+- `founder-metric-reel`
+- `gcode`
+- `get-available-resources`
+- `gh-fix-ci`
+- `godot-prompter`
+- `godot-prompter/skills/2d-essentials`
+- `godot-prompter/skills/3d-essentials`
+- `godot-prompter/skills/animation-system`
+- `godot-prompter/skills/audio-system`
+- `godot-prompter/skills/camera-system`
+- `godot-prompter/skills/component-system`
+- `godot-prompter/skills/dependency-injection`
+- `godot-prompter/skills/event-bus`
+- `godot-prompter/skills/gdscript-patterns`
+- `godot-prompter/skills/godot-debugging`
+- `godot-prompter/skills/godot-mentor`
+- `godot-prompter/skills/godot-optimization`
+- `godot-prompter/skills/godot-project-setup`
+- `godot-prompter/skills/godot-testing`
+- `godot-prompter/skills/godot-ui`
+- `godot-prompter/skills/input-handling`
+- `godot-prompter/skills/math-essentials`
+- `godot-prompter/skills/physics-system`
+- `godot-prompter/skills/resource-pattern`
+- `godot-prompter/skills/save-load`
+- `godot-prompter/skills/scene-organization`
+- `godot-prompter/skills/state-machine`
+- `godot-prompter/skills/using-godot-prompter`
+- `graphite`
+- `gsap-core`
+- `gsap-scrolltrigger`
+- `gsap-timeline`
+- `humanizer`
+- `immersive-evidence-workspace`
+- `internal-comms`
+- `kingmaker-cloudflare-release`
+- `kingmaker-doc-author`
+- `kingmaker-engine-verifier`
+- `kingmaker-flagship-driver`
+- `kingmaker-native-internet`
+- `kingmaker-proof-authoring`
+- `kingmaker-proof-runner`
+- `kingmaker-readme-sync`
+- `kingmaker-repo-hygiene`
+- `kingmaker-voice-runtime`
+- `kingmaker-voice-verification`
+- `lead-magnets`
+- `local-seo-manager`
+- `marketing-ideas`
+- `mcp-server-builder`
+- `movie-gen`
+- `native-capability-extraction`
+- `observability-and-instrumentation`
+- `offers`
+- `office`
+- `open-harness`
+- `paper-search-pro`
+- `parametric-cad-verify`
+- `penetration-testing`
+- `playwright-cli`
+- `pricing`
+- `rea`
+- `referrals`
+- `research`
+- `scheduler`
+- `security-and-hardening`
+- `security-audit`
+- `service-business-website`
+- `site-media-fetch`
+- `skill-creator`
+- `skill-kokoro-tts-tool`
+- `skill-matchmaker`
+- `social`
+- `social-media-gen`
+- `spanish-regional-localization`
+- `theme-factory`
+- `trading-agents`
+- `universal-modder`
+- `universal-modder/skills/asset-pipeline`
+- `universal-modder/skills/fal-assets`
+- `universal-modder/skills/game-automation`
+- `universal-modder/skills/game-recon`
+- `universal-modder/skills/game-research-websearch`
+- `universal-modder/skills/mashup-mods`
+- `universal-modder/skills/mod-any-game`
+- `universal-modder/skills/publish-mod`
+- `universal-modder/skills/reverse-engineering`
+- `universal-modder/skills/share-field-notes`
+- `universal-modder/skills/showcase-video`
+- `verify-claims`
+- `voice-operations-command`
+- `wake-word-detection`
+- `web-artifacts-builder`
+- `webapp-testing`
+- `website-build-standard`
+- `wholesale-real-estate`
+- `workflows`
+
+- `(vendored) cli_hub/_matrix_data/3d-cad`
+- `(vendored) cli_hub/_matrix_data/game-development`
+- `(vendored) cli_hub/_matrix_data/image-design`
+- `(vendored) cli_hub/_matrix_data/knowledge-research`
+- `(vendored) cli_hub/_matrix_data/video-creation`
+
+</details>
+
+---
+
 ## The vision
 
 *Status key: **LIVE** = shipped and working. **BUILT** = in the codebase, not yet wired into the running app. **PLANNED** = designed, not yet built. If it isn't marked LIVE, it isn't done.*
@@ -128,9 +325,14 @@ The sharp edges, under the same audit chain and approval gates as everything els
 
 - **`kingmaker-x-heretic` spine mode** — loads only pinned abliterated models; requires the founder's tap per session. No tap, no run.
 - **darkweb-search** — Tor-only, fail-closed, read-only, text-only. CSAM auto-abort is a hard rule with no override path — not tap, not session, nothing. Abort in <1s, log without content, notify the founder. **Status: in the codebase, UNTESTED live — no Tor traffic has run through it.**
-- **abliterate-model** — the local uncensoring pipeline; output must be hash-pinned before the heretic spine will load it.
+- **abliterate-model** — the local uncensoring pipeline (governed, founder tap, provenance hash-checked); output must be hash-pinned before the heretic spine will load it. **Status: UNTESTED live — needs a GPU box and official base weights.**
+- **heretic-llm** — the uncensoring engine abliterate-model drives. External Python tool, AGPL-3.0: it runs via subprocess ONLY, never imported, never linked, never shipped in this repo.
 
 They exist because the governed path needs a complete picture to govern against.
+
+### OSINT — private side
+
+Kingmaker's OSINT toolkit (LittleBrother) is a **private-side module** — it is not in this repository. Solomon gets only the public-source boundary (public IP and username lookups; no person/phone non-public lookups, no pretexting).
 
 ### Trust — LIVE
 
