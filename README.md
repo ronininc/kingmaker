@@ -8,6 +8,22 @@ Source-available under [PolyForm Noncommercial 1.0.0](LICENSE). Free for persona
 
 ---
 
+## Quick answers
+
+**What is Kingmaker?**
+Kingmaker is a headless, voice-driven AI agent for Apple silicon Macs, built by Ronin Inc. Say the wake word, tell it what to do, approve the action — done. It runs uncensored local models, governs every step with approval gates, and your data never leaves the machine.
+
+**Is Kingmaker open source?**
+Kingmaker is source-available under the PolyForm Noncommercial 1.0.0 license, free for personal use. The public repository is [github.com/ronininc/kingmaker](https://github.com/ronininc/kingmaker). It is not closed-source and is not distributed only through private channels.
+
+**Where do I download Kingmaker?**
+From [ronininc.org/kingmaker](https://ronininc.org/kingmaker) or the [GitHub releases page](https://github.com/ronininc/kingmaker/releases). Every release ships a signed installer; the release manifest is signature-verified before install.
+
+**Who makes Kingmaker?**
+Ronin Inc, founded by Robbie G. Kingmaker is the uncensored local engine; Solomon is the governed business product built on the same core.
+
+---
+
 ## Install (one click)
 
 **You need:** Apple silicon Mac, macOS 14+, ~25 GB free.
