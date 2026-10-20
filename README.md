@@ -1,8 +1,8 @@
 # Kingmaker
 
-**Your Mac, voice-driven. Local AI, no cloud. Your data never leaves.**
+**Your Mac, working — not just talking. A console for local AI: type, speak, or drive it from your tools. Your data never leaves.**
 
-Kingmaker is a headless, voice-driven agent for Apple silicon Macs. Say the wake word, tell it what to do, approve the action — done. It runs uncensored local models, governs every step with approval gates, and your data stays on your machine.
+Kingmaker is a Mac agent with a menu-bar console ("the bar"): a chat UI with a sidebar, a model picker, an Artifacts tab, and a Skills tab — plus voice control, a CLI, an MCP surface your other tools can drive, and an iPhone bridge. Say the wake word or type; it proposes the action, you approve, and the Hands of Horus drive your real Mac apps. Every step is governed, every action is on the audit chain, and your data stays in `~/Library/Application Support/sol-ghost/runtime`.
 
 Source-available under [PolyForm Noncommercial 1.0.0](LICENSE). Free for personal use.
 
@@ -11,7 +11,7 @@ Source-available under [PolyForm Noncommercial 1.0.0](LICENSE). Free for persona
 ## Quick answers
 
 **What is Kingmaker?**
-Kingmaker is a headless, voice-driven AI agent for Apple silicon Macs, built by Ronin Inc. Say the wake word, tell it what to do, approve the action — done. It runs uncensored local models, governs every step with approval gates, and your data never leaves the machine.
+Kingmaker is a Mac agent built by Ronin Inc: a menu-bar console, voice control, CLI, and MCP surface for running AI on your own Mac. It routes work to interchangeable AI brains (local or cloud), governs every step with approval gates, and keeps your data on your machine.
 
 **Is Kingmaker open source?**
 Kingmaker is source-available under the PolyForm Noncommercial 1.0.0 license, free for personal use. The public repository is [github.com/ronininc/kingmaker](https://github.com/ronininc/kingmaker). It is not closed-source and is not distributed only through private channels.
@@ -24,9 +24,19 @@ Ronin Inc, founded by Robbie G. Kingmaker is the uncensored local engine; Solomo
 
 ---
 
-## Install (one click)
+## The system
 
-**You need:** Apple silicon Mac, macOS 14+, ~25 GB free.
+Five surfaces, one engine:
+
+- **The bar** — the menu-bar console. Chat UI with a sidebar of conversations, a model picker, an Artifacts tab (everything Kingmaker made), a Skills tab (mint new skills), file drops, a global hotkey, and a first-run tour. The Ronin crest in the menu bar glows when awake, pulses while speaking, and rings while listening.
+- **Voice** — wake word, spoken commands, voiceprint enrollment, a voice-turn ledger. Approvals are never a click: they are your word. "Hey Siri, wake Kingmaker" works too.
+- **CLI** — `kingmaker` / `sol-ghost`: full terminal control, iPhone bridge controls, model management, enrollment.
+- **MCP** — any MCP client (Claude, Codex, an IDE) can drive your Mac *through* Kingmaker: ask, plan, propose — the engine governs, the Mac executes.
+- **iPhone bridge** — your one iPhone, driven from your Mac, local only: see the screen, tap, type, call, iMessage. Trusting a contact or changing policy takes your Touch ID at the CLI. Outbound goes to people you know; strangers are prohibited.
+
+## Install
+
+**You need:** Apple silicon Mac, macOS 14+, **≈ 29 GB free** (the 18.5 GB knowledge library is a required step; Kingmaker keeps 20 GB free and pauses heavy jobs below that). Intel Macs, Windows, and Linux do not install.
 
 1. **Download:** [Kingmaker Installer DMG](https://ronininc.org/download/kingmaker) (or from the [latest release](https://github.com/ronininc/kingmaker/releases))
 2. **Open the DMG**, double-click the installer
@@ -38,27 +48,14 @@ That's it. No terminal. No config files. One button.
 
 > **First launch:** The installer isn't notarized yet. When macOS blocks it, go to **System Settings → Privacy & Security → Open Anyway**. One time only.
 
----
-
 ## What it does
 
-- **Voice control** — "Hey Kingmaker, open Safari" → it proposes the action, you say yes, it clicks
-- **Local models** — abliterated (uncensored) models run on-device via Ollama. No API keys, no cloud, no subscription
-- **Approval gates** — nothing happens without your word. Every action is proposed first, you approve or cancel
-- **Your data stays put** — `~/Library/Application Support/sol-ghost/runtime`. Never uploaded, never shared
-- **Hands of Horus** — clicks, types, and drives real Mac apps (not screenshots — actual automation)
-
----
-
-## Measured (8 GB M3, 2026-10-07)
-
-| | Desktop app | Kingmaker |
-|---|---|---|
-| UI processes | 417 MB (GPU + renderer) | none |
-| Idle memory | 434 MB | 145 MB |
-| Boot to ready | — | 22s cold, 5s warm |
-
-The engine runs headless — no window, no Dock icon, no Electron renderer. Just a menu bar icon.
+- **Talk & do** — voice or text in, proposed action out, your word approves it. Hands of Horus click, type, and drive real Mac apps.
+- **Make** — office files (Word, Excel, PowerPoint, PDF) rendered locally with bundled open libraries; artifacts and reels through seven creative CLIs. The local model never writes file bytes: it answers with a JSON spec, the engine renders it.
+- **Know** — 106 skills in `core/skills`, and Kingmaker absorbs what it connects to: new connectors become *candidate* skills (minting never grants permission). REA reverse-engineers every connector's code before use and quarantines anything that phones home, grabs credentials, or raises privileges unprompted.
+- **Trade** — a desk of LLM analysts (market, social, news, fundamentals) debates a ticker, bull vs bear, risk team argues, portfolio manager rates it. Research aid, not an autopilot.
+- **Phone home (to you)** — Kingmaker calls *your* number with updates through your own Twilio account. It never calls anyone else.
+- **Think fast, think governed** — every command gets a lane first: instant rules, then a lightweight local router (1.7B, ~155 ms), then the heavy governed brain only when needed.
 
 ---
 
@@ -74,7 +71,7 @@ SaaS is dead — service is the value, software is the wrapper. Kingmaker puts p
 
 ### The router doctrine — LIVE
 
-Kingmaker is a **router**, not a model. The 140+ modules in `lib/` hold the methods; interchangeable AI brains (local or cloud) execute. Brains never self-coordinate — every multi-step job fans out from the router and reports back up. Swap the brain, keep the governance. The routing, the skill tree, and the combined skills are the product: they push any model to its ceiling under personal compute.
+Kingmaker is a **router**, not a model. The 140+ modules in `lib/` hold the methods; interchangeable AI brains (local, Claude, Grok, ChatGPT) execute. Brains never self-coordinate — every multi-step job fans out from the router and reports back up. Swap the brain, keep the governance. The routing, the skill tree, and the combined skills are the product: they push any model to its ceiling under personal compute.
 
 ### Doing more with less — LIVE
 
@@ -82,7 +79,7 @@ Reading (prefill) is parallel and cheap. Writing (decode) is sequential and dear
 
 ### Governance stack — LIVE
 
-Ten modules in `lib/`, verified in the codebase. Nothing executes outside them:
+Ten modules in `lib/`. Nothing executes outside them:
 
 - **decision-router** — local reflex layer; simple decisions resolve without a cloud round-trip.
 - **audit-chain** — every action hash-chained, tamper-evident. The ledger is the product.
@@ -93,21 +90,33 @@ Ten modules in `lib/`, verified in the codebase. Nothing executes outside them:
 - **compute-governor** — resident/stream/refused load decisions graded on the *active set*, not weight bytes.
 - **model-condense** — FP8 dense backbone, MXFP4 experts, sparse activation, small KV cache. Same model + device always yields the same plan.
 - **runtime-degrade** — full capability first, degrade only on resource exhaustion.
-- **universal-file-handler**, **keychain-seal**, **kill-switch**, **duress** — also in the tree.
+- **bar-guard** — your words come first, before any framing, before any brain. Kill-switch phrases and duress handling built in.
+
+Plus **keychain-seal**, **kill-switch**, **duress**, **universal-file-handler**.
 
 ### THE CAGE — LIVE
 
-New capabilities enter through a 7-stage ingestion pipeline, ported from the private `kingmaker-os` runtime. Stages 1–3 (discovery, triage, scan) run autonomously. **Stage 4 is a hard gate: nothing enters the brain library without the founder's signed tap** — `decidedBy` is the literal `'robbie'`. Stage 5 re-validates the approval and recomputes the packet hash before ingesting anything; a tampered packet throws and nothing ingests. Stage 7 (fleet learning) is opt-in; customer data is hardcoded out. The code calls it THE CAGE, and it means it.
+New capabilities enter through a 7-stage ingestion pipeline, ported from the private `kingmaker-os` runtime. Stages 1–3 (discovery, triage, scan) run autonomously. **Stage 4 is a hard gate: nothing enters the brain library without the founder's signed tap** — `decidedBy` is the literal `'robbie'`. Stage 5 re-validates the approval and recomputes the packet hash before ingesting anything; a tampered packet throws and nothing ingests. Stage 7 (fleet learning) is opt-in; customer data is hardcoded out.
+
+### Titan — LIVE
+
+Gated self-iteration. When the system hits something it can't reason through, it says so first — then works every avenue in the background and saves the learned pathway. Whatever puts it down, it adapts to until it gets up immune.
 
 ### The bridge — BUILT
 
-`lib/bridge-keys.mjs`: rotating key agreement between the user's devices. Two keys born at setup, mutual docking auth, then liveness proven with rotating call signs — **296 per cycle, 6 digits each, rotating every 24 hours**, derived from a shared seed. *"Seeded deterministic rotation, synchronized with nothing but math."* Long-term keys are never seen after setup; only call signs travel. Pure functions, no I/O, no network, no server. **Status: in the v4.0 codebase, not yet wired into the running launcher.**
+Rotating key agreement between the user's devices. Two keys born at setup, mutual docking auth, then liveness proven with rotating call signs — **296 per cycle, 6 digits each, rotating every 24 hours**, derived from a shared seed. *"Seeded deterministic rotation, synchronized with nothing but math."* Long-term keys are never seen after setup; only call signs travel. Pure functions, no I/O, no network, no server. **Status: in the v4.0 codebase, not yet wired into the running launcher.**
 
-### Compute — LIVE, next target PLANNED
+### Compute — LIVE, next target in the pipeline
 
-Live today: the governor, condense, and degrade modules above. Measured on an 8GB M3: 145MB idle, 22s cold boot, 5s warm.
+Live today: the governor, condense, degrade, and fast-route modules. Measured on an 8GB M3: 145MB idle, 22s cold boot, 5s warm.
 
-Next target: **Edge0-35B-A3B** — a 35B sparse MoE (40 layers, 256 experts, 4 active per token) streaming in **under 3 GiB of active RAM** at 14.9–17.7 tok/s, Apache-2.0 licensed. **Status: candidate discovered (Stage 1), triaged FLAG — no published hash, first-time publisher, needs human eyes before it goes near the library.**
+Next target: **Edge0-35B-A3B** — a 35B sparse MoE (40 layers, 256 experts, 4 active per token) streaming in **under 3 GiB of active RAM** at 14.9–17.7 tok/s, Apache-2.0 licensed. Edge0's models are already in the Hugging Bay catalog; the 35B is through pipeline Stages 1–2. **Status: triaged FLAG — no published hash, first-time publisher, needs human eyes before it goes near the library.**
+
+Honest limit, measured: **there is no memory tier above 16 GB today** — on 24–64 GB machines the extra memory sits unused. That changes when the streaming tier lands.
+
+### Models — LIVE
+
+Hugging Bay is Kingmaker's model source: every file recorded with its SHA-256 and license, no account needed. A download is your ask (CLI or the bar), lands in the models folder, and is kept only when size and SHA-256 match the record — anything else is deleted. `kingmaker models hb search | info | pull`.
 
 ### K-Bucks — BUILT, economy PLANNED
 
@@ -125,13 +134,17 @@ They exist because the governed path needs a complete picture to govern against.
 
 ### Trust — LIVE
 
-Releases ship as 8 signed archive parts + installer DMG via GitHub Releases. The manifest is signed with an **offline RSA-4096** key; the installer verifies the signature against a pinned public key (`lib/kingmaker-release-public.pem`) before touching a byte. Tampered manifest = refused, loudly. Key rotation is deliberate: rotate, re-pin, re-sign, ship an installer carrying the new pin. The launcher checks a Cloudflare Worker + R2 bucket for updates.
+Releases ship as 8 signed archive parts + installer DMG via GitHub Releases. The manifest is signed with an **offline RSA-4096** key; the installer verifies the signature against a pinned public key (`lib/kingmaker-release-public.pem`) before touching a byte. Tampered manifest = refused, loudly. Key rotation is deliberate: rotate, re-pin, re-sign, ship an installer carrying the new pin. The launcher checks the update host (Cloudflare Worker + R2, in `update-host/`) for new releases.
+
+### The fleet — LIVE protocol, collective early
+
+Every Kingmaker learns on its own Mac (on by default). **Sharing** what it learned with the community is a separate switch, decided in a permissions box: share-and-get-improvements is the default, nothing leaves until the box has been shown, "keep it on this Mac" stops sharing at once, "forget what I shared" asks the collective to erase your contributions. The fleet host (`fleet-host/`, Cloudflare Worker) receives closed packets, stores them, and hands each install back its signed bundle — it never executes anything it receives. **Status: protocol and host code live; the collective is young.**
 
 ### Kingmaker vs Solomon
 
 Kingmaker is the uncensored engine underneath — source-available, more abilities, cannot be owned or licensed, only caged by its device. Solomon is the governed business product built on the same core: it synthesizes knowledge for production only, passes legal restrictions, and ships to clients whose lawyers review the config — the review is the product.
 
-### The fleet — PLANNED
+### The fleet vision — PLANNED
 
 The endgame is a network of independent sovereign nodes — citizens and companies running their own infrastructure, compounding knowledge through opt-in fleet learning while personal data never leaves the machine. One distribution method: high-density compute staged on sovereign vessels in international waters — ocean-water cooling, no grid dependence, no single jurisdiction. Kingmaker **mitigates** (individual sovereignty bounds the damage); Solomon **prevents** (owned infrastructure has no failure mode for the reset to trigger).
 
@@ -141,32 +154,21 @@ The endgame is a network of independent sovereign nodes — citizens and compani
 
 ---
 
-## v0.4.0 — Governance Stack + Reflex Layer *(shipped 2026-10-19)*
+## Hardware outcomes
 
-Nine new modules, measured:
+Measured 2026-10-09 (MacBook Air M3, 8 GB). Full numbers in `catalog/`.
 
-- **Decision router** — local reflex layer routes simple decisions without cloud round-trip (<100ms on M5)
-- **Audit chain** — every action hash-chained, tamper-evident
-- **Model pin registry** — only pinned model hashes load; unpinned weights refused
-- **Governance spine** — `custom` or `kingmaker-x-heretic` mode, per-session tap
-- **Ingestion guard** — all input treated as untrusted at the boundary
-- **Egress guard** — allowlisted hosts only, Tor-only mode for darkweb
-- **Darkweb search** — Tor-only, read-only, per-session approval, CSAM auto-abort (no override)
-- **Abliteration pipeline** — official base weights → local uncensoring → hash-pinned
-- **Universal file handler** — encounters unknown file types, converts locally via system tools
-- **Model ingestion pipeline** — deterministic discovery → triage → scan → your tap → ingestion → fleet distribution; Edge0 streaming MoE runs 35B-class models in ~3GB RAM
-- **K-Bucks UBI** — every install carries a pre-loaded grant; one verified identity, one grant, signed and audited
-- **Compute governor** — 10th governance module: resident/stream/refused load decisions graded on the active set, not weight bytes
-- **Model condense** — points the compute program at the model: FP8 dense / MXFP4 experts, expert residency, KV budget
-- **Runtime degrade** — try full, fall back on resource exhaustion only; lazy residency, maximum throughput
-
-Full changelog with benchmarks ships with the release.
-
----
+| Machine | Outcome |
+|---|---|
+| **8 GB Apple-silicon Mac** | **Works.** Cloud brains are quick (thinking happens in the cloud). Local brain: simple answers in 2–4 s; multi-step reasoning gets shaky, model reloads cost 1–5 s between jobs. |
+| **16 GB Apple-silicon Mac** | **Good** (estimate). The local brain becomes the 8B model — much smarter, chat stays smooth. |
+| **24–64 GB Apple-silicon Mac** | **Good, same as 16 GB** (estimate). No tier above 16 GB today — extra memory sits unused until the streaming tier lands. |
 
 ## The details
 
 **System requirements:** [docs/SYSTEM-REQUIREMENTS.md](docs/SYSTEM-REQUIREMENTS.md)
+
+**What Kingmaker absorbed:** [docs/ABSORBED.md](docs/ABSORBED.md) — open projects studied to improve the architecture. Nothing absorbed ships as-is; GPL projects give ideas only, never code.
 
 **Wake word:** Picked at install, then cemented. 1-3 words. Want a different one? Reinstall.
 
@@ -174,16 +176,17 @@ Full changelog with benchmarks ships with the release.
 
 **Voice:** Say yes to approve. Say "cancel" to stop. Verified voice (opt-in) for hands-free approval.
 
-**For developers:** `./install.sh` → `kingmaker doctor` → `kingmaker start`
+**Repo map:**
+
+| Repo | Visibility | Contents |
+|---|---|---|
+| `ronininc/kingmaker` | Public | This repo: app, engine, releases, installer |
+| `ronininc/kingmaker-os` | Private | TypeScript governance runtime (source of truth the app ports from) |
+| `ronininc/kingmaker-private` | Private | Mac app |
+| `ronininc/kingmaker-brain-library` | Public | Model packs per Mac class |
 
 ---
 
 ## License
 
-Source-available under [PolyForm Noncommercial License 1.0.0](LICENSE). Free for personal use. Commercial use requires a license.
-
-**The deal:** The code is open. The hashes are private (anti-spoofing). You can audit everything, build it yourself, and verify it does what it claims.
-
----
-
-*"Service, function, power. To the people."*
+PolyForm Noncommercial 1.0.0 — free for personal use. [Commercial licenses](COMMERCIAL-LICENSE.md) available. See [TERMS.md](TERMS.md) and [PRIVACY.md](PRIVACY.md).
