@@ -59,6 +59,53 @@ That's it. No terminal. No config files. One button.
 
 ---
 
+## Skills — the capability surface
+
+Skills are not optional extras. They are how Kingmaker's core functions happen: the files hold the methods, the router picks the skill, the brain executes. 174 ship in this repo — 106 top-level packs in `core/skills`, nested sub-skills, and 5 vendored.
+
+
+**Core and everything else** (50)
+
+`agent-self-scheduling`, `axis-projection`, `create-skill-gen`, `custom-tool-builder`, `dagster-expert`, `data-visualization`, `fastmcp`, `ffmpeg-skill`, `founder-metric-reel`, `get-available-resources`, `gh-fix-ci`, `graphite`, `gsap-core`, `gsap-scrolltrigger`, `gsap-timeline`, `humanizer`, `immersive-evidence-workspace`, `internal-comms`, `kingmaker-flagship-driver`, `kingmaker-native-internet`, `kingmaker-proof-authoring`, `kingmaker-proof-runner`, `kingmaker-repo-hygiene`, `kingmaker-voice-runtime`, `kingmaker-voice-verification`, `marketing-ideas`, `mcp-server-builder`, `movie-gen`, `native-capability-extraction`, `observability-and-instrumentation`, `offers`, `open-harness`, `parametric-cad-verify`, `playwright-cli`, `pricing`, `rea`, `referrals`, `scheduler`, `security-and-hardening`, `security-audit`, `skill-creator`, `skill-kokoro-tts-tool`, `skill-matchmaker`, `social`, `spanish-regional-localization`, `theme-factory`, `verify-claims`, `voice-operations-command`, `wholesale-real-estate`, `workflows`
+
+**Driving real tools (CLI bridges)** (7)
+
+`cli-anything`, `cli-anything-blender`, `cli-anything-comfyui`, `cli-anything-freecad`, `cli-anything-godot`, `cli-anything-hermes`, `cli-hub-meta-skill`
+
+**Making: 3D, image, video, art** (31)
+
+`aaa-modeling`, `algorithmic-art`, `blender-3d-asset-generation`, `comfyui`, `godot-prompter`, `godot-prompter/skills/2d-essentials`, `godot-prompter/skills/3d-essentials`, `godot-prompter/skills/animation-system`, `godot-prompter/skills/audio-system`, `godot-prompter/skills/camera-system`, `godot-prompter/skills/component-system`, `godot-prompter/skills/dependency-injection`, `godot-prompter/skills/event-bus`, `godot-prompter/skills/gdscript-patterns`, `godot-prompter/skills/godot-debugging`, `godot-prompter/skills/godot-mentor`, `godot-prompter/skills/godot-optimization`, `godot-prompter/skills/godot-project-setup`, `godot-prompter/skills/godot-testing`, `godot-prompter/skills/godot-ui`, `godot-prompter/skills/input-handling`, `godot-prompter/skills/math-essentials`, `godot-prompter/skills/physics-system`, `godot-prompter/skills/resource-pattern`, `godot-prompter/skills/save-load`, `godot-prompter/skills/scene-organization`, `godot-prompter/skills/state-machine`, `godot-prompter/skills/using-godot-prompter`, `site-media-fetch`, `social-media-gen`, `web-artifacts-builder`
+
+**Building and code** (27)
+
+`app-remake-belt`, `claude-code-skillforge`, `claude-code-skillforge/examples/auditing-seo`, `claude-code-skillforge/examples/formatting-commits`, `clone`, `clone/references/cli-anything`, `clone/references/graphify`, `clone/references/reverse-engineer-anything`, `codex-handoff`, `coding-gen`, `debugging-and-error-recovery`, `gcode`, `kingmaker-engine-verifier`, `penetration-testing`, `universal-modder`, `universal-modder/skills/asset-pipeline`, `universal-modder/skills/fal-assets`, `universal-modder/skills/game-automation`, `universal-modder/skills/game-recon`, `universal-modder/skills/game-research-websearch`, `universal-modder/skills/mashup-mods`, `universal-modder/skills/mod-any-game`, `universal-modder/skills/publish-mod`, `universal-modder/skills/reverse-engineering`, `universal-modder/skills/share-field-notes`, `universal-modder/skills/showcase-video`, `webapp-testing`
+
+**Business, leads, and clients** (8)
+
+`big-box-store`, `business-name-fit`, `business-profile-recon`, `clover-operations-command`, `contract-and-proposal-writer`, `emails`, `lead-magnets`, `service-business-website`
+
+**Web and search** (9)
+
+`ai-search-ranking`, `cloudflare-ordering-worker`, `customer-research`, `deep-research`, `kingmaker-cloudflare-release`, `local-seo-manager`, `paper-search-pro`, `research`, `website-build-standard`
+
+**Documents and writing** (4)
+
+`copy-editing`, `copywriting`, `office`, `wake-word-detection`
+
+**Research and knowledge** (31)
+
+`deepcamera`, `deepcamera/skills/analysis/cloud-provider-regression`, `deepcamera/skills/analysis/home-security-benchmark`, `deepcamera/skills/analysis/homesafe-bench`, `deepcamera/skills/analysis/smarthome-bench`, `deepcamera/skills/annotation/dataset-annotation`, `deepcamera/skills/annotation/dataset-management`, `deepcamera/skills/automation/ha-trigger`, `deepcamera/skills/automation/mqtt`, `deepcamera/skills/automation/webhook`, `deepcamera/skills/camera-providers/eufy`, `deepcamera/skills/camera-providers/reolink`, `deepcamera/skills/camera-providers/tapo`, `deepcamera/skills/channels/line`, `deepcamera/skills/channels/matrix`, `deepcamera/skills/channels/signal`, `deepcamera/skills/detection/yolo-detection-2026`, `deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos`, `deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl`, `deepcamera/skills/detection/yolo-detection-2026-openvino`, `deepcamera/skills/integrations/homeassistant-bridge`, `deepcamera/skills/segmentation/sam2-segmentation`, `deepcamera/skills/streaming/go2rtc-cameras`, `deepcamera/skills/training/model-training`, `deepcamera/skills/transformation/depth-estimation`, `docker-build-strategies`, `docker-compose-patterns`, `docker-destructive-guardrails`, `docker-project-foundations`, `kingmaker-doc-author`, `kingmaker-readme-sync`
+
+**Trading and finance** (2)
+
+`algo-trading`, `trading-agents`
+
+**Vendored (kingmaker-cli-hub)** (5)
+
+`cli_hub/_matrix_data/3d-cad`, `cli_hub/_matrix_data/game-development`, `cli_hub/_matrix_data/image-design`, `cli_hub/_matrix_data/knowledge-research`, `cli_hub/_matrix_data/video-creation`
+
+---
+
 ## By the numbers
 
 | | |
@@ -68,193 +115,6 @@ That's it. No terminal. No config files. One button.
 | Test files | 105 |
 | MCP tools | 16 (7 core + 9 iPhone bridge) |
 | Brains | Local, Claude, Grok, ChatGPT |
-
-## Skills
-
-106 top-level packs in `core/skills`, plus nested sub-skills and 5 vendored cli-hub skills. Skills are how Kingmaker learns: the files hold the methods, the router picks the skill, the brain executes.
-
-<details>
-<summary>All 174 skills (click to expand)</summary>
-
-- `aaa-modeling`
-- `agent-self-scheduling`
-- `ai-search-ranking`
-- `algo-trading`
-- `algorithmic-art`
-- `app-remake-belt`
-- `axis-projection`
-- `big-box-store`
-- `blender-3d-asset-generation`
-- `business-name-fit`
-- `business-profile-recon`
-- `claude-code-skillforge`
-- `claude-code-skillforge/examples/auditing-seo`
-- `claude-code-skillforge/examples/formatting-commits`
-- `cli-anything`
-- `cli-anything-blender`
-- `cli-anything-comfyui`
-- `cli-anything-freecad`
-- `cli-anything-godot`
-- `cli-anything-hermes`
-- `cli-hub-meta-skill`
-- `clone`
-- `clone/references/cli-anything`
-- `clone/references/graphify`
-- `clone/references/reverse-engineer-anything`
-- `cloudflare-ordering-worker`
-- `clover-operations-command`
-- `codex-handoff`
-- `coding-gen`
-- `comfyui`
-- `contract-and-proposal-writer`
-- `copy-editing`
-- `copywriting`
-- `create-skill-gen`
-- `custom-tool-builder`
-- `customer-research`
-- `dagster-expert`
-- `data-visualization`
-- `debugging-and-error-recovery`
-- `deep-research`
-- `deepcamera`
-- `deepcamera/skills/analysis/cloud-provider-regression`
-- `deepcamera/skills/analysis/home-security-benchmark`
-- `deepcamera/skills/analysis/homesafe-bench`
-- `deepcamera/skills/analysis/smarthome-bench`
-- `deepcamera/skills/annotation/dataset-annotation`
-- `deepcamera/skills/annotation/dataset-management`
-- `deepcamera/skills/automation/ha-trigger`
-- `deepcamera/skills/automation/mqtt`
-- `deepcamera/skills/automation/webhook`
-- `deepcamera/skills/camera-providers/eufy`
-- `deepcamera/skills/camera-providers/reolink`
-- `deepcamera/skills/camera-providers/tapo`
-- `deepcamera/skills/channels/line`
-- `deepcamera/skills/channels/matrix`
-- `deepcamera/skills/channels/signal`
-- `deepcamera/skills/detection/yolo-detection-2026`
-- `deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos`
-- `deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl`
-- `deepcamera/skills/detection/yolo-detection-2026-openvino`
-- `deepcamera/skills/integrations/homeassistant-bridge`
-- `deepcamera/skills/segmentation/sam2-segmentation`
-- `deepcamera/skills/streaming/go2rtc-cameras`
-- `deepcamera/skills/training/model-training`
-- `deepcamera/skills/transformation/depth-estimation`
-- `docker-build-strategies`
-- `docker-compose-patterns`
-- `docker-destructive-guardrails`
-- `docker-project-foundations`
-- `emails`
-- `fastmcp`
-- `ffmpeg-skill`
-- `founder-metric-reel`
-- `gcode`
-- `get-available-resources`
-- `gh-fix-ci`
-- `godot-prompter`
-- `godot-prompter/skills/2d-essentials`
-- `godot-prompter/skills/3d-essentials`
-- `godot-prompter/skills/animation-system`
-- `godot-prompter/skills/audio-system`
-- `godot-prompter/skills/camera-system`
-- `godot-prompter/skills/component-system`
-- `godot-prompter/skills/dependency-injection`
-- `godot-prompter/skills/event-bus`
-- `godot-prompter/skills/gdscript-patterns`
-- `godot-prompter/skills/godot-debugging`
-- `godot-prompter/skills/godot-mentor`
-- `godot-prompter/skills/godot-optimization`
-- `godot-prompter/skills/godot-project-setup`
-- `godot-prompter/skills/godot-testing`
-- `godot-prompter/skills/godot-ui`
-- `godot-prompter/skills/input-handling`
-- `godot-prompter/skills/math-essentials`
-- `godot-prompter/skills/physics-system`
-- `godot-prompter/skills/resource-pattern`
-- `godot-prompter/skills/save-load`
-- `godot-prompter/skills/scene-organization`
-- `godot-prompter/skills/state-machine`
-- `godot-prompter/skills/using-godot-prompter`
-- `graphite`
-- `gsap-core`
-- `gsap-scrolltrigger`
-- `gsap-timeline`
-- `humanizer`
-- `immersive-evidence-workspace`
-- `internal-comms`
-- `kingmaker-cloudflare-release`
-- `kingmaker-doc-author`
-- `kingmaker-engine-verifier`
-- `kingmaker-flagship-driver`
-- `kingmaker-native-internet`
-- `kingmaker-proof-authoring`
-- `kingmaker-proof-runner`
-- `kingmaker-readme-sync`
-- `kingmaker-repo-hygiene`
-- `kingmaker-voice-runtime`
-- `kingmaker-voice-verification`
-- `lead-magnets`
-- `local-seo-manager`
-- `marketing-ideas`
-- `mcp-server-builder`
-- `movie-gen`
-- `native-capability-extraction`
-- `observability-and-instrumentation`
-- `offers`
-- `office`
-- `open-harness`
-- `paper-search-pro`
-- `parametric-cad-verify`
-- `penetration-testing`
-- `playwright-cli`
-- `pricing`
-- `rea`
-- `referrals`
-- `research`
-- `scheduler`
-- `security-and-hardening`
-- `security-audit`
-- `service-business-website`
-- `site-media-fetch`
-- `skill-creator`
-- `skill-kokoro-tts-tool`
-- `skill-matchmaker`
-- `social`
-- `social-media-gen`
-- `spanish-regional-localization`
-- `theme-factory`
-- `trading-agents`
-- `universal-modder`
-- `universal-modder/skills/asset-pipeline`
-- `universal-modder/skills/fal-assets`
-- `universal-modder/skills/game-automation`
-- `universal-modder/skills/game-recon`
-- `universal-modder/skills/game-research-websearch`
-- `universal-modder/skills/mashup-mods`
-- `universal-modder/skills/mod-any-game`
-- `universal-modder/skills/publish-mod`
-- `universal-modder/skills/reverse-engineering`
-- `universal-modder/skills/share-field-notes`
-- `universal-modder/skills/showcase-video`
-- `verify-claims`
-- `voice-operations-command`
-- `wake-word-detection`
-- `web-artifacts-builder`
-- `webapp-testing`
-- `website-build-standard`
-- `wholesale-real-estate`
-- `workflows`
-
-- `(vendored) cli_hub/_matrix_data/3d-cad`
-- `(vendored) cli_hub/_matrix_data/game-development`
-- `(vendored) cli_hub/_matrix_data/image-design`
-- `(vendored) cli_hub/_matrix_data/knowledge-research`
-- `(vendored) cli_hub/_matrix_data/video-creation`
-
-</details>
-
----
 
 ## The vision
 
