@@ -1,0 +1,46 @@
+{
+ "governedSurface": {
+  "audit": "Local hash-chained JSONL (lib/audit-log.mjs); host injects auditPath; verifyAudit() exposes chain verification.",
+  "csamDiscipline": "Input and result screening on every call; a hit aborts instantly, is logged WITHOUT content, and has no override path (same discipline as darkweb-search).",
+  "fullMethodsKingmakerOnly": [
+   "phoneLookup",
+   "personLookup",
+   "breachQuery"
+  ],
+  "fullMethodsPosture": "Tap-gated stubs: every call requires a verified founder tap token; absent/invalid token refuses and the refusal is audit-logged. Wiring a live non-public source is a founder act, never an install default.",
+  "neverInAnyBuild": [
+   "password resets / credential stuffing / account takeover",
+   "camera tracking of individuals / live surveillance",
+   "pretexting"
+  ],
+  "publicMethods": [
+   "usernameLookup",
+   "ipLookup",
+   "domainLookup",
+   "webRecon",
+   "emailFormatCheck"
+  ],
+  "transport": "Injected by the host; the module ships no network code and no telemetry. No transport = public methods refuse (fail-closed)."
+ },
+ "history": "Built 2026-10-19/20 in ~/workspace/littlebrother (kept as the build home). Code modules landed in the app tree during the 4.1 assembly (2026-10-20 08:14Z) but WITHOUT a descriptor and never wired or verified there — founder flagged 2026-10-20 ('install little brother into the goddamn program like I asked 3 days ago'). Completed 2026-10-20 evening: descriptor landed, in-stack install verified 13/13, ships in full with 4.2.",
+ "id": "littlebrother",
+ "installedFiles": {
+  "boundary-spec.md": "The boundary law this build implements (Robbie, 2026-10-18).",
+  "build-solomon.mjs": "Produces the Solomon bundle with the full set physically excluded.",
+  "lib/audit-log.mjs": "Hash-chained audit log (openAuditLog / verifyEntries).",
+  "lib/littlebrother.mjs": "Factory: createLittleBrother({ mode: 'kingmaker' | 'solomon', transport, tapVerifier, auditPath }) — one factory, two builds.",
+  "lib/methods-full.mjs": "Full method set (Kingmaker build only, tap-gated).",
+  "lib/methods-public.mjs": "Public-source methods (both builds)."
+ },
+ "kind": "native-component",
+ "lane": "OSINT lookups under governance: every call screened, audit-chained, and logged (lookups and refusals alike)",
+ "license": "Ronin Inc own code (clean-room build from boundary-spec.md; the GPL-3.0 upstream was ideas-only, never read, never copied)",
+ "licensePosture": {
+  "class": "own-code",
+  "distribution": "Vendored into the Kingmaker app payload as lib/stack-littlebrother — this is Robbie's own code, built in-house 2026-10-19. Kingmaker-side + private-side only; never named in public material (total tool count only).",
+  "solomon": "Public-source methods ONLY, produced by build-solomon.mjs: the bundle physically removes the full-methods module and its loading code — absence, not a flag. Verified by the component's own test (solomon: bundle physically excludes full-only code)."
+ },
+ "name": "LittleBrother — governed OSINT method set (native, ships in the program)",
+ "role": "Kingmaker's OSINT capability, installed as working code in the app payload — not a registration. Public-source lookups plus the tap-gated full method set (Kingmaker build only).",
+ "status": "INSTALLED — real code in the stack tree (kingmaker-stack/littlebrother) and in the app tree (lib/stack-littlebrother: 4 lib modules + build-solomon.mjs + boundary-spec.md, byte sizes verified 2026-10-20). Descriptor landed 2026-10-20. Acceptance suite 13/13 green against the installed stack copy; Mac-tree smoke import is Phase 1 of the 4.2 build order."
+}
