@@ -1,8 +1,8 @@
 {
   "_comment": "The PUBLIC fingerprint of the Kingmaker Release signing certificate (lib/release-identity.mjs). Never the private key.",
   "name": "Kingmaker Release",
-  "sha1": "4C75DB94DFBE6CA6F87EFA56A5C5F0D6C9244AD1",
-  "sha256": "752B86C185A940A966EFFC489996F380261FD4D2D132AF3488386C0E9D199AD0",
-  "notAfter": "Oct 11 04:36:41 2056 GMT",
-  "createdAt": "2026-10-19T04:36:41.428Z"
+  "sha1": "D4D40C383400C2D62785FB1D60FB0C3AD69CC3C2",
+  "sha256": "FE703A41F02C817ECDA367D38FD50A947E853F03FC84F3713317AE5AF3DA1BB1",
+  "notAfter": "Oct 15 17:08:26 2056 GMT",
+  "createdAt": "2026-10-23T17:08:25.734Z"
 }
