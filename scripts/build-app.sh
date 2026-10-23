@@ -1,5 +1,6 @@
 #!/bin/sh
-# Build the THIN "Kingmaker.app": a menu bar agent (no window, no Dock icon) that runs its engine headless on the
+# Build the THIN "Kingmaker.app": a normal-window app by default (Dock icon + menu-bar logo; set km.windowMode=bar for the
+# old no-window, menu-bar-only agent) that runs its engine headless on the
 # runtime of an INSTALLED Kingmaker.app (KINGMAKER_RUNTIME_APP). The standalone app (the engine runtime inside) is
 # built by the engine build (it reads this checkout's app/bundle.json, app/ and lib/). People install it with
 # Kingmaker Installer (scripts/build-installer.sh), never with this.
