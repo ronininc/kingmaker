@@ -1,5 +1,7 @@
 # Kingmaker
 
+### Become digitally sovereign for free today.
+
 **Your Mac, working — not just talking. A console for local AI: type, speak, or drive it from your tools. Your data never leaves.**
 
 Kingmaker is a Mac agent with a menu-bar console ("the bar"): a chat UI with a sidebar, a model picker, an Artifacts tab, and a Skills tab — plus voice control, a CLI, an MCP surface your other tools can drive, and an iPhone bridge. Say the wake word or type; it proposes the action, you approve, and the Hands of Horus drive your real Mac apps. Every step is governed, every action is on the audit chain, and your data stays in `~/Library/Application Support/sol-ghost/runtime`.
