@@ -11,7 +11,7 @@ from .clover_client import CloverAPIError, CloverClient
 from .config import MerchantConfig, MerchantRegistry
 
 
-HOST = os.getenv("HOST", "0.0.0.0")
+HOST = os.getenv("HOST", "127.0.0.1")  # loopback by default; the server has no auth, so never expose it on the network
 PORT = int(os.getenv("PORT", "8000"))
 WRITES_ENABLED = os.getenv("ENABLE_CLOVER_WRITES", "false").strip().lower() == "true"
 
