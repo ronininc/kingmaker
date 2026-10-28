@@ -238,10 +238,13 @@ and answer within that memory.
   GB > 7.5 GB" for Qwen3 8B, and 8.78 GB for Qwen2.5-Coder 7B, are the VM's, not a 16 GB Mac's: on the host the 8B
   holds 7.29 GB at twice the context. The memory verdict for the 16 GB pack needs a real 16 GB Mac.
 
-## The Brain Library (public)
+## The Brain Library (private)
 
-[github.com/ronininc/kingmaker-brain-library](https://github.com/ronininc/kingmaker-brain-library) publishes everything
-here:
+[github.com/ronininc/kingmaker-brain-library](https://github.com/ronininc/kingmaker-brain-library) is a **private** repo.
+`kingmaker models library` reads it through the GitHub API with a token that can read the repo, found in this order:
+`KINGMAKER_LIBRARY_TOKEN`, `GITHUB_TOKEN`, `GH_TOKEN`, the macOS Keychain generic password `kingmaker-library`
+(`security add-generic-password -s kingmaker-library -a "$USER" -w`), then `gh auth token`. With none, it stops with a
+message saying so. No token is ever stored in this repo. The library holds:
 - **`library.json`**, with its schema (`kingmaker.brain-library/1`): all 52 Apple-silicon Mac configurations (chip ×
   RAM, M1 to M5 Max and the Ultras), the class each gets, the picks per class, and every model measured, with its
   source, licence and results.
