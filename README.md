@@ -247,7 +247,7 @@ Measured 2026-10-09 (MacBook Air M3, 8 GB). Full numbers in `catalog/`.
 | `ronininc/kingmaker` | Public | This repo: app, engine, releases, installer |
 | `ronininc/kingmaker-os` | Private | TypeScript governance runtime (source of truth the app ports from) |
 | `ronininc/kingmaker-private` | Private | Mac app |
-| `ronininc/kingmaker-brain-library` | Public | Model packs per Mac class |
+| `ronininc/kingmaker-brain-library` | Private | Model packs per Mac class. Kingmaker reads it with a GitHub token: `KINGMAKER_LIBRARY_TOKEN`, the Keychain item `kingmaker-library`, or `gh auth login` (see docs/MAC-PROFILES.md) |
 
 ---
 
