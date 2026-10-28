@@ -54,7 +54,7 @@ That's it. No terminal. No config files. One button.
 
 - **Talk & do** — voice or text in, proposed action out, your word approves it. Hands of Horus click, type, and drive real Mac apps.
 - **Make** — office files (Word, Excel, PowerPoint, PDF) rendered locally with bundled open libraries; artifacts and reels through seven creative CLIs. The local model never writes file bytes: it answers with a JSON spec, the engine renders it.
-- **Know** — 106 skills in `core/skills`, and Kingmaker absorbs what it connects to: new connectors become *candidate* skills (minting never grants permission). REA reverse-engineers every connector's code before use and quarantines anything that phones home, grabs credentials, or raises privileges unprompted.
+- **Know** — 106 skills in `core/skills`, and Kingmaker absorbs what it connects to: new connectors become *candidate* skills (minting never grants permission). REA reverse-engineers every connector's code before use and quarantines anything that phones home, grabs credentials, or raises privileges unprompted. The R&D floor (`kingmaker rd`) is the separate analysis engine for a shipped artifact: five modules over the free, licence-checked part of the REA toolkit. It does not download that toolkit and it does not replace the connector check. See `docs/RD-FLOOR.md`.
 - **Trade** — a desk of LLM analysts (market, social, news, fundamentals) debates a ticker, bull vs bear, risk team argues, portfolio manager rates it. Research aid, not an autopilot.
 - **Phone home (to you)** — Kingmaker calls *your* number with updates through your own Twilio account. It never calls anyone else.
 - **Think fast, think governed** — every command gets a lane first: instant rules, then a lightweight local router (1.7B, ~155 ms), then the heavy governed brain only when needed.
@@ -115,7 +115,7 @@ Skills are not optional extras. They are how Kingmaker's core functions happen: 
 | Modules in `lib/` | 146 files |
 | Skills | 174 (169 in `core/skills`, 5 vendored) |
 | Test files | 105 |
-| MCP tools | 16 (7 core + 9 iPhone bridge) |
+| MCP tools | 17 (8 core + 9 iPhone bridge) |
 | Brains | Local, Claude, Grok, ChatGPT |
 
 ## The vision

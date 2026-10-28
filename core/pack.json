@@ -566,6 +566,15 @@
           "stockMac": false,
           "rea": "rejected as a connector (an installer pipes curl into sh)",
           "status": "absorbed: REA rules as data, deny lists not findings, re-read on change, owner acknowledgements bound to the code (lib/rea-rules.mjs)"
+        },
+        {
+          "name": "REA (morluto/rea)",
+          "from": "https://github.com/morluto/rea @ 40b9c03 (2026-10-28), npm rea-agents 6.8.0",
+          "license": "MIT. Not imported: runtime graph quarantines openpgp LGPL-3.0+ and optional frida LGPL-2.0.",
+          "ships": "not shipped. lib/rd-floor.mjs dispatches an operator-installed binary of that exact version. docs/RD-FLOOR.md",
+          "stockMac": false,
+          "rea": "the connector checker (lib/rea.mjs) is a different tool and stays; this row is the analysis toolkit",
+          "status": "R&D floor: five modules, licence gate, kingmaker rd. Not merged into a deploy."
         }
       ]
     }

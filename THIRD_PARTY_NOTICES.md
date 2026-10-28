@@ -102,3 +102,7 @@ Fetched from their own sources only when you ask, each under its own licence: Tr
 Apache-2.0, `kingmaker markets install`), the ArtCraft apps (MIT OR Apache-2.0, `kingmaker craft install`), Ollama
 and the local models (each model's own licence), the Hands of Horus / Peekaboo (MIT), SearXNG (AGPL-3.0, run as a
 separate local service), and the large apps listed in `core/pack.json`.
+
+REA the analysis toolkit (morluto/rea, rea-agents 6.8.0, MIT) is **not** fetched and **not** vendored. Its runtime
+graph quarantines openpgp (LGPL-3.0+) and optional frida (LGPL-2.0). The R&D floor will run a binary of that exact
+version only when the operator has already installed it. The audit is `docs/RD-FLOOR.md`.

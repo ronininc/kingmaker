@@ -54,9 +54,10 @@ agent use this app" stops at step 2; a full reconstruction runs all three.
 Every outward or changing step keeps Kingmaker's gates: a tool that sends, pays,
 publishes, changes credentials, or writes persistent config waits for the owner's go.
 Installing Ghidra, Aider, or a TokenRing package is an owner-approved step, surfaced on
-Kingmaker's setup screen like any connector. REA's MCP server and its analysis engines
-are likewise connected only when needed, with the owner's approval — see
-`references/reverse-engineer-anything/SKILL.md` ("Connect only when needed").
+Kingmaker's setup screen like any connector. On this Mac the operator runs REA through the
+R&D floor (`kingmaker rd`, `docs/RD-FLOOR.md`): free engines only, paid providers refused,
+GPL and LGPL engines not dispatched, and Kingmaker does not download the toolkit. The
+method in `references/reverse-engineer-anything/SKILL.md` still says how to read the evidence.
 
 ## Output
 
