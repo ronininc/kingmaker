@@ -151,7 +151,7 @@ Ten modules in `lib/`. Nothing executes outside them:
 - **runtime-degrade** — full capability first, degrade only on resource exhaustion.
 - **bar-guard** — your words come first, before any framing, before any brain. Kill-switch phrases and duress handling built in.
 
-Plus **keychain-seal**, **kill-switch**, **duress**, **universal-file-handler**.
+Plus **keychain-seal** (Scripture Armor — the sealed vault both systems stand on; see *Kingmaker vs Solomon* below), **kill-switch**, **duress**, **universal-file-handler**.
 
 ### THE CAGE — LIVE
 
@@ -207,6 +207,8 @@ Every Kingmaker learns on its own Mac (on by default). **Sharing** what it learn
 ### Kingmaker vs Solomon
 
 Kingmaker is the uncensored engine underneath — source-available, more abilities, cannot be owned or licensed, only caged by its device. Solomon is the governed business product built on the same core: it synthesizes knowledge for production only, passes legal restrictions, and ships to clients whose lawyers review the config — the review is the product.
+
+**The armor under both.** Kingmaker and Solomon both stand on Scripture Armor — Ronin Inc's sealed vault for keys, data, and software. Nothing sealed by Armor opens without its owner's approval, on the owner's own machine; possession of a sealed file is not possession of what's inside it. Armor is private, commercial, and application-gated, and it is the one bridge between the two systems: ronininc.org/scripture-armor.
 
 ### The fleet vision — PLANNED
 
