@@ -2,9 +2,9 @@
 // and eye, app/Resources/MenuBarLogo.png, a template image), which says what Kingmaker is doing (operator
 // 2026-10-08: "a tiny Ronin Inc logo that glows when awake, pulses while speaking to the user, and shows an RGB
 // outline while listening; no windows"). It starts its engine headless (lib/cli.mjs start --agent) on the runtime this
-// bundle carries (Contents/MacOS/KingmakerEngine, from the engine build; an older name in an app built before 0.3.0), reads its "@@ghost {json}" state
-// lines, and stops it on quit. A thin dev build (scripts/build-app.sh) carries no runtime and borrows the installed
-// Kingmaker.app's (KINGMAKER_RUNTIME_APP). Approvals are never a click: they are your word.
+// bundle carries (Contents/MacOS/KingmakerEngine, from the engine build), reads its "@@ghost {json}" state lines,
+// and stops it on quit. It never borrows an engine from another app or an environment-selected path.
+// Approvals are never a click: they are your word.
 //
 // The logo, by state (all drawn by Core Animation in the render server; asleep there is no animation at all):
 //   starting   dimmed while the engine boots
@@ -3815,18 +3815,14 @@ final class GhostApp: NSObject, NSApplicationDelegate {
 
   private var headlessHostMode: Bool { SMAppService.mainApp.status == .enabled }
 
-  private let runtimeApp = ProcessInfo.processInfo.environment["KINGMAKER_RUNTIME_APP"] ?? "/Applications/Kingmaker.app"
-  /// The Node runtime to run the CLI with: this bundle's own (no Solomon.app needed), else the installed app's.
+  /// The Node runtime to run the CLI with. Production bundles are self-contained: never execute a binary selected
+  /// from an environment variable or a second app, because path + executable mode do not establish its signer.
   private var runtimeBinary: (path: String, bundled: Bool) {
-    // The engine's names inside the app (0.3.0 on), then the older ones (an app built before 0.3.0).
     let fm = FileManager.default
-    let firstExecutable = { (app: String) -> String? in
-      ["KingmakerEngine", "Solomon"].map { "\(app)/Contents/MacOS/\($0)" }.first { fm.isExecutableFile(atPath: $0) }
-    }
     let ownApp = Bundle.main.bundleURL.path
-    let hasRuntime = ["kingmaker-runtime", "solomon-runtime"].contains { fm.fileExists(atPath: "\(ownApp)/Contents/Resources/\($0)") }
-    if let own = firstExecutable(ownApp), hasRuntime { return (own, true) }
-    return (firstExecutable(runtimeApp) ?? "\(runtimeApp)/Contents/MacOS/KingmakerEngine", false)
+    let hasRuntime = fm.fileExists(atPath: "\(ownApp)/Contents/Resources/sol-ghost/lib/kingmaker.mjs")
+    let own = "\(ownApp)/Contents/MacOS/KingmakerEngine"
+    return (hasRuntime && fm.isExecutableFile(atPath: own) ? own : "", true)
   }
   private lazy var activeProfile: ActiveProfile? = {
     let home = URL(fileURLWithPath: NSHomeDirectory(), isDirectory: true)
@@ -4053,9 +4049,9 @@ final class GhostApp: NSObject, NSApplicationDelegate {
 
   private func launch() {
     appliedPrefs = false // a fresh engine gets the owner's off/mute again
-    let (binary, bundled) = runtimeBinary
+    let (binary, _) = runtimeBinary
     guard FileManager.default.isExecutableFile(atPath: binary), let resources = Bundle.main.resourceURL else {
-      lastLine = bundled ? "This Kingmaker.app is missing its runtime. Reinstall it (Kingmaker Installer), or rebuild it (the engine build)." : "No engine runtime: this build carries none and there is none at \(runtimeApp)."
+      lastLine = "This Kingmaker.app is missing its signed, bundled runtime. Reinstall it with Kingmaker Installer."
       log(lastLine)
       transition(to: "down"); render(); return
     }

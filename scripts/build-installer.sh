@@ -38,6 +38,9 @@ if [ -n "$manifest" ]; then
     || { echo "the manifest at $manifest is not sound" >&2; exit 2; }
   release="$(plutil -extract tag raw -o - "$manifest")"
   version="$(plutil -extract version raw -o - "$manifest")"
+  [ -s "$manifest.sig" ] || { echo "no detached signature at $manifest.sig; production installer builds fail closed" >&2; exit 2; }
+  node "$here/scripts/kingmaker-release-sign.mjs" verify --manifest "$manifest" --sig "$manifest.sig" >/dev/null \
+    || { echo "the detached release signature does not verify against the pinned public key" >&2; exit 2; }
 else
   echo "! no --manifest: this installer will say it has nothing to download (fine for looking at the window, not for shipping)"
 fi
@@ -83,13 +86,8 @@ cp "$here/lib/kingmaker-release-public.pem" "$app/Contents/Resources/kingmaker-r
 if [ -n "$manifest" ]; then
   cp "$manifest" "$app/Contents/Resources/kingmaker-manifest.json"
   # The detached signature, if the release was signed (release-parts.mjs --sign-key). engine.sh refuses a manifest whose
-  # signature is present-but-bad, always; an absent one is allowed at first install but refused on --require-signed.
-  if [ -f "$manifest.sig" ]; then
-    cp "$manifest.sig" "$app/Contents/Resources/kingmaker-manifest.json.sig"
-    echo "· release signature embedded (verified against the pinned key at install time)"
-  else
-    echo "! no $manifest.sig: this installer's release is UNSIGNED. Sign it: node scripts/release-parts.mjs --sign-key <offline-private.pem>"
-  fi
+  cp "$manifest.sig" "$app/Contents/Resources/kingmaker-manifest.json.sig"
+  echo "· verified release signature embedded (required on first install and update)"
 fi
 # Self-enrollment: with KINGMAKER_ENROLL_URL + KINGMAKER_ENROLL_CODE in the environment the installer carries
 # enroll.json, and every Mac it installs gets its own update key (installer/engine.sh). Without them: no auto-updates.

@@ -42,13 +42,13 @@ if [ -n "${KINGMAKER_PATH:-}" ]; then export PATH="$KINGMAKER_PATH"; else export
 
 WAKE=""; TERMS=""; MANIFEST="$HERE/kingmaker-manifest.json"; SOURCE=""; BASE_URL=""; PREFIX=""; WITH_TOOLS=0; NO_LAUNCH=0; INSPECT=0; PACK=""; LIBRARY_DELIVERY="${KINGMAKER_LIBRARY_DELIVERY:-}"; LIBRARY_DELIVERY_SET=0
 # The pinned release-signing public key (build-installer.sh ships it beside engine.sh) and whether an unsigned release
-# is refused. The running app passes --require-signed for updates; first install may be transitional (see below).
-RELEASE_PUBKEY="$HERE/kingmaker-release-public.pem"; REQUIRE_SIGNED="${KINGMAKER_REQUIRE_SIGNED:-0}"
+# is refused. First installs and updates share the same fail-closed signature requirement.
+RELEASE_PUBKEY="$HERE/kingmaker-release-public.pem"; REQUIRE_SIGNED=1
 while [ $# -gt 0 ]; do
   case "$1" in
     --wake-word) WAKE="${2:-}"; shift 2 ;;
     --manifest) MANIFEST="${2:-}"; shift 2 ;;
-    --require-signed) REQUIRE_SIGNED=1; shift ;;
+    --require-signed) REQUIRE_SIGNED=1; shift ;; # retained for older callers; signing is always required
     --release-pubkey) RELEASE_PUBKEY="${2:-}"; shift 2 ;;
     --source) SOURCE="${2:-}"; shift 2 ;;
     --base-url) BASE_URL="${2:-}"; shift 2 ;;
@@ -212,19 +212,14 @@ printf '\n=== %s Kingmaker %s install (prefix %s) ===\n' "$(date -u +%FT%TZ)" "$
 # with stock macOS openssl, is what a thief cannot forge without the OFFLINE private key. See lib/release-signing.mjs.
 #   - signature present + verifies  → trusted, proceed.
 #   - signature present + fails     → refuse, always (tampering, or wrong key).
-#   - signature absent              → refuse if --require-signed / KINGMAKER_REQUIRE_SIGNED=1 (updates do), else warn
-#                                      and proceed (a transitional unsigned release; real builds are always signed).
+#   - signature absent              → refuse. First installs and updates use the same trust boundary.
 verify_release_signature() {
   local sig="$MANIFEST.sig" bin="$CACHE/.manifest.sig.bin"
   if [ ! -s "$RELEASE_PUBKEY" ]; then
-    note "No pinned release key in this installer; cannot verify the release signature."
-    [ "$REQUIRE_SIGNED" = 1 ] && fail "A signed release was required, but this installer carries no release key to check it against."
-    return 0
+    fail "A signed release is required, but this installer carries no release key to check it against."
   fi
   if [ ! -s "$sig" ]; then
-    [ "$REQUIRE_SIGNED" = 1 ] && fail "This release is not signed, and a signed release was required. Refusing it."
-    note "This release is not signed. Install it only if you got it straight from Ronin Inc."
-    return 0
+    fail "This release is not signed. Refusing it."
   fi
   command -v openssl >/dev/null 2>&1 || fail "Cannot verify the release signature: openssl is not available on this Mac."
   base64 -D -i "$sig" -o "$bin" 2>>"$LOG" || base64 -d -i "$sig" -o "$bin" 2>>"$LOG" || fail "The release signature is not valid base64."

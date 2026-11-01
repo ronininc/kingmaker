@@ -1,18 +1,19 @@
 #!/bin/sh
-# Build the THIN "Kingmaker.app": a normal-window app by default (Dock icon + menu-bar logo; set km.windowMode=bar for the
-# old no-window, menu-bar-only agent) that runs its engine headless on the
-# runtime of an INSTALLED Kingmaker.app (KINGMAKER_RUNTIME_APP). The standalone app (the engine runtime inside) is
-# built by the engine build (it reads this checkout's app/bundle.json, app/ and lib/). People install it with
-# Kingmaker Installer (scripts/build-installer.sh), never with this.
+# Build a self-contained Kingmaker.app. KINGMAKER_ENGINE_BINARY must name the reviewed native Node/Electron engine
+# runtime; builds never borrow an engine from another installed app.
 #   scripts/build-app.sh            → dist/Kingmaker.app
 #   scripts/build-app.sh --install  → also copies it to ~/Applications (replacing an old Sol Ghost.app there)
 set -eu
 here="$(cd "$(dirname "$0")/.." && pwd -P)"
 app="$here/dist/Kingmaker.app"
 version="$(sed -n 's/.*"version": "\([^"]*\)".*/\1/p' "$here/package.json" | head -1)"
+: "${KINGMAKER_ENGINE_BINARY:?set KINGMAKER_ENGINE_BINARY to the reviewed engine runtime executable}"
+[ -x "$KINGMAKER_ENGINE_BINARY" ] || { echo "KINGMAKER_ENGINE_BINARY is not executable: $KINGMAKER_ENGINE_BINARY" >&2; exit 2; }
 rm -rf "$app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources/sol-ghost"
 swiftc -O -o "$app/Contents/MacOS/Kingmaker" "$here/app/Kingmaker.swift" -framework AppKit -framework ApplicationServices -framework QuartzCore -framework ServiceManagement
+cp "$KINGMAKER_ENGINE_BINARY" "$app/Contents/MacOS/KingmakerEngine"
+chmod 755 "$app/Contents/MacOS/KingmakerEngine"
 # Kingmaker's own ffmpeg (LGPL, VideoToolbox): "make an ad" needs it, and a stock Mac has none.
 [ -x "$here/app/Resources/bin/ffmpeg" ] && [ -x "$here/app/Resources/bin/ffprobe" ] || "$here/scripts/build-ffmpeg.sh"
 # Kingmaker's own uv: extensions that run on Python (Blender's MCP) need it, and a stock Mac has none.
@@ -24,6 +25,8 @@ cp -R "$here/app/Resources/." "$app/Contents/Resources/"
 node "$here/scripts/build-payload.mjs" --out "$here/dist/payload"
 rm -rf "$app/Contents/Resources/sol-ghost"
 tar -xf "$here/dist/payload/kingmaker-payload.tar" -C "$app/Contents/Resources"
+got="$("$app/Contents/MacOS/KingmakerEngine" "$app/Contents/Resources/sol-ghost/lib/kingmaker.mjs" version)"
+[ "$got" = "$version" ] || { echo "bundled engine handshake reported ${got:-nothing}, expected $version" >&2; exit 2; }
 sed -e "s/@VERSION@/$version/g" -e "s/@SOLOMON_BUILD@/borrowed (installed Kingmaker.app)/g" "$here/app/Info.plist" > "$app/Contents/Info.plist"
 printf 'APPL????' > "$app/Contents/PkgInfo"
 [ -f "$here/scripts/kingmaker-mac-signing.mjs" ] || { echo "Signing Kingmaker.app needs Ronin's own signing tooling, which is not in the public repo: use the released app." >&2; exit 2; }
