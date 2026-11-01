@@ -26,3 +26,10 @@ unverified until reviewed; they must never overwrite verified runtime files.
 
 All work after this baseline belongs to a new release line. Do not move or rewrite
 the v4.4.1 tag.
+
+## Reconstructed dependency lock
+
+`package-lock.json` was regenerated on 2026-11-01 with npm from the recovered
+`package.json`; it is not claimed to be the lost original lockfile. It locks only
+the declared development toolchain and does not alter the verified v4.4.1 runtime
+payload baseline.
