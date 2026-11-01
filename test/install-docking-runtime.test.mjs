@@ -3,7 +3,7 @@ import { chmodSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
-import { createIdentity, signPayload } from '../scripture-armor/armor.mjs';
+import { createIdentity, signPayload, signRevocation } from '../scripture-armor/armor.mjs';
 import { createArmorRevocationChecker, createDockChallengeStore, createKingmakerArmorProofVerifier } from '../lib/install-docking-runtime.mjs';
 import { createLauncherDockGate } from '../lib/install-docking.mjs';
 
@@ -18,6 +18,11 @@ const fixture = () => {
 const proof = (identity, challenge, issuedAt) => signPayload(identity, {
   type: 'kingmaker.install-proof/1', nonce: challenge, at: new Date(issuedAt).toISOString(),
   body: { schema: 'kingmaker.install-proof/1', challenge, issuedAt, ...expectedInstallIdentity },
+});
+const revocationSnapshot = (issuer, querySignFp, at, overrides = {}) => signPayload(issuer, {
+  type: 'armor.revocation-query-response/1', at: new Date(at).toISOString(),
+  body: { schema: 'armor.revocation-query-response/1', querySignFp, complete: true,
+    generatedAt: new Date(at).toISOString(), validUntil: new Date(at + 60_000).toISOString(), records: [], ...overrides },
 });
 
 test('concrete Armor verifier binds signature, embedded fingerprint, challenge and install claims', async (t) => {
@@ -44,11 +49,13 @@ test('durable challenge consumption survives restart and permits only one winner
 test('Launcher gate runs concrete Armor verification and durable replay refusal', async (t) => {
   const f = fixture(); t.after(() => rmSync(f.root, { recursive: true, force: true }));
   const challenge = 'challenge_endtoend01'; const issuedAt = Date.parse('2026-11-01T00:00:00Z');
+  const issuer = createIdentity(join(f.root, 'revocation-issuer'), 'Revocation fixture');
   const store = createDockChallengeStore({ path: join(f.root, 'state', 'challenges.sqlite') }); t.after(() => store.close());
   const gate = createLauncherDockGate({
     expectedInstallIdentity, expectedArmorIdentity: f.expectedArmorIdentity,
     verifyKingmaker: createKingmakerArmorProofVerifier({ expectedInstallIdentity, expectedArmorIdentity: f.expectedArmorIdentity }),
-    checkRevocation: createArmorRevocationChecker({ records: { v: 1, records: [] }, resolveSignPub: () => null }),
+    checkRevocation: createArmorRevocationChecker({ trustedIssuerSignFp: issuer.signFp, now: () => issuedAt,
+      fetchSnapshot: async (fp) => revocationSnapshot(issuer, fp, issuedAt), resolveSignPub: () => null }),
     consumeChallenge: store.consumeChallenge,
     reportToCrm: async ({ install }) => ({ ok: true, issuer: 'ronin-crm', installId: install.installId, deviceSha256: install.deviceSha256, keyTypes: install.keyTypes }),
     now: () => issuedAt,
@@ -58,11 +65,25 @@ test('Launcher gate runs concrete Armor verification and durable replay refusal'
   assert.equal((await gate(request)).reason, 'replayed_challenge');
 });
 
-test('revocation configuration fails closed when missing or malformed', async () => {
+test('revocation requires a fresh authenticated complete query-bound response', async (t) => {
+  const f = fixture(); t.after(() => rmSync(f.root, { recursive: true, force: true }));
+  const issuer = createIdentity(join(f.root, 'issuer'), 'Revocation fixture');
+  const other = createIdentity(join(f.root, 'other'), 'Other fixture');
+  const fp = f.identity.signFp; const at = Date.parse('2026-11-01T00:00:00Z');
   assert.throws(() => createArmorRevocationChecker({}), /TRUSTED_REVOCATION_PROVIDER_REQUIRED/);
-  const check = createArmorRevocationChecker({ records: { v: 1, records: [] }, resolveSignPub: () => null });
-  assert.equal(await check({ senderSignFp: 'a'.repeat(64) }), false);
+  const checker = (fetchSnapshot, extra = {}) => createArmorRevocationChecker({ trustedIssuerSignFp: issuer.signFp, fetchSnapshot, resolveSignPub: () => null, now: () => at, ...extra });
+  assert.equal(await checker(async () => revocationSnapshot(issuer, fp, at))({ senderSignFp: fp }), false);
+  await assert.rejects(() => checker(async () => null)({ senderSignFp: fp }), /UNAUTHENTICATED/);
+  await assert.rejects(() => checker(async () => revocationSnapshot(other, fp, at))({ senderSignFp: fp }), /UNTRUSTED_ISSUER/);
+  await assert.rejects(() => checker(async () => revocationSnapshot(issuer, 'a'.repeat(64), at))({ senderSignFp: fp }), /INCOMPLETE/);
+  await assert.rejects(() => checker(async () => revocationSnapshot(issuer, fp, at - 600_000))({ senderSignFp: fp }), /STALE/);
+  await assert.rejects(() => checker(async () => revocationSnapshot(issuer, fp, at, { complete: false }))({ senderSignFp: fp }), /INCOMPLETE/);
+  const unsigned = revocationSnapshot(issuer, fp, at); unsigned.sig = '';
+  await assert.rejects(() => checker(async () => unsigned)({ senderSignFp: fp }), /UNAUTHENTICATED/);
+  const revoked = signRevocation(issuer, { label: 'fixture', seal_fp: f.identity.sealFp, sign_fp: fp, at: new Date(at).toISOString(), by_sign_fp: issuer.signFp, by_label: issuer.label, reason: 'fixture' });
+  const resolveSignPub = (wanted) => wanted === issuer.signFp ? issuer.sign_pub : null;
+  const checkRevoked = createArmorRevocationChecker({ trustedIssuerSignFp: issuer.signFp, fetchSnapshot: async () => revocationSnapshot(issuer, fp, at, { records: [revoked] }), resolveSignPub, now: () => at });
+  assert.equal(await checkRevoked({ senderSignFp: fp }), true);
+  const check = checker(async () => revocationSnapshot(issuer, fp, at));
   await assert.rejects(() => check({ senderSignFp: '' }), /REVOCATION_IDENTITY_INVALID/);
-  const untrusted = createArmorRevocationChecker({ records: { v: 1, records: [{ sign_fp: 'a'.repeat(64) }] }, resolveSignPub: () => null });
-  await assert.rejects(() => untrusted({ senderSignFp: 'a'.repeat(64) }), /REVOCATION_RECORD_UNVERIFIABLE/);
 });
