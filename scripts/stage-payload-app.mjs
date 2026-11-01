@@ -3,7 +3,8 @@
 // consumed by the installer. Production builds require an explicit signing identity;
 // ad-hoc signing is available only to fixture tests and can never produce a release.
 import { execFileSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,22 +14,45 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 function safeArchiveEntries(payload) {
   const entries = execFileSync('tar', ['-tf', payload], { encoding: 'utf8' }).trim().split('\n').filter(Boolean);
+  const verbose = execFileSync('tar', ['-tvf', payload], { encoding: 'utf8' }).trim().split('\n').filter(Boolean);
   if (!entries.length) throw new Error('payload archive is empty');
+  if (verbose.length !== entries.length) throw new Error('could not account for every payload archive entry');
   for (const entry of entries) {
     if (entry.startsWith('/') || entry.split('/').includes('..') || !(entry === 'sol-ghost/' || entry.startsWith('sol-ghost/'))) {
       throw new Error(`unsafe payload entry: ${entry}`);
     }
   }
+  for (let i = 0; i < verbose.length; i += 1) {
+    const type = verbose[i][0];
+    if (type !== '-' && type !== 'd') throw new Error(`unsafe payload entry type ${type} for ${entries[i]}`);
+  }
   return entries;
 }
 
-export function stagePayloadApp({ payload, wrapper, out, identity = null, fixtureAdhoc = false, resources = join(ROOT, 'app', 'Resources'), infoPlist = join(ROOT, 'app', 'Info.plist') }) {
+const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
+function allFiles(root) {
+  const found = [];
+  const walk = (dir, prefix = '') => {
+    for (const name of readdirSync(dir)) {
+      const abs = join(dir, name), rel = prefix ? `${prefix}/${name}` : name, st = lstatSync(abs);
+      if (st.isSymbolicLink() || (!st.isFile() && !st.isDirectory())) throw new Error(`unsafe extracted payload type: ${rel}`);
+      if (st.isDirectory()) walk(abs, rel); else found.push(rel);
+    }
+  };
+  walk(root); return found.sort();
+}
+
+export function stagePayloadApp({ payload, wrapper, out, expectedSha256, expectedVersion, identity = null, fixtureAdhoc = false, resources = join(ROOT, 'app', 'Resources'), infoPlist = join(ROOT, 'app', 'Info.plist') }) {
   payload = resolve(payload); wrapper = resolve(wrapper); out = resolve(out);
   if (!existsSync(payload)) throw new Error(`no payload at ${payload}`);
   if (!existsSync(wrapper)) throw new Error(`no native wrapper at ${wrapper}`);
   if (basename(out) !== 'Kingmaker.app') throw new Error('output must be named Kingmaker.app');
   if (fixtureAdhoc && process.env.KINGMAKER_FIXTURE_BUILD !== '1') throw new Error('ad-hoc signing is fixture-only (set KINGMAKER_FIXTURE_BUILD=1 in an isolated test)');
   if (!fixtureAdhoc && !identity) throw new Error('production staging requires an explicit Kingmaker Release signing identity');
+  if (!/^[a-f0-9]{64}$/.test(String(expectedSha256 ?? ''))) throw new Error('an externally trusted payload sha256 is required');
+  if (!expectedVersion) throw new Error('an externally trusted payload version is required');
+  const archiveSha = sha256(readFileSync(payload));
+  if (archiveSha !== expectedSha256) throw new Error(`payload sha256 mismatch: got ${archiveSha}`);
   safeArchiveEntries(payload);
 
   const scratch = mkdtempSync(join(tmpdir(), 'km-stage-payload-'));
@@ -37,6 +61,18 @@ export function stagePayloadApp({ payload, wrapper, out, identity = null, fixtur
     const runtime = join(scratch, 'sol-ghost');
     const proof = checkPayload(runtime, { deep: true, installed: true });
     if (!proof.ok || !proof.listed) throw new Error(payloadProblem(proof) || 'payload manifest is invalid');
+    if (proof.version !== expectedVersion) throw new Error(`payload version ${proof.version} does not match trusted version ${expectedVersion}`);
+    const manifest = JSON.parse(readFileSync(join(runtime, 'payload.json'), 'utf8'));
+    const expectedFiles = [...manifest.files.map((f) => f.path), 'payload.json'].sort();
+    const actualFiles = allFiles(runtime);
+    if (JSON.stringify(actualFiles) !== JSON.stringify(expectedFiles)) throw new Error('payload contains files not listed by its manifest, or omits listed files');
+    for (const file of actualFiles) {
+      if (file === 'payload.json') continue;
+      const abs = join(runtime, file), bytes = readFileSync(abs);
+      if ((file === 'bin/kingmaker' || bytes.subarray(0, 2).toString() === '#!') && !(statSync(abs).mode & 0o111)) {
+        throw new Error(`payload executable is not executable: ${file}`);
+      }
+    }
 
     rmSync(out, { recursive: true, force: true });
     mkdirSync(join(out, 'Contents', 'MacOS'), { recursive: true });
@@ -65,6 +101,6 @@ export function stagePayloadApp({ payload, wrapper, out, identity = null, fixtur
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const value = (flag) => { const i = process.argv.indexOf(flag); return i > 0 ? process.argv[i + 1] : null; };
   const fixtureAdhoc = process.argv.includes('--fixture-adhoc');
-  const result = stagePayloadApp({ payload: value('--payload'), wrapper: value('--wrapper'), out: value('--out'), identity: value('--identity'), fixtureAdhoc });
+  const result = stagePayloadApp({ payload: value('--payload'), wrapper: value('--wrapper'), out: value('--out'), expectedSha256: value('--payload-sha256'), expectedVersion: value('--payload-version'), identity: value('--identity'), fixtureAdhoc });
   console.log(`staged ${result.out}: Kingmaker ${result.version}, ${result.files} verified payload files${result.fixture ? ' (FIXTURE, ad-hoc signed)' : ''}`);
 }

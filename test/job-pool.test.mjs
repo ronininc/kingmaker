@@ -20,6 +20,12 @@ test('idempotency and a lease prevent two fake workers from claiming one job', (
   assert.deepEqual(pool.events().map((x) => x.event), ['submitted', 'claimed', 'acknowledged', 'completed']);
 });
 
+test('same idempotency key rejects different job content', () => {
+  const pool = createJobPool({ id: () => 'pool_conflict' });
+  pool.submit({ text: 'first instruction', idempotencyKey: 'fixture:job:conflict' });
+  assert.throws(() => pool.submit({ text: 'different instruction', idempotencyKey: 'fixture:job:conflict' }), /IDEMPOTENCY_CONFLICT/);
+});
+
 test('bounded retry backs off, changes owner, and ends with terminal evidence', () => {
   let t = 10_000;
   const pool = createJobPool({ now: () => t, id: () => 'pool_retry', baseBackoffMs: 100, maxAttempts: 2 });
