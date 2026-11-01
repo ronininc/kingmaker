@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { generateKeyPairSync, sign } from 'node:crypto';
+import { createHash, generateKeyPairSync, sign } from 'node:crypto';
 import { mkdirSync, mkdtempSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -37,13 +37,17 @@ test('adapter rejects source aliases, source mutation and oversized evidence',as
 });
 
 test('CRM Ed25519 receipt binds exact fresh scope, registered authority and one nonce',async()=>{
-  const {privateKey,publicKey}=generateKeyPairSync('ed25519'),nowMs=1_800_000_000_000,executor={id:'executor-fixture',fingerprint:'e'.repeat(64)},spent=new Set();
-  const verifier=createExternalDispatchReceiptVerifier({authorities:{'key-fixture':{publicJwk:publicKey.export({format:'jwk'})}},executorRegistration:executor,now:()=>nowMs,authorityStatus:async()=> 'active',executorStatus:async()=> 'active',consumeNonce:async({keyId,nonce})=>{const k=`${keyId}:${nonce}`;if(spent.has(k))return false;spent.add(k);return true;}});
+  const {privateKey,publicKey}=generateKeyPairSync('ed25519'),nowMs=1_800_000_000_000,executor={id:'executor-fixture',fingerprint:'e'.repeat(64)},spent=new Set(),leaseToken='lease-token-fixture';
   const expected={externalJobId,nativeOpportunityId,manifestSha256:'a'.repeat(64),rulesSnapshotDigest:'d'.repeat(64),commitSha:'63837fb778d6a39f02be0ce76ff89f2bc8d74bdc'};
-  const receipt={schema:'ronin.external-security-dispatch/v1',jobId:externalJobId,nativeOpportunityId,manifestDigest:expected.manifestSha256,rulesSnapshotDigest:expected.rulesSnapshotDigest,sourceCommit:expected.commitSha,executorRegistrationId:executor.id,executorFingerprint:executor.fingerprint,attemptId:'attempt-fixture',leaseExpiresAt:Math.floor(nowMs/1000)+600,nonce:'fresh_nonce_12345678901234567890',issuedAt:Math.floor(nowMs/1000)};
-  const envelope=(r=receipt)=>({receipt:r,signature:{keyId:'key-fixture',value:sign(null,Buffer.from(JSON.stringify(r,Object.keys(r).sort())),privateKey).toString('base64url')}});
+  const leaseTokenHash=createHash('sha256').update(leaseToken).digest('hex'),receipt={schema:'ronin.external-security-dispatch/v1',jobId:externalJobId,nativeOpportunityId,manifestDigest:expected.manifestSha256,rulesSnapshotDigest:expected.rulesSnapshotDigest,sourceCommit:expected.commitSha,executorRegistrationId:executor.id,executorFingerprint:executor.fingerprint,attemptId:'attempt-fixture',leaseTokenHash,leaseExpiresAt:Math.floor(nowMs/1000)+600,nonce:'fresh_nonce_12345678901234567890',issuedAt:Math.floor(nowMs/1000)};
+  const current=(r=receipt)=>({status:'queued',jobId:r.jobId,manifestSha256:r.manifestDigest,executorId:r.executorRegistrationId,leaseTokenHash:r.leaseTokenHash,leaseExpiresAt:r.leaseExpiresAt,nonce:r.nonce,dispatchKeyId:'key-fixture'});
+  const verifier=createExternalDispatchReceiptVerifier({authorities:{'key-fixture':{publicJwk:publicKey.export({format:'jwk'})}},executorRegistration:executor,now:()=>nowMs,authorityStatus:async()=>({active:true,expiresAt:Math.floor(nowMs/1000)+1000}),executorStatus:async()=>({active:true}),attemptStatus:async()=>current(),consumeNonce:async({keyId,nonce})=>{const k=`${keyId}:${nonce}`;if(spent.has(k))return false;spent.add(k);return true;}});
+  const envelope=(r=receipt,token=leaseToken)=>({lease_token:token,receipt:r,signature:{keyId:'key-fixture',value:sign(null,Buffer.from(JSON.stringify(r,Object.keys(r).sort())),privateKey).toString('base64url')}});
   assert.equal((await verifier(envelope(),expected)).authorized,true);await assert.rejects(()=>verifier(envelope(),expected),/REPLAY/);
   const tampered={...receipt,nonce:'other_nonce_12345678901234567890',sourceCommit:'0'.repeat(40)};await assert.rejects(()=>verifier(envelope(tampered),expected),/BINDING/);
   const stale={...receipt,nonce:'stale_nonce_12345678901234567890',issuedAt:Math.floor(nowMs/1000)-1000,leaseExpiresAt:Math.floor(nowMs/1000)-100};await assert.rejects(()=>verifier(envelope(stale),expected),/STALE/);
-  const revoked=createExternalDispatchReceiptVerifier({authorities:{'key-fixture':{publicJwk:publicKey.export({format:'jwk'})}},executorRegistration:executor,now:()=>nowMs,authorityStatus:async()=> 'revoked',executorStatus:async()=> 'active',consumeNonce:async()=>true});await assert.rejects(()=>revoked(envelope({...receipt,nonce:'revoked_nonce_12345678901234567'}),expected),/REVOKED/);
+  await assert.rejects(()=>verifier(envelope({...receipt,nonce:'token_nonce_123456789012345678'},'wrong-token'),expected),/LEASE_TOKEN/);
+  const revoked=createExternalDispatchReceiptVerifier({authorities:{'key-fixture':{publicJwk:publicKey.export({format:'jwk'})}},executorRegistration:executor,now:()=>nowMs,authorityStatus:async()=>({active:false,revoked:true}),executorStatus:async()=>({active:true}),attemptStatus:async()=>current(),consumeNonce:async()=>true});await assert.rejects(()=>revoked(envelope({...receipt,nonce:'revoked_nonce_12345678901234567'}),expected),/REVOKED/);
+  const expired=createExternalDispatchReceiptVerifier({authorities:{'key-fixture':{publicJwk:publicKey.export({format:'jwk'})}},executorRegistration:executor,now:()=>nowMs,authorityStatus:async()=>({active:true,expiresAt:Math.floor(nowMs/1000)-1}),executorStatus:async()=>({active:true}),attemptStatus:async()=>current(),consumeNonce:async()=>true});await assert.rejects(()=>expired(envelope({...receipt,nonce:'expired_nonce_12345678901234567'}),expected),/REVOKED/);
+  const changed=createExternalDispatchReceiptVerifier({authorities:{'key-fixture':{publicJwk:publicKey.export({format:'jwk'})}},executorRegistration:executor,now:()=>nowMs,authorityStatus:async()=>({active:true}),executorStatus:async()=>({active:true}),attemptStatus:async()=>({...current(),status:'cancelled'}),consumeNonce:async()=>true});await assert.rejects(()=>changed(envelope({...receipt,nonce:'changed_nonce_12345678901234567'}),expected),/ATTEMPT_CHANGED/);
 });
