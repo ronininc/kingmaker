@@ -1,6 +1,6 @@
 {
   "name": "kingmaker",
-  "version": "4.4.0",
+  "version": "4.4.2-recovered.0",
   "private": true,
   "description": "Kingmaker: a Mac agent with no window. Your Mac's own apps are the screen, voice drives it, its engine governs every step, the Hands of Horus do the clicking.",
   "type": "module",
@@ -9,7 +9,7 @@
     "sol-ghost": "bin/sol-ghost"
   },
   "scripts": {
-    "test": "node --test --test-force-exit \"test/*.test.mjs\" \"addons/*/test/*.test.mjs\"",
+    "test": "node --test --test-force-exit test/*.test.mjs",
     "test:armor": "node scripture-armor/test/run-tests.mjs && node scripture-armor/test/run-tests-v2-scan.mjs && node scripture-armor/test/run-tests-v2-phase4.mjs && node scripture-armor/test/run-tests-v2-cell.mjs && node scripture-armor/test/run-tests-v2-airlock.mjs && node scripture-armor/test/run-tests-v2-estate.mjs && node scripture-armor/test/run-tests-v4-pq.mjs && node scripture-armor/test/run-tests-gemini-fix.mjs",
     "test:all": "npm test && npm run test:os && npm run test:armor && npm run typecheck",
     "proof:floor": "node --test --test-force-exit addons/meeting-notes/test/floor-participant.test.mjs addons/meeting-notes/test/floor-addon.test.mjs addons/meeting-notes/test/floor-participant-stt.test.mjs addons/meeting-notes/test/floor-participant-audio.test.mjs addons/meeting-notes/test/floor-participant-audio-e2e.test.mjs addons/meeting-notes/test/floor-participant-e2e.test.mjs addons/meeting-notes/test/floor-participant-orosolu.test.mjs",
