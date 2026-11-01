@@ -1,0 +1,13 @@
+{
+  "_comment": "How Kingmaker.app is laid out. The engine build and scripts/build-app.sh read this, so the app's name, executable and resources live in one place.",
+  "schema": "kingmaker.bundle/1",
+  "appName": "Kingmaker.app",
+  "displayName": "Kingmaker",
+  "executable": "Kingmaker",
+  "bundleId": "com.ronininc.solghost",
+  "swift": ["app/Kingmaker.swift"],
+  "frameworks": ["AppKit", "ApplicationServices", "QuartzCore", "ServiceManagement"],
+  "resources": "app/Resources",
+  "infoPlist": "app/Info.plist",
+  "legacyAppNames": ["Sol Ghost.app"]
+}
