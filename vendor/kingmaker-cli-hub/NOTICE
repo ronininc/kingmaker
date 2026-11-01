@@ -1,0 +1,17 @@
+Kingmaker CLI Hub
+=================
+
+This folder is Ronin Inc's copy of cli-hub 0.4.1 from CLI-Anything by HKUDS (https://github.com/HKUDS/CLI-Anything),
+used under its licences: cli-hub's own package metadata declares the MIT License (LICENSE-MIT), and the upstream
+repository as a whole is Apache-2.0 (LICENSE-APACHE). Both texts ship here and either permits this copy. It is kept and
+run as part of Kingmaker, independent of the upstream repository.
+
+Changes from upstream (2026-10-15):
+- analytics.py: replaced with a stub that does nothing. Upstream sent every run, install and launch to Umami / PostHog by default (opt-out only) with
+  a persistent machine id; this copy sends nothing.
+- registry.py, matrix.py, matrix_skill.py: the catalogs are Ronin's (catalog/, seeded from upstream's public registry
+  on 2026-10-15) or a URL the owner sets; no upstream fetch by default.
+- installer.py, matrix_skill.py, registry.py: state lives in ~/.kingmaker-cli-hub (KINGMAKER_CLI_HUB_HOME), not ~/.cli-hub.
+- Renamed Kingmaker CLI Hub; launched by ./kingmaker-cli-hub.
+
+Every CLI it installs is inspected by Kingmaker's REA (lib/rea.mjs) before Kingmaker will use it.

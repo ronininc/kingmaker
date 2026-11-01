@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Scripture Armor vault daemon — launchd template.
+     Rendered by mac/install-daemon.sh (placeholders substituted with the
+     owner's real paths) and installed as a system LaunchDaemon by default,
+     or as a per-user LaunchAgent only in the explicit fallback mode. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>org.ronininc.scripture-vaultd</string>
+  __USERNAME_ENTRY__
+  <key>ProgramArguments</key>
+  <array>
+    <string>__NODE_BIN__</string>
+    <string>__REPO_DIR__/vaultd.mjs</string>
+    <string>serve</string>
+    <string>--identity-dir</string>
+    <string>__IDENTITY_DIR__</string>
+    <string>--socket</string>
+    <string>__IDENTITY_DIR__/vaultd.sock</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>__REPO_DIR__</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>HOME</key>
+    <string>__OWNER_HOME__</string>
+    <key>PATH</key>
+    <string>__PATH_VALUE__</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>ThrottleInterval</key>
+  <integer>10</integer>
+  <key>StandardOutPath</key>
+  <string>__LOG_PATH__</string>
+  <key>StandardErrorPath</key>
+  <string>__LOG_PATH__</string>
+</dict>
+</plist>

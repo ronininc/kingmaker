@@ -1,0 +1,32 @@
+{
+  "bin": {
+    "scripture-armor": "./armor.mjs",
+    "scripture-vaultd": "./vaultd.mjs"
+  },
+  "description": "Seal any file \u2014 or an entire repository \u2014 so only its matching copy can open it. Symmetric AEAD underneath, a Rosetta-keyed ancient-script skin over it, a signed frame around it, and a vault daemon that answers only to its owner.",
+  "engines": {
+    "node": ">=24"
+  },
+  "files": [
+    "armor.mjs",
+    "vaultd.mjs",
+    "cell.mjs",
+    "airlock.mjs",
+    "scan.mjs",
+    "launch.mjs",
+    "terms.mjs",
+    "open-standalone.mjs",
+    "README.md",
+    "FORMAT.md",
+    "LICENSE",
+    "dns-profiles",
+    "mac"
+  ],
+  "name": "scripture-armor",
+  "scripts": {
+    "test": "node test/run-tests.mjs"
+  },
+  "type": "module",
+  "version": "1.1.1",
+  "license": "Apache-2.0"
+}

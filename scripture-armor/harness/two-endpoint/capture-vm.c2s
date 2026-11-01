@@ -1,0 +1,20 @@
+POST / HTTP/1.1
+host: 127.0.0.1:18741
+connection: keep-alive
+content-type: application/vnd.scripture-armor; v=3
+accept: */*
+accept-language: *
+sec-fetch-mode: cors
+user-agent: node
+accept-encoding: gzip, deflate
+content-length: 1886
+
+SCRIPTURE-ARMOR v3
+{"v":3,"canary":"64d92199-3762-4737-bc5c-aab4774f03a7","created":"2026-10-25T10:22:54.966Z","expiry":null,"commit":"de493f3d06e6356c81b59abe8183a9025ffd7c079de8988df1ee1a7152ec09d2","sender_sign_fp":"860a70e8181ed335fb51aea436e865d9ec41cfb4b408f59ee8dcff59d8de9082","sender_sign_pub":"7X_b-lpgWYbMAwv0aQ-qZhQ27yYaXWhdBqAJVrRzEwc","recipient_seal_fp":"3a4977ba983e4c038c5fa9639af2ae22ee9e731ed970a0cb20f8bbe10e277bdf","armor_seed":"7pnFx+IbOUYqVogwuNP9Gw==","eph_pub":"6cVZQlaHFsy-Io-wWdXr9x-q7058vipv_saNvrCYC2Y","key_nonce":"P3DnquJ+2GuhM3bZ","key_ct":"mDeWPchv0hfhrOw0QB+dcFT2gxVuqu27ELo3lk0HkBEt7KhigxFyz7wgqmaTuD2R","file_nonce":"a8821l0zAKah01n8","scan_verdict":null,"scan_digest":null,"scan_report":null,"scan_override":null,"armor_tier":null,"sig":"0KHNxNQB2vcKfve0fcjPuWO1bWO6y+I6WaszMbA4mOiNvKVx6TamA8WoZeen8pZNApv9AKffzcCGTKa5y5qlDQ=="}
+𐘣𐘱𒀻𒀋𐘔𒀠𐘸𒀅𒀗𒀭𐘷𐘑𒀪𒀆𐘝𐘙𐘫𐘊𒀹𐘮
+𐘸𒀁𐘋𐘓𐘙𒀝𒀍𐘲𒀺𐘣𒀟𒀵𒀫𐘙𐘸𐘰𐘱𐘰𐘭𐘮𒀿𐘠
+𒀝𐘐𐘌𒀎𒀿𐘛𒀗𐘤𒀬𒀜𒀞𐘧𐘆𐘶𐘲𐘯𐘁𒀚𒀌𐘲𒀖𒀼𐘺𐘑
+𐘋𒀛𒀚𐘈𐘦𒀽𒀂𒀸𐘆𐘬𐘩𐘜𒀲𐘫𒀆𐘥𒀐𒀩𐘥𒀃𒀂𒀯𐘊
+𐘱𐘤𒀤𐘿𐘚𐘵𐘄𒀍𒀫𐘒𐘬𐘺𐘖𒀍𐘥𐘛𒀍𒀦𐘧𒀆𒀷𐘺𐘨𒀷𒀃
+𐘛𒀳𐘸𒀞𒀳𒀝𒀏𒀝𒀸𐘈𒀐𐘥𐘾𒀑𒀃𐘝𐘢
+𐘍𐘲𒀛

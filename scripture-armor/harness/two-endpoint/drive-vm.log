@@ -1,0 +1,989 @@
+[    0.000000] Linux ve[    0.000000] Linux version 6.18.58-0-virt (buildozer@build-3-24-x86_64) (cc (Alpine 15.2.0) 15.2.0, GNU ld (GNU Binutils) 2.45.1) #1-Alpine SMP PREEMPT_DYNAMIC 2026-10-21 10:53:34
+[    0.000000] Command line: console=ttyS0,115200 modules=loop,squashfs,sd-mod,usb-storage panic=60
+[    0.000000] BIOS-provided physical RAM map:
+[    0.000000] BIOS-e820: [mem 0x0000rsion 6.18.58-0-virt (buildozer@build-3-24-x86_64) (cc (Alpine 15.2.0) 15.2.0, GNU ld (GNU Binutils) 2.45.1) #1-Alpine SMP PREEMPT_DYNAMIC 2026-10-21 10:53:34
+[    0.000000] Command line: console=ttyS0,115200 modules=loop,squashfs,sd-mod,usb-storage panic=60
+[    0.000000] BIOS-provided physical RAM map:
+[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
+[    0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff] reserved
+[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x000000001ffdffff] usable
+[    0.000000] BIOS-e820: [mem 0x000000001ffe0000-0x000000001fffffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff] reserved
+[    0.000000] BIOS-e820: [mem 0x000000fd00000000-0000000000000-0x000000000009fbff] usable
+[    0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff] reserved
+[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x000000001ffdffff] usable
+[    0.000000] BIOS-e820: [mem 0x000000001ffe0000-0x000000001fffffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff] reserved
+[    0.000000] BIOS-e820: [mem 0x000000fd00000000-0x000000ffffffffff] reserved
+[    0.000000] NX (Execute Disable) protection: active
+[    0.000000] APIC: Static calls initialized
+[    0.000000] SMBIOS 3.0.0 presentx000000ffffffffff] reserved
+[    0.000000] NX (Execute Disable) protection: active
+[    0.000000] APIC: Static calls initialized
+[    0.000000] SMBIOS 3.0.0 present.
+[    0.000000] DMI: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[    0.000000] DMI: Memory slots populated: 1/1
+[    0.000000] tsc: Fast.
+[    0.000000] DMI: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[    0.000000] DMI: Memory slots populated: 1/1
+[    0.000000] tsc: Fast TSC calibration using PIT
+[    0.000000] tsc: Detected 14 TSC calibration using PIT
+[    0.000000] tsc: Detected 1497.750 MHz processor
+[    0.012597.750 MHz processor
+[    0.012546] last_pfn = 0x1ffe0 max_arch_pfn = 0x40046] last_pfn = 0x1ffe0 max_arch_pfn = 0x400000000
+[    0.013764] MTRR map: 4 entries (3 fixed +000000
+[    0.013764] MTRR map: 4 entries (3 fixed + 1 variable; max 19), built  1 variable; max 19), built from 8 variable MTRRs
+[    0.014070] x86/from 8 variable MTRRs
+[    0.014070] x86/PAT: Configuration [0-7]: WB  WC  UC- UC  WB  WP  UC- WT  
+[    0.041889] fPAT: Configuration [0-7]: WB  WC  UC- UC  WB  WP  UC- WT  
+[    0.041889] found SMP MP-table at [mem 0x000f5470-0x000f547f]
+[    0ound SMP MP-table at [mem 0x000f5470-0x000f547f]
+[    0.049511] RAMDISK: [mem 0x1f67c000-0x1ffdffff].049511] RAMDISK: [mem 0x1f67c000-0x1ffdffff]
+[    0.049929] ACPI: Early table checksum verification disa
+[    0.049929] ACPI: Early table checksum verification disabled
+[    0.050482] ACPI: RSDP 0x0bled
+[    0.050482] ACPI: RSDP 0x00000000000F5280 000014 (v00 BOCHS )
+0000000000F5280 000014 (v00 BOCHS )
+[    0.050964] ACPI: RSDT 0x000000001FFE1C58 000034 (v01 BO[    0.050964] ACPI: RSDT 0x000000001FFE1C58 000034 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+CHS  BXPC     00000001 BXPC 00000001)
+[    0.051760] ACPI: FACP 0x000000001FFE1B[    0.051760] ACPI: FACP 0x000000001FFE1B0C 000074 (v01 BOCHS  BXPC     00000001 BXPC 0000C 000074 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.0500001)
+[    0.052571] ACPI: DSDT 0x000000001FFE0040 001ACC (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.052673] ACPI: FACS 0x000000001FFE0000 000040
+[2571] ACPI: DSDT 0x000000001FFE0040 001ACC (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.052673] ACPI: FACS 0x000000001FFE0000 000040
+[    0.052753] ACPI: APIC 0x000000001FFE1B80 000078 (v03 BOCHS  BXPC     00000001 BXPC 00000001)
+[        0.052753] ACPI: APIC 0x000000001FFE1B80 000078 (v03 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.052800] ACPI: HPET 0x000000001FFE1BF8 0000380.052800] ACPI: HPET 0x000000001FFE1BF8 000038 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.052826] ACP (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.052826] ACPI: WAET 0x000000001FFE1C30 000028 (v01 BOCI: WAET 0x000000001FFE1C30 000028 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.052965] ACPHS  BXPC     00000001 BXPC 00000001)
+[    0.052965] ACPI: Reserving FACP table memory at [mem 0x1ffI: Reserving FACP table memory at [mem 0x1ffe1b0c-0x1ffe1b7f]
+[    0.053011] ACPI: Reserving DSDT table memorye1b0c-0x1ffe1b7f]
+[    0.053011] ACPI: Reserving DSDT table memory at [mem 0x1ffe0040-0x1ffe1b0b]
+[    0.053022 at [mem 0x1ffe0040-0x1ffe1b0b]
+[    0.053022] ACPI] ACPI: Reserving FACS table memory at [mem 0x1ffe0000-: Reserving FACS table memory at [mem 0x1ffe0000-0x1ffe003f]
+[    0.053030] ACPI: Reserving APIC table memory at [mem 0x1ffe1b80-0x1ffe1bf0x1ffe003f]
+[    0.053030] ACPI: Reserving APIC table memory at [mem 0x1ffe1b80-0x1ffe1bf7]7]
+[    0.053038] ACPI: Reserving HPET table memory at [mem 0x1ffe1bf8-0x1ffe
+[    0.053038] ACPI: Reserving HPET table memory at [mem 0x1ffe1bf8-0x1ffe1c2f]
+[    0.053046] ACPI:1c2f]
+[    0.053046] ACPI: Reserving WAET table memory at [mem 0x1ffe1c30-0x1ffe1c Reserving WAET table memory at [mem 0x1ffe1c30-0x1ffe1c57]
+57]
+[    0.057393] No NUMA configuration found
+[    0.057393] No NUMA configuration found
+[    0.057427] Faking a node at [mem 0x0000000000000000-0x000000001ffd[    0.057427] Faking a node at [mem 0x0000000000000000-0x000000001ffdffff]
+[    0.058622] NODE_DATA(0) allocated [mem 0xffff]
+[    0.058622] NODE_DATA(0) allocated [mem 0x1f677d40-0x1f67bfff]
+[    0.062364] Zone ranges:
+[    0.062401]1f677d40-0x1f67bfff]
+[    0.062364] Zone ranges:
+[    0.062401]   DMA      [mem 0x0000000000001000-0x   DMA      [mem 0x0000000000001000-0x0000000000ffffff]
+[    0.062517]0000000000ffffff]
+[    0.062517]   DMA32    [mem 0x0000000001000000-0x000000001ffdffff]
+   DMA32    [mem 0x0000000001000000-0x000000001ffdffff]
+[    0.062531]   Normal   empty
+[    0.062531]   Normal   empty
+[    0.062562] Movable zone start for each node[    0.062562] Movable zone start for each node
+[    0.062614] Early memory node rang
+[    0.062614] Early memory node ranges
+[    0.062654]   node   0: [mem 0x00000000000010es
+[    0.062654]   node   0: [mem 0x0000000000001000-0x000000000009efff]
+00-0x000000000009efff]
+[    0.062922]   node   0: [mem 0x000000000010000[    0.062922]   node   0: [mem 0x0000000000100000-0x000000001ffdffff]
+[    0.063128] Initmem setup node 0 [me0-0x000000001ffdffff]
+[    0.063128] Initmem setup node 0 [mem 0x0000000000001000-0x000000001ffdffff]
+[    0.065220m 0x0000000000001000-0x000000001ffdffff]
+[    0.065220] On node 0, zone DMA: 1 ] On node 0, zone DMA: 1 pages in unavailable ranges
+[    0.065694] On pages in unavailable ranges
+[    0.065694] On node 0, zone DMA: 97 pages in unavailable ranges
+node 0, zone DMA: 97 pages in unavailable ranges
+[    0.088415] On node 0, zone DMA32: 32 p[    0.088415] On node 0, zone DMA32: 32 pages in unavailable ranges
+[    0.089383] ACages in unavailable ranges
+[    0.089383] ACPI: PM-Timer IO Port: 0x608
+[    0PI: PM-Timer IO Port: 0x608
+[    0.090232] ACPI: LAPIC_NMI (acpi_id[0xff] dfl dfl lint.090232] ACPI: LAPIC_NMI (acpi_id[0xff] dfl dfl lint[0x1])
+[    0.090870] IOAPIC[0]: apic_id 0,[0x1])
+[    0.090870] IOAPIC[0]: apic_id 0, version 32, address 0xfec00000, GSI 0-23
+[    0.091070]  version 32, address 0xfec00000, GSI 0-23
+[    0.091070] ACPI: INT_SRC_OVR (bus 0 bus_iACPI: INT_SRC_OVR (bus 0 bus_irq 0 global_irq 2 dfl dfl)
+[    0.091537] ACPI: INT_SRC_OVR (bus 0 bus_irq rq 0 global_irq 2 dfl dfl)
+[    0.091537] ACPI: INT_SRC_OVR (bus 0 bus_irq 5 global_irq 5 high level)
+5 global_irq 5 high level)
+[    0.091611] ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 hi[    0.091611] ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 high level)
+[    0.091793] ACPI: INT_SRC_OVR (gh level)
+[    0.091793] ACPI: INT_SRC_OVR (bus 0 bus_irq 10 global_irq 10 high level)
+[    0.0918bus 0 bus_irq 10 global_irq 10 high level)
+[    0.091804] ACPI: INT_SRC_OVR (bus 0 bus_irq 11 04] ACPI: INT_SRC_OVR (bus 0 bus_irq 11 global_irq 11 high level)
+[    0.092177] ACPI: Using ACPI global_irq 11 high level)
+[    0.092177] ACPI: Using ACPI (MADT) for SMP configuration informa(MADT) for SMP configuration information
+[    0.092254] ACPI: HPET id: 0x8086a201 base: 0xfed00000
+tion
+[    0.092254] ACPI: HPET id: 0x8086a201 base: 0xfed00000
+[    0.093157] CPU topo: Max. logi[    0.093157] CPU topo: Max. logical packages:   1
+[    0.093190] CPU topo: Max. logical dies: cal packages:   1
+[    0.093190] CPU topo: Max. logical dies:       1
+[    0.093204] CPU      1
+[    0.093204] CPU topo: Max. dies per package:   1
+[    0.093275] CPU topo: Max. topo: Max. dies per package:   1
+[    0.093275] CPU topo: Max. threads per core:   1
+[    0.093507] CPU topo: Num. cores per package:     1
+[    0.093526] CPU topo: Num. threads per package:   1
+[    0.093537] CPU topo: Allowing 1 present CPUs plus 0  threads per core:   1
+[    0.093507] CPU topo: Num. cores per package:     1
+[    0.093526] CPU topo: Num. threads per package:   1
+[    0.093537] CPU topo: Allowing 1 present CPUs plus 0 hotplug CPUs
+[    0.095229]hotplug CPUs
+[    0.095229] [mem 0x20000000-0xfffbffff] available for PCI devi [mem 0x20000000-0xfffbffff] available for PCI devices
+[    0.095318] Booting paravirtualized kernel on bareces
+[    0.095318] Booting paravirtualized kernel on bare hardware
+[    0.095689] clocksource: refined-jiffies: mask hardware
+[    0.095689] clocksource: refined-jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_id: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1910969940391419 ns
+[    0.111497] setup_percle_ns: 1910969940391419 ns
+[    0.111497] setup_percpu: NR_CPUS:256 nr_cpumask_bits:1 nr_cpu_ids:1 pu: NR_CPUS:256 nr_cpumask_bits:1 nr_cpu_ids:1 nr_node_ids:1
+[    0.115883] percpu: Embedded 55 pagesnr_node_ids:1
+[    0.115883] percpu: Embedded 55 pages/cpu s186200 r8192 d30888 u209/cpu s186200 r8192 d30888 u2097152
+[    0.118888] Kernel command line: console=ttyS0,115200 7152
+[    0.118888] Kernel command line: console=ttyS0,115200 modules=loop,squashfs,sd-mod,usb-storage pmodules=loop,squashfs,sd-mod,usb-storage panic=60
+[    0.120815] Unknown kernel command line panic=60
+[    0.120815] Unknown kernel command line parameters "modules=loop,squashfs,sd-mod,uarameters "modules=loop,squashfs,sd-mod,usb-storage", will be passed to user space.
+[    0.12124sb-storage", will be passed to user space.
+[    0.121244] printk: log buffer data + 4] printk: log buffer data + meta data: 131072 + 458meta data: 131072 + 458752 = 589824 bytes
+[    0.121751] Dentry c752 = 589824 bytes
+[    0.121751] Dentry cache hash table entries: 65536 (ordeache hash table entries: 65536 (order: 7, 524288 bytes, linear)
+[    0.122100] Inode-cache hash table er: 7, 524288 bytes, linear)
+[    0.122100] Inode-cache hash table entries: 32768 (order: 6, 262144 byntries: 32768 (order: 6, 262144 bytes, linear)
+[    0.127292] Fallback order for Node 0: 0tes, linear)
+[    0.127292] Fallback order for Node 0: 0 
+[    0.127716] Built 1 zon 
+[    0.127716] Built 1 zonelists, mobility grouping on.  Total pages: 130942
+[    0.1277elists, mobility grouping on.  Total pages: 130942
+[    0.127740] Policy zone: DMA32
+[    0.13040] Policy zone: DMA32
+[    0.130714] mem auto-init: stack:all(zero), heap alloc:on, heap free:714] mem auto-init: stack:all(zero), heap alloc:on, heap free:off
+[    0.205055] SLUB: HWalign=64, Order=0-3, MinObjects=off
+[    0.205055] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.229394] Dynamic Preempt: no0, CPUs=1, Nodes=1
+[    0.229394] Dynamic Preempt: none
+[    0.235379] rcu: Preemptible hierarchical RCU implementation.
+ne
+[    0.235379] rcu: Preemptible hierarchical RCU implementation.
+[    0.235448] rcu: 	RCU restricting CPUs fr[    0.235448] rcu: 	RCU restricting CPUs from NR_CPUS=256 to nr_cpu_ids=1.
+[    0.235784] 	Trampolineom NR_CPUS=256 to nr_cpu_ids=1.
+[    0.235784] 	Trampoline variant of Tasks RCU enabled. variant of Tasks RCU enabled.
+[    0.235803] 	Tracing variant of Tasks RCU enabled.
+[    0.23595
+[    0.235803] 	Tracing variant of Tasks RCU enabled.
+[    0.235953] rcu: RCU calculated value 3] rcu: RCU calculated value of scheduler-enlistment delay is 100 jiffies.
+[    0.236011] rcu: Adjusting geof scheduler-enlistment delay is 100 jiffies.
+[    0.236011] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+[    0ometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+[    0.237947] RCU Tasks: Setting shift to 0 and lim t.237947] RCU Tasks: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1 rcu_tao 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=1.
+[    0.237985] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=1.
+[    0.298703]sk_cpu_ids=1.
+[    0.237985] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=1.
+[    0.298703] NR_IRQS: 16640, nr_irqs: 25 NR_IRQS: 16640, nr_irqs: 256, preallocated irqs: 16
+[    0.314070] rcu:6, preallocated irqs: 16
+[    0.314070] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.315327] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns:  srcu_init: Setting srcu_struct sizes based on contention.
+[    0.315327] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1911260446275000 ns
+1911260446275000 ns
+[    0.323205] kfence: initialized - using 209715[    0.323205] kfence: initialized - using 2097152 bytes for 255 objects at 0x(____ptrval____)-0x(__2 bytes for 255 objects at 0x(____ptrval____)-0x(____ptrval____)
+[    0.333287] Console: colour __ptrval____)
+[    0.333287] Console: colour VGA+ 80x25
+[    0.336202] printk: legacy VGA+ 80x25
+[    0.336202] printk: legacy console [ttyS0] enabled
+console [ttyS0] enabled
+[    0.36122[    0.361221] ACPI: Core revision 20250807
+1] ACPI: Core revision 20250807
+[    0.3705[    0.370530] clocksource: hpet: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604467 ns
+30] clocksource: hpet: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604467 ns
+[    0.378032] APIC: [    0.378032] APIC: Switch to symmetric I/O mode setup
+Switch to symmetric I/O mode setup
+[    0.38[    0.386089] ..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
+6089] ..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
+[    0.392711] clocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x1596d5299bc, max_idle_ns: 440795236382 ns
+[    0.392711] clocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x1596d5299bc, max_idle_ns: 440795236382 ns
+[    0.394692] Calibrating delay loop (skipped), value calculated using timer frequency.. 2995.50 BogoMIPS (lpj=1497750)
+[    0.394692] Calibrating delay loop (skipped), value calculated using timer frequency.. 2995.50 BogoMIPS (lpj=1497750)
+[   [    0.397857] Last level iTLB entries: 4KB 512, 2MB 255, 4MB 127
+[    0.398117] Last level dTLB entries: 4KB 512, 2MB 255, 4MB 127, 1GB 0
+ 0.397857] Last level iTLB entries: 4KB 512, 2MB 255, 4MB 127
+[    0.398117] Last level dTLB entries: 4KB 512, 2MB 255, 4MB 127, 1GB 0
+[    0.398940] mitigations: Enabled attack vectors: user_kernel, use[    0.398940] mitigations: Enabled attack vectors: user_kernel, user_user, guest_host, guest_guest, SMT mitigations: auto
+r_user, guest_host, guest_guest, SMT mitigations: auto
+[    0.400329] Spectre V2 : Mitigation: Retpolines
+[    0.400329] Spectre V2 : Mitigation: Retpolines
+[    0.400787] Spectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization
+[    0.401236] Spectre V2 : Spectre v2 / SpectreRSB: Filling RSB on context switch and VMEXIT
+[    0.400787] Spectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization
+[    0.401236] Spectre V2 : Spectre v2 / SpectreRSB: Filling RSB on context switch and VMEXIT
+[    0.405185] x86/fpu: x87 FPU will us[    0.405185] x86/fpu: x87 FPU will use FXSAVE
+e FXSAVE
+[    0.878985] Freeing SMP al[    0.878985] Freeing SMP alternatives memory: 40K
+ternatives memory: 40K
+[    0.881353] pid[    0.881353] pid_max: default: 32768 minimum: 301
+_max: default: 32768 minimum: 301
+[    0.901[    0.901536] LSM: initializing lsm=lockdown,capability,landlock,yama
+536] LSM: initializing lsm=lockdown,capability,landlock,yama
+[    0.90[    0.908436] landlock: Up and running.
+[    0.908704] Yama: becoming mindful.
+8436] landlock: Up and running.
+[    0.908704] Yama: becoming mindful.
+[    0[    0.916112] Mount-cache hash table entries: 1024 (order: 1, 8192 bytes, linear)
+.916112] Mount-cache hash table entries: 1024 (order: 1, 8192 bytes, linear)
+[    0.916806] Mountpoint-cache hash table entries: 1024 (order: 1[    0.916806] Mountpoint-cache hash table entries: 1024 (order: 1, 8192 bytes, linear)
+, 8192 bytes, linear)
+[    1.079236][    1.079236] smpboot: CPU0: AMD QEMU Virtual CPU version 2.5+ (family: 0xf, model: 0x6b, stepping: 0x1)
+ smpboot: CPU0: AMD QEMU Virtual CPU version 2.5+ (family: 0xf, model: 0x6b, stepping: 0x1)
+[    1.09929[    1.099297] Performance Events: PMU not available due to virtualization, using software events only.
+7] Performance Events: PMU not available due to virtualization, using software events only.
+[    1.10176[    1.101761] signal: max sigframe size: 1440
+1] signal: max sigframe size: 1440
+[    1.109374] rcu: Hierar[    1.109374] rcu: Hierarchical SRCU implementation.
+[    1.109725] rcu: 	Max phase no-delay instances is 400.
+chical SRCU implementation.
+[    1.109725] rcu: 	Max phase no-delay instances is 400.
+[    1.12[    1.122083] NMI watchdog: Perf NMI watchdog permanently disabled
+2083] NMI watchdog: Perf NMI watchdog permanently disabled
+[    1.132236] smp: Bringing up secondary CPUs ...
+[    1.132236] smp: Bringing up secondary CPUs ...
+[    1.136236] smp: Brought up 1 node, 1 CPU
+[    1.136236] smpboot: Total of 1 processors activated (2995.50 BogoMIPS)
+[    1.136236] smp: Brought up 1 node, 1 CPU
+[    1.136236] smpboot: Total of 1 processors activated (2995.50 BogoMIPS)
+[    1.[    1.151013] Memory: 461960K/523768K available (14710K kernel code, 2033K rwdata, 9936K rodata, 3008K init, 1144K bss, 58724K reserved, 0K cma-reserved)
+151013] Memory: 461960K/523768K available (14710K kernel code, 2033K rwdata, 9936K rodata, 3008K init, 1144K bss, 58724K reserved, 0K cma-reserved)
+[    1.16656[    1.166563] devtmpfs: initialized
+3] devtmpfs: initialized
+[    1.173[    1.173754] x86/mm: Memory block size: 128MB
+754] x86/mm: Memory block size: 128MB
+[    1.192677[    1.192677] posixtimers hash table entries: 512 (order: 1, 8192 bytes, linear)
+] posixtimers hash table entries: 512 (order: 1, 8192 bytes, linear)
+[    1.193632] futex hash table entries: 256 (16384 bytes on 1 NUMA nodes, total 16 KiB, lin[    1.193632] futex hash table entries: 256 (16384 bytes on 1 NUMA nodes, total 16 KiB, linear).
+ear).
+[    1.221708][    1.221708] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+ NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    1.227603] [    1.227603] audit: initializing netlink subsys (disabled)
+audit: initializing netlink subsys (disabled)
+[    1.237236] thermal_sys: Registered thermal governor 'step_wise'
+[    1.239699] audit: type=2000 audit(1792923550.852:1): state=initialized audit_enabled=0 res=1
+[    1.237236] thermal_sys: Registered thermal governor 'step_wise'
+[    1.239699] audit: type=2000 audit(1792923550.852:1): state=initialized audit_enabled=0 res=1
+[    1.240437] cpuidle: using governor ladder
+[    1.241022] cpuidle: using governor menu
+[    1.240437] cpuidle: using governor ladder
+[    1.241022] cpuidle: using governor menu
+[    1.245260] acpiphp: [    1.245260] acpiphp: ACPI Hot Plug PCI Controller Driver version: 0.5
+ACPI Hot Plug PCI Controller Driver version: 0.5
+[    1.254816] PCI: Usin[    1.254816] PCI: Using configuration type 1 for base access
+g configuration type 1 for base access
+[    1.262982] kp[    1.262982] kprobes: kprobe jump-optimization is enabled. All kprobes are optimized if possible.
+robes: kprobe jump-optimization is enabled. All kprobes are optimized if possible.
+[    1.284148] HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
+[  [    1.284148] HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
+[    1.284282] HugeTLB: 28 KiB vmemmap can be freed for a 2.00 MiB page
+  1.284282] HugeTLB: 28 KiB vmemmap can be freed for a 2.00 MiB page
+[    1.3064[    1.306431] ACPI: Added _OSI(Module Device)
+[    1.306677] ACPI: Added _OSI(Processor Device)
+[    1.306793] ACPI: Added _OSI(Processor Aggregator Device)
+31] ACPI: Added _OSI(Module Device)
+[    1.306677] ACPI: Added _OSI(Processor Device)
+[    1.306793] ACPI: Added _OSI(Processor Aggregator Device)
+[    1.3251[    1.325182] ACPI: 1 ACPI AML tables successfully acquired and loaded
+82] ACPI: 1 ACPI AML tables successfully acquired and loaded
+[    1.385306] ACPI: Interpreter enabled
+[    1.385306] ACPI: Interpreter enabled
+[    1.386375] ACPI: PM: (supports S0 S3 S5)
+[    1.386594] ACPI: Using IOAPIC for interrupt routing
+[    1.386375] ACPI: PM: (supports S0 S3 S5)
+[    1.386594] ACPI: Using IOAPIC for interrupt routing
+[    1.387869] PCI: Using host bridge windows from ACPI; if necessary, use "pci=nocrs" and report a bug
+[    1.388292] PCI: Using E820 reservations for host bridge windows
+[    1.387869] PCI: Using host bridge windows from ACPI; if necessary, use "pci=nocrs" and report a bug
+[    1.388292] PCI: Using E820 reservations for host bridge windows
+[    1.390236] ACPI: Enabled 2 GPEs in block 00 to 0F[    1.390236] ACPI: Enabled 2 GPEs in block 00 to 0F
+
+[    1.48016[    1.480163] ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-ff])
+3] ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-ff])
+[    1.481644] acpi PNP0A03:00: _OSC: OS supports [    1.481644] acpi PNP0A03:00: _OSC: OS supports [ASPM ClockPM Segments MSI HPX-Type3]
+[ASPM ClockPM Segments MSI HPX-Type3]
+[    1.482480] acpi PNP0A03:00: _OSC: not requesting OS control; OS requires [ExtendedConfig ASPM[    1.482480] acpi PNP0A03:00: _OSC: not requesting OS control; OS requires [ExtendedConfig ASPM ClockPM MSI]
+ ClockPM MSI]
+[    1.484651] ac[    1.484651] acpi PNP0A03:00: fail to add MMCONFIG information, can't access extended configuration space under this bridge
+pi PNP0A03:00: fail to add MMCONFIG information, can't access extended configuration space under this bridge
+[    1.4951[    1.495108] acpiphp: Slot [3] registered
+08] acpiphp: Slot [3] registered
+[    1.496312] ac[    1.496312] acpiphp: Slot [4] registered
+[    1.496647] acpiphp: Slot [5] registered
+[    1.497037] acpiphp: Slot [6] registered
+piphp: Slot [4] registered
+[    1.496647] acpiphp: Slot [5] registered
+[    1.497037] acpiphp: Slot [6] registered
+[    1.497384] acpiphp: Slot [7] registered
+[    1.497384] acpiphp: Slot [7] registered
+[    1.497784] acpiphp: Slot [8] registered
+[    1.497784] acpiphp: Slot [8] registered
+[    1.498105] acpiphp: Slot [9] registered
+[    1.498105] acpiphp: Slot [9] registered
+[    1.498369] acpiphp: Slot [10] registered
+[    1.498369] acpiphp: Slot [10] registered
+[    1.498752] acpiphp: Slot [11] registered
+[    1.499268] acpiphp: Slot [12] registered
+[    1.499560] acpiphp: Slot [13] registered
+[    1.498752] acpiphp: Slot [11] registered
+[    1.499268] acpiphp: Slot [12] registered
+[    1.499560] acpiphp: Slot [13] registered
+[    1.499832] acpiphp: Slot [14] registered
+[    1.499832] acpiphp: Slot [14] registered
+[    1.500444] acpiphp: Slot [15] registered
+[    1.500756] acpiphp: Slot [16] registered
+[[    1.500444] acpiphp: Slot [15] registered
+[    1.500756] acpiphp: Slot [16] registered
+[    1.501329] acpiphp: Slot [17] registered
+    1.501329] acpiphp: Slot [17] registered
+[[    1.502351] acpiphp: Slot [18] registered
+    1.502351] acpiphp: Slot [18] registered
+[[     1.503416] acpiphp: Slot [19] registered
+[   1.503416] acpiphp: Slot [19] registered
+[    1.504236] acpiphp: Slot [20] registered
+    1.504236] acpiphp: Slot [20] registered
+[[    1.5043    1.504396] acpiphp: Slot [21] registered
+[96] acpiphp: Slot [21] registered
+[    1.505456] acpiphp: Slot [22] registered
+[    1.505456] acpiphp: Slot [22] registered
+[    1.506437] acpiphp: Slot [23] registered
+    1.506437] acpiphp: Slot [23] registered
+[    1.507188] acpiphp: Slot [24] registered
+[    1.507188] acpiphp: Slot [24] registered
+[    1.507236] acpiphp: Slot [25] registered
+[    1.507236] acpiphp: Slot [25] registered
+[[    1.507415] acpiphp: Slot [26] registered
+    1.507415] acpiphp: Slot [26] registered
+[[    1.508399] acpiphp: Slot [27] registered
+    1.508399] acpiphp: Slot [27] registered
+[[    1.509125] acpiphp: Slot [28] registered
+    1.509125] acpiphp: Slot [28] registered
+[[    1.509291]    1.509291] acpiphp: Slot [29] registered
+[ acpiphp: Slot [29] registered
+[    1.510319] acpiphp: Slot [30] registered
+    1.510319] acpiphp: Slot [30] registered
+[[    1.511056] acpiphp: Slot [31] registered
+    1.511056] acpiphp: Slot [31] registered
+[    1.513099] PCI[    1.513099] PCI host bridge to bus 0000:00
+ host bridge to bus 0000:00
+[[    1.515330] pci_bus 0000:00: root bus resource [io  0x0000-0x0cf7 window]
+[    1.515330] pci_bus 0000:00: root bus resource [io  0x0000-0x0cf7 window]
+[    1.516931] pci_bus 0000:00: root bus resource [io  0x0d00-0xffff window]
+    1.516931] pci_bus 0000:00: root bus resource [io  0x0d00-0xffff window]
+[    1.517271] pci_bus 00[    1.517271] pci_bus 0000:00: root bus resource [mem 0x000a0000-0x000bffff window]
+[00:00: root bus resource [mem 0x000a0000-0x000bffff window]
+[    1.518275] pci_bus 0000:00: root bus resource [mem 0x20000000-0xfebfffff     1.518275] pci_bus 0000:00: root bus resource [mem 0x20000000-0xfebfffff window]
+[window]
+[    1.519284] pci_bus 0000:00: root bus reso    1.519284] pci_bus 0000:00: root bus resource [mem 0x100000000-0x17fffffff window]
+urce [mem 0x100000000-0x17fffffff window]
+[    1.521099] pci_bus 0000:00: root bus resource [bus 00-ff]
+[    1.521099] pci_bus 0000:00: root bus resource [bus 00-ff]
+[    1.526486][    1.526486] pci 0000:00:00.0: [8086:1237] type 00 class 0x060000 conventional PCI endpoint
+ pci 0000:00:00.0: [8086:1237] type 00 class 0x060000 conventional PCI endpoint
+[    1.535363][    1.535363] pci 0000:00:01.0: [8086:7000] type 00 class 0x060100 conventional PCI endpoint
+ pci 0000:00:01.0: [8086:7000] type 00 class 0x060100 conventional PCI endpoint
+[    1.537393][    1.537393] pci 0000:00:01.1: [8086:7010] type 00 class 0x010180 conventional PCI endpoint
+ pci 0000:00:01.1: [8086:7010] type 00 class 0x010180 conventional PCI endpoint
+[    1.538647] pci 00[    1.538647] pci 0000:00:01.1: BAR 4 [io  0xc040-0xc04f]
+[    1.539275] pci 0000:00:01.1: BAR 0 [io  0x01f0-0x01f7]: legacy IDE quirk
+00:00:01.1: BAR 4 [io  0xc040-0xc04f]
+[    1.539275] pci 0000:00:01.1: BAR 0 [io  0x01f0-0x01f7]: legacy IDE quirk
+[    1.539629] pci 0000:00:01.1: BAR 1 [io  0x03f6]: legacy IDE quirk
+[    1.539977][    1.539629] pci 0000:00:01.1: BAR 1 [io  0x03f6]: legacy IDE quirk
+[    1.539977] pci 0000:00:01.1: BAR 2 [io  0x0170-0x0177]: legacy IDE quirk
+ pci 0000:00:01.1: BAR 2 [io  0x0170-0x0177]: legacy IDE quirk
+[    1.540312] pci 0000:00:01.1: BAR 3 [io  0x0376][    1.540312] pci 0000:00:01.1: BAR 3 [io  0x0376]: legacy IDE quirk
+: legacy IDE quirk
+[    1.542358[    1.542358] pci 0000:00:01.3: [8086:7113] type 00 class 0x068000 conventional PCI endpoint
+] pci 0000:00:01.3: [8086:7113] type 00 class 0x068000 conventional PCI endpoint
+[    1.543383] p[    1.543383] pci 0000:00:01.3: quirk: [io  0x0600-0x063f] claimed by PIIX4 ACPI
+[    1.543825] pci 0000:00:01.3: quirk: [io  0x0700-0x070f] claimed by PIci 0000:00:01.3: quirk: [io  0x0600-0x063f] claimed by PIIX4 ACPI
+[    1.543825] pci 0000:00:01.3: quirk: [io  0x0700-0x070f] claimed by PIIX4 SMB
+IX4 SMB
+[    1.545788[    1.545788] pci 0000:00:02.0: [1234:1111] type 00 class 0x030000 conventional PCI endpoint
+] pci 0000:00:02.0: [1234:1111] type 00 class 0x030000 conventional PCI endpoint
+[    1.5[    1.547324] pci 0000:00:02.0: BAR 0 [mem 0xfd000000-0xfdffffff pref]
+[    1.547748] pci 0000:00:02.0: BAR 2 [mem 0xfeb90000-0xfeb90fff]
+47324] pci 0000:00:02.0: BAR 0 [mem 0xfd000000-0xfdffffff pref]
+[    1.547748] pci 0000:00:02.0: BAR 2 [mem 0xfeb90000-0xfeb90fff]
+[    1.548261] pci 0000:00:02.0: ROM [mem 0xfeb80000-0xfeb8ffff pref]
+[    1.548261] pci 0000:00:02.0: ROM [mem 0xfeb80000-0xfeb8ffff pref]
+[    1.549365] pc[    1.549365] pci 0000:00:02.0: Video device with shadowed ROM at [mem 0x000c0000-0x000dffff]
+i 0000:00:02.0: Video device with shadowed ROM at [mem 0x000c0000-0x000dffff]
+[    1.551446] [    1.551446] pci 0000:00:03.0: [1af4:1009] type 00 class 0x000200 conventional PCI endpoint
+pci 0000:00:03.0: [1af4:1009] type 00 class 0x000200 conventional PCI endpoint
+[    1.553[    1.553285] pci 0000:00:03.0: BAR 0 [io  0xc000-0xc01f]
+[    1.553617] pci 0000:00:03.0: BAR 1 [mem 0xfeb91000-0xfeb91fff]
+285] pci 0000:00:03.0: BAR 0 [io  0xc000-0xc01f]
+[    1.553617] pci 0000:00:03.0: BAR 1 [mem 0xfeb91000-0xfeb91fff]
+[    1.554626] pci 0000:00:03.0: BAR 4 [mem 0xfe000000-0xfe003fff 64bit pref]
+[    1.554626] pci 0000:00:03.0: BAR 4 [mem 0xfe000000-0xfe003fff 64bit pref]
+[    1.56379[    1.563797] pci 0000:00:04.0: [1af4:1000] type 00 class 0x020000 conventional PCI endpoint
+7] pci 0000:00:04.0: [1af4:1000] type 00 class 0x020000 conventional PCI endpoint
+[    1.56[    1.565311] pci 0000:00:04.0: BAR 0 [io  0xc020-0xc03f]
+[    1.565619] pci 0000:00:04.0: BAR 1 [mem 0xfeb92000-0xfeb92fff]
+[    1.566272] p5311] pci 0000:00:04.0: BAR 0 [io  0xc020-0xc03f]
+[    1.565619] pci 0000:00:04.0: BAR 1 [mem 0xfeb92000-0xfeb92fff]
+[    1.566272] pci 0000:00:04.0: BAR 4 [mem 0xfe004000-0xfe007fff 64bit pref]
+[    1.566592] pci 0000:00:04.0: ROM [mem 0xfeb00000-0xfeb7ffffci 0000:00:04.0: BAR 4 [mem 0xfe004000-0xfe007fff 64bit pref]
+[    1.566592] pci 0000:00:04.0: ROM [mem 0xfeb00000-0xfeb7ffff pref]
+ pref]
+[[    1.585289] ACPI: PCI: Interrupt link LNKA configured for IRQ 10
+    1.585289] ACPI: PCI: Interrupt link LNKA configured for IRQ 10
+[[    1.587732] ACPI: PCI: Interrupt link LNKB configured for IRQ 10
+    1.587732] ACPI: PCI: Interrupt link LNKB configured for IRQ 10
+[ [    1.58   1.588236] ACPI:8236] ACPI: PCI: In PCI: Interrupt linkterrupt link LNKC  LNKC configurconfigured for IRQ 11
+ed for IRQ 11
+[    1.591615] ACPI: PCI: Interrupt link LNKD configured for IRQ 11
+[    1.592213] ACPI: PCI: Interrupt link LNKS configured for IRQ 9
+[    1.591615] ACPI: PCI: Interrupt link LNKD configured for IRQ 11
+[    1.592213] ACPI: PCI: Interrupt link LNKS configured for IRQ 9
+[[    1.601917] iommu:    1.601917] iommu:  Default domain type: TranslDefault domain type: Translaated
+ted
+[[    1.602758]     1.602758] iommu:iommu: DM DMA domain TLB invalidation poliA domain TLB invalidation policcy: lazy mode
+y: lazy mode
+[[    1.614262] SCSI subsystem     1.614262] SCSI subsystem initialized
+initialized
+[[    1.619586] pp    1.619586] pps_core: LinuxPPS API ver. 1 s_core: LinuxPPS API ver. 1 registered
+[registered
+[     1.620289]    1.620289] pps_core: Sopps_core: Softwaftware ver. 5.3.6 - Copyrighre ver. 5.3.6 - Copyright 2005-2007 Rt 2005-2007 Rodolfo Giomeodolfo Giometti <giometti@ltti <giometti@linux.it>inux.it>
+
+[ [    1.622481] PTP clock support regis   1.622481] PTP clock support registered
+tered
+[[     1   1.652689.652689]] PCI:  PCI: Using ACPUsing ACPI for II for IRQ routing
+RQ routing
+[[    1.660922    1.660922] hpet: 3 channel] hpet: 3 channels of 0 reserves of 0 reserved fod for per-cpu timers
+r per-cpu timers
+[[        11.664.664715] clocksource: Sw715] clocksource: Switched to itched to clocksclocksource tsource tsc-early
+c-early
+[    1.69687[    1.696870] VFS: Disk quotas dquot_6.6.0
+[    1.697806] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+0] VFS: Disk quotas dquot_6.6.0
+[    1.697806] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+[[    1.718048] pnp: PnP ACPI init
+    1.718048] pnp: PnP ACPI init
+[    1.728040] pnp: PnP ACPI: found 5 devices
+[    1.728040] pnp: PnP ACPI: found 5 devices
+[    1.780371] c[    1.780371] clocksource: acpi_pm: mask: 0xffffff max_cycles: 0xffffff, max_idle_ns: 2085701024 ns
+locksource: acpi_pm: mask: 0xffffff max_cycles: 0xffffff, max_idle_ns: 2085701024 ns
+[    1.783473] NET: Registered PF_INET protocol family
+[    1.783473] NET: Registered PF_INET protocol family
+[    1.785457] IP idents hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    1.785457] IP idents hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    1[    1.930563] tcp_listen_portaddr_hash hash table entries: 256 (order: 0, 4096 bytes, linear)
+.930563] tcp_listen_portaddr_hash hash table entries: 256 (order: 0, 4096 bytes, linear)
+[    [    1.932427] Table-perturb hash table entries: 651.932427] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    1.933291] TCP established hash table entries: 4096 (order: 3, 32768 bytes, linear)
+536 (order: 6, 262144 bytes, linear)
+[    1.933291] TCP established hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    1.9[    1.934350] TCP bind hash table entries: 4096 (order: 5, 131072 by34350] TCP bind hash table entries: 4096 (order: 5, 131072 bytes, linear)
+tes, linear)
+[    1.935118] TCP: Hash tables configured (established 4096 bind 4096)
+[    1.935118] TCP: Hash tables configured (established 4096 bind 4096)
+[  [    1.938150] MPTCP token hash table entries: 512 (order: 2, 12288 bytes, linear)
+  1.938150] MPTCP token hash table entries: 512 (order: 2, 12288 bytes, linear)
+[    1.939073] UDP hash table entries: 256 [    1.939073] UDP hash table entries: 256 (order: 2, 16384 bytes, linear)
+(order: 2, 16384 bytes, linear)
+[    1.939767] UDP-Lite h[    1.939767] UDP-Lite hash table entries: 256 (order: 2, 1638ash table entries: 256 (order: 2, 16384 bytes, linear)
+4 bytes, linear)
+[    1[    1.942584] NET: Registered PF_UNIX/PF_LOCAL protocol family
+.942584] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[   [    1.943581] NET: Registered PF_XDP protocol family
+[    1.944207] pci_bus 0000:00: resource 4 [io  0x0000-0x0cf7 window]
+[    1.945324] pci_bus 0000:00: reso 1.943581] NET: Registered PF_XDP protocol family
+[    1.944207] pci_bus 0000:00: resource 4 [io  0x0000-0x0cf7 window]
+[    1.945324] pci_bus 0000:00: resource 5 [io  0x0d00-0xffff window]
+urce 5 [io  0x0d00-0xffff window]
+[    1.945537] pci_bus 0000:00: resource 6 [mem 0x000a000[    1.945537] pci_bus 0000:00: resource 6 [mem 0x000a0000-0x000bffff window]
+[ 0-0x000bffff window]
+[    1.945785   1.945785] pci_bus 0000:00: ] pci_bus 0000:00: resource 7 [mem 0x20000000-0xfebfffff window]
+resource 7 [mem 0x20000000-0xfebfffff window]
+[    1.946046] pci_bus 0000:00: resource 8 [mem 0x100000000-0x17ffffff[    1.946046] pci_bus 0000:00: resource 8 [mem 0x100000000-0x17fffffff window]
+f window]
+[    1[    1.947223] pci 0000:00:01.0: PIIX3: Enabling Passive Release
+[    1.947520] pci 0000:00:00.0: Limiting direct.947223] pci 0000:00:01.0: PIIX3: Enabling Passive Release
+[    1.947520] pci 0000:00:00.0: Limiting direct PCI/PCI transfers
+[    1.947901]  PCI/PCI transfers
+[    1.947901] PCI: CLS 0 bytes, default 64
+PCI: CLS 0 bytes, default 64
+[    1.955208] Initialise system trusted keyrings
+[    1.955208] Initialise system trusted keyrings
+[    1[    1.969645] Unpacking initramfs...
+.969645] Unpacking initramfs...
+[    1.989060] workin[    1.989060] workingset: timestamp_bits=40 max_order=17 bucket_order=0
+gset: timestamp_bits=40 max_order=17 bucket_order=0
+[    1.[    1.995530] Key type asymmetric registered
+[    1.995832] 995530] Key type asymmetric registered
+[    1.995832] Asymmetric key parser 'x5Asymmetric key parser 'x509' registered
+09' registered
+[    [    1.996827] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 247)
+1.996827] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 247)
+[    2.012[    2.012779] io scheduler mq-deadline registered
+[    2.013129] io scheduler kyber registered
+779] io scheduler mq-deadline registered
+[    2.013129] io scheduler kyber registered
+[    2.0139[    2.013915] io scheduler bfq registered
+15] io scheduler bfq registered
+[    2.03247[    2.032477] ERST DBG: ERST support is disabled.
+7] ERST DBG: ERST support is disabled.
+[    2.2[    2.222479] ACPI: \_SB_.LNKC: Enabled at IRQ 11
+22479] ACPI: \_SB_.LNKC: Enabled at IRQ 11
+[    2.6[    2.665023] ACPI: \_SB_.LNKD: Enabled at IRQ 10
+65023] ACPI: \_SB_.LNKD: Enabled at IRQ 10
+[    2.[    2.803885] Serial: 8250/16550 driver, 4 ports, IRQ sharing enabled
+803885] Serial: 8250/16550 driver, 4 ports, IRQ sharing enabled
+[  [    2.811659] 00:04: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+  2.811659] 00:04: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+[    2.[    2.886801] VMware PVSCSI driver - version 1.0.7.0-k
+886801] VMware PVSCSI driver - version 1.0.7.0-k
+[    [    2.912051] scsi host0: ata_piix
+2.912051] scsi host0: ata_piix
+[    2.9[    2.923565] scsi host1: ata_piix
+23565] scsi host1: ata_piix
+[    2[    2.926386] ata1: PATA max MWDMA2 cmd 0x1f0 ctl 0x3f6 bmdma 0xc040 irq 14 lpm-pol 0
+[    2.926822] ata2: PATA max MWDMA2 cmd 0x170 ctl 0x376 bmdma 0xc048 irq 15 lpm-pol 0
+.926386] ata1: PATA max MWDMA2 cmd 0x1f0 ctl 0x3f6 bmdma 0xc040 irq 14 lpm-pol 0
+[    2.926822] ata2: PATA max MWDMA2 cmd 0x170 ctl 0x376 bmdma 0xc048 irq 15 lpm-pol 0
+[    [    2.928964] hv_vmbus: registering driver hv_netvsc
+2.928964] hv_vmbus: registering driver hv_netvsc
+[    [    2.930890] i8042: PNP: PS/2 Controller [PNP0303:KBD,PNP0f13:MOU] at 0x60,0x64 irq 1,12
+2.930890] i8042: PNP: PS/2 Controller [PNP0303:KBD,PNP0f13:MOU] at 0x60,0x64 irq 1,12
+[    2.936636] serio: i8042 KBD port at 0x60,0x64 irq 1
+[    2.936636] serio: i8042 KBD port at 0x60,0x64 irq 1
+[    2.937151] serio: i8042 AUX port at 0x60,0x6[    2.937151] serio: i8042 AUX port at 0x60,0x64 irq 12
+4 irq 12
+[    2.937652] hv_vmbus: registering driver hyperv_keyboard
+[    2.937652] hv_vmbus: registering driver hyperv_keyboard
+[    2[    2.939531] rtc_cmos PNP0B00:00: RTC can wake from S4
+.939531] rtc_cmos PNP0B00:00: RTC can wake from S4
+[    2.949789] input: AT Translated Set 2 keyboard as /devices/platform/i8042/serio0/input/input0
+[    2.949789] input: AT Translated Set 2 keyboard as /devices/platform/i8042/serio0/input/input0
+[    2.972114] tsc: Refined TSC clocksource calibra[    2.972114] tsc: Refined TSC clocksource calibration: 1497.750 MHz
+tion: 1497.750 MHz
+[    2.973039] clo[    2.973039] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x1596d5299bc, max_idle_ns: 440795236382 ns
+cksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x1596d5299bc, max_idle_ns: 440795236382 ns
+[   [    2.975662] clocksource: Switched to clocksource tsc
+ 2.975662] clocksource: Switched to clocksource tsc
+[    2.991958] rtc_cmos PNP0B00:00: registered as rtc0
+[    2.991958] rtc_cmos PNP0B00:00: registered as rtc0
+[    2.993154] rtc_cmos PNP0B00:00: setting system clock to 2026-10-25T10:19:13 UTC (1792923553)
+[    2.993154] rtc_cmos PNP0B00:00: setting system clock to 2026-10-25T10:19:13 UTC (1792923553)
+[    2.996251] rtc_cmos PNP0B00:00: alarms up to one day, y3k,[    2.996251] rtc_cmos PNP0B00:00: alarms up to one day, y3k, 242 bytes nvram, hpet irqs
+ 242 bytes nvram, hpet irqs
+[    2.[    2.997169] amd_pstate: the _CPC object is not present in SBIOS or ACPI disabled
+997169] amd_pstate: the _CPC object is not present in SBIOS or ACPI disabled
+[    3.004387] gre: GRE over IPv4 demultiplexer driver
+[    3.004387] gre: GRE over IPv4 demultiplexer driver
+[    3.006216] NET: Registered PF_INET6 protocol family
+[    3.006216] NET: Registered PF_INET6 protocol family
+[    3.034879] Segme[    3.034879] Segment Routing with IPv6
+[    3.035337] In-situ OAM (IOAM) with IPv6
+nt Routing with IPv6
+[    3.035337] In-situ OAM (IOAM) with IPv6
+[    3.051010] Key t[    3.051010] Key type dns_resolver registered
+ype dns_resolver registered
+[    3.057265] IPI sho[    3.057265] IPI shorthand broadcast: enabled
+rthand broadcast: enabled
+[    3.121917] sched_clock: Marking stable (3058764915, 62152208)->(3176710095, -55792972)
+[    3.121917] sched_clock: Marking stable (3058764915, 62152208)->(3176710095, -55792972)
+[ [    3   3.189509] ata2: found un.189509] ata2: found unknown devicknown device e (class 0)
+(class 0)
+[    3.206281][    3.206281] ata1: found u ata1: found unknonknowwn device (class 0)
+n device (class 0)
+[    3.261350] ata2.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+[    3.261350] ata2.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+[    3.267474] ata1.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+[    3.267474] ata1.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+[    3.3[    3.317121] scsi 0:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     2.5+ PQ: 0 ANSI: 5
+17121] scsi 0:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     2.5+ PQ: 0 ANSI: 5
+[    3.324167] registered taskstats version 1
+[    3.324167] registered taskstats version 1
+[   [    3.32 3.329067] Loading c9067] Loading compiled-in X.509 certificatesompiled-in X.509 certificates
+
+[    3.371[    3.371720] scsi 720] scsi 1:0:0:0: CD1:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     2.5+-ROM            QEMU     QEMU DVD-ROM     2.5+ PQ: 0 ANSI: 5
+ PQ: 0 ANSI: 5
+[    3.774687] Freeing initrd memory: 9616K
+[    3.774687] Freeing initrd memory: 9616K
+[[    4.028541] Loaded X.509 cert 'alpinelinux.org: Alpine Linux kernel key: d76a695f66ad9cd28f5c22a8508f36e91f521f7a'
+    4.028541] Loaded X.509 cert 'alpinelinux.org: Alpine Linux kernel key: d76a695f66ad9cd28f5c22a8508f36e91f521f7a'
+[    4.067077] Demotion targets for Node 0: null
+[    4.067077] Demotion targets for Node 0: null
+[    4.069874] Key type .fscrypt registered
+[    4.070264] Key type fscrypt-provisioning registered
+[    4.069874] Key type .fscrypt registered
+[    4.070264] Key type fscrypt-provisioning registered
+[    4.287400] Freeing unused kernel [    4.287400] Freeing unused kernel image (initmem) memory: 3008K
+[    4.288496] Write protecting the kernel read-only data: 26624k
+image (initmem) memory: 3008K
+[    4.288496] Write protecting the kernel read-only data: 26624k
+[[    4.294348] Freeing unused kernel image (text/rodata gap) memory: 1672K
+[    4.295585] Freeing unused kernel image (rodata/data gap) memory: 304K
+    4.294348] Freeing unused kernel image (text/rodata gap) memory: 1672K
+[    4.295585] Freeing unused kernel image (rodata/data gap) memory: 304K
+[   [    4.298720] rodata_test: 4.298720] rodata_test: all  all tests were successful
+tests were successful
+[[    4.301401] Run /init    4.301401] Run /init as init process
+ as init process
+[    4.733714] Al[    4.733714] Alpine Init 3.14.1-r0
+pine Init 3.14.1-r0
+Alpine Init 3.14Alpine Init 3.14.1-r0.1-r0
+
+[[    4.745073] Loading boot drivers...
+    4.745073] Loading boot drivers...
+ * Lo * Loading boot drivers: ading boot drivers: [    4.8[    4.898417] 98417] loop: module loaded
+loop: module loaded
+[    4.924808] squashfs: version 4.0 (2009/01/[    4.924808] squashfs: version 4.0 (2009/01/31) Phillip Loug31) Phillip Lougher
+her
+[    5[    5.020752] ACPI: bus type USB registered
+.020752] ACPI: bus type USB registered
+[    5.023717] usbcore: registere[    5.023717] usbcore: registered new interface driver usbfs
+[    5.024377] usbcore: registered new interface driver hub
+[d new interface driver usbfs
+[    5.024377] usbcore: registered new interface driver hub
+[    5.024846] usbcore: registered new device driver usb
+    5.024846] usbcore: registered new device driver usb
+[    5.049111] usbcore: r[    5.049111] usbcore: registered new interface driver usb-storage
+egistered new interface driver usb-storage
+[    5.062761] Loading boot drivers: ok.
+[    5.062761] Loading boot drivers: ok.
+ok.
+ok.
+[    5.190778] Mounting boot media...
+[    5.190778] Mounting boot media...
+ * Mounting boot media:  * Mounting boot media: [    5.707805] sr 0:0:0[    5.707805] sr 0:0:0:0: [sr0] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+:0: [sr0] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+[    5.[    5.717359] cdrom: Uniform CD-ROM driver Revision: 3.20
+717359] cdrom: Uniform CD-ROM driver Revision: 3.20
+[    5[    5.742418] sr 1:0:0:0: [sr1] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+.742418] sr 1:0:0:0: [sr1] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+[   14.465959] b[   14.465959] block sr0: the capability attribute has been deprecated.
+lock sr0: the capability attribute has been deprecated.
+[[   18.905903] Mounting boot    18.905903] Mounting boot media: ok.
+media: ok.
+okok..
+
+[ [   20.434172] Installing packages to root fi  20.434172] Installing packages to root filelesystem...
+system...
+  * Install* Installing pacing packakages tges to root fio root filesystlesystem: em: ( ( 1/28) Installing alpine-baselayo1/28) Installing alpine-baselayout-data (3.7.2-r1)ut-data (3.7.2-r1)
+
+7  0%      7  0%                                                                                    8[0K( 2/28) Installin8[0K( 2/28) Installing musl (1.2.6-r3)g musl (1.2.6-r3)
+
+77  0%              0%                                                                              8[0K7  1%   8[0K7  1%                                                                                       8[08[0KK7  3% #                  7  3% #                                                                    8[0K7  5% ##                                          8[0K7  5% ##                                          8[08[0K7  7% ###         K7  7% ###                                                                         8[08[0K( 3/28) Installing busybox (1.37.0-r31)
+7  7% ###                                         8[0K7  8% ###                          K( 3/28) Installing busybox (1.37.0-r31)
+7  7% ###                                         8[0K7  8% ###                                                        8[0K8[0K7 10% ####                                        7 10% ####                                        8[0K7 13% 8[0K7 13% #####              #####                                                                8[08[0K7 15% ######                                      K7 15% ######                                      8[8[0K7 16% #######                         0K7 16% #######                                                 8[08[0K  Executing busybox-1.37.0-r31.post-install
+7 16% #######                                     K  Executing busybox-1.37.0-r31.post-install
+7 16% #######                                     8[08[0K( 4/28) Installing busybox-binsh (1.37.0-r31)
+7 16% #######                                     8[0K7 17% #######                                     K( 4/28) Installing busybox-binsh (1.37.0-r31)
+7 16% #######                                     8[0K7 17% #######                                     8[8[0K( 5/28) Installing alpine-baselayout (3.7.2-r1)
+7 17% #######                                     8[0K7 18% ########                                    0K( 5/28) Installing alpine-baselayout (3.7.2-r1)
+7 17% #######                                     8[0K7 18% ########                                    8[0K  Ex8[0K  Executing alpine-baselayout-3.7.2-r1.pre-install
+7 18% ########                                    ecuting alpine-baselayout-3.7.2-r1.pre-install
+7 18% ########                                    8[0K7 19% ###8[0K7 19% ########                                    8[0K  Executing alpine-baselayout-3.7.2-r1.post-install
+7 19% ########                                    #####                                    8[0K  Executing alpine-baselayout-3.7.2-r1.post-install
+7 19% ########                                    88[0K( 6/28) Installing bridge (1.5-r5[0K( 6/28) Installing bridge (1.5-r5))
+
+7 19% 7 19% ########                ########                                                        88[0K7 20% ########  [0K7 20% ########                                                                      8[08[0KK( 7/28) Installing( 7/28) Installing ifupdown-ng (0.13.0-r0)
+7 20% ########                                    8[0K7 21% #########                                    ifupdown-ng (0.13.0-r0)
+7 20% ########                                    8[0K7 21% #########                                   8[8[0K7 22% #########                             0K7 22% #########                                         88[0K( 8/28) Installin[0K( 8/28) Installing openrc-user (0.63.2-r0)g openrc-user (0.63.2-r0)
+
+7 22% #########    7 22% #########                                                                  8[08[0K7 23% #######K7 23% ##########                                 ###                                   88[0K( 9/28) Installing libcap2 (2.78-r0)
+7 23% ##########                                  [0K( 9/28) Installing libcap2 (2.78-r0)
+7 23% ##########                                  8[08[0K7 24% ##########            K7 24% ##########                                                        8[0K(10/28[0K(10/28) Ins8) Insttalallilinng og openrc (0.63.2-r0)penrc (0.63.2-r0)
+
+7 24% #########7 24% ##########                                  8[0K7 25% ###########          #                                  8[0K7 25% ###########                                                        88[0K7 27% ############[0K7 27% ############                                                                8[0K7 29% ############                                8[0K7 29% ############                                8[8[0K  Executing openrc-0K  Executing openrc-0.63.2-r0.post-install0.63.2-r0.post-install
+
+7 29% ############                                7 29% ############                                88[0K(11/28) Ins[0K(11/28) Installing talling alpine-alpine-conf (3.22.0-r0)conf (3.22.0-r0)
+
+7 27 29% ############            9% ############                                                    8[0K7 30% #############       8[0K7 30% #############                                                       8[0K7 31%8[0K7 31% #############                                #############                               8[0K(12/28) Insta8[0K(12/28) Installing alpine-keys (2.6-r0)lling alpine-keys (2.6-r0)
+
+7 31% #############          7 31% #############                                                    8[0K78[0K7 32% ##############  32% ##############                                                           8[0K(13/28) Ins8[0K(13/28) Installing altalling alppine-rine-release (3.24.3-r0)elease (3.24.3-r0)
+
+77 32% ##############     32% ##############                                                        8[0K7 33% 8[0K7 33% #####################                 #######                                           8[0K(14/28) Installing libcrypto3 (3.5.9-r0)
+8[0K(14/28) Installing libcrypto3 (3.5.9-r0)
+7 33% #7 33% ##############                     #############                              8[0K7 34% ###############                                      8[0K7 34% ###############                             8[0K7 36% #######8[0K7 36% ################                      #########                                  8[0K78[0K7 38% #################             38% #################                                          8[0K78[0K7 41% ##################                           41% ##################                          8[0K7 43% ##################                          8[0K7 43% ##################                          8[0K7 45% #############8[0K7 45% ###################                 ######                                 88[0K7 47% ####################                        [0K7 47% ####################                        8[0K7 49% ###8[0K7 49% #####################                       ##################                       8[0K7 58[0K7 51% ######################                      1% ######################                      8[0K7 53% ###8[0K7 53% #######################                     ####################                     8[0K7 58[0K7 55% ########################                    5% ########################                    8[0K7 57% #########8[0K7 57% #########################                   ################                   8[0K7 59% ##########################8[0K7 59% ##########################                                    8[0K7 618[0K7 61% ###########################                 % ###########################                 8[0K7 63% ############################                8[0K7 63% ############################                8[0K8[0K7 66% ###########################7 66% #############################               ##               8[0K(15/8[0K(15/28) Installing libssl3 (3.5.9-r0)
+7 66% #############################               8[0K7 67% ###28) Installing libssl3 (3.5.9-r0)
+7 66% #############################               8[0K7 67% #############################               ##########################               8[0K7 69% ########8[0K7 69% ##############################              ######################              8[0K7 8[0K7 71% ###############################             71% ###############################             8[0K7 738[0K7 73% ################################            % ################################            8[0K(18[0K(16/28) Installing ssl_client (1.37.0-r31)
+6/28) Installing ssl_client (1.37.0-r31)
+7 73% ################################            7 73% ################################            8[0K7 74% ################################            8[0K7 74% ################################            8[0K(8[0K(17/28) Installing zlib (1.3.2-r1)
+7 74% #################17/28) Installing zlib (1.3.2-r1)
+7 74% ################################            ###############            8[0K7 75% ###8[0K7 75% #################################           ##############################           88[0K7 76% #################################           [0K7 76% #################################           8[0K8[0K(18/28) Installing libapk (3.0.8-r0)(18/28) Installing libapk (3.0.8-r0)
+7 76% #################################           8[0K7 77% 
+7 76% #################################           8[0K7 77% ##################################          ##################################          8[0K7 8[0K7 79% ##################################          79% ##################################          8[0K7 8[0K7 79% ###################################         79% ###################################         8[0K(19/28[0K(19/28) Installing ca-certificates-bundle (20261020-r0)8) Installing ca-certificates-bundle (20261020-r0)
+7 79%
+7 79% ###################################          ###################################         8[0K7 80% ###################################         8[0K7 80% ###################################         8[0K7 8[0K7 82% ####################################        82% ####################################        8[0K(20/8[0K(20/28) Installing apk-tools (3.0.8-r0)
+7 82% ####################################        8[0K7 83% ####################################        28) Installing apk-tools (3.0.8-r0)
+7 82% ####################################        8[0K7 83% ####################################        8[08[0K7 84% #####################################       K7 84% #####################################       8[0K(21/28)8[0K(21/28) Installing mdev-conf (4.10-r0)
+7 84% #####################################        Installing mdev-conf (4.10-r0)
+7 84% #####################################       8[0K7 85% ###################################8[0K7 85% #####################################       ##       8[0K(22/28) In8[0K(22/28) Installing busybox-mdev-openrc (1.37.0-r31)
+7 85% #####################################       8[0K7 8stalling busybox-mdev-openrc (1.37.0-r31)
+7 85% #####################################       8[0K7 86% ######################################      6% ######################################      8[0K(23/28[0K(23/28) Installing busybox-openrc (1.37.0-r31)
+7 86% ######################################      8[0K7 87% ######################################      8) Installing busybox-openrc (1.37.0-r31)
+7 86% ######################################      8[0K7 87% ######################################      8[0K(8[0K(24/28) Installing busybox-suid (1.37.0-r31)
+7 87% ######################################      8[0K7 88% ######################################      24/28) Installing busybox-suid (1.37.0-r31)
+7 87% ######################################      8[0K7 88% ######################################      8[0K7 88% ###8[0K7 88% #######################################     ####################################     8[0K(25/28) In8[0K(25/28) Installing scanelf (1.3.9-r1)
+7 88% #######################################     8[0K7 89% #######################################     stalling scanelf (1.3.9-r1)
+7 88% #######################################     8[0K7 89% #######################################     8[0K7 90% ###############8[0K7 90% #######################################     ########################     8[0K(26/28) Installin8[0K(26/28) Installing musl-utils (1.2.6-r3)
+7 90% #######################################     8[0K7 91% ########g musl-utils (1.2.6-r3)
+7 90% #######################################     8[0K7 91% ########################################    ################################    8[0K(27/8[0K(27/28) Installing alpine-base (3.24.3-r0)28) Installing alpine-base (3.24.3-r0)
+7 91% ########################################    
+7 91% ########################################    8[0K7 92% ##########################8[0K7 92% ########################################    ##############    8[0K(28/28) Installing openssl (3.5.8[0K(28/28) Installing openssl (3.5.9-r0)
+7 929-r0)
+7 92% % ############################################################################### #       8[0K78[0K7 93% #########################################    93% #########################################   8[0K7 95% ########################################8[0K7 95% ##########################################  ##  8[08[0K7 97% ##########################################  K7 97% ##########################################  8[0K78[0K7 98% ###########################################  98% ########################################### 8[08[0K7100% ############################################K7100% ############################################8[0KExecuting busybox-8[0KExecuting busybox-1.37.0-r31.trigger
+1.37.0-r31.trigger
+OK: 10.5 MiB in OK: 10.5 MiB in 28 packages
+28 packages
+[   22.838[   22.838872] Installing packages to root filesystem: ok.
+872] Installing packages to root filesystem: ok.
+ok.
+ok.
+
+
+
+
+   Op   OpenRC 0.63.2 is starting up Linux 6.18.58-0-virt (x86_64)
+
+enRC 0.63.2 is starting up Linux 6.18.58-0-virt (x86_64)
+
+ * /proc is alre * /proc is already mounted
+ady mounted
+ * Mounting /run ... * Mounting /run ... [ ok ] [ ok ]
+
+ * /run/openrc * /run/openrc: creating directory
+: creating directory
+ *  * /r/run/lock: creating directoryun/lock: creating directory
+
+ * /run/lo * /run/lock: correcting ownerck: correcting owner
+
+ * Caching service dependencies ... [ ok ]
+ * Caching service dependencies ... [ ok ]
+ * Remounting de * Remounting devtmpfs on /dev ...vtmpfs on /dev ... [ ok ] [ ok ]
+
+ * Mounting /dev/mqueue ... * Mounting /dev/mqueue ...  [ ok ]
+[ ok ]
+ * Mounting mo * Mounting modloop  ...dloop  ... * Verifying mod * Verifying modloop
+loop
+ [ ok ] [ ok ]
+
+ * Mounti * Mounting security filesystem ...ng security filesystem ... [ ok ] [ ok ]
+
+ * Mounting * Mounting debug filesystem ... debug filesystem ... [ ok ] [ ok ]
+
+ * * Mounting trace filesyst Mounting trace filesystem ...em ... [ ok ] [ ok ]
+
+ * Mounti * Mounting persistent storage (pstore) filesystem ...ng persistent storage (pstore) filesystem ... [ ok ] [ ok ]
+
+ * Mo * Mounting bpf filesystem ...unting bpf filesystem ... [ ok ]
+ [ ok ]
+ * Star * Starting busybox mdev ...ting busybox mdev ... [ o [ ok ]
+k ]
+ * Scann * Scanning hardware for mdev ...ing hardware for mdev ... [ ok ] [ ok ]
+
+ * Loading h * Loading hardware drivers ...ardware drivers ... [ ok ] [ ok ]
+
+ * Loading modul * Loading modules ...es ... [ ok ] [ ok ]
+
+ * Setti * Setting system clock using the hardware clock [UTC] ...ng system clock using the hardware clock [UTC] ... [ ok ] [ ok ]
+
+ * Checking * Checking local filesystems  ... local filesystems  ... [ ok ] [ ok ]
+
+ * R * Remounting filesystems ...emounting filesystems ... [ ok ] [ ok ]
+
+ * Mounting loc * Mounting local filesystems ...al filesystems ... [ ok ] [ ok ]
+
+ * Configuring  * Configuring kernel parameters ...kernel parameters ... [ ok ] [ ok ]
+
+ *  * Creating user login records ...Creating user login records ... [ ok ]
+ [ ok ]
+ * Cleaning /tm * Cleaning /tmp dip directory ...rectory ... [ ok ]
+ [ ok ]
+ * Sett * Setting hostname to localhost from /etc/hostname ...ing hostname to localhost from /etc/hostname ... [ ok  [ ok ]
+]
+ * St * Starting busybox syslog ...arting busybox syslog ... [ o [ ok ]
+k ]
+ * Starting  * Starting firstboot ...firstboot ... [ ok  [ ok ]
+]
+
+
+Welcome tWelcome to Alpine Linux 3.24
+o Alpine Linux 3.24
+Kernel Kernel 6.18.58-0-virt on x86_64 (/dev/ttyS0)
+
+6.18.58-0-virt on x86_64 (/dev/ttyS0)
+
+localhost login: localhost login: root
+rootroot
+
+Welcome to AlpWelcome to Alpine!
+
+The Aine!
+
+The Alpine Wiki clpine Wiki contains a lontains a large aarge amount of hmount of howow-t-to o guguidideses a and nd gegennereralal
+inf
+information about administratinormation about administrating Alpine systems.
+See <https://wig Alpine systems.
+See <https://wiki.alpinelinux.org/>.ki.alpinelinux.org/>.
+
+
+Yo
+You can setup the u can setup the systesystem with the command: setup-alpim with the command: setup-alpinene
+
+
+
+You may change this messageYou may change this message by editing /etc/motd. by editing /etc/motd.
+
+
+
+localhoslocalhost:~# t:~# ip link set eth0 up; udhcpc -i eth0 -t 10; ip -4 addr show eth0
+echo SENT-NET-OK
+[6nip link set eth0 up; udhcpc -i eth0 -t 10; ip -4 addr show eth0
+[6nip link set eth0 up; udhcpc -i eth0 -t 10; ip -4 addr show eth0
+echo SENT-echo SENT-NET-OK
+NET-OK
+udhcpc: sudhcpc: started, v1.37.0
+tarted, v1.37.0
+udhcpc: broadcasting discoverudhcpc: broadcasting discover
+
+udhcpc: udhcpc: broadcasting select for 10.0.2.15, server 10.0.2.2
+broadcasting select for 10.0.2.15, server 10.0.2.2
+udhcpc: ludhcpc: lease of 10.0.2.15 obtained from 10.0.2.2, lease time 86400
+ease of 10.0.2.15 obtained from 10.0.2.2, lease time 86400
+2: eth0: 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+<BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    in    inet 10.0.2.15/24 scope global eth0
+et 10.0.2.15/24 scope global eth0
+       valid_lft       valid_lft forever preferred_lft forever
+ forever preferred_lft forever
+localhoslocalhost:~# t:~# echechoo SEN SENT-T-NENET-OKT-OK
+
+modprobe 9p 2>/dev/null; modprobe 9pnet_virtio 2>/dev/null; mkdir -p /mnt/host && mount -t 9p -o trans=virtio,version=9p2000.L host0 /mnt/host && ls /mnt/host
+echo SENT-9P-OK
+SENT-NET-OK
+localhost:~# [6nmodprobe 9p 2>/dev/null; modprobe 9pnet_virtio 2>/dev/null; mkdir -
+p /mnt/host && mount -t 9p -o trans=virtio,version=9p2000.L host0 /mnt/host && l
+s /mnt/host
+SENT-NET-OK
+localhost:~# [6nmodprobe 9p 2>/dev/null; modprobe 9pnet_virtio 2>/dev/null; mkdir -
+p /mnt/host && mount -t 9p -o trans=virtio,version=9p2000.L host0 /mnt/host && l
+s /mnt/host
+echo SENTecho SENT-9P-OK
+-9P-OK
+[0;0mbun[0;0mbundle.tar.gz[m     [0;0mengine-block.txt[m  [1;34mguest-libs[m        [1;34mnode-dist[m
+dle.tar.gz[m     [0;0mengine-block.txt[m  [1;34mguest-libs[m        [1;34mnode-dist[m
+localhlocalhost:~# ost:~# eechocho S SENTENT-9-9P-OKP-OKcp /mnt/host/guest-libs/usr/lib/libstdc++.so.6* /mnt/host/guest-libs/usr/lib/libgcc_s.so.1 /usr/lib/ && ls -la /usr/lib/libstdc++*
+echo SENT-LIBS-OK
+
+SENT-9P-OK
+localhost:~# [6ncp /mnt/host/guest-libs/usr/lib/libstdc++.so.6* /mnt/host/guest-lib
+s/usr/lib/libgcc_s.so.1 /usr/lib/ && ls -la /usr/lib/libstdc++*
+
+SENT-9P-OK
+localhost:~# [6ncp /mnt/host/guest-libs/usr/lib/libstdc++.so.6* /mnt/host/guest-lib
+s/usr/lib/libgcc_s.so.1 /usr/lib/ && ls -la /usr/lib/libstdc++*
+echo SENT-LIBS-OK
+echo SENT-LIBS-OK
+-rwxr-xr-x    1 -rwxr-xr-x    1 root     root       2804104 Oct 25 10:21 [1;32m/usr/lib/libstdc++.so.6[m
+root     root       2804104 Oct 25 10:21 [1;32m/usr/lib/libstdc++.so.6[m
+-rwxr-xr-x    1 root  -rwxr-xr-x    1 root     root       2804104 Oct 25 10:21 [1;32m/usr/lib/libstdc++.so.6.0.34[m
+   root       2804104 Oct 25 10:21 [1;32m/usr/lib/libstdc++.so.6.0.34[m
+lolocalhost:~# ecalhost:~# ecchhoo  SSEENTNT-L-LIIBBSS-O-OKK/mnt/host/node-dist/bin/node --version
+
+SENT-LIBS-OK
+localhost:~# [6n
+SENT-LIBS-OK
+localhost:~# [6n//mmnnt/hostt/host//nnode-dist/bin/nodode-dist/bin/node -e --v-version
+ersion
+v22.1v22.14.04.0mkdir -p /root/x && cd /root/x && tar xzf /mnt/host/bundle.tar.gz && cp /mnt/host/engine-block.txt . && ls
+echo SENT-FETCH-OK
+
+mkdir -p /root/x && cd /root/x && tar xzf /mnt/host/bundle.tar.gz && cp /mnt/host/engine-block.txt . && ls
+localhost:~# mkdir -p /root/x && cd /root/x && tar xzf /mnt/host/bundle.tar.gz &
+& cp /mnt/host/engine-block.txt . && ls
+
+mkdir -p /root/x && cd /root/x && tar xzf /mnt/host/bundle.tar.gz && cp /mnt/host/engine-block.txt . && ls
+localhost:~# mkdir -p /root/x && cd /root/x && tar xzf /mnt/host/bundle.tar.gz &
+& cp /mnt/host/engine-block.txt . && ls
+echo echo SENT-FETCH-OK
+SENT-FETCH-OK
+[1;34mengine[m        [1;34mengine[m            [0;0mpeer-server.mjs[m   [1;34mscripture-armor[m    [0;0mpeer-server.mjs[m   [1;34mscripture-armor[m
+[0;0mengine-block.txt[m  [0;0mrogue-server.mjs[m
+
+[0;0mengine-block.txt[m  [0;0mrogue-server.mjs[m
+loclocalhost:~/x# alhost:~/x# eechcho o SSENT-ENT-FEFETTCCH-OH-OK
+K
+cd /root/x && (nohup /mnt/host/node-dist/bin/node peer-server.mjs > peer.log 2>&1 &) && (nohup /mnt/host/node-dist/bin/node rogue-server.mjs > rogue.log 2>&1 &) && sleep 3 && cat peer.log rogue.log
+echo SENT-PEERS-OK
+SENT-FETCH-OK
+localhost:~/x# [6ncd /root/x && (nohup /mnt/host/node-dist/bin/node peer-server.mjs
+ > peer.log 2>&1 &) && (nohup /mnt/host/node-dist/bin/node rogue-server.mjs > ro
+gue.log 2>&1 &) && sleep 3 && cat peer.log rogue.log
+SENT-FETCH-OK
+localhost:~/x# [6ncd /root/x && (nohup /mnt/host/node-dist/bin/node peer-server.mjs
+ > peer.log 2>&1 &) && (nohup /mnt/host/node-dist/bin/node rogue-server.mjs > ro
+gue.log 2>&1 &) && sleep 3 && cat peer.log rogue.log
+echecho SENT-PEERS-OK
+o SENT-PEERS-OK
+locallocalhost:~/x# host:~/x# eechcho o SSENENT-PET-PEERS-ERS-OK
+OK
+cat /root/x/evidence.json; poweroff
+SENT-PEERS-OK
+localhost:~/x# [6nSENT-PEERS-OK
+localhost:~/x# [6nccaat /root/x/t /root/x/evidenevidence.json; pce.json; pooweroffweroff
+
+{{
+  "peer_sign_fp": "8c3e5abdde8b847e22c9024cb3c08d12df0eeb536868a5b1ab23cbf0ce77c042",
+  "peer_seal_fp": "3a4977ba983e4c038c5fa9639af2ae22ee9e731ed970a0cb20f8bbe10e277bdf",
+  "packages_opened": 1,
+  "packages
+  "peer_sign_fp": "8c3e5abdde8b847e22c9024cb3c08d12df0eeb536868a5b1ab23cbf0ce77c042",
+  "peer_seal_fp": "3a4977ba983e4c038c5fa9639af2ae22ee9e731ed970a0cb20f8bbe10e277bdf",
+  "packages_opened": 1,
+  "packages_refused": 2,
+  "sende_refused": 2,
+  "senders_seen": [
+    "860rs_seen": [
+    "860a70e8181ed335fb51a70e8181ed335fb51aeaea4a436e36e8865d9ec41cfb4b408f59ee8dcff59d8de9082"
+  ]65d9ec41cfb4b408f59ee8dcff59d8de9082"
+  ],
+  "last_payload_sha256": ,
+  "last_payload_sha256": "f9169164fc1a9e4f07"f9169164fc1a9e4f075c68ef1f15099d63316b3f5c68ef1f15099d63316b3f5767be55e221725767be55e22172ececffffaaaabfbf7474",",
+  "last_envelope_sha256
+  "last_envelope_sha256": "635a4b2241336f2380ad34fb814f916e0c41f1bd33c7536472c2664f0cdf08d": "635a4b2241336f2380ad34fb814f916e0c41f1bd33c7536472c2664f0cdf08d5",
+  "refusals":5",
+  "refusals": [ [
+
+    "armor-native: package from u    "armor-native: package from unexpected sender f8a10515b0nexpected sender f8a10515b06f4ec102aae15acc6026f4ec102aae15acc602a5a5d99d99fdfd7474727204046565d6d6b2b28a8a8e8ee3e37777212137375b5befef â â€”€” r refefususeded",",
+    "armor-native: packa
+    "armor-native: package not addressed to this engine â€” refused"
+  ],
+  "unexpected_sender_beacons": 1
+}ge not addressed to this engine â€” refused"
+  ],
+  "unexpected_sender_beacons": 1
+}localhost:~/x# [6nlocalhost:~/x# [6n * S * Stopping busybox syslog ...topping busybox syslog ...  [ ok ]
+[ ok ]
+ * Unmounting loo * Unmounting loop devices
+p devices
+ * *   Remounting /.modloop read    Remounting /.modloop read only ...only ... [ ok ] [ ok ]
+
+ * Unmount * Unmounting filesystems
+ing filesystems
+ *   Unm *   Unmounting /mnt/host ...ounting /mnt/host ... [ ok ]
+ [ ok ]
+ *   Unmounting /media/sr0 ... *   Unmounting /media/sr0 ... [ ok  [ ok ]
+]
+ * Setti * Setting hardware clock using the systng hardware clock using the systemem clock [UTC] ... clock [UTC] ... [ ok  [ ok ]
+]
+ * Sto * Stopping busybox mdev ...pping busybox mdev ... [ ok  [ ok ]
+]
+ [ ok  [ ok ]
+]
+ * Te * Terminating remaining processes rminating remaining processes ......[ [  245.382378] reboot: Power down
+ 245.382378] reboot: Power down

@@ -1,0 +1,44 @@
+PASS — setup: identities created and public blocks parse
+PASS — B1 fleet contribute through the wrap completes :: {"ok":true,"receipt":{"installationId":"inst-proof-1","packetId":"pkt-proof-1","accepted":true,"at":"2026-10-25T09:08:35.342Z","signature":"q5dceVrpXY3X+4Pi936J
+PASS — B2 signed fleet receipt verified THROUGH the wrap
+PASS — B3 fleet forget through the wrap completes
+PASS — B4 wire shows Scripture Armor packages
+PASS — B5 wire does NOT show the packet plaintext marker
+PASS — B6 wire does NOT show the transmitted hash in the clear
+PASS — B7 wire does NOT show the install proof secret
+PASS — B8 wire body is glyph armor (PUA / Linear A / Cuneiform ranges)
+PASS — B9 provenance: fleet leg recorded, answered by the host identity, return-matched :: answered_by=28cd403ee991f528ddc9e8fd500f18e319ef508e1db5389a57e1f4c2a0a57874
+PASS — C1 legacy (unenrolled) contribute still works — compatibility kept
+PASS — C2 CONTROL: legacy wire DOES show the plaintext marker (the wrap is the difference)
+PASS — D1 response naming a never-sent canary is refused as a beacon
+PASS — D2 a second answer to an answered request is refused as replay
+PASS — D3 both refusals are in the beacon record
+PASS — E1 flow exchange round-trips a payload
+PASS — E2 RETURN-HASH LOOP: peer chain receipt verifies against the sent chain :: head=5f9265a522c4e65cf0733c3538fe5c88bed78aba90ee0875b6f110464ea96fa2
+PASS — E3 one flipped byte kills the flow and raises its beacon :: flow-aead-failure: packet altered or foreign (chain mismatch)
+PASS — E4 a signed receipt with the wrong chain head is refused
+PASS — F1 public-API call completes through the estate relay
+PASS — F2 the API key crossed INSIDE the wrap (stub saw it; it was never a wire header)
+PASS — F3 engine↔relay wire shows no API key, no prompt, no response plaintext
+PASS — F4 relay provenance names the answering relay identity
+PASS — F5 native policy refuses an unenrolled target (fail-closed, and the refusal is provenance)
+PASS — F6 residual-direct leg works and is NAMED unwrapped in its provenance
+PASS — F7 sensing ledger: fleet + relay + refusal all readable as source provenance
+PASS — G1 published hash does not appear anywhere in the package
+PASS — G2 the visible frame carries only the keyed commitment (no checkable relation) :: commit
+PASS — G3 the enrolled target opens the package and recovers the hash inside
+PASS — H1 Addendum D: the armor refuses Kingmaker as a subject
+PASS — H2 the same bytes ride fine as TRAFFIC — the armor serves Kingmaker, it does not process it
+PASS — H3 integration surface exposes no cell/govern API
+--- prove.sh (kernel lane, verbatim) ---
+{"stage":"probe","exit":0,"state":{  "lane": "kernel",  "platform": "linux",  "kernel": "7.0.0-39-generic",  "unprivilegedBpfDisabled": 2,  "effectiveCaps": {    "CAP_NET_ADMIN": true,    "CAP_SYS_MODULE": true,    "CAP_SYS_ADMIN": true,    "CAP_AUDIT_CONTROL": true,    "CAP_BPF": true,    "CAP_PERFMON": true  },  "btf": true,  "bpffsMounted": false,  "tracepoints": false,  "lsms": null,  "cgroup": "v2",  "audit": true,  "modulesDisabled": false,  "userNamespaces": true,  "packagedLoader": true,  "packagedObject": true,  "observationCanLoad": true,  "enforcement": "designed-only (DESIGN.md) — nothing in this package blocks, drops, or mediates at the kernel boundary"}}
+{"stage":"pin","ok":true,"objectSha256":"3171c6e005f2859ad0764c8faed3434df29519572585e2f6118a9660fd28e35b"}
+{"ok":false,"stage":"load","errno":1,"error":"Operation not permitted"}
+{"recorded":true,"log":"/home/hatch/workspace/kingmaker-armor-native/proof/state-kernel/kernel-events.jsonl","prev":"GENESIS","ok":false}
+--- prove.sh exit: 2 ---
+PASS — I1 kernel lane prove.sh ran and left its hash-chained event log :: exit=2
+PASS — I2 armor bridge verifies the kernel chain :: records=1
+PASS — I3 kernel load events attested into the armor estate log
+PASS — I4 kernel accounting: the wrapped fleet connect is accounted; a stranger connect beacons
+
+==== armor-native proof: 36 passed, 0 failed ====

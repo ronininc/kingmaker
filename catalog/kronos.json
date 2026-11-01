@@ -1,0 +1,49 @@
+{
+  "_comment": "Kingmaker's Kronos vertical: the connector for Conway-Research/automaton, run behind Kingmaker's rails (lib/automaton.mjs). Both the agent and the gate-off toggle ship OFF. The owner, 2026-10-15: 'youre just giving kingmaker a cnnector for it so i dont have to do so manually' and 'Include the gate-off toggle too: ships off, needs a second confirmation and a spend cap, then automaton acts autonomously.' Pins are the integrity anchor: a git commit hash checksums the whole tree. Keys/wallet are never here; they are sealed in the Mac's Keychain.",
+  "schema": "kingmaker.kronos/1",
+  "updated": "2026-10-15",
+  "vertical": "kronos",
+  "default": "off",
+  "program": {
+    "id": "automaton",
+    "name": "Automaton (Conway Research)",
+    "repo": "Conway-Research/automaton",
+    "url": "https://github.com/Conway-Research/automaton",
+    "commit": "d8f816881fd24b6f5e3d616e59edec387a447667",
+    "license": "MIT",
+    "connector": "repo",
+    "bundled": true,
+    "summary": "Conway's open-source autonomous agent, run only behind Kingmaker's rails.",
+    "install": "Clone at the pinned commit, REA-scan as a repo connector, run under lib/automaton.mjs. See installPlan()."
+  },
+  "skills": {
+    "id": "conway-skills",
+    "repo": "Conway-Research/skills",
+    "url": "https://github.com/Conway-Research/skills",
+    "commit": "54df68e6f0e0ca7ad5df586ec109f6b7b4b9ffee",
+    "license": null,
+    "bundled": false,
+    "fetchOnEnable": true,
+    "summary": "Conway's skills. No licence on the repo, so never bundled or republished: fetched from Conway on this Mac only when enabled, at the pinned commit."
+  },
+  "rails": {
+    "enabledByDefault": false,
+    "capRequired": true,
+    "caps": ["total", "daily"],
+    "capEnforcedOutsideAgent": true,
+    "gate": {
+      "default": "on",
+      "onMeans": "every money action and every self-modification asks first (consent to the owner's phone)",
+      "offToggle": {
+        "shipsOff": true,
+        "needs": ["a required spend cap", "a second confirmation"],
+        "thenMeans": "money actions within the cap run autonomously; self-modification still asks; replication is still refused"
+      }
+    },
+    "replication": "never",
+    "realFunds": "live mode only; dry-run (default) and testnet never move real money",
+    "killSwitch": "'stop approving' (said or typed) stops the agent and its children, freezes spending, and puts the gate back on; only the owner clears it at the console",
+    "wallet": "keys sealed in this Mac's login Keychain (service 'Ronin Automaton Wallet'), never on disk",
+    "audit": "every decision logged (shown in Kingmaker and the Ronin dashboard); problems go to the phone"
+  }
+}

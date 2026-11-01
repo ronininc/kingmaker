@@ -1,0 +1,3044 @@
+{
+ "schema": "kingmaker.release/1",
+ "tag": "v4.4.1",
+ "version": "4.4.1",
+ "product": "Kingmaker",
+ "repo": "ronininc/kingmaker",
+ "builtFrom": "kingmaker-4.4 merged tree @ 84b7e15 (Phase 0 merge of ronininc/kingmaker-private 4.3 rf5 base + public scripture-armor v4 fold; see kingmaker-4.4/PHASE0-MERGE-REPORT.md) + pin fix 8cbce8a (lib/release-identity.json plain JSON; see kingmaker-4.4/PIN-FIX-REPORT.md) + light runtime built in 9503d3d (light-runtime/ surface wired: payload part + kingmaker light) + routing fix 0f059f1 (the blind router: head+tail routing view + long guard). Unit = the Mac payload bake (scripts/build-payload.mjs). v4.4.1: the payload archive is re-issued with the exec-bit fix ONLY \u2014 the 35 shebang entries the 4.4.0 bake landed at 0660 (incl. bin/kingmaker, bin/sol-ghost and vendor/kingmaker-cli-hub/kingmaker-cli-hub) are 0770; every content byte is identical to the 4.4.0 payload (all 377 payload.json-indexed files hash-match), so the tar's internal payload.json still reads version 4.4.0 \u2014 release version 4.4.1 denotes the corrected packaging. Payload sha256 c553e9a41e6940e18d6adf934b4745891b0f489b38a8f470a220818dccbe7e2a supersedes the 4.4.0 artifact of record 2356f466b07f5d20f89d0acae54c700d42c3e3d41858000137495354af024af0 (superseded 7bbe9b5ff7cf28d540dea223f4be760b6c912acb4c7d50873043fca8aca6fe76 in 4.4.0). Bake guard widened in 52a0008: build-payload.mjs now refuses to tar if ANY shebang entry lacks the owner-exec bit.",
+ "createdAt": "2026-10-29T18:45:11Z",
+ "signature": "",
+ "units": {
+  "macos": {
+   "file": "kingmaker-payload.tar",
+   "size": 26163200,
+   "sha256": "c553e9a41e6940e18d6adf934b4745891b0f489b38a8f470a220818dccbe7e2a",
+   "partSize": 1073741824,
+   "manifestFiles": 378,
+   "parts": [
+    {
+     "name": "kingmaker-payload.tar.part-aa",
+     "size": 26163200,
+     "sha256": "c553e9a41e6940e18d6adf934b4745891b0f489b38a8f470a220818dccbe7e2a"
+    }
+   ]
+  }
+ },
+ "files": [
+  {
+   "path": "COMMERCIAL-LICENSE.md",
+   "sha256": "dd1d43c172fd4d696ecd32e5c048c50bd30d6d58c381d58829780700d5fc549d",
+   "size": 1372,
+   "unit": "macos",
+   "offset": 26156544,
+   "entryBytes": 2048
+  },
+  {
+   "path": "LICENSE",
+   "sha256": "6ef542ef6b9ec45aca5a3062cb90a252c40ab65f275ac87c4f1985f6d115283b",
+   "size": 5106,
+   "unit": "macos",
+   "offset": 26150912,
+   "entryBytes": 5632
+  },
+  {
+   "path": "TERMS.md",
+   "sha256": "bb6f90ec691021f3063500d3838cdc37d5d30920d3fa51b2c2ca9a6c692d0f27",
+   "size": 8023,
+   "unit": "macos",
+   "offset": 26142208,
+   "entryBytes": 8704
+  },
+  {
+   "path": "THIRD_PARTY_NOTICES.md",
+   "sha256": "cf8f1661749547b77fd00afb1b6c6cd08fa317fd99a987b585aecd88416cc97d",
+   "size": 8324,
+   "unit": "macos",
+   "offset": 26132992,
+   "entryBytes": 9216
+  },
+  {
+   "path": "assets/kingmaker-idle-dashboard.svg",
+   "sha256": "a80a94f652384ef2e1b7e124d8278d0233355de5dfbc9fcad527240277db693f",
+   "size": 2496,
+   "unit": "macos",
+   "offset": 26129920,
+   "entryBytes": 3072
+  },
+  {
+   "path": "assets/ronin-crest-site.png",
+   "sha256": "50e883b46d7f0d10acfc37dc6b5327f636144ce6044e4b626418c67e58b7e10c",
+   "size": 1166265,
+   "unit": "macos",
+   "offset": 24963072,
+   "entryBytes": 1166848
+  },
+  {
+   "path": "assets/ronin-inc-crest-512.png",
+   "sha256": "597970cb79ddc3fdacd4c635b9be702663550aca5c417a71ec387874fd3263fd",
+   "size": 271681,
+   "unit": "macos",
+   "offset": 24690688,
+   "entryBytes": 272384
+  },
+  {
+   "path": "assets/ronin-inc-crest.png",
+   "sha256": "50e883b46d7f0d10acfc37dc6b5327f636144ce6044e4b626418c67e58b7e10c",
+   "size": 1166265,
+   "unit": "macos",
+   "offset": 23523840,
+   "entryBytes": 1166848
+  },
+  {
+   "path": "bin/kingmaker",
+   "sha256": "487a0622e526c6966d254397374c49c9cf69f7194fe6e7dff9a7ca9dadb23366",
+   "size": 2796,
+   "unit": "macos",
+   "offset": 23519744,
+   "entryBytes": 3584
+  },
+  {
+   "path": "bin/sol-ghost",
+   "sha256": "487a0622e526c6966d254397374c49c9cf69f7194fe6e7dff9a7ca9dadb23366",
+   "size": 2796,
+   "unit": "macos",
+   "offset": 23516160,
+   "entryBytes": 3584
+  },
+  {
+   "path": "catalog/HARDWARE_OUTCOMES.md",
+   "sha256": "c66e9bfcd8be188dd58d42dc1b87f87c910f85c715fa23d02f746fccb980c502",
+   "size": 10575,
+   "unit": "macos",
+   "offset": 23504384,
+   "entryBytes": 11264
+  },
+  {
+   "path": "catalog/bench/bench_concurrent.py",
+   "sha256": "41e457a281cc46eb5022a7b570c29cca82e2eb114f681bc04c16a534900004ce",
+   "size": 2249,
+   "unit": "macos",
+   "offset": 23501312,
+   "entryBytes": 3072
+  },
+  {
+   "path": "catalog/bench/bench_host.jsonl",
+   "sha256": "0722c72290f03577ffcb7d624dc830f71c31ba99b71f74d5d2eab2b82f4f2fd5",
+   "size": 13650,
+   "unit": "macos",
+   "offset": 23486976,
+   "entryBytes": 14336
+  },
+  {
+   "path": "catalog/bench/bench_models.py",
+   "sha256": "a37b188d860d494b9a67408e88e74424b791f5578f50349536f99e4a7fd418fe",
+   "size": 3092,
+   "unit": "macos",
+   "offset": 23482880,
+   "entryBytes": 4096
+  },
+  {
+   "path": "catalog/bench/conc_8gb.json",
+   "sha256": "1b527f907ac67eb49acc2fa61dd0f64f80e0d37890c76fb41b84c41640c807f4",
+   "size": 1374,
+   "unit": "macos",
+   "offset": 23480832,
+   "entryBytes": 2048
+  },
+  {
+   "path": "catalog/bench/eval_host.jsonl",
+   "sha256": "3fba1a48353d81e59f8aea988c5a262f3b1823a761a2c729ec7e3e73eb48e5ed",
+   "size": 11826,
+   "unit": "macos",
+   "offset": 23468032,
+   "entryBytes": 12800
+  },
+  {
+   "path": "catalog/bench/eval_host_long.jsonl",
+   "sha256": "6710d6c7adf28dca72a41c1e9e0f541a4cda07719bcbcbd360126ed064c75b33",
+   "size": 1646,
+   "unit": "macos",
+   "offset": 23465472,
+   "entryBytes": 2560
+  },
+  {
+   "path": "catalog/bench/eval_models.py",
+   "sha256": "e23f34f2051578a29e9658b596f5ede9a872840a7695d7c25f98ebb62447884f",
+   "size": 3633,
+   "unit": "macos",
+   "offset": 23460864,
+   "entryBytes": 4608
+  },
+  {
+   "path": "catalog/bench/m5-pro-24gb-as-8gb.json",
+   "sha256": "ae7e60f9e98f209a4be036186efc95e0d4dba4d206c60202fcc5bc456250850c",
+   "size": 265008,
+   "unit": "macos",
+   "offset": 23195136,
+   "entryBytes": 265728
+  },
+  {
+   "path": "catalog/bench/m5-pro-24gb.json",
+   "sha256": "9d879ff59c99ed1c3e3c511499c1cd4ad46fdf29c9d5944eca3a6bf588f3f2bd",
+   "size": 348415,
+   "unit": "macos",
+   "offset": 22845952,
+   "entryBytes": 349184
+  },
+  {
+   "path": "catalog/bench/vm/m5-pro-virtual-16gb.json",
+   "sha256": "0ff96350b581132f4705a4d4e9cf59c6a67d49d11ba50245d670c9a2be706e64",
+   "size": 68865,
+   "unit": "macos",
+   "offset": 22776320,
+   "entryBytes": 69632
+  },
+  {
+   "path": "catalog/bench/vm/m5-pro-virtual-8gb.json",
+   "sha256": "f162ffbf212ba5ccf04217b9d927f9f4904c6c84bd16384e88ec1a8803303be7",
+   "size": 83904,
+   "unit": "macos",
+   "offset": 22691840,
+   "entryBytes": 84480
+  },
+  {
+   "path": "catalog/churn/2026-10-15.md",
+   "sha256": "38047f820149e63a6f45328af51343857d01c7a822c91ae327288334eb4f9bc5",
+   "size": 229,
+   "unit": "macos",
+   "offset": 22689792,
+   "entryBytes": 1024
+  },
+  {
+   "path": "catalog/churn/state.json",
+   "sha256": "6d6c6f49ff81454d45a3e7dd88c0c926ec36bc023707aa6ff7c170e8779c3c12",
+   "size": 192616,
+   "unit": "macos",
+   "offset": 22496256,
+   "entryBytes": 193536
+  },
+  {
+   "path": "catalog/essentials.json",
+   "sha256": "19b40fece47572545845a18e5dd4259174be1073e6831855650abc168c9cb629",
+   "size": 1581,
+   "unit": "macos",
+   "offset": 22493184,
+   "entryBytes": 2560
+  },
+  {
+   "path": "catalog/extensions.json",
+   "sha256": "62c58439b225c80961eccc527e99c91039603a7ddfc3ab40e41c91dbf2535f24",
+   "size": 5595,
+   "unit": "macos",
+   "offset": 22487040,
+   "entryBytes": 6144
+  },
+  {
+   "path": "catalog/kingmaker-picks.json",
+   "sha256": "6c537985a9453af80c52150d1249a687db87f1875226626cb9ec8e1ff9c05fd3",
+   "size": 1336,
+   "unit": "macos",
+   "offset": 22484992,
+   "entryBytes": 2048
+  },
+  {
+   "path": "catalog/kronos.json",
+   "sha256": "f704f5e642495f2742468a73bf5672fa301384889b5ec64d819e18ee5c8c51e9",
+   "size": 2685,
+   "unit": "macos",
+   "offset": 22481408,
+   "entryBytes": 3584
+  },
+  {
+   "path": "catalog/scrape/build_hb.py",
+   "sha256": "83576b4991de6773401833b9a0ba5f0b4001afce4ea0177fd64a9241ca869780",
+   "size": 10305,
+   "unit": "macos",
+   "offset": 22470144,
+   "entryBytes": 11264
+  },
+  {
+   "path": "catalog/scrape/files_hb.py",
+   "sha256": "84f25b157de28abd2a8068a1b4c4c07f957468ca409d63c2785bcdb4a8bd4ddd",
+   "size": 2616,
+   "unit": "macos",
+   "offset": 22466560,
+   "entryBytes": 3584
+  },
+  {
+   "path": "catalog/scrape/scrape_hb.py",
+   "sha256": "96ca0b5085c7bd62170303ad25134570e557b5883cd44d21d8fe82496461079e",
+   "size": 2267,
+   "unit": "macos",
+   "offset": 22463488,
+   "entryBytes": 3072
+  },
+  {
+   "path": "core/pack.json",
+   "sha256": "288e380cfbdb3b1e9431b57c35707cded98d0e05e2630e027817e1031a38d9fc",
+   "size": 22113,
+   "unit": "macos",
+   "offset": 22439424,
+   "entryBytes": 23040
+  },
+  {
+   "path": "lib/abliterate-model.mjs",
+   "sha256": "3e6dd811bf1badd3778a2698282b1dd4d2c76b16d344de3684a98ab67f568f2c",
+   "size": 3826,
+   "unit": "macos",
+   "offset": 22434304,
+   "entryBytes": 4608
+  },
+  {
+   "path": "lib/absorb.mjs",
+   "sha256": "67b9c6d656d7e76cd7848aa78dc305ac4fdcd61248f7f998e3098c2d77223a76",
+   "size": 9461,
+   "unit": "macos",
+   "offset": 22424064,
+   "entryBytes": 10240
+  },
+  {
+   "path": "lib/ad-video.mjs",
+   "sha256": "9d9711f1fabbd4313cdc9614ca3f2200cc33062a1b62b83efb0a98b02ca2a654",
+   "size": 20267,
+   "unit": "macos",
+   "offset": 22403072,
+   "entryBytes": 20992
+  },
+  {
+   "path": "lib/addon-core.mjs",
+   "sha256": "8b34249fe630260e4c72b20f5145a5bbe97a2d60b9cf6fed185c27f9e03cfe87",
+   "size": 1124,
+   "unit": "macos",
+   "offset": 22401024,
+   "entryBytes": 2048
+  },
+  {
+   "path": "lib/addon-entitlement.mjs",
+   "sha256": "8f86db1cee6ac836d4f978b3676d936989c40b51ceefcc706c4c2a2ef673ea71",
+   "size": 4436,
+   "unit": "macos",
+   "offset": 22395904,
+   "entryBytes": 5120
+  },
+  {
+   "path": "lib/addons.mjs",
+   "sha256": "f44b28fe27e96820b1e968556ab735ab589ee2a83acb71d891685723123e3a7e",
+   "size": 19965,
+   "unit": "macos",
+   "offset": 22375424,
+   "entryBytes": 20480
+  },
+  {
+   "path": "lib/announcements.mjs",
+   "sha256": "05124041e582403cc854b20381efe68058887ae44a631300f2ef03db503ebe57",
+   "size": 5432,
+   "unit": "macos",
+   "offset": 22369280,
+   "entryBytes": 6144
+  },
+  {
+   "path": "lib/armor-egress.mjs",
+   "sha256": "23181d39e245fb36cc72fe49918f1a14d1647a46842d9e131e64a95337112ca1",
+   "size": 13962,
+   "unit": "macos",
+   "offset": 22354432,
+   "entryBytes": 14848
+  },
+  {
+   "path": "lib/armor-native.mjs",
+   "sha256": "a6e136c45b770d5fbb31e089bd74aa7c978b6c52363b148215e3b706d929474e",
+   "size": 20329,
+   "unit": "macos",
+   "offset": 22333440,
+   "entryBytes": 20992
+  },
+  {
+   "path": "lib/artcraft.mjs",
+   "sha256": "8b1bbb5fac3b26c44c34612a57ce033f1015d6195827d2a637e6da168566c30f",
+   "size": 37263,
+   "unit": "macos",
+   "offset": 22295552,
+   "entryBytes": 37888
+  },
+  {
+   "path": "lib/artifacts.mjs",
+   "sha256": "a6d9f07bcbf79e75cb5f882ef829230715f4ef1bac1742bb759e2c05b94201f5",
+   "size": 3459,
+   "unit": "macos",
+   "offset": 22291456,
+   "entryBytes": 4096
+  },
+  {
+   "path": "lib/audit-chain.mjs",
+   "sha256": "b73338158df59d6cfc808de6f3eb55bc36ac5e6f267d07c3f278d24fca6eb9e5",
+   "size": 3438,
+   "unit": "macos",
+   "offset": 22287360,
+   "entryBytes": 4096
+  },
+  {
+   "path": "lib/automaton.mjs",
+   "sha256": "c043e34913a1a2f5c60ad9f99c39e9d5b1c0dab8adf95dca51ede8af1ab39497",
+   "size": 18046,
+   "unit": "macos",
+   "offset": 22268416,
+   "entryBytes": 18944
+  },
+  {
+   "path": "lib/background.mjs",
+   "sha256": "74d5cc68384249c58d3fcc90319cd77227f8ef298cddeda3f5edee63fc5641bc",
+   "size": 3835,
+   "unit": "macos",
+   "offset": 22263808,
+   "entryBytes": 4608
+  },
+  {
+   "path": "lib/bar-events.mjs",
+   "sha256": "3ee60969f00ecd7a0ba9a14e49ef29cc2321ba36d69ef9741b0dd001d0345dfe",
+   "size": 1083,
+   "unit": "macos",
+   "offset": 22261760,
+   "entryBytes": 2048
+  },
+  {
+   "path": "lib/bar-guard.mjs",
+   "sha256": "f627feeca6491bf2236d59980a7a9fd8b1cd479798073d21e69b129850575f53",
+   "size": 4798,
+   "unit": "macos",
+   "offset": 22256128,
+   "entryBytes": 5632
+  },
+  {
+   "path": "lib/bench-cli.mjs",
+   "sha256": "3bdd9f99473d3db7f7c7d3545a8cde9b33489e3bc216721a2dc5d7ee5b848826",
+   "size": 24548,
+   "unit": "macos",
+   "offset": 22231040,
+   "entryBytes": 25088
+  },
+  {
+   "path": "lib/brain-library.mjs",
+   "sha256": "7701d75063764cef152700cce585a65f06f4f86ac4ef24847c0310bd1abee963",
+   "size": 21943,
+   "unit": "macos",
+   "offset": 22208512,
+   "entryBytes": 22528
+  },
+  {
+   "path": "lib/brain-memory.mjs",
+   "sha256": "5c5ec20ed7f57a27e4f72fc4c2ca859455dece026b69a1bd43662274aa79897a",
+   "size": 6853,
+   "unit": "macos",
+   "offset": 22200832,
+   "entryBytes": 7680
+  },
+  {
+   "path": "lib/bridge-keys.mjs",
+   "sha256": "ab9643bf2cb6432cbb61e756a7d82d5da9fa8ce5b3721b2ca506f0497f387cb0",
+   "size": 3315,
+   "unit": "macos",
+   "offset": 22196736,
+   "entryBytes": 4096
+  },
+  {
+   "path": "lib/bridge-metrics.mjs",
+   "sha256": "388e0cfeea1972b6362e3164f78a088a4df7dc621e6593db379b971452298d6d",
+   "size": 2778,
+   "unit": "macos",
+   "offset": 22193152,
+   "entryBytes": 3584
+  },
+  {
+   "path": "lib/bridge-tripwire.mjs",
+   "sha256": "56ad6b49deb2a8382830037398e16f3875865d3f128bf087266bbe46fd636c90",
+   "size": 2138,
+   "unit": "macos",
+   "offset": 22190080,
+   "entryBytes": 3072
+  },
+  {
+   "path": "lib/calibration.mjs",
+   "sha256": "2b8d892946f1c16f94878d498634f82503a8c13644b8bcfa2fa0b31191c5fe0b",
+   "size": 6893,
+   "unit": "macos",
+   "offset": 22182400,
+   "entryBytes": 7680
+  },
+  {
+   "path": "lib/chatgpt-brain.mjs",
+   "sha256": "80d5c5b609f59c0c6abaddae312f7ecea7c3d5ceccf0c7dbc037a6b81f346595",
+   "size": 8299,
+   "unit": "macos",
+   "offset": 22173184,
+   "entryBytes": 9216
+  },
+  {
+   "path": "lib/chrome.mjs",
+   "sha256": "5ceabbbe55564eed805c40b1178cb259338427fce310f9402c4290961ffbf126",
+   "size": 4070,
+   "unit": "macos",
+   "offset": 22168576,
+   "entryBytes": 4608
+  },
+  {
+   "path": "lib/claude-brain.mjs",
+   "sha256": "bd017c51f936c4fb9e58015f566d6dcc65caf9412b571007dc30861b5a1af47e",
+   "size": 15898,
+   "unit": "macos",
+   "offset": 22151680,
+   "entryBytes": 16896
+  },
+  {
+   "path": "lib/cli.mjs",
+   "sha256": "96265a6531dbb436b2a545eecda51ae9a423d4cd42c6b60cb689eb4a54ca7340",
+   "size": 234453,
+   "unit": "macos",
+   "offset": 21916672,
+   "entryBytes": 235008
+  },
+  {
+   "path": "lib/client.mjs",
+   "sha256": "f178c68e80fd88e3414a84d113c0b7951affc9fd532ba9bf87f4d357e3047469",
+   "size": 11664,
+   "unit": "macos",
+   "offset": 21904384,
+   "entryBytes": 12288
+  },
+  {
+   "path": "lib/codebase-memory.mjs",
+   "sha256": "6692e7d3b0d950b099e09a738743191bb47da39cadfd8cf75ca2ff5cbe69d38e",
+   "size": 5496,
+   "unit": "macos",
+   "offset": 21898240,
+   "entryBytes": 6144
+  },
+  {
+   "path": "lib/codegen.mjs",
+   "sha256": "35907cf9d3a98bc7eea5d34014e9f26a92a8fc035f46e02b3667965132fd5b4e",
+   "size": 3982,
+   "unit": "macos",
+   "offset": 21893632,
+   "entryBytes": 4608
+  },
+  {
+   "path": "lib/cold-start.mjs",
+   "sha256": "02408244a17167aaae1181f4232f75abb71e2d0bf4b1612515f14bcb3e7e0c9c",
+   "size": 6508,
+   "unit": "macos",
+   "offset": 21886464,
+   "entryBytes": 7168
+  },
+  {
+   "path": "lib/command-list.mjs",
+   "sha256": "1e0e8c513da2f16ec077ba257182c11a92514d993d25b56473ffd1cc295444b5",
+   "size": 10008,
+   "unit": "macos",
+   "offset": 21875712,
+   "entryBytes": 10752
+  },
+  {
+   "path": "lib/compute-governor.mjs",
+   "sha256": "6ba783d9043fc6c53701cbf027c644d0b18c5075c6e5d616d2b2552a1c9edd6d",
+   "size": 4370,
+   "unit": "macos",
+   "offset": 21870592,
+   "entryBytes": 5120
+  },
+  {
+   "path": "lib/connectors.mjs",
+   "sha256": "dcb2a23dea29d9643e12a75ab1a293f8af59a19f48e95c8efda4a711e2375853",
+   "size": 29970,
+   "unit": "macos",
+   "offset": 21839872,
+   "entryBytes": 30720
+  },
+  {
+   "path": "lib/core-pack.mjs",
+   "sha256": "4585c5ed4777f917208cb78280515529d236bd6010df102c4974b3fe551aae83",
+   "size": 7943,
+   "unit": "macos",
+   "offset": 21831168,
+   "entryBytes": 8704
+  },
+  {
+   "path": "lib/darkweb-search.mjs",
+   "sha256": "d722afc6aaf51880bbda6ff0df96645290b6f231e1677c815149a36ec9d46d38",
+   "size": 4482,
+   "unit": "macos",
+   "offset": 21826048,
+   "entryBytes": 5120
+  },
+  {
+   "path": "lib/datasets.mjs",
+   "sha256": "e9ddd22c84a4787e9690edace54ecfe7a5f8b566a1cc6eda3006b5ff7a4825a4",
+   "size": 7441,
+   "unit": "macos",
+   "offset": 21817856,
+   "entryBytes": 8192
+  },
+  {
+   "path": "lib/decision-router.mjs",
+   "sha256": "0d2dff756e0490de41b3f2c91732bdcd72fbb361d677498f7fdbcc5752b6b40e",
+   "size": 6340,
+   "unit": "macos",
+   "offset": 21810688,
+   "entryBytes": 7168
+  },
+  {
+   "path": "lib/deterministic-archive.mjs",
+   "sha256": "99d81e5bfad3c05a3dc669edce098338c79076f5d13010ad4c6323a39d7ca589",
+   "size": 4234,
+   "unit": "macos",
+   "offset": 21805568,
+   "entryBytes": 5120
+  },
+  {
+   "path": "lib/device-candidates.mjs",
+   "sha256": "7f90500bc1fcbdca29073f55928560faa37d77e494b6812fabd00dfb16ab3c02",
+   "size": 25120,
+   "unit": "macos",
+   "offset": 21779456,
+   "entryBytes": 26112
+  },
+  {
+   "path": "lib/device-desk.mjs",
+   "sha256": "5a67e682c55a152b0e0373bc2143df1732cfac58cee3107c835cb6f7025f6b70",
+   "size": 23354,
+   "unit": "macos",
+   "offset": 21755392,
+   "entryBytes": 24064
+  },
+  {
+   "path": "lib/device-keys.mjs",
+   "sha256": "bc809b45cca3ee99c37a7383c609967fdfbf270fce6f96fdbaf7b3a7e38a7eb6",
+   "size": 28689,
+   "unit": "macos",
+   "offset": 21725696,
+   "entryBytes": 29696
+  },
+  {
+   "path": "lib/device-scan.mjs",
+   "sha256": "3dd4832e5becca1a58b907f9483ea75f3adc6085abcd9357efebc31069fba857",
+   "size": 44301,
+   "unit": "macos",
+   "offset": 21680640,
+   "entryBytes": 45056
+  },
+  {
+   "path": "lib/device-tools.mjs",
+   "sha256": "387d6aa8aeeb88a10d0c238aa4b342098033551371e7f76e935438c3d8c87bd1",
+   "size": 14015,
+   "unit": "macos",
+   "offset": 21665792,
+   "entryBytes": 14848
+  },
+  {
+   "path": "lib/duress.mjs",
+   "sha256": "0ebe38c40f73a70b13519feac9455f86afabb19ed1d5f42ea1488cb07ba45256",
+   "size": 14373,
+   "unit": "macos",
+   "offset": 21650432,
+   "entryBytes": 15360
+  },
+  {
+   "path": "lib/edge0-candidate.json",
+   "sha256": "be4a7e26e91cea4f1c0a539760261e0cf5aacb5e4c5fa4775a14a9fa1cb94a72",
+   "size": 1657,
+   "unit": "macos",
+   "offset": 21647872,
+   "entryBytes": 2560
+  },
+  {
+   "path": "lib/egress-guard.mjs",
+   "sha256": "2d13f4ea2cedd2d51c6ffa10d001cfddc95f84aba20f16b722dcd34e65a3a008",
+   "size": 1634,
+   "unit": "macos",
+   "offset": 21645312,
+   "entryBytes": 2560
+  },
+  {
+   "path": "lib/enroll.mjs",
+   "sha256": "94f8bc293bb26694a61579887e080bb5ecffb346e8ccb373857f0b89ea03d4b9",
+   "size": 8106,
+   "unit": "macos",
+   "offset": 21636608,
+   "entryBytes": 8704
+  },
+  {
+   "path": "lib/eviction-policy.mjs",
+   "sha256": "5eb5f119c41e003c2de70faf2c6bca6bf726e37cf1620908108a3404dba0c352",
+   "size": 8349,
+   "unit": "macos",
+   "offset": 21627392,
+   "entryBytes": 9216
+  },
+  {
+   "path": "lib/evidence.mjs",
+   "sha256": "d0a4ae2f7d89df261cdc82105c4d559e43489311e8fa665c5f332bf51285dd7f",
+   "size": 13090,
+   "unit": "macos",
+   "offset": 21613568,
+   "entryBytes": 13824
+  },
+  {
+   "path": "lib/extensions.mjs",
+   "sha256": "7b034fa20140f2bca1280ac69fe6c40eb3fd5f211ee3861d1e2ea8d66602a11f",
+   "size": 15027,
+   "unit": "macos",
+   "offset": 21597696,
+   "entryBytes": 15872
+  },
+  {
+   "path": "lib/fabrication.mjs",
+   "sha256": "54f1ef101ef2bbb9c6b504a0a959eb072a4f62b4d5106fbb6735f19cecdb775f",
+   "size": 2594,
+   "unit": "macos",
+   "offset": 21594112,
+   "entryBytes": 3584
+  },
+  {
+   "path": "lib/fast-route.mjs",
+   "sha256": "5d1cffb629b3b2714817184abf247726cec72f0c5fbe678b0472bec29c4653b6",
+   "size": 12978,
+   "unit": "macos",
+   "offset": 21580288,
+   "entryBytes": 13824
+  },
+  {
+   "path": "lib/field-photo.mjs",
+   "sha256": "5a1f4452527e9853c365b8536a7c192c9b25354b2b7a506bd261c0b96cd4f172",
+   "size": 14726,
+   "unit": "macos",
+   "offset": 21564928,
+   "entryBytes": 15360
+  },
+  {
+   "path": "lib/first-run.mjs",
+   "sha256": "ab8ea7d2308cc31dbed2ec170edc96c15cf77ac3580a93a589b681832f8b7f66",
+   "size": 4825,
+   "unit": "macos",
+   "offset": 21559296,
+   "entryBytes": 5632
+  },
+  {
+   "path": "lib/fleet-distribution.mjs",
+   "sha256": "48f50e089137b4b1ef339c134f40706e1e5f91079f58e3f604045d046389c917",
+   "size": 3834,
+   "unit": "macos",
+   "offset": 21554688,
+   "entryBytes": 4608
+  },
+  {
+   "path": "lib/fleet-learning.mjs",
+   "sha256": "86f65d737f461b6963cc1adcdef3f8af35f068cd42554af3d687d422de4ce000",
+   "size": 3553,
+   "unit": "macos",
+   "offset": 21550592,
+   "entryBytes": 4096
+  },
+  {
+   "path": "lib/fleet-transport.mjs",
+   "sha256": "12b89dd149cfb192617ceb27fd53d8d58855a12444a5833f1b48302fcd10ea55",
+   "size": 8236,
+   "unit": "macos",
+   "offset": 21541376,
+   "entryBytes": 9216
+  },
+  {
+   "path": "lib/flow.mjs",
+   "sha256": "cc3157b81078f11dc6007e2af78fa6e466876b5f50cd23c2a8635649c272f611",
+   "size": 4018,
+   "unit": "macos",
+   "offset": 21536768,
+   "entryBytes": 4608
+  },
+  {
+   "path": "lib/follow-up.mjs",
+   "sha256": "e2945002cea0da6b9debc54de49c5d33d00d4cc82af97a428809d3aa4a219f97",
+   "size": 4757,
+   "unit": "macos",
+   "offset": 21531136,
+   "entryBytes": 5632
+  },
+  {
+   "path": "lib/fork.mjs",
+   "sha256": "59d57d1aac510a6ec538ea3ded746788c8867dd00f9febca185a9c06b51c75d5",
+   "size": 4016,
+   "unit": "macos",
+   "offset": 21526528,
+   "entryBytes": 4608
+  },
+  {
+   "path": "lib/governance-spine.mjs",
+   "sha256": "8ca7780f0949b692092f43dd293cc769ea702fca766c3c85edf10a1e10ebe8ed",
+   "size": 2175,
+   "unit": "macos",
+   "offset": 21523456,
+   "entryBytes": 3072
+  },
+  {
+   "path": "lib/grok-brain.mjs",
+   "sha256": "0858b2d5f7ba3791e34af45ac5fa418db788c6a7d12073a4b099c7c65004c3c9",
+   "size": 7614,
+   "unit": "macos",
+   "offset": 21515264,
+   "entryBytes": 8192
+  },
+  {
+   "path": "lib/hash-util.mjs",
+   "sha256": "a29d70c8942642282136a14fd23c9a0fd1c96ed6cb3f8b781ffc9adf7162b40c",
+   "size": 1530,
+   "unit": "macos",
+   "offset": 21513216,
+   "entryBytes": 2048
+  },
+  {
+   "path": "lib/health.mjs",
+   "sha256": "c33c897abd8aa21a9454e1a1a8de02dff523b15ed35c5059c27c27a60db5be7c",
+   "size": 11363,
+   "unit": "macos",
+   "offset": 21500928,
+   "entryBytes": 12288
+  },
+  {
+   "path": "lib/huggingbay-catalog.json",
+   "sha256": "adc193d533b09b8506401dc79409accfd6ae1bc6c9259c2ac6e0e222108092e5",
+   "size": 582097,
+   "unit": "macos",
+   "offset": 20918272,
+   "entryBytes": 582656
+  },
+  {
+   "path": "lib/huggingbay.mjs",
+   "sha256": "ee7aa086434ec1c362c1078f6d2a2d84b67b1b81d512ef6bfd80c5a3004b4af8",
+   "size": 21563,
+   "unit": "macos",
+   "offset": 20895744,
+   "entryBytes": 22528
+  },
+  {
+   "path": "lib/idle-gaps.mjs",
+   "sha256": "c5bc98b84c06dda15743878a659a4793cb0adea8ef5479d2c4ecd4a222f4eefb",
+   "size": 4116,
+   "unit": "macos",
+   "offset": 20890624,
+   "entryBytes": 5120
+  },
+  {
+   "path": "lib/image-lane.mjs",
+   "sha256": "dc79d19b48b4958fb9720edafce0bca47cf665bf99801a2cde48d03434f965e4",
+   "size": 5569,
+   "unit": "macos",
+   "offset": 20884480,
+   "entryBytes": 6144
+  },
+  {
+   "path": "lib/ingestion-guard.mjs",
+   "sha256": "c067bda550da751e3ab50e6ca067c0968c1cacf130ad779e5c959185bcd32e38",
+   "size": 2664,
+   "unit": "macos",
+   "offset": 20880896,
+   "entryBytes": 3584
+  },
+  {
+   "path": "lib/install-config.mjs",
+   "sha256": "b93695ad027ab293fae8a8829c25869049d6434b774f456d87d7f12693110e9f",
+   "size": 8914,
+   "unit": "macos",
+   "offset": 20871168,
+   "entryBytes": 9728
+  },
+  {
+   "path": "lib/instructions.mjs",
+   "sha256": "ad86349cf681a05b0a28d49c9e848627bcba4d5af375c5892e1aa75a5e34792b",
+   "size": 13946,
+   "unit": "macos",
+   "offset": 20856320,
+   "entryBytes": 14848
+  },
+  {
+   "path": "lib/integrity.mjs",
+   "sha256": "4e53d793eeef65cb035e8340ad687f78c5a6ced2a4bf4c9e3119fa25d8f609aa",
+   "size": 5087,
+   "unit": "macos",
+   "offset": 20850688,
+   "entryBytes": 5632
+  },
+  {
+   "path": "lib/interaction-owner.mjs",
+   "sha256": "fd62d0efaf2e2dfdae0326718ceb0185e2deaf3731c37b79b3964591c6e21585",
+   "size": 2628,
+   "unit": "macos",
+   "offset": 20847104,
+   "entryBytes": 3584
+  },
+  {
+   "path": "lib/iphone-bridge.mjs",
+   "sha256": "df69e4fb489c7b45da830a0a131c207260f64ab82a44c92e2284c74f7b672472",
+   "size": 29247,
+   "unit": "macos",
+   "offset": 20816896,
+   "entryBytes": 30208
+  },
+  {
+   "path": "lib/iphone-cli.mjs",
+   "sha256": "71355712581cdc6562a8f7af76351df4e920fa5196400eb4b59487334817aa94",
+   "size": 7422,
+   "unit": "macos",
+   "offset": 20808704,
+   "entryBytes": 8192
+  },
+  {
+   "path": "lib/iphone-dnc.mjs",
+   "sha256": "de0d3b6dfd71f4d24bb6edb3a1790744c271896b6e0047a259231ce5bf94dcdf",
+   "size": 5020,
+   "unit": "macos",
+   "offset": 20803072,
+   "entryBytes": 5632
+  },
+  {
+   "path": "lib/iphone-mcp.mjs",
+   "sha256": "04d142a6221d94d7e375ea7593403ea94068050e41d9eda11ddefa04d6ffceda",
+   "size": 7266,
+   "unit": "macos",
+   "offset": 20794880,
+   "entryBytes": 8192
+  },
+  {
+   "path": "lib/iphone-policy.mjs",
+   "sha256": "413fed3f9a1c6b8ecafdfebad804fcc82273191800407836b231d8674e574391",
+   "size": 10883,
+   "unit": "macos",
+   "offset": 20783104,
+   "entryBytes": 11776
+  },
+  {
+   "path": "lib/job-inbox.mjs",
+   "sha256": "ec494565252ef660d581e2a3d76d5b415c22b3c80454a34477500db7d26ea38a",
+   "size": 15432,
+   "unit": "macos",
+   "offset": 20766720,
+   "entryBytes": 16384
+  },
+  {
+   "path": "lib/k-office.d.mts",
+   "sha256": "a9548a9d2df12a281d40190af2e9b15dbe89ff07c27f01a10f22ce1dfb58e941",
+   "size": 1522,
+   "unit": "macos",
+   "offset": 20764672,
+   "entryBytes": 2048
+  },
+  {
+   "path": "lib/k-office.mjs",
+   "sha256": "02e59ffec53f6d7421b1d35c25f3902f02a9dab0b1127527dadbb06b9c07040f",
+   "size": 15302,
+   "unit": "macos",
+   "offset": 20748800,
+   "entryBytes": 15872
+  },
+  {
+   "path": "lib/kbucks-ledger.mjs",
+   "sha256": "c27e27d4a7f8ce44516878bdbd42237cbb9fa3e031014b1aafc7a006ab195449",
+   "size": 3210,
+   "unit": "macos",
+   "offset": 20744704,
+   "entryBytes": 4096
+  },
+  {
+   "path": "lib/key-acquire.mjs",
+   "sha256": "8f97d98f8248b5b582972498bdf01fd74d76b79a0e541f2526bb54add7a9a573",
+   "size": 14296,
+   "unit": "macos",
+   "offset": 20729856,
+   "entryBytes": 14848
+  },
+  {
+   "path": "lib/keychain-seal.mjs",
+   "sha256": "1e6d2485c2dcd73f0a7b6434762512c0588d9837d679afa82aa0840deed82158",
+   "size": 5853,
+   "unit": "macos",
+   "offset": 20723200,
+   "entryBytes": 6656
+  },
+  {
+   "path": "lib/keys.mjs",
+   "sha256": "323a9940f203ca23cda7b31b62bdcc0e49d2e5262636f60e4f6b75c17fb33370",
+   "size": 17335,
+   "unit": "macos",
+   "offset": 20705280,
+   "entryBytes": 17920
+  },
+  {
+   "path": "lib/kill-switch.mjs",
+   "sha256": "9f634096dd3cf7ee08d6bb548c3da72a298eae047a22922ecb5dd9d969dc6f30",
+   "size": 757,
+   "unit": "macos",
+   "offset": 20703744,
+   "entryBytes": 1536
+  },
+  {
+   "path": "lib/kingmaker-facts.mjs",
+   "sha256": "86e68cdc6fa9db7e1783f7a12b6d80efea4ff0fadc854510335e621f5c32b97f",
+   "size": 2144,
+   "unit": "macos",
+   "offset": 20700672,
+   "entryBytes": 3072
+  },
+  {
+   "path": "lib/kingmaker-home.mjs",
+   "sha256": "8fae8641ca1caf221ad344d9c4b9c9dcf379c8bc50d5c20a6a0bbf4eb07ef92f",
+   "size": 5026,
+   "unit": "macos",
+   "offset": 20695040,
+   "entryBytes": 5632
+  },
+  {
+   "path": "lib/kingmaker-release-public.pem",
+   "sha256": "b8c3a8c560b0d2e1f8245baf799e3f61add14cfb4b21ac26020041bf52659706",
+   "size": 800,
+   "unit": "macos",
+   "offset": 20693504,
+   "entryBytes": 1536
+  },
+  {
+   "path": "lib/kingmaker.mjs",
+   "sha256": "7e9ba0f9c05918d65c462d619ad406dfbb07962afd3fb6bc7b3f0479ba91facb",
+   "size": 1106,
+   "unit": "macos",
+   "offset": 20691456,
+   "entryBytes": 2048
+  },
+  {
+   "path": "lib/knowledge.mjs",
+   "sha256": "ed9b8cb37b4ae6494562a9c7a8bf8e21a18a1b52ddaf9458a60c337459c72802",
+   "size": 27829,
+   "unit": "macos",
+   "offset": 20662784,
+   "entryBytes": 28672
+  },
+  {
+   "path": "lib/lang.mjs",
+   "sha256": "a8f7d2ae83d4bf022b51ecccf09dfac896c3ba08e97a3d37368da471aafb00d2",
+   "size": 7239,
+   "unit": "macos",
+   "offset": 20654592,
+   "entryBytes": 8192
+  },
+  {
+   "path": "lib/learning.mjs",
+   "sha256": "c9cfbf17b5d4ed5ddcf1ea2ff2528a08ff0ed88210c8c8e9fdb451cfb3286be9",
+   "size": 10779,
+   "unit": "macos",
+   "offset": 20642816,
+   "entryBytes": 11776
+  },
+  {
+   "path": "lib/library-scan.mjs",
+   "sha256": "71ceef3f7d24a7d9aad346f3a257f8422d4fe768124e6ca26ea0c05d38c68b9e",
+   "size": 16067,
+   "unit": "macos",
+   "offset": 20625920,
+   "entryBytes": 16896
+  },
+  {
+   "path": "lib/local-turn.mjs",
+   "sha256": "24a6f8cffd483e88637b152aa9f255747544fe573007c80c191e9c36584ba41a",
+   "size": 3077,
+   "unit": "macos",
+   "offset": 20621824,
+   "entryBytes": 4096
+  },
+  {
+   "path": "lib/mac-profiles.mjs",
+   "sha256": "03ae8ca1c280e13508e7fdef667b0ef6e57429dcd589b6540e85b8daa06f4960",
+   "size": 21076,
+   "unit": "macos",
+   "offset": 20599808,
+   "entryBytes": 22016
+  },
+  {
+   "path": "lib/mcp.mjs",
+   "sha256": "86fd412d3c40bde750da11a292036860b88ac86cd7e3b4b5b3892306e6d6311e",
+   "size": 24921,
+   "unit": "macos",
+   "offset": 20574208,
+   "entryBytes": 25600
+  },
+  {
+   "path": "lib/meeting.mjs",
+   "sha256": "3c47b4f40da18fb797b32243366d07136d0055cffdb34ba8e0a0440ff85a73ac",
+   "size": 3982,
+   "unit": "macos",
+   "offset": 20569600,
+   "entryBytes": 4608
+  },
+  {
+   "path": "lib/merchant.mjs",
+   "sha256": "92a68fca8fd498d76f8e73d9598c18339d396b0b9c353115008aa1cdf00bea3c",
+   "size": 3742,
+   "unit": "macos",
+   "offset": 20564992,
+   "entryBytes": 4608
+  },
+  {
+   "path": "lib/metrics-history.mjs",
+   "sha256": "d80d09c58ff2d6ad35e045e2989dfcffef4e1bf2d43aba080758c98f5f26b5a8",
+   "size": 6183,
+   "unit": "macos",
+   "offset": 20557824,
+   "entryBytes": 7168
+  },
+  {
+   "path": "lib/model-bench.mjs",
+   "sha256": "5c16373660a13deda655b1cf4a95f949b4c84a80bf557741fa2010d036f78cbf",
+   "size": 33659,
+   "unit": "macos",
+   "offset": 20523520,
+   "entryBytes": 34304
+  },
+  {
+   "path": "lib/model-candidate.mjs",
+   "sha256": "84698e6fcd70504bb72ce3c5cd2f2ef92758e89705f9d84e5b81e8fa1fe6cfbe",
+   "size": 2326,
+   "unit": "macos",
+   "offset": 20520448,
+   "entryBytes": 3072
+  },
+  {
+   "path": "lib/model-condense.mjs",
+   "sha256": "3a6f9af50e647f0687c2c372090efe4528ef43a82158a21ab5075bd05e5f4bc1",
+   "size": 3361,
+   "unit": "macos",
+   "offset": 20516352,
+   "entryBytes": 4096
+  },
+  {
+   "path": "lib/model-discovery.mjs",
+   "sha256": "71b665f443a7e4f317042530a4032e0a2e529fd894a40bc0cc6da120a64f399b",
+   "size": 5841,
+   "unit": "macos",
+   "offset": 20509696,
+   "entryBytes": 6656
+  },
+  {
+   "path": "lib/model-ingestion.mjs",
+   "sha256": "9906d17c0b94edcd166407758c0802fac845463eca729336f47202cd66b0a3e1",
+   "size": 9123,
+   "unit": "macos",
+   "offset": 20499968,
+   "entryBytes": 9728
+  },
+  {
+   "path": "lib/model-pin-registry.mjs",
+   "sha256": "6607861779a4b200676041cd057683f0175fa198c5e2b1438dac539262825ee7",
+   "size": 2378,
+   "unit": "macos",
+   "offset": 20496896,
+   "entryBytes": 3072
+  },
+  {
+   "path": "lib/model-scan.mjs",
+   "sha256": "2b0987e5c3ca905f8c393a13c213dbd0f86ad5ea340e87b39643e1de733ae27a",
+   "size": 7658,
+   "unit": "macos",
+   "offset": 20488704,
+   "entryBytes": 8192
+  },
+  {
+   "path": "lib/model-triage.mjs",
+   "sha256": "6c35bba6b43224f5b9c88f63f725692fb2232a168b0c289e0b7e86e39626feb0",
+   "size": 4191,
+   "unit": "macos",
+   "offset": 20483584,
+   "entryBytes": 5120
+  },
+  {
+   "path": "lib/model-warm.mjs",
+   "sha256": "3f765a6505d557c01bfa3b85c3bf767dcd6bcbfe8d50789afb4a943093cfa15b",
+   "size": 9365,
+   "unit": "macos",
+   "offset": 20473344,
+   "entryBytes": 10240
+  },
+  {
+   "path": "lib/models.mjs",
+   "sha256": "696b6e4e5cc62a01520d4672a39496a2e398fa5e34ba5d6b9b41b43395901170",
+   "size": 8133,
+   "unit": "macos",
+   "offset": 20464640,
+   "entryBytes": 8704
+  },
+  {
+   "path": "lib/next-suggest.mjs",
+   "sha256": "0458bab555e485b6eb0de4a5b152ef6685862a505de1b1cb9394bae0340e4914",
+   "size": 4178,
+   "unit": "macos",
+   "offset": 20459520,
+   "entryBytes": 5120
+  },
+  {
+   "path": "lib/office.mjs",
+   "sha256": "e985617f3e9da13d6f38f6a954949ac55e166c14d5d730438b80a5456802c132",
+   "size": 17397,
+   "unit": "macos",
+   "offset": 20441600,
+   "entryBytes": 17920
+  },
+  {
+   "path": "lib/ollama-runtime.mjs",
+   "sha256": "d2bd9dd3b4bb8ace3727d864409c5f5b642c0851a6aba75f9eff3b3aab62473c",
+   "size": 8573,
+   "unit": "macos",
+   "offset": 20432384,
+   "entryBytes": 9216
+  },
+  {
+   "path": "lib/owner-voice.mjs",
+   "sha256": "10879b6b83ea63426044adf4da4b73ede3c7a3454db197e7f23c80558618b301",
+   "size": 13054,
+   "unit": "macos",
+   "offset": 20418560,
+   "entryBytes": 13824
+  },
+  {
+   "path": "lib/pacer.mjs",
+   "sha256": "93b351e9de985c172977a57ca687e88eb7f3d04e19f6487f9f21870f6534edc1",
+   "size": 9326,
+   "unit": "macos",
+   "offset": 20408320,
+   "entryBytes": 10240
+  },
+  {
+   "path": "lib/paths.mjs",
+   "sha256": "22d480a00f8f19fea7b05aab67d79a0fefeab78f44c1064dce36b32fd7b1c36d",
+   "size": 12731,
+   "unit": "macos",
+   "offset": 20395008,
+   "entryBytes": 13312
+  },
+  {
+   "path": "lib/payload.mjs",
+   "sha256": "04de204370d315d7b20a5390072b39c2290b1264459c6426c07f6fca8d3c6a86",
+   "size": 6314,
+   "unit": "macos",
+   "offset": 20387840,
+   "entryBytes": 7168
+  },
+  {
+   "path": "lib/permission-gate.mjs",
+   "sha256": "645aa69af8dc6c49e3ed23db11a52eb3f558235ac3d9f02dcf54713b95699bdc",
+   "size": 5197,
+   "unit": "macos",
+   "offset": 20381696,
+   "entryBytes": 6144
+  },
+  {
+   "path": "lib/personalization.mjs",
+   "sha256": "508b0cef0d9413415c3913a800827fb51843acd58526e1b8f0ddb6d43e6116fd",
+   "size": 23155,
+   "unit": "macos",
+   "offset": 20357632,
+   "entryBytes": 24064
+  },
+  {
+   "path": "lib/phone-companion.mjs",
+   "sha256": "145b0106a1cf0f42bc69fe2e3ec4f09d1f30aef06b5ebdad49abfc0dfa3e2cbf",
+   "size": 94115,
+   "unit": "macos",
+   "offset": 20262912,
+   "entryBytes": 94720
+  },
+  {
+   "path": "lib/phone-icon.mjs",
+   "sha256": "ad08109e4e490b715611205142ef3200768eb2a85452a66205699e3685b1fa23",
+   "size": 476,
+   "unit": "macos",
+   "offset": 20261888,
+   "entryBytes": 1024
+  },
+  {
+   "path": "lib/phone-ring.mjs",
+   "sha256": "ceeef526bd760836ebf256e82d55684b24e33524dde4f3bcfaa9863aad010811",
+   "size": 5817,
+   "unit": "macos",
+   "offset": 20255232,
+   "entryBytes": 6656
+  },
+  {
+   "path": "lib/phone-voice.mjs",
+   "sha256": "05caffc046e5276788fe867a9cf975c916c2a074ac5c1a869316d0f7d65fcacc",
+   "size": 3764,
+   "unit": "macos",
+   "offset": 20250624,
+   "entryBytes": 4608
+  },
+  {
+   "path": "lib/phone.mjs",
+   "sha256": "ff511feca0a7e70aaadb5e965c7dd655b839d4c86dc6d93b8e4509cd6b6bd563",
+   "size": 6171,
+   "unit": "macos",
+   "offset": 20243456,
+   "entryBytes": 7168
+  },
+  {
+   "path": "lib/power.mjs",
+   "sha256": "3994d1c2c531a53440414ab8698da730f29cf361bf418fd0cea23ea909eb8280",
+   "size": 1755,
+   "unit": "macos",
+   "offset": 20240896,
+   "entryBytes": 2560
+  },
+  {
+   "path": "lib/profile.mjs",
+   "sha256": "c4dbeb8e6affcc7f4107844018ba0b61a2908c6d0459afe18a8e47a2739e3a56",
+   "size": 21183,
+   "unit": "macos",
+   "offset": 20218880,
+   "entryBytes": 22016
+  },
+  {
+   "path": "lib/project-twin.mjs",
+   "sha256": "8115c836cf701800b6a6caa747372a53b58172ce8a54b6ad481266f601c4a5e9",
+   "size": 2778,
+   "unit": "macos",
+   "offset": 20215296,
+   "entryBytes": 3584
+  },
+  {
+   "path": "lib/rea-rules.mjs",
+   "sha256": "1d302f3b099ecac583ebf92ed23cf1e526299b68595d2e078f13d65ee0fb2782",
+   "size": 11581,
+   "unit": "macos",
+   "offset": 20203008,
+   "entryBytes": 12288
+  },
+  {
+   "path": "lib/rea.mjs",
+   "sha256": "f1dc25dc59faa3c8aa5bf9168d78d58dd555b0c6697406e0ea5149933f2cc8b9",
+   "size": 21221,
+   "unit": "macos",
+   "offset": 20180992,
+   "entryBytes": 22016
+  },
+  {
+   "path": "lib/reflex-layer.mjs",
+   "sha256": "9ab1dd00646021346efae9342a2b095b3d555389ab574f58ca613f2550fc4353",
+   "size": 9593,
+   "unit": "macos",
+   "offset": 20170752,
+   "entryBytes": 10240
+  },
+  {
+   "path": "lib/reflex-producers.mjs",
+   "sha256": "e2da43d17ec624348ed75d5397b36c4b16445b0da1736ad0b6d033f8e94211ea",
+   "size": 8705,
+   "unit": "macos",
+   "offset": 20161024,
+   "entryBytes": 9728
+  },
+  {
+   "path": "lib/reflex-seat.mjs",
+   "sha256": "1f8f5520f7a6a87caf08f798991b66ca6c6dee4e2bd9abf9cd66779471956914",
+   "size": 13532,
+   "unit": "macos",
+   "offset": 20146688,
+   "entryBytes": 14336
+  },
+  {
+   "path": "lib/release-identity.json",
+   "sha256": "4846c4eaf55ed18f04c5905954f36dc3729df2fa0cbbb87f9516da539674ea72",
+   "size": 390,
+   "unit": "macos",
+   "offset": 20145664,
+   "entryBytes": 1024
+  },
+  {
+   "path": "lib/release-identity.mjs",
+   "sha256": "bff38f15c7f2abfb210d7697d4d3c4b1422bce19215d3f3c5f4b69eb7dd9baef",
+   "size": 5272,
+   "unit": "macos",
+   "offset": 20139520,
+   "entryBytes": 6144
+  },
+  {
+   "path": "lib/release-manifest.mjs",
+   "sha256": "a9d323f94727d50bc61d01912e265292695358bd83e9437c2837aa086f23769d",
+   "size": 22293,
+   "unit": "macos",
+   "offset": 20116480,
+   "entryBytes": 23040
+  },
+  {
+   "path": "lib/release-platforms.mjs",
+   "sha256": "c602f621c7cd8d089ebde8129478134f5a45fb3f5ec3bc5d95a82437d65247a2",
+   "size": 8692,
+   "unit": "macos",
+   "offset": 20107264,
+   "entryBytes": 9216
+  },
+  {
+   "path": "lib/release-pubkey.mjs",
+   "sha256": "51f42213bb42982892d295ad29088f88dfdcea657978e6cfd825ea68fcae83c9",
+   "size": 1041,
+   "unit": "macos",
+   "offset": 20105216,
+   "entryBytes": 2048
+  },
+  {
+   "path": "lib/release-signing.mjs",
+   "sha256": "7d32256ea554388d65ea649d6332a2ff1e68aa326af6476144263b15208373de",
+   "size": 4726,
+   "unit": "macos",
+   "offset": 20099584,
+   "entryBytes": 5632
+  },
+  {
+   "path": "lib/research.mjs",
+   "sha256": "5fded89dd83f63ded97dfae52d9248698753fe424d7b843fe1ccb55b203d3dfa",
+   "size": 2944,
+   "unit": "macos",
+   "offset": 20096000,
+   "entryBytes": 3584
+  },
+  {
+   "path": "lib/resident-engine.mjs",
+   "sha256": "c9880113648447d0e2f4abedec31041c6ba3abfdea99cf72973892c15588e001",
+   "size": 10464,
+   "unit": "macos",
+   "offset": 20084736,
+   "entryBytes": 11264
+  },
+  {
+   "path": "lib/ring.mjs",
+   "sha256": "e2a1678520464c87def032e3efcbfc310663b92eb584d10c4cd78395f598b557",
+   "size": 6080,
+   "unit": "macos",
+   "offset": 20078080,
+   "entryBytes": 6656
+  },
+  {
+   "path": "lib/ronin-install-cert-public.pem",
+   "sha256": "7be415825211f2dcf6367614c27b6b4759b66206e75b5f0a17ae39c49607ea1b",
+   "size": 178,
+   "unit": "macos",
+   "offset": 20077056,
+   "entryBytes": 1024
+  },
+  {
+   "path": "lib/ronin-installer.mjs",
+   "sha256": "268a89149d46f7d24605dc08ef3f3400fb32a88e220a55d436c4c4f52e723cd4",
+   "size": 12908,
+   "unit": "macos",
+   "offset": 20063232,
+   "entryBytes": 13824
+  },
+  {
+   "path": "lib/rrf.mjs",
+   "sha256": "f98006d7c3405cfcba959fdabaaf737567b8b078d8e976ace32af7a8efbe6fde",
+   "size": 3225,
+   "unit": "macos",
+   "offset": 20059136,
+   "entryBytes": 4096
+  },
+  {
+   "path": "lib/runtime-degrade.mjs",
+   "sha256": "8e6e7795c58e56d36f878472e44b84b0677ac1b025e869072eca6507a2b860b9",
+   "size": 3450,
+   "unit": "macos",
+   "offset": 20055040,
+   "entryBytes": 4096
+  },
+  {
+   "path": "lib/runtime.mjs",
+   "sha256": "7c07f75211ff9ac3b93afd838121ca63ef411d52f83e17054467b29217e5e39a",
+   "size": 14673,
+   "unit": "macos",
+   "offset": 20039680,
+   "entryBytes": 15360
+  },
+  {
+   "path": "lib/session.mjs",
+   "sha256": "b0f625eee2158ce3675ad02e4bdf0bf2a747a80f3ec905a3165106aece405ab7",
+   "size": 20333,
+   "unit": "macos",
+   "offset": 20018688,
+   "entryBytes": 20992
+  },
+  {
+   "path": "lib/sharing.mjs",
+   "sha256": "e3f55f5fba0dd38d364936cb12418cec5bc9ba28400cc5fbe97187517c5a6ef4",
+   "size": 9833,
+   "unit": "macos",
+   "offset": 20007936,
+   "entryBytes": 10752
+  },
+  {
+   "path": "lib/siri.mjs",
+   "sha256": "5a826d6b27f9604d9a58fc1f1c782757a49af5e238b5ae89c2370b5aadf6e9c4",
+   "size": 3315,
+   "unit": "macos",
+   "offset": 20003840,
+   "entryBytes": 4096
+  },
+  {
+   "path": "lib/skill-create.mjs",
+   "sha256": "4badb2c9e0f67e82033b3a08620d7b03b7bf18c8d68b472788d876db640633c4",
+   "size": 1958,
+   "unit": "macos",
+   "offset": 20001280,
+   "entryBytes": 2560
+  },
+  {
+   "path": "lib/soak-evidence.mjs",
+   "sha256": "7c6c51203c195c15e4d21ad15fd8c1627d3a51e6289aec94dbe45fd57643e1c0",
+   "size": 7943,
+   "unit": "macos",
+   "offset": 19992576,
+   "entryBytes": 8704
+  },
+  {
+   "path": "lib/soak-fixtures.mjs",
+   "sha256": "888ba6443c8044a8598cbdfad4eb7566979717217f048b4dd823f316abf68b21",
+   "size": 2326,
+   "unit": "macos",
+   "offset": 19989504,
+   "entryBytes": 3072
+  },
+  {
+   "path": "lib/soak-work.mjs",
+   "sha256": "656e360822c5cc7d6ff41867a0bcbebcdfd2e55065a16b801c93ea378e4f15f9",
+   "size": 17236,
+   "unit": "macos",
+   "offset": 19971584,
+   "entryBytes": 17920
+  },
+  {
+   "path": "lib/titan-adapt.mjs",
+   "sha256": "4174ec6bd54255aaa73bd627655f1444b946e983ede42a540eeba5aa86fce4d9",
+   "size": 3518,
+   "unit": "macos",
+   "offset": 19967488,
+   "entryBytes": 4096
+  },
+  {
+   "path": "lib/token-meter.mjs",
+   "sha256": "0040f8f211240e1fc67740019254996949e6e6bbde6218f7d7bfd8f874ff571d",
+   "size": 5772,
+   "unit": "macos",
+   "offset": 19960832,
+   "entryBytes": 6656
+  },
+  {
+   "path": "lib/tool-call.mjs",
+   "sha256": "6a0eafa23a93ce5fb922437da3d680d8eea119450e5f86535c4dd79f237c0024",
+   "size": 7517,
+   "unit": "macos",
+   "offset": 19952640,
+   "entryBytes": 8192
+  },
+  {
+   "path": "lib/trading-agents-cli.mjs",
+   "sha256": "3c876f51aa64ffb1cbe93575a6d2a764fa88a7e0f5b63fa24e9c830c5370d561",
+   "size": 2970,
+   "unit": "macos",
+   "offset": 19949056,
+   "entryBytes": 3584
+  },
+  {
+   "path": "lib/trading-agents-driver.py",
+   "sha256": "5519c594d6a57cf38aad80e3529e022108dcd8094b2cb593f2ef7928b7841983",
+   "size": 2386,
+   "unit": "macos",
+   "offset": 19945984,
+   "entryBytes": 3072
+  },
+  {
+   "path": "lib/trading-agents.mjs",
+   "sha256": "ccb83d14513f3ca8dd329484d63b8391268727de25b2283d379b5fb506f3c544",
+   "size": 12841,
+   "unit": "macos",
+   "offset": 19932160,
+   "entryBytes": 13824
+  },
+  {
+   "path": "lib/turn-chain.mjs",
+   "sha256": "76ae2ab85b361a2e239f39e1aeab42b9e67bb36e597b9d5c6e7f11bb4853d851",
+   "size": 3038,
+   "unit": "macos",
+   "offset": 19928576,
+   "entryBytes": 3584
+  },
+  {
+   "path": "lib/ubi-grant.mjs",
+   "sha256": "3f2e78adf9d81a97e82727a4af42d1be2107eea85b0bd5019928289cd5b8084f",
+   "size": 4366,
+   "unit": "macos",
+   "offset": 19923456,
+   "entryBytes": 5120
+  },
+  {
+   "path": "lib/universal-file-handler.mjs",
+   "sha256": "4ae8643fdf91f5c7532d73db09842d55d95c9c2d177c568b9d8c9f2708e61b1e",
+   "size": 7316,
+   "unit": "macos",
+   "offset": 19915264,
+   "entryBytes": 8192
+  },
+  {
+   "path": "lib/update-notify.mjs",
+   "sha256": "5d942ee1268c24986400227585bbb7b186f3e2b4fd6ffaf699630f2c70e7fae6",
+   "size": 2156,
+   "unit": "macos",
+   "offset": 19912192,
+   "entryBytes": 3072
+  },
+  {
+   "path": "lib/update.mjs",
+   "sha256": "788060c0b292022e969f85e6a20d6c17f7ed862354fee5c2fc7f4ee41ce6e2dc",
+   "size": 30782,
+   "unit": "macos",
+   "offset": 19880448,
+   "entryBytes": 31744
+  },
+  {
+   "path": "lib/voice-ledger.mjs",
+   "sha256": "938399070c2b7435c355b1f047146516b1097d99e46e6a4bcfc0358f71543c1c",
+   "size": 4601,
+   "unit": "macos",
+   "offset": 19875328,
+   "entryBytes": 5120
+  },
+  {
+   "path": "lib/voice.mjs",
+   "sha256": "4c75284a3bc200e3f21f0b35eda3559b0f57e5d6fb7b760d50c175ac5f2ee7a8",
+   "size": 54361,
+   "unit": "macos",
+   "offset": 19820032,
+   "entryBytes": 55296
+  },
+  {
+   "path": "lib/web-push.mjs",
+   "sha256": "9e7623ce63fdd4cb7ccdbf937f09931dab81b71cbe6fcf1bd4179d7ee48961c9",
+   "size": 4444,
+   "unit": "macos",
+   "offset": 19814912,
+   "entryBytes": 5120
+  },
+  {
+   "path": "light-runtime/index.html",
+   "sha256": "23fd192ed8ccc84f88888b3cc6e8e7bba5acec1c2c877fcca8cf4c0e7c4a60de",
+   "size": 15624,
+   "unit": "macos",
+   "offset": 19798016,
+   "entryBytes": 16384
+  },
+  {
+   "path": "light-runtime/server.mjs",
+   "sha256": "8fab515d63f4bd0fc72af3fba289d0d380023d51ad9fe913137b6d380d079d72",
+   "size": 7188,
+   "unit": "macos",
+   "offset": 19789824,
+   "entryBytes": 8192
+  },
+  {
+   "path": "light-runtime/state-schema.mjs",
+   "sha256": "7c43050584c6d45abfd1ecada22fd050396057b9a7472d5d9a75beb7063ce989",
+   "size": 9916,
+   "unit": "macos",
+   "offset": 19779072,
+   "entryBytes": 10752
+  },
+  {
+   "path": "package.json",
+   "sha256": "c3272c7f33358831b09f45b83d03d95d0e354bf2e2c1636164da2364fef1189d",
+   "size": 2561,
+   "unit": "macos",
+   "offset": 19774976,
+   "entryBytes": 3584
+  },
+  {
+   "path": "scripture-armor/.gitignore",
+   "sha256": "57fec5cc7c176f0d4d5a0f8157594c804ee8c588cb6995d35159de34b0d524d1",
+   "size": 228,
+   "unit": "macos",
+   "offset": 19773952,
+   "entryBytes": 1024
+  },
+  {
+   "path": "scripture-armor/CORRECTION-2026-10-26.md",
+   "sha256": "1188ef2a1bf951742ff52601ca60108ac795e7f71cfed56f126647b54b411311",
+   "size": 7307,
+   "unit": "macos",
+   "offset": 19765760,
+   "entryBytes": 8192
+  },
+  {
+   "path": "scripture-armor/DEFAULT-DAEMON-REPORT.md",
+   "sha256": "7e12dd1bddb5296f68d83619a686da70e1a7c76f55587c734a2a50eddedd3d1d",
+   "size": 7476,
+   "unit": "macos",
+   "offset": 19757568,
+   "entryBytes": 8192
+  },
+  {
+   "path": "scripture-armor/FIX-REPORT-419.md",
+   "sha256": "917e8f73aa89fe383627e9c4ea2a6047753225fb23346b212dce2a6a8a0dea60",
+   "size": 9271,
+   "unit": "macos",
+   "offset": 19747328,
+   "entryBytes": 10240
+  },
+  {
+   "path": "scripture-armor/FIX-REPORT.md",
+   "sha256": "e2c7bfdf2034cf0428e4171fbe719c8bb5e21306ce84d991218fdc45a8410a17",
+   "size": 17505,
+   "unit": "macos",
+   "offset": 19728896,
+   "entryBytes": 18432
+  },
+  {
+   "path": "scripture-armor/FORMAT.md",
+   "sha256": "23d17e1954d08ef3071a46b2d680180177d35cbdd51d92d969cfd3f75ee2b486",
+   "size": 4928,
+   "unit": "macos",
+   "offset": 19723264,
+   "entryBytes": 5632
+  },
+  {
+   "path": "scripture-armor/GEMINI-FIX-REPORT.md",
+   "sha256": "7b6fb83f311c1df7dbfaede885862e5728763975423f0c1d6ec07d2c875d4a6e",
+   "size": 10752,
+   "unit": "macos",
+   "offset": 19712000,
+   "entryBytes": 11264
+  },
+  {
+   "path": "scripture-armor/GEMINI-REVIEW-VERIFICATION.md",
+   "sha256": "de4d7e15b88c516d9d9eff7e53b1dcb57bfcc744b38644620ebd42440d14a172",
+   "size": 17091,
+   "unit": "macos",
+   "offset": 19694080,
+   "entryBytes": 17920
+  },
+  {
+   "path": "scripture-armor/INDEPENDENT-RERUN-2026-10-26.md",
+   "sha256": "af8094bb10e44b32ce510ee135a2775af0e5e5a3195530b9d14198158687dfbb",
+   "size": 5265,
+   "unit": "macos",
+   "offset": 19687936,
+   "entryBytes": 6144
+  },
+  {
+   "path": "scripture-armor/LICENSE",
+   "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+   "size": 11358,
+   "unit": "macos",
+   "offset": 19675648,
+   "entryBytes": 12288
+  },
+  {
+   "path": "scripture-armor/MULTIPLATFORM-INSTALLER-REPORT.md",
+   "sha256": "c8d612129a60fa0e9b7b878282f5454d46a8beea841be4beff630da309b6f771",
+   "size": 16473,
+   "unit": "macos",
+   "offset": 19658240,
+   "entryBytes": 17408
+  },
+  {
+   "path": "scripture-armor/OPEN-SURFACES.md",
+   "sha256": "6a88666efe8ff2ac4eee9ee2fb88bb4546d0d86aec2a656c69085a2a397cc34d",
+   "size": 11001,
+   "unit": "macos",
+   "offset": 19646464,
+   "entryBytes": 11776
+  },
+  {
+   "path": "scripture-armor/PHASE2-REPORT.md",
+   "sha256": "fda03735b172a189a21fafd9e84f9e2f7f4bdc176998f1c461ac11b968bbd010",
+   "size": 11037,
+   "unit": "macos",
+   "offset": 19634688,
+   "entryBytes": 11776
+  },
+  {
+   "path": "scripture-armor/PHASE3-REPORT.md",
+   "sha256": "a7e7a4bf85c79ccc026e59d5f2cbe39b131fb97b22b8c85fc846c2d3c9c5e587",
+   "size": 12008,
+   "unit": "macos",
+   "offset": 19621888,
+   "entryBytes": 12800
+  },
+  {
+   "path": "scripture-armor/PHASE4-REPORT.md",
+   "sha256": "273fce4b766faa823e2f3f3e7f727f222738db094665c03c401e6ef3eb37a358",
+   "size": 17112,
+   "unit": "macos",
+   "offset": 19603968,
+   "entryBytes": 17920
+  },
+  {
+   "path": "scripture-armor/PUSH-TO-PRODUCTION-2026-10-26.md",
+   "sha256": "8d4dbe9718a0c7192da7d94a6ae1647ab91de6c47dc13ef31104c452f2b31acf",
+   "size": 4259,
+   "unit": "macos",
+   "offset": 19598848,
+   "entryBytes": 5120
+  },
+  {
+   "path": "scripture-armor/README.md",
+   "sha256": "8ff03ab0072bbe84f0e15b01018c39c271623d2dda79c879825733600c49cc0e",
+   "size": 46596,
+   "unit": "macos",
+   "offset": 19551232,
+   "entryBytes": 47616
+  },
+  {
+   "path": "scripture-armor/REFIT-SUMMARY.md",
+   "sha256": "7c8313175d0603970d739122fc032dad8b182863fce3168246a35e74c6a9ad75",
+   "size": 6427,
+   "unit": "macos",
+   "offset": 19544064,
+   "entryBytes": 7168
+  },
+  {
+   "path": "scripture-armor/RELEASE-READINESS.md",
+   "sha256": "974701440a36cea373a9b4e806957eacef3ccb5908bd51552a414080e7705a32",
+   "size": 20556,
+   "unit": "macos",
+   "offset": 19522560,
+   "entryBytes": 21504
+  },
+  {
+   "path": "scripture-armor/SHIP-SHEET.md",
+   "sha256": "42cc05892adbba9e377a679e71894cebdd3a487b77bc8b6d7a80293bda83846e",
+   "size": 2115,
+   "unit": "macos",
+   "offset": 19519488,
+   "entryBytes": 3072
+  },
+  {
+   "path": "scripture-armor/airlock.mjs",
+   "sha256": "1813ba0357cd4a84297bec46d7f771b68c1fe0d0810b17b5eaf081aa5c638907",
+   "size": 17300,
+   "unit": "macos",
+   "offset": 19501568,
+   "entryBytes": 17920
+  },
+  {
+   "path": "scripture-armor/armor.mjs",
+   "sha256": "ea2ff10eea605debcfca03c854ed02daa6c202c8e6133805afd448573d2ff61e",
+   "size": 119210,
+   "unit": "macos",
+   "offset": 19381760,
+   "entryBytes": 119808
+  },
+  {
+   "path": "scripture-armor/cell.mjs",
+   "sha256": "49c8e3aa35a0d8c2dafa9a0cf83f62af7db43dcf1ac22777b2092a88f4df8eef",
+   "size": 11415,
+   "unit": "macos",
+   "offset": 19369472,
+   "entryBytes": 12288
+  },
+  {
+   "path": "scripture-armor/dns-profiles/android-private-dns.md",
+   "sha256": "185d4fac83deb0bf68e35e2ebc5e868072c96de99516864f8445a8e4f9aece92",
+   "size": 2069,
+   "unit": "macos",
+   "offset": 19366400,
+   "entryBytes": 3072
+  },
+  {
+   "path": "scripture-armor/dns-profiles/linux-resolved.conf",
+   "sha256": "c549a4574a717b039b88a49d553ba66101873fc4bf3a717e9da2d3a52c578910",
+   "size": 1269,
+   "unit": "macos",
+   "offset": 19364352,
+   "entryBytes": 2048
+  },
+  {
+   "path": "scripture-armor/dns-profiles/linux-stubby.yaml",
+   "sha256": "160f1b6729834b2ae5f5843c0559999a9b57c05bf89023f1b8719be7c7b5ce39",
+   "size": 1409,
+   "unit": "macos",
+   "offset": 19362304,
+   "entryBytes": 2048
+  },
+  {
+   "path": "scripture-armor/dns-profiles/scripture-armor-dns.mobileconfig",
+   "sha256": "1838ae623411ebadd3a05ebcf94c99ff0dea8c0e9890949e9493cbde5c469331",
+   "size": 4649,
+   "unit": "macos",
+   "offset": 19356672,
+   "entryBytes": 5632
+  },
+  {
+   "path": "scripture-armor/dns-profiles/windows-doh.md",
+   "sha256": "3b42daffcbd9b522d2b65a0f8a65321495db57c1851f437fe6e02cea80318fb2",
+   "size": 2630,
+   "unit": "macos",
+   "offset": 19353088,
+   "entryBytes": 3584
+  },
+  {
+   "path": "scripture-armor/ghidra-scripts/ScriptureScan.java",
+   "sha256": "bd1eee0213e85c8c429039f5c44c8436111d4e2e041ca16b61f250a1e6773f81",
+   "size": 16635,
+   "unit": "macos",
+   "offset": 19335168,
+   "entryBytes": 17408
+  },
+  {
+   "path": "scripture-armor/harness/BUILD-REPORT.md",
+   "sha256": "2080e2ea6935c4a7878ee7b3337ec4da2511541efdd7749218db403a7c8c22e8",
+   "size": 14220,
+   "unit": "macos",
+   "offset": 19319808,
+   "entryBytes": 14848
+  },
+  {
+   "path": "scripture-armor/harness/FIX-REPORT.md",
+   "sha256": "0d79232c6fc0f4f7a6da74e90b8ef7e1f7237cae3eed1fb50a3834a789330ce2",
+   "size": 20549,
+   "unit": "macos",
+   "offset": 19298304,
+   "entryBytes": 21504
+  },
+  {
+   "path": "scripture-armor/harness/INTEROP-REPORT.md",
+   "sha256": "e909730cc6db58175a07b753e2bc705a6a124668b57735689209543427d0f0e6",
+   "size": 16589,
+   "unit": "macos",
+   "offset": 19280896,
+   "entryBytes": 17408
+  },
+  {
+   "path": "scripture-armor/harness/LIVE-FIRE-REPORT.md",
+   "sha256": "bb86f79b6f3a865b48f6370f846b4a2ad47fc274a95c99fe62f7efdc2079f970",
+   "size": 14725,
+   "unit": "macos",
+   "offset": 19265536,
+   "entryBytes": 15360
+  },
+  {
+   "path": "scripture-armor/harness/TWO-ENDPOINT-PROOF.md",
+   "sha256": "96b1492afe34e87875fb1a8fe94733788bbd0f5f2503ba8a40f0eebe593e158f",
+   "size": 12162,
+   "unit": "macos",
+   "offset": 19252736,
+   "entryBytes": 12800
+  },
+  {
+   "path": "scripture-armor/harness/interop/capture-interop-relay.c2s",
+   "sha256": "ebc47b38604093178fe9aca73de85cc3a9988bdf9aecb502677cc56a123b39d3",
+   "size": 7093145,
+   "unit": "macos",
+   "offset": 12158976,
+   "entryBytes": 7093760
+  },
+  {
+   "path": "scripture-armor/harness/interop/capture-interop-relay.s2c",
+   "sha256": "f4999616cf858cd9b44b1677472e40c377a5838dd205dce11359ec7c1a481e5d",
+   "size": 7493487,
+   "unit": "macos",
+   "offset": 4664832,
+   "entryBytes": 7494144
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/engine-block.txt",
+   "sha256": "233697ffca96ba71459625fd8b3a3a8b0dcbef47f000db37485bbcd344d1352e",
+   "size": 200,
+   "unit": "macos",
+   "offset": 4663808,
+   "entryBytes": 1024
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/engine/lib/armor-native.mjs",
+   "sha256": "2d84c08d2ecea03e138bc7236a072af9d932b751c8e2cc09ed43f56d5f2cd7ab",
+   "size": 16197,
+   "unit": "macos",
+   "offset": 4646912,
+   "entryBytes": 16896
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/evidence.json",
+   "sha256": "fc2c9444bcc78f0acdc90f57a65c6fdb06081e81e2501a5302b18bd96a2291dd",
+   "size": 790,
+   "unit": "macos",
+   "offset": 4644352,
+   "entryBytes": 1536
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/peer-block.txt",
+   "sha256": "fcffba6aa0160ba8d7897eb40f7a61d771167be15fb7b18d8510263488db117d",
+   "size": 188,
+   "unit": "macos",
+   "offset": 4643328,
+   "entryBytes": 1024
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/peer-server.mjs",
+   "sha256": "11a2c3dc653d279b6b91dc3354ff06e2eadff3b828b675e8113b3c9261baac3a",
+   "size": 6900,
+   "unit": "macos",
+   "offset": 4635648,
+   "entryBytes": 7680
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/rogue-server.mjs",
+   "sha256": "319d12a7136d02879d5bab3560e59c4b9387488ce7fcf639321ab4f1329afe7c",
+   "size": 2702,
+   "unit": "macos",
+   "offset": 4632064,
+   "entryBytes": 3584
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/airlock.mjs",
+   "sha256": "6c24dcc6a0a773adbce57a6d4e6017eb15b6f18a954505e45e9d36f84801ef7b",
+   "size": 11969,
+   "unit": "macos",
+   "offset": 4619264,
+   "entryBytes": 12800
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/armor.mjs",
+   "sha256": "56dbb5b6e0954fdcd6fb034626697be451095b81690fb787f57d0476c0b9b66e",
+   "size": 99861,
+   "unit": "macos",
+   "offset": 4518400,
+   "entryBytes": 100864
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/cell.mjs",
+   "sha256": "49c8e3aa35a0d8c2dafa9a0cf83f62af7db43dcf1ac22777b2092a88f4df8eef",
+   "size": 11415,
+   "unit": "macos",
+   "offset": 4506112,
+   "entryBytes": 12288
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/custody.mjs",
+   "sha256": "004305328998d9b23db3fb503138cf2811bc2a62fc6cace191195343601cc33c",
+   "size": 12983,
+   "unit": "macos",
+   "offset": 4492288,
+   "entryBytes": 13824
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/launch.mjs",
+   "sha256": "40cb4d696774baf6b48ca18d5ea30b25b13854bedd4ebbe3d4a279b1cf503819",
+   "size": 4418,
+   "unit": "macos",
+   "offset": 4487168,
+   "entryBytes": 5120
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/package.json",
+   "sha256": "d1d8bd81a9be752f3db0e50b9dbb8cef0a8ed88a7d31daf91264b5bc0a992ce0",
+   "size": 527,
+   "unit": "macos",
+   "offset": 4485632,
+   "entryBytes": 1536
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/refit-estate.mjs",
+   "sha256": "8f41004e50c3ba168224a43ae846019b18757fae5b5681d98d4ef43eacab0047",
+   "size": 16243,
+   "unit": "macos",
+   "offset": 4468736,
+   "entryBytes": 16896
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/refit-gates.mjs",
+   "sha256": "e6d361d0f38ce64d55391106528e69c0e58bc7b92ff52b3fe7f3f73190f8adee",
+   "size": 21004,
+   "unit": "macos",
+   "offset": 4446720,
+   "entryBytes": 22016
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/refit-net.mjs",
+   "sha256": "1067bf31daf1bc009113572eeacc77351c04d2745c3371233af75318bdb8d485",
+   "size": 17372,
+   "unit": "macos",
+   "offset": 4428800,
+   "entryBytes": 17920
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/refit-store.mjs",
+   "sha256": "225bbe0834aa35519d7eb03210e4d24eaef61ac1f5f5df100b12e192ce82c0cb",
+   "size": 15589,
+   "unit": "macos",
+   "offset": 4412416,
+   "entryBytes": 16384
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/scan.mjs",
+   "sha256": "666b3d86a904983c05dc4daafb64c4dd610e8f75fbf580034dbf97208f372649",
+   "size": 42184,
+   "unit": "macos",
+   "offset": 4369408,
+   "entryBytes": 43008
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/terms.mjs",
+   "sha256": "b167408c72fb3d2309cb73409103a789259ffd1cf7ae3c90cfcaceeec10f4b80",
+   "size": 6720,
+   "unit": "macos",
+   "offset": 4361728,
+   "entryBytes": 7680
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/vaultd.mjs",
+   "sha256": "34b8ca5b0416fc662c944224e5cdfd6051c16ee7db3632327e3076636b8b813c",
+   "size": 171293,
+   "unit": "macos",
+   "offset": 4189696,
+   "entryBytes": 172032
+  },
+  {
+   "path": "scripture-armor/harness/interop/probe-served-ledger-restart.mjs",
+   "sha256": "3bb0126ce4005d6f9b139c794450005d717d3097a8ca1a8f7a5cf5d865f81bb7",
+   "size": 2899,
+   "unit": "macos",
+   "offset": 4185088,
+   "entryBytes": 3584
+  },
+  {
+   "path": "scripture-armor/harness/interop/results-widening.json",
+   "sha256": "ff7ef747ef1a2b40883fb606b5642788d59b54ebf62339fd6b8f9ffe69588fd5",
+   "size": 2502,
+   "unit": "macos",
+   "offset": 4182016,
+   "entryBytes": 3072
+  },
+  {
+   "path": "scripture-armor/harness/interop/results.json",
+   "sha256": "aa1e463a127d55cca5c13025c0ae5ff0cfccb3438f02ced3d4b5189bcb53e921",
+   "size": 49703,
+   "unit": "macos",
+   "offset": 4131328,
+   "entryBytes": 50688
+  },
+  {
+   "path": "scripture-armor/harness/interop/run-interop-widening.mjs",
+   "sha256": "289ee9bab566bb93fe8328dcce73fbfda69563416f87ec44b97da7ab4a7dbae4",
+   "size": 13901,
+   "unit": "macos",
+   "offset": 4116480,
+   "entryBytes": 14848
+  },
+  {
+   "path": "scripture-armor/harness/interop/run-interop.mjs",
+   "sha256": "43d5d5f9c3cbb44a1d0ee14519cc34d3d171dbe7247078998390874bab59a4eb",
+   "size": 33447,
+   "unit": "macos",
+   "offset": 4082176,
+   "entryBytes": 34304
+  },
+  {
+   "path": "scripture-armor/harness/interop/run-output.txt",
+   "sha256": "21456827f1808ecefeb16b873f3362db9bda0eca947ffec8527a2170b0613244",
+   "size": 12218,
+   "unit": "macos",
+   "offset": 4069376,
+   "entryBytes": 12800
+  },
+  {
+   "path": "scripture-armor/harness/live-fire/capture-live-peer.c2s",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "size": 0,
+   "unit": "macos",
+   "offset": 4068352,
+   "entryBytes": 512
+  },
+  {
+   "path": "scripture-armor/harness/live-fire/capture-live-peer.s2c",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "size": 0,
+   "unit": "macos",
+   "offset": 4067840,
+   "entryBytes": 512
+  },
+  {
+   "path": "scripture-armor/harness/live-fire/capture-live-relay.c2s",
+   "sha256": "5afc0564f57ed7fd67e4ccacc7c139eea94fd18baab49fb311e9fbc8789602f4",
+   "size": 6156,
+   "unit": "macos",
+   "offset": 4060672,
+   "entryBytes": 7168
+  },
+  {
+   "path": "scripture-armor/harness/live-fire/capture-live-relay.s2c",
+   "sha256": "f445df3ca4679b869d980cca7756b7ebe4dc29a4442417f6cdfb5bff76907b09",
+   "size": 15473,
+   "unit": "macos",
+   "offset": 4044288,
+   "entryBytes": 16384
+  },
+  {
+   "path": "scripture-armor/harness/live-fire/results.json",
+   "sha256": "7a3696fdcdf088f387c57d0b358958354e2cccb467f879b032534d35839aaba2",
+   "size": 9519,
+   "unit": "macos",
+   "offset": 4034048,
+   "entryBytes": 10240
+  },
+  {
+   "path": "scripture-armor/harness/live-fire/run-live-fire.mjs",
+   "sha256": "2618f4aeab53258dd58fd6486c1b0dbeda7baaf05d5800a08d1791077440b31c",
+   "size": 15942,
+   "unit": "macos",
+   "offset": 4017152,
+   "entryBytes": 16896
+  },
+  {
+   "path": "scripture-armor/harness/proof/capture-fleet.c2s",
+   "sha256": "427c55bd1b387a017a9ae12f6a0b85d7721d8015d467a1ffa3e8340cd73673eb",
+   "size": 4013,
+   "unit": "macos",
+   "offset": 4012032,
+   "entryBytes": 4608
+  },
+  {
+   "path": "scripture-armor/harness/proof/capture-fleet.s2c",
+   "sha256": "efcde405a3d7cbd8138b18c4028b7401253d67959626aefe071aa55a79b0814b",
+   "size": 3513,
+   "unit": "macos",
+   "offset": 4007936,
+   "entryBytes": 4096
+  },
+  {
+   "path": "scripture-armor/harness/proof/capture-legacy.c2s",
+   "sha256": "c4d49539c8bd76f7c9a008059620f10731c37962462783f1a897abd124eadad2",
+   "size": 628,
+   "unit": "macos",
+   "offset": 4006400,
+   "entryBytes": 1536
+  },
+  {
+   "path": "scripture-armor/harness/proof/capture-legacy.s2c",
+   "sha256": "647aaadb98e3708db8446c8ad786c815c3e2339522967b3770dad16c4c6becaf",
+   "size": 395,
+   "unit": "macos",
+   "offset": 4005376,
+   "entryBytes": 1024
+  },
+  {
+   "path": "scripture-armor/harness/proof/capture-relay.c2s",
+   "sha256": "c4ee080695b6ea0986098550fb8d7d6b89a011d191429083c0641a00b9fc1fa9",
+   "size": 2132,
+   "unit": "macos",
+   "offset": 4002304,
+   "entryBytes": 3072
+  },
+  {
+   "path": "scripture-armor/harness/proof/capture-relay.s2c",
+   "sha256": "0754bf9d5147ee963b10b4c30bf7c0e2a6ddf1bd3a4d686fcc060d590934a8c7",
+   "size": 2568,
+   "unit": "macos",
+   "offset": 3998720,
+   "entryBytes": 3584
+  },
+  {
+   "path": "scripture-armor/harness/proof/fleet-host.mjs",
+   "sha256": "2b2eb2f99cd8186a5db452e711e13bf8df55a4fd07eed3a10ee48abdba3c56ac",
+   "size": 4295,
+   "unit": "macos",
+   "offset": 3993600,
+   "entryBytes": 5120
+  },
+  {
+   "path": "scripture-armor/harness/proof/proof-output.txt",
+   "sha256": "8f731d33cd012b85add434f8ec582ba7ae8d71a30e49c610753a379fa331fc0c",
+   "size": 4086,
+   "unit": "macos",
+   "offset": 3988992,
+   "entryBytes": 4608
+  },
+  {
+   "path": "scripture-armor/harness/proof/relay.mjs",
+   "sha256": "5f95556292229fdb120a3eae7e60164f3a73ea42c1ca0c2fb8e29f780505d89e",
+   "size": 3178,
+   "unit": "macos",
+   "offset": 3984896,
+   "entryBytes": 4096
+  },
+  {
+   "path": "scripture-armor/harness/proof/run-proof.mjs",
+   "sha256": "e6388588b4762b2fa31a516eb7bf3398c91c5587763710e3639d619b96b79b0f",
+   "size": 17256,
+   "unit": "macos",
+   "offset": 3966976,
+   "entryBytes": 17920
+  },
+  {
+   "path": "scripture-armor/harness/proof/tap.mjs",
+   "sha256": "a82845b5a4700933d8a72f00d285fcd84f2212150941a22e391d674ad21a42fe",
+   "size": 1357,
+   "unit": "macos",
+   "offset": 3964928,
+   "entryBytes": 2048
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/capture-flow.c2s",
+   "sha256": "67dbd514de1a4cf7c39066306427d74aa04050320f200338cec1144e6af04e47",
+   "size": 711,
+   "unit": "macos",
+   "offset": 3962880,
+   "entryBytes": 1536
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/capture-flow.s2c",
+   "sha256": "e434b3ae5ef932aa64c3465f19523f86da2d55434b2144ab7998cb3ee608a718",
+   "size": 1315,
+   "unit": "macos",
+   "offset": 3960832,
+   "entryBytes": 2048
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/capture-vm.c2s",
+   "sha256": "ede820421a61ecf72c118b362fa5cafb913633210856210a32eb562c57e6910a",
+   "size": 2131,
+   "unit": "macos",
+   "offset": 3957760,
+   "entryBytes": 3072
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/capture-vm.s2c",
+   "sha256": "101ca4b0b4b547c9cdcba26c8b14ce5e01368767f8120e2a029cc91e8229e2a8",
+   "size": 2941,
+   "unit": "macos",
+   "offset": 3954176,
+   "entryBytes": 3584
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/drive-vm.log",
+   "sha256": "c16074e5093204b6cdb00eaf4e3bf13e0668b5caee568bd4efcedbc1597a7401",
+   "size": 72184,
+   "unit": "macos",
+   "offset": 3881472,
+   "entryBytes": 72704
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/drive-vm.py",
+   "sha256": "6caca38cb5533dc0e33009be6bae4cd15f1519992757a4b46ad6e3c99a121952",
+   "size": 4719,
+   "unit": "macos",
+   "offset": 3875840,
+   "entryBytes": 5632
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/driver.out",
+   "sha256": "8802b385ed86684b9e6ff392246e1ef9e9a927c8088623b35ec0a78172f93640",
+   "size": 275,
+   "unit": "macos",
+   "offset": 3874816,
+   "entryBytes": 1024
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/engine/lib/armor-native.mjs",
+   "sha256": "2d84c08d2ecea03e138bc7236a072af9d932b751c8e2cc09ed43f56d5f2cd7ab",
+   "size": 16197,
+   "unit": "macos",
+   "offset": 3857920,
+   "entryBytes": 16896
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/peer-server.mjs",
+   "sha256": "11a2c3dc653d279b6b91dc3354ff06e2eadff3b828b675e8113b3c9261baac3a",
+   "size": 6900,
+   "unit": "macos",
+   "offset": 3849216,
+   "entryBytes": 7680
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/rogue-server.mjs",
+   "sha256": "319d12a7136d02879d5bab3560e59c4b9387488ce7fcf639321ab4f1329afe7c",
+   "size": 2702,
+   "unit": "macos",
+   "offset": 3845632,
+   "entryBytes": 3584
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/airlock.mjs",
+   "sha256": "6c24dcc6a0a773adbce57a6d4e6017eb15b6f18a954505e45e9d36f84801ef7b",
+   "size": 11969,
+   "unit": "macos",
+   "offset": 3832832,
+   "entryBytes": 12800
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/armor.mjs",
+   "sha256": "56dbb5b6e0954fdcd6fb034626697be451095b81690fb787f57d0476c0b9b66e",
+   "size": 99861,
+   "unit": "macos",
+   "offset": 3731968,
+   "entryBytes": 100864
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/cell.mjs",
+   "sha256": "49c8e3aa35a0d8c2dafa9a0cf83f62af7db43dcf1ac22777b2092a88f4df8eef",
+   "size": 11415,
+   "unit": "macos",
+   "offset": 3719680,
+   "entryBytes": 12288
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/custody.mjs",
+   "sha256": "004305328998d9b23db3fb503138cf2811bc2a62fc6cace191195343601cc33c",
+   "size": 12983,
+   "unit": "macos",
+   "offset": 3705856,
+   "entryBytes": 13824
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/launch.mjs",
+   "sha256": "40cb4d696774baf6b48ca18d5ea30b25b13854bedd4ebbe3d4a279b1cf503819",
+   "size": 4418,
+   "unit": "macos",
+   "offset": 3700736,
+   "entryBytes": 5120
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/package.json",
+   "sha256": "d1d8bd81a9be752f3db0e50b9dbb8cef0a8ed88a7d31daf91264b5bc0a992ce0",
+   "size": 527,
+   "unit": "macos",
+   "offset": 3699200,
+   "entryBytes": 1536
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/refit-estate.mjs",
+   "sha256": "8f41004e50c3ba168224a43ae846019b18757fae5b5681d98d4ef43eacab0047",
+   "size": 16243,
+   "unit": "macos",
+   "offset": 3682304,
+   "entryBytes": 16896
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/refit-gates.mjs",
+   "sha256": "e6d361d0f38ce64d55391106528e69c0e58bc7b92ff52b3fe7f3f73190f8adee",
+   "size": 21004,
+   "unit": "macos",
+   "offset": 3660288,
+   "entryBytes": 22016
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/refit-net.mjs",
+   "sha256": "1067bf31daf1bc009113572eeacc77351c04d2745c3371233af75318bdb8d485",
+   "size": 17372,
+   "unit": "macos",
+   "offset": 3642368,
+   "entryBytes": 17920
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/refit-store.mjs",
+   "sha256": "225bbe0834aa35519d7eb03210e4d24eaef61ac1f5f5df100b12e192ce82c0cb",
+   "size": 15589,
+   "unit": "macos",
+   "offset": 3625984,
+   "entryBytes": 16384
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/scan.mjs",
+   "sha256": "666b3d86a904983c05dc4daafb64c4dd610e8f75fbf580034dbf97208f372649",
+   "size": 42184,
+   "unit": "macos",
+   "offset": 3582976,
+   "entryBytes": 43008
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/terms.mjs",
+   "sha256": "b167408c72fb3d2309cb73409103a789259ffd1cf7ae3c90cfcaceeec10f4b80",
+   "size": 6720,
+   "unit": "macos",
+   "offset": 3575296,
+   "entryBytes": 7680
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/vaultd.mjs",
+   "sha256": "34b8ca5b0416fc662c944224e5cdfd6051c16ee7db3632327e3076636b8b813c",
+   "size": 171293,
+   "unit": "macos",
+   "offset": 3403264,
+   "entryBytes": 172032
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-src/peer-server.mjs",
+   "sha256": "11a2c3dc653d279b6b91dc3354ff06e2eadff3b828b675e8113b3c9261baac3a",
+   "size": 6900,
+   "unit": "macos",
+   "offset": 3394560,
+   "entryBytes": 7680
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-src/rogue-server.mjs",
+   "sha256": "319d12a7136d02879d5bab3560e59c4b9387488ce7fcf639321ab4f1329afe7c",
+   "size": 2702,
+   "unit": "macos",
+   "offset": 3390976,
+   "entryBytes": 3584
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/results.json",
+   "sha256": "976a96a9512af3754456a3cdcc1accc1abe31ac278708c92ed93c8af3020a10b",
+   "size": 4673,
+   "unit": "macos",
+   "offset": 3384832,
+   "entryBytes": 5632
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/run-two-endpoint.mjs",
+   "sha256": "deb5b10534bbcac69c3130741a5d03a0c4d108aaa70774d28c0d3756f4b35711",
+   "size": 13796,
+   "unit": "macos",
+   "offset": 3370496,
+   "entryBytes": 14336
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/share/engine-block.txt",
+   "sha256": "713c44c096df29c4499b8c9ed8a4a5cb12a4f3bfc4d91862178824c103ba707a",
+   "size": 200,
+   "unit": "macos",
+   "offset": 3369472,
+   "entryBytes": 1024
+  },
+  {
+   "path": "scripture-armor/launch.mjs",
+   "sha256": "20e5b545783b6bfb2b561f9c6b85aa71aee640e3b1e12d370b0e05073f9def78",
+   "size": 5485,
+   "unit": "macos",
+   "offset": 3361792,
+   "entryBytes": 6144
+  },
+  {
+   "path": "scripture-armor/linux/install-armor.sh",
+   "sha256": "2274959bddd8bd3f37ea060e6706e28cb3733d6b644f59feb770bae7cd569778",
+   "size": 5387,
+   "unit": "macos",
+   "offset": 3355648,
+   "entryBytes": 6144
+  },
+  {
+   "path": "scripture-armor/linux/install-daemon.sh",
+   "sha256": "01e16fab873968f40efbeed66b20b4642397253a1ad6fb19aefb18cd20150138",
+   "size": 11867,
+   "unit": "macos",
+   "offset": 3342848,
+   "entryBytes": 12800
+  },
+  {
+   "path": "scripture-armor/linux/scripture-vaultd-user.service",
+   "sha256": "c536d4bbb65627f1d9ea6b2f8df291bc734a9cf6d3381316a3c65bb57c2bb01d",
+   "size": 1797,
+   "unit": "macos",
+   "offset": 3340288,
+   "entryBytes": 2560
+  },
+  {
+   "path": "scripture-armor/linux/scripture-vaultd.service",
+   "sha256": "aad750d738917cb521e29578569c185c5e021da14d56ae96f036456846e9a98b",
+   "size": 3079,
+   "unit": "macos",
+   "offset": 3336192,
+   "entryBytes": 4096
+  },
+  {
+   "path": "scripture-armor/mac/breach-scan.sh",
+   "sha256": "01a3ae10c0a64ff3ca3ed0cd11356a4d41c41df7fc1e3f2b751176899a07a8ff",
+   "size": 4667,
+   "unit": "macos",
+   "offset": 3330048,
+   "entryBytes": 5632
+  },
+  {
+   "path": "scripture-armor/mac/install-armor.sh",
+   "sha256": "00875234f9aef023cc94926be84f53566e93ec85667c1d32dfea5666d8e309c3",
+   "size": 4973,
+   "unit": "macos",
+   "offset": 3324416,
+   "entryBytes": 5632
+  },
+  {
+   "path": "scripture-armor/mac/install-daemon.sh",
+   "sha256": "422e8e18be56a2f2811358b77976c64ea8182e9149cc740dc8c685768d8d8cf2",
+   "size": 8596,
+   "unit": "macos",
+   "offset": 3315200,
+   "entryBytes": 9216
+  },
+  {
+   "path": "scripture-armor/mac/org.ronininc.scripture-vaultd.plist",
+   "sha256": "ee21aaa558669df4b8dddfd9e40bc98711e3579a1d2aec4560b9c6d5f662cc06",
+   "size": 1339,
+   "unit": "macos",
+   "offset": 3313152,
+   "entryBytes": 2048
+  },
+  {
+   "path": "scripture-armor/open-standalone.mjs",
+   "sha256": "eb85fb681bc8637f872c028bc35dcfa42386c32c68b7b8d53f16d0acbe21709d",
+   "size": 7764,
+   "unit": "macos",
+   "offset": 3303936,
+   "entryBytes": 8704
+  },
+  {
+   "path": "scripture-armor/package.json",
+   "sha256": "96c8bc39ad4f1f0c120b2a59b8bdc5a95f84534d198d6aa25b807b42b0b7445d",
+   "size": 795,
+   "unit": "macos",
+   "offset": 3302400,
+   "entryBytes": 1536
+  },
+  {
+   "path": "scripture-armor/refit-net.mjs",
+   "sha256": "1067bf31daf1bc009113572eeacc77351c04d2745c3371233af75318bdb8d485",
+   "size": 17372,
+   "unit": "macos",
+   "offset": 3284480,
+   "entryBytes": 17920
+  },
+  {
+   "path": "scripture-armor/scan.mjs",
+   "sha256": "455c8cb4fd3671df21ae5aa49eaba273cf1bb3a3bbd187023acc34bf025a6989",
+   "size": 40296,
+   "unit": "macos",
+   "offset": 3243520,
+   "entryBytes": 40960
+  },
+  {
+   "path": "scripture-armor/terms.mjs",
+   "sha256": "b167408c72fb3d2309cb73409103a789259ffd1cf7ae3c90cfcaceeec10f4b80",
+   "size": 6720,
+   "unit": "macos",
+   "offset": 3235840,
+   "entryBytes": 7680
+  },
+  {
+   "path": "scripture-armor/test/craft-helper.mjs",
+   "sha256": "0cb2a6294ec619495b8324db34e1250c879a46c962bd27f42a52fd68e6413fbf",
+   "size": 1382,
+   "unit": "macos",
+   "offset": 3233792,
+   "entryBytes": 2048
+  },
+  {
+   "path": "scripture-armor/test/fixtures-cell/echohash.mjs",
+   "sha256": "25c6036d2d0635ee46515db76e5a7c15b616c80e069caef443151496b3d04e5e",
+   "size": 2246,
+   "unit": "macos",
+   "offset": 3230720,
+   "entryBytes": 3072
+  },
+  {
+   "path": "scripture-armor/test/fixtures-cell/emitunk.mjs",
+   "sha256": "d2fa380be98ab1f7385e02580e9cb36aa1294aea3b3f27d706885f139a6daa69",
+   "size": 1462,
+   "unit": "macos",
+   "offset": 3228672,
+   "entryBytes": 2048
+  },
+  {
+   "path": "scripture-armor/test/fixtures-cell/sleeper.mjs",
+   "sha256": "89aeee4c4f0a71aa2798c7ab21ca49a5690add91eaf3661e258df273889de9f6",
+   "size": 424,
+   "unit": "macos",
+   "offset": 3227648,
+   "entryBytes": 1024
+  },
+  {
+   "path": "scripture-armor/test/fixtures-cell/spawner-bad.mjs",
+   "sha256": "125f932ee817a32481616c3fe58dccb4b129d1091dc0ba8860bf9f370aeb7f5a",
+   "size": 1706,
+   "unit": "macos",
+   "offset": 3225088,
+   "entryBytes": 2560
+  },
+  {
+   "path": "scripture-armor/test/fixtures-cell/spawner-clean.mjs",
+   "sha256": "0d701aba7dd0030576bbba13afd854179b373cfde80b37e8a8dae39022a4bca1",
+   "size": 1574,
+   "unit": "macos",
+   "offset": 3222528,
+   "entryBytes": 2560
+  },
+  {
+   "path": "scripture-armor/test/fixtures-cell/tierprobe.mjs",
+   "sha256": "2ff663f54a1f1c62ce4c378006d97baeb9c60cff8a319e2db488175898ca957d",
+   "size": 1535,
+   "unit": "macos",
+   "offset": 3220480,
+   "entryBytes": 2048
+  },
+  {
+   "path": "scripture-armor/test/fixtures-cell/tooluser.mjs",
+   "sha256": "5f21b117ebfd3170725a4496d54eed254ac8e96b042cab4f75df1a88f79eba9a",
+   "size": 2381,
+   "unit": "macos",
+   "offset": 3217408,
+   "entryBytes": 3072
+  },
+  {
+   "path": "scripture-armor/test/fixtures-cell/trywrite.mjs",
+   "sha256": "af4c15a51b1740d6d1e4e9ac3c8d470dff52c335ec4e0ae2254839f35fa9e79f",
+   "size": 1839,
+   "unit": "macos",
+   "offset": 3214848,
+   "entryBytes": 2560
+  },
+  {
+   "path": "scripture-armor/test/fixtures-src/bad.c",
+   "sha256": "f580a3f9b82dfe15514474c6c2048e085c441c90bc36ba88625f15061c240bc0",
+   "size": 642,
+   "unit": "macos",
+   "offset": 3212800,
+   "entryBytes": 1536
+  },
+  {
+   "path": "scripture-armor/test/fixtures-src/clean.c",
+   "sha256": "1d9aee51a514a419cc9c98bdb6a4a29d5f1ec816e47a8e49c702facbaf010a33",
+   "size": 558,
+   "unit": "macos",
+   "offset": 3211264,
+   "entryBytes": 1536
+  },
+  {
+   "path": "scripture-armor/test/mesh-tee.mjs",
+   "sha256": "081a133738461ed0c61b2a551047e802bcd9ddf15fd7bf9d0706eafd899e8e71",
+   "size": 1051,
+   "unit": "macos",
+   "offset": 3208704,
+   "entryBytes": 2048
+  },
+  {
+   "path": "scripture-armor/test/run-tests-gemini-fix.mjs",
+   "sha256": "dab6eb4d852f4e713cb08f8aa5b2a745901feee3007918ee1ff0187fa2c6ebe5",
+   "size": 20045,
+   "unit": "macos",
+   "offset": 3187712,
+   "entryBytes": 20992
+  },
+  {
+   "path": "scripture-armor/test/run-tests-v2-airlock.mjs",
+   "sha256": "022f1b03bddbceb0fe604ed37c3e9744cc3450666915136a5ec370598a9008b5",
+   "size": 30871,
+   "unit": "macos",
+   "offset": 3155968,
+   "entryBytes": 31744
+  },
+  {
+   "path": "scripture-armor/test/run-tests-v2-cell.mjs",
+   "sha256": "df1ce77816570659076fbde1415cd4427077c984f388aaee3103cd2098375e83",
+   "size": 43292,
+   "unit": "macos",
+   "offset": 3111936,
+   "entryBytes": 44032
+  },
+  {
+   "path": "scripture-armor/test/run-tests-v2-estate.mjs",
+   "sha256": "09175b945a7fce561dbe50eefb3be9633cd50886319c4cd1886b63e15580e693",
+   "size": 36086,
+   "unit": "macos",
+   "offset": 3075072,
+   "entryBytes": 36864
+  },
+  {
+   "path": "scripture-armor/test/run-tests-v2-phase4.mjs",
+   "sha256": "a32e0ad8a88d2560cc4c210c36cf8e9a98d94ad05060303824c9b93fa7a14d8a",
+   "size": 41262,
+   "unit": "macos",
+   "offset": 3033088,
+   "entryBytes": 41984
+  },
+  {
+   "path": "scripture-armor/test/run-tests-v2-scan.mjs",
+   "sha256": "36c3d531981af3e66af2972d00fa2db9b910c5a280d5f2bff77bf5e02851e403",
+   "size": 40962,
+   "unit": "macos",
+   "offset": 2991104,
+   "entryBytes": 41984
+  },
+  {
+   "path": "scripture-armor/test/run-tests-v4-pq.mjs",
+   "sha256": "795badf93206f608cac0f92ea50a97027943307a9785a678c4e5f57f02bf38a4",
+   "size": 8576,
+   "unit": "macos",
+   "offset": 2981888,
+   "entryBytes": 9216
+  },
+  {
+   "path": "scripture-armor/test/run-tests.mjs",
+   "sha256": "ff2953a1681d2672747b76e7665f256ee90923e5aa585c5f8491061f340d93ee",
+   "size": 46466,
+   "unit": "macos",
+   "offset": 2934784,
+   "entryBytes": 47104
+  },
+  {
+   "path": "scripture-armor/vaultd.mjs",
+   "sha256": "a227bf9e4263102484f20c59ac4d100b7462c7c83c462b661a7167b389c6ccd9",
+   "size": 182080,
+   "unit": "macos",
+   "offset": 2751488,
+   "entryBytes": 182784
+  },
+  {
+   "path": "scripture-armor/windows/install-armor.ps1",
+   "sha256": "4723b85f9d6ed5649404ea29d8ed855bb9e76860b369cf5ce274c523debd5b6d",
+   "size": 12600,
+   "unit": "macos",
+   "offset": 2738176,
+   "entryBytes": 13312
+  },
+  {
+   "path": "vendor/fleet/fleet-packet.mjs",
+   "sha256": "3475a67658fd2959dcc902d192694bbab6f859bc8837406bc4ff07033e57c976",
+   "size": 29583,
+   "unit": "macos",
+   "offset": 2706944,
+   "entryBytes": 30208
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/LICENSE-APACHE",
+   "sha256": "0cff1a8ac2a381870a2c57cbe9b25f95bea0925b39b7fbf6a04ec23df7c77760",
+   "size": 11357,
+   "unit": "macos",
+   "offset": 2694144,
+   "entryBytes": 12288
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/LICENSE-MIT",
+   "sha256": "6287e7084fb9e9eded3267c677aa378bc03dffc72bbebdc559ade163f249d467",
+   "size": 1131,
+   "unit": "macos",
+   "offset": 2692096,
+   "entryBytes": 2048
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/NOTICE",
+   "sha256": "ec7ee07a5b59fedca407549ff73de894090df9f6cdcd7c397e619d3c8afaf5ac",
+   "size": 1167,
+   "unit": "macos",
+   "offset": 2690048,
+   "entryBytes": 2048
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/catalog/public_registry.json",
+   "sha256": "7b4c5b8e5a07cbe86a46670cfe264c60caff90e327d15a9e4a54998cc8505269",
+   "size": 22526,
+   "unit": "macos",
+   "offset": 2667008,
+   "entryBytes": 23040
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/catalog/registry.json",
+   "sha256": "45997b60cc5b4ce1a8313b36d3171c5c4be09b76eb19eb53aa88087f5e9be466",
+   "size": 57022,
+   "unit": "macos",
+   "offset": 2609152,
+   "entryBytes": 57856
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/__init__.py",
+   "sha256": "468664c1931bf97f93258feb95f008aaac1e70f1b5b005f30eea613db192031f",
+   "size": 138,
+   "unit": "macos",
+   "offset": 2607616,
+   "entryBytes": 1024
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/3d-cad/SKILL.md",
+   "sha256": "d99e3052894ed51547623664f7347c9297948f4949920417c51085153eacdcbd",
+   "size": 9728,
+   "unit": "macos",
+   "offset": 2597376,
+   "entryBytes": 10240
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/game-development/SKILL.md",
+   "sha256": "927218fdf6f39a4403424b021dfe8c0a5aefcca3ba2dd8cbd16cd227550827ff",
+   "size": 9404,
+   "unit": "macos",
+   "offset": 2586624,
+   "entryBytes": 10240
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/image-design/SKILL.md",
+   "sha256": "98a4f88c6a8d24e40a0720dc4e133cad9e57f88062447e4e9bc584ddb9c1c41d",
+   "size": 9745,
+   "unit": "macos",
+   "offset": 2575360,
+   "entryBytes": 10752
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/knowledge-research/SKILL.md",
+   "sha256": "52e005e3170ff0b79c8ff85713384acdceced872f3a16823b572af557f45d36b",
+   "size": 11071,
+   "unit": "macos",
+   "offset": 2563072,
+   "entryBytes": 11776
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/SKILL.md",
+   "sha256": "2bee5c8492b8cb36f6246aba321781c70af56ae69d854b9a3e5eea2dfd87e5cc",
+   "size": 49425,
+   "unit": "macos",
+   "offset": 2512384,
+   "entryBytes": 50176
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/references/art-direction-review.md",
+   "sha256": "bf0cdadb51857e2510cfa430efdab783d7110025570394759494974b1b590bda",
+   "size": 5105,
+   "unit": "macos",
+   "offset": 2505728,
+   "entryBytes": 6656
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/references/captions.md",
+   "sha256": "48f120cda98673dac5f40429189b5e2c8cf2d2644d1f1bc3138a9115ce29c6c0",
+   "size": 17391,
+   "unit": "macos",
+   "offset": 2487808,
+   "entryBytes": 17920
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/references/nle-shotcut-kdenlive.md",
+   "sha256": "f80a2d02a04537054432475443f1511275d5475a810e155303793d1e33d44068",
+   "size": 4305,
+   "unit": "macos",
+   "offset": 2481664,
+   "entryBytes": 6144
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/references/render-doctor.md",
+   "sha256": "bb35d6274cf1b502a29e02de4f661e73aa0f06c8e91b07ccc35e590a10893d46",
+   "size": 6103,
+   "unit": "macos",
+   "offset": 2475008,
+   "entryBytes": 6656
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/references/sound-design.md",
+   "sha256": "b2e0b6b239ec5a4f8345d4460a3c365d9a2138f884e72e8a0e782a59444592bd",
+   "size": 7889,
+   "unit": "macos",
+   "offset": 2466304,
+   "entryBytes": 8704
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/references/source-triage.md",
+   "sha256": "9e93e499e0efd5663539ccdb7efc62bd33c16f3a3f487330ea1849e27c977963",
+   "size": 6245,
+   "unit": "macos",
+   "offset": 2459136,
+   "entryBytes": 7168
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/references/story-structure-audio.md",
+   "sha256": "f9d8c6cca4eb23ebcc8aa98bb138a3fcc48da862bfc2b4bf441244201bbf0781",
+   "size": 7540,
+   "unit": "macos",
+   "offset": 2449920,
+   "entryBytes": 9216
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/scripts/video_doctor.py",
+   "sha256": "f7559a686d9d2c0491b54651d6e2935477c5a4f4339560baa0d9ae07464803db",
+   "size": 99239,
+   "unit": "macos",
+   "offset": 2349568,
+   "entryBytes": 99840
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/analytics.py",
+   "sha256": "ac50fc8a24f46ddbbd5b461f37da5bb21cce187510175bd4600f00364ff750d1",
+   "size": 606,
+   "unit": "macos",
+   "offset": 2346496,
+   "entryBytes": 1536
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/cli.py",
+   "sha256": "472339601f5503828c251314b396b1a9b56dff55513561b07d3a80f7c819dfb4",
+   "size": 41223,
+   "unit": "macos",
+   "offset": 2304512,
+   "entryBytes": 41984
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/installer.py",
+   "sha256": "fd7a53ec90590b077d24ac17da2656b4be07dec67ddb807c1714e4a8fc952b3e",
+   "size": 21146,
+   "unit": "macos",
+   "offset": 2282496,
+   "entryBytes": 22016
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/matrix.py",
+   "sha256": "84370d3366afc301dfb17b94ec0cce7d50ee1ede8e7cd8baae635c7234c80e2e",
+   "size": 21314,
+   "unit": "macos",
+   "offset": 2260480,
+   "entryBytes": 22016
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/matrix_skill.py",
+   "sha256": "0ee29b42c25a618348fe08484bfecfe4bcfc36ecbfbb913329fbfccde310ed8f",
+   "size": 14381,
+   "unit": "macos",
+   "offset": 2245120,
+   "entryBytes": 15360
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/preview.py",
+   "sha256": "ca31a8b545e3689de0a26a3609fb69905dfb0b7e300bc7a083d2403b303dd749",
+   "size": 67090,
+   "unit": "macos",
+   "offset": 2177024,
+   "entryBytes": 68096
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/registry.py",
+   "sha256": "f2b929bb3b28bfa327c284d87f79059f0c5503b6da28aa895c401a8196d8f023",
+   "size": 3942,
+   "unit": "macos",
+   "offset": 2172416,
+   "entryBytes": 4608
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/ronin.py",
+   "sha256": "0a67ab3cc31ce24ea0b024516682354d87bd6f8835eca7679f3b4151ea1f3fd9",
+   "size": 960,
+   "unit": "macos",
+   "offset": 2170880,
+   "entryBytes": 1536
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/kingmaker-cli-hub",
+   "sha256": "a6d9badb09091d0bb8892f68db459eaffda68c71924517cb874e45456efa0968",
+   "size": 763,
+   "unit": "macos",
+   "offset": 2168832,
+   "entryBytes": 1536
+  },
+  {
+   "path": "vendor/office/THIRD_PARTY_LICENSES.txt",
+   "sha256": "47bb686d360728a4824a105c90a34467075bba6e277d6dcf2327228ddcb4081b",
+   "size": 157073,
+   "unit": "macos",
+   "offset": 2010624,
+   "entryBytes": 157696
+  },
+  {
+   "path": "vendor/office/office-libs.mjs",
+   "sha256": "948b264e7472327621cce95287a8d13d899f64fc50b68172b438498d2e4ce383",
+   "size": 1948447,
+   "unit": "macos",
+   "offset": 61440,
+   "entryBytes": 1949184
+  }
+ ]
+}

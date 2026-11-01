@@ -1,0 +1,573 @@
+{
+  "name": "Kingmaker core pack",
+  "why": "Everything a small business needs, built in, running on the Mac itself. The owner's gift: \"It all belongs inside Kingmaker.\"",
+  "rules": [
+    "Ships: only what Kingmaker may redistribute (Ronin's own work, MIT, Apache-2.0, BSD, MPL, OFL). Every item names its licence; anything 'All rights reserved' or unlicensed stays out.",
+    "Stock Mac: an item that needs Python, Homebrew or a developer tool is marked so until Kingmaker carries what it needs.",
+    "Large apps (LibreOffice, Blender, GIMP…) don't ride inside Kingmaker.app: they install on first use from their official source, one ask, with the exact size.",
+    "The owner's proprietary CRM is never in this pack: skills tied to it live in the owner's private-skills folder on their own install only.",
+    "Every skill and tool gets REA's check (lib/rea.mjs) before Kingmaker uses it."
+  ],
+  "stacks": {
+    "skills": {
+      "what": "Ronin's skills as Kingmaker's own capabilities, plus the best public skills, each under its own licence.",
+      "where": "core/skills/<name>/SKILL.md",
+      "items": [
+        {
+          "name": "website-build-standard",
+          "license": "Ronin Inc (source-available with Kingmaker)",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "service-business-website",
+          "license": "Ronin Inc (source-available with Kingmaker)",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "big-box-store",
+          "license": "Ronin Inc (source-available with Kingmaker)",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "business-profile-recon",
+          "license": "Ronin Inc (source-available with Kingmaker)",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "site-media-fetch",
+          "license": "Ronin Inc (source-available with Kingmaker)",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "spanish-regional-localization",
+          "license": "Ronin Inc (source-available with Kingmaker)",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "wholesale-real-estate",
+          "license": "Ronin Inc (source-available with Kingmaker)",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "immersive-evidence-workspace",
+          "license": "Ronin Inc (source-available with Kingmaker)",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "cloudflare-ordering-worker",
+          "license": "Ronin Inc (source-available with Kingmaker)",
+          "status": "in core/skills",
+          "stockMac": true,
+          "needs": "the merchant's own Cloudflare account (key in the vault)"
+        },
+        {
+          "name": "clover-operations-command",
+          "license": "Ronin Inc (source-available with Kingmaker)",
+          "status": "in core/skills",
+          "stockMac": false,
+          "needs": "the merchant's own Clover token (vault); its small MCP server needs Python until Kingmaker carries one"
+        },
+        {
+          "name": "copywriting",
+          "license": "MIT",
+          "from": "https://github.com/coreyhaines31/marketingskills",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "emails",
+          "license": "MIT",
+          "from": "https://github.com/coreyhaines31/marketingskills",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "offers",
+          "license": "MIT",
+          "from": "https://github.com/coreyhaines31/marketingskills",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "social",
+          "license": "MIT",
+          "from": "https://github.com/coreyhaines31/marketingskills",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "copy-editing",
+          "license": "MIT",
+          "from": "https://github.com/coreyhaines31/marketingskills",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "pricing",
+          "license": "MIT",
+          "from": "https://github.com/coreyhaines31/marketingskills",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "customer-research",
+          "license": "MIT",
+          "from": "https://github.com/coreyhaines31/marketingskills",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "lead-magnets",
+          "license": "MIT",
+          "from": "https://github.com/coreyhaines31/marketingskills",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "referrals",
+          "license": "MIT",
+          "from": "https://github.com/coreyhaines31/marketingskills",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "marketing-ideas",
+          "license": "MIT",
+          "from": "https://github.com/coreyhaines31/marketingskills",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "local-seo-manager",
+          "license": "MIT",
+          "from": "https://github.com/alirezarezvani/claude-skills",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "business-name-fit",
+          "license": "MIT",
+          "from": "https://github.com/alirezarezvani/claude-skills",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "contract-and-proposal-writer",
+          "license": "MIT",
+          "from": "https://github.com/alirezarezvani/claude-skills",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "humanizer",
+          "license": "MIT",
+          "from": "https://github.com/blader/humanizer",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "internal-comms",
+          "license": "Apache-2.0",
+          "from": "https://github.com/anthropics/skills",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "theme-factory",
+          "license": "Apache-2.0",
+          "from": "https://github.com/anthropics/skills",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "algorithmic-art",
+          "license": "Apache-2.0",
+          "from": "https://github.com/anthropics/skills",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "office",
+          "license": "Ronin Inc (source-available with Kingmaker)",
+          "status": "in core/skills",
+          "stockMac": true
+        },
+        {
+          "name": "trading-agents",
+          "license": "Ronin Inc (source-available with Kingmaker); runs TradingAgents (TauricResearch, Apache-2.0), installed on first use at a pinned commit",
+          "status": "in core/skills",
+          "from": "https://github.com/TauricResearch/TradingAgents @ 1394a3f (0.6.0, 2026-10-03)",
+          "stockMac": true,
+          "needs": "kingmaker markets install: its own Python via the uv inside Kingmaker.app, a few hundred MB; thinks on the local Ollama models",
+          "does": "research only: an AI analyst desk rates one ticker; never trades"
+        },
+        {
+          "name": "rea",
+          "license": "Ronin Inc (source-available with Kingmaker)",
+          "status": "in core/skills",
+          "stockMac": true,
+          "does": "Kingmaker's REA gate as a skill: read any code before it runs, say what it would do unprompted"
+        },
+        {
+          "name": "cli-anything",
+          "license": "Apache-2.0",
+          "status": "in core/skills",
+          "from": "https://github.com/HKUDS/CLI-Anything @ 34f5195",
+          "stockMac": true,
+          "does": "a ready CLI from the Kingmaker CLI Hub, or a new CLI-Anything harness for any app"
+        },
+        {
+          "name": "Ronin's skills (imported 2026-10-16)",
+          "license": "each its own: Ronin Inc's, MIT, Apache-2.0 or Unlicense (THIRD_PARTY_NOTICES.md)",
+          "status": "in core/skills",
+          "stockMac": true,
+          "count": 75,
+          "skills": [
+            "aaa-modeling",
+            "agent-self-scheduling",
+            "ai-search-ranking",
+            "algo-trading",
+            "app-remake-belt",
+            "axis-projection",
+            "blender-3d-asset-generation",
+            "claude-code-skillforge",
+            "cli-anything-blender",
+            "cli-anything-comfyui",
+            "cli-anything-freecad",
+            "cli-anything-godot",
+            "cli-anything-hermes",
+            "cli-hub-meta-skill",
+            "clone",
+            "codex-handoff",
+            "coding-gen",
+            "comfyui",
+            "create-skill-gen",
+            "custom-tool-builder",
+            "dagster-expert",
+            "data-visualization",
+            "debugging-and-error-recovery",
+            "deep-research",
+            "deepcamera",
+            "docker-build-strategies",
+            "docker-compose-patterns",
+            "docker-destructive-guardrails",
+            "docker-project-foundations",
+            "fastmcp",
+            "ffmpeg-skill",
+            "founder-metric-reel",
+            "gcode",
+            "get-available-resources",
+            "gh-fix-ci",
+            "godot-prompter",
+            "graphite",
+            "gsap-core",
+            "gsap-scrolltrigger",
+            "gsap-timeline",
+            "kingmaker-cloudflare-release",
+            "kingmaker-doc-author",
+            "kingmaker-engine-verifier",
+            "kingmaker-flagship-driver",
+            "kingmaker-native-internet",
+            "kingmaker-proof-authoring",
+            "kingmaker-proof-runner",
+            "kingmaker-readme-sync",
+            "kingmaker-repo-hygiene",
+            "kingmaker-voice-runtime",
+            "kingmaker-voice-verification",
+            "mcp-server-builder",
+            "movie-gen",
+            "native-capability-extraction",
+            "observability-and-instrumentation",
+            "open-harness",
+            "paper-search-pro",
+            "parametric-cad-verify",
+            "penetration-testing",
+            "playwright-cli",
+            "research",
+            "scheduler",
+            "security-and-hardening",
+            "security-audit",
+            "skill-creator",
+            "skill-kokoro-tts-tool",
+            "skill-matchmaker",
+            "social-media-gen",
+            "universal-modder",
+            "verify-claims",
+            "voice-operations-command",
+            "wake-word-detection",
+            "web-artifacts-builder",
+            "webapp-testing",
+            "workflows"
+          ],
+          "held": "Anthropic's proprietary skills (docx, pdf, pptx, xlsx, computer-use, built-in-browser, chrome-browser), Anthropic's built-in skills with no licence (docs, import-memory, google-workspace, morning), and the owner's private engines (custom-lead-generator, profiler, council-conductor)",
+          "how": "scripts/import-skills.mjs (operator)"
+        }
+      ],
+      "privateOnly": [
+        {
+          "name": "custom-lead-generator",
+          "why": "the owner's private lead engine, tied to their own CRM"
+        },
+        {
+          "name": "profiler",
+          "why": "tied to the owner's CRM records"
+        }
+      ],
+      "notShipped": [
+        {
+          "name": "docx, xlsx, pptx, pdf (Anthropic)",
+          "why": "\"© Anthropic, PBC. All rights reserved\": not redistributable. Replaced by the office stack below."
+        },
+        {
+          "name": "built-in-browser, chrome-browser, computer-use, morning, docs, google-workspace, import-memory, deep-research (Anthropic)",
+          "why": "proprietary or unlicensed, and written for Claude's own apps; Kingmaker has its own browser, research and voice."
+        },
+        {
+          "name": "voice-operations-command",
+          "why": "written for Claude's mobile app; Kingmaker's fn-key voice does this natively."
+        }
+      ],
+      "next": [
+        {
+          "name": "meetings, capture, roast, rfp-responder, process-mapper (alirezarezvani, MIT)",
+          "why": "good fits; their helper scripts are Python: port to JS first"
+        },
+        {
+          "name": "frontend-slides (zarazhangrui, MIT)",
+          "why": "HTML decks with no PowerPoint; drop its Vercel deploy script first"
+        },
+        {
+          "name": "invoice-organizer (ComposioHQ)",
+          "why": "licence only claimed in a README: confirm or rewrite"
+        },
+        {
+          "name": "pdf (openai/skills, Apache-2.0), excel-automation (daymade, MIT)",
+          "why": "replacements for the proprietary pdf/xlsx skills; need script ports"
+        }
+      ],
+      "rejected": [
+        "doc-coauthoring (no licence)",
+        "vercel writing-guidelines (no licence; fetches its rules from the web each run)",
+        "photo-to-scanned-pdf (fakes signatures)",
+        "twitter-algorithm-optimizer (AGPL-3.0)",
+        "stock-analysis, business-investment-advisor (investment advice)",
+        "video/youtube downloaders (break platform terms)",
+        "skills that need cloud AI keys (openai transcribe/speech/imagegen, ad-creative with an affiliate link, ui-ux-pro-max)",
+        "using-superpowers (takes over every reply)"
+      ]
+    },
+    "art": {
+      "what": "Make pictures, thumbnails, reels, title cards, print and 3D, locally.",
+      "items": [
+        {
+          "name": "Kingmaker image lane (local diffusion)",
+          "license": "per model, shown before download",
+          "ships": "built in",
+          "stockMac": true
+        },
+        {
+          "name": "PhotoCraft, VectorCraft, FilmCraft, LightCraft, EffectCraft, PrintCraft, DesignCraft (ArtCraft apps)",
+          "license": "MIT OR Apache-2.0 (names and logos are not open: Kingmaker never shows their marks)",
+          "ships": "prebuilt inside Kingmaker.app (today: built with cargo on first use, which a stock Mac can't)",
+          "stockMac": false
+        },
+        {
+          "name": "Inkscape",
+          "license": "GPL-2.0-or-later",
+          "ships": "first use, from inkscape.org",
+          "stockMac": true
+        },
+        {
+          "name": "GIMP",
+          "license": "GPL-3.0-or-later",
+          "ships": "first use, from gimp.org",
+          "stockMac": true
+        },
+        {
+          "name": "Krita",
+          "license": "GPL-3.0",
+          "ships": "first use, from krita.org",
+          "stockMac": true
+        },
+        {
+          "name": "Blender",
+          "license": "GPL-2.0-or-later",
+          "ships": "first use, from blender.org",
+          "stockMac": true
+        },
+        {
+          "name": "Audacity",
+          "license": "GPL-3.0",
+          "ships": "first use, from audacityteam.org",
+          "stockMac": true
+        },
+        {
+          "name": "Kdenlive / Shotcut",
+          "license": "GPL-3.0",
+          "ships": "first use, from their sites",
+          "stockMac": true
+        },
+        {
+          "name": "ffmpeg (video cutting, the ad maker)",
+          "license": "LGPL-2.1+ build",
+          "ships": "inside Kingmaker.app (Resources/bin)",
+          "stockMac": true
+        }
+      ]
+    },
+    "office": {
+      "what": "Word, Excel, PowerPoint and PDF files written by Kingmaker itself, opened by whatever the owner uses.",
+      "items": [
+        {
+          "name": "docx 9.8.1 (dolanmiu/docx)",
+          "license": "MIT",
+          "ships": "bundled in vendor/office/office-libs.mjs (one 1.9 MB file, runs on Kingmaker's own Node 24)",
+          "stockMac": true,
+          "does": "Word documents: letters, proposals, menus",
+          "status": "working"
+        },
+        {
+          "name": "exceljs 4.4.0",
+          "license": "MIT",
+          "ships": "bundled in vendor/office/office-libs.mjs (one 1.9 MB file, runs on Kingmaker's own Node 24)",
+          "stockMac": true,
+          "does": "Excel workbooks: price lists, inventories, invoices",
+          "status": "working",
+          "note": "streaming reader left out (its unzipper dependency pulls in an unlicensed package); load(buffer) and all writing work"
+        },
+        {
+          "name": "pptxgenjs 4.0.1",
+          "license": "MIT",
+          "ships": "bundled in vendor/office/office-libs.mjs (one 1.9 MB file, runs on Kingmaker's own Node 24)",
+          "stockMac": true,
+          "does": "PowerPoint decks",
+          "status": "working"
+        },
+        {
+          "name": "pdf-lib 1.17.1",
+          "license": "MIT",
+          "ships": "bundled in vendor/office/office-libs.mjs (one 1.9 MB file, runs on Kingmaker's own Node 24)",
+          "stockMac": true,
+          "does": "PDFs: fill, merge, stamp, split",
+          "status": "working"
+        },
+        {
+          "name": "macOS textutil and Preview",
+          "license": "part of macOS",
+          "ships": "already on every Mac",
+          "stockMac": true,
+          "does": "convert rtf/html/doc/docx/odt, print to PDF"
+        },
+        {
+          "name": "LibreOffice (headless)",
+          "license": "MPL-2.0",
+          "ships": "first use, from libreoffice.org",
+          "stockMac": true,
+          "does": "open and convert anything, render documents to PDF"
+        }
+      ],
+      "how": "The local model answers with a small JSON spec (core/skills/office); lib/office.mjs renders it with the bundled libraries into ~/Documents/Kingmaker, never over an existing file. Rebuild the bundle with scripts/build-office-vendor.sh.",
+      "next": [
+        "Route 'make me a Word doc / spreadsheet / deck / PDF' to the office skill without typing /office: lib/cli.mjs's typed-turn handler can use pickBuiltInSkill (lib/core-pack.mjs); the bar session owns cli.mjs.",
+        "Designed layouts (flyers, menus, posters) through the art stack; today a PDF is plain text."
+      ]
+    },
+    "website": {
+      "what": "Build and stock a small business's site: the website skills above, plus free resources it may use commercially.",
+      "items": [
+        {
+          "name": "Google Fonts",
+          "license": "SIL OFL 1.1 / Apache-2.0",
+          "ships": "fetched per site",
+          "stockMac": true
+        },
+        {
+          "name": "Lucide icons",
+          "license": "ISC",
+          "ships": "vendored",
+          "stockMac": true
+        },
+        {
+          "name": "Heroicons",
+          "license": "MIT",
+          "ships": "vendored",
+          "stockMac": true
+        },
+        {
+          "name": "Openverse (CC images and audio)",
+          "license": "per item, CC0/CC-BY shown with credit",
+          "ships": "searched per site",
+          "stockMac": true
+        },
+        {
+          "name": "Unsplash / Pexels photos",
+          "license": "their free licences (no resale as-is)",
+          "ships": "searched per site, credited",
+          "stockMac": true
+        },
+        {
+          "name": "Vecteezy free vectors",
+          "license": "Vecteezy Free License (attribution required)",
+          "ships": "searched per site, credited",
+          "stockMac": true
+        },
+        {
+          "name": "The business's own photos and media (site-media-fetch)",
+          "license": "the owner's",
+          "ships": "skill",
+          "stockMac": true
+        }
+      ]
+    },
+    "engineering": {
+      "what": "Open projects Kingmaker learns its own architecture and testing from (the owner, 2026-10-15: \"absorb from it what we can to make kingmaker better\"). References, not shipped: what was taken is written in docs/ABSORBED.md, re-implemented in Kingmaker's own code.",
+      "where": "docs/ABSORBED.md",
+      "items": [
+        {
+          "name": "olmo-core (allenai/olmo-core)",
+          "from": "https://github.com/allenai/olmo-core @ 5f6f58a (2026-10-02)",
+          "license": "Apache-2.0",
+          "ships": "reference only (Python, PyTorch, CUDA training: not a stock-Mac tool)",
+          "stockMac": false,
+          "rea": "clean",
+          "status": "absorbed: bench provenance (lib/model-bench.mjs benchProvenance)"
+        },
+        {
+          "name": "OpenHuman (tinyhumansai/openhuman)",
+          "from": "https://github.com/tinyhumansai/openhuman @ 056134c (2026-10-16)",
+          "license": "GPL-3.0-only",
+          "ships": "reference only: ideas, never code (GPL can't enter Kingmaker)",
+          "stockMac": false,
+          "rea": "rejected as a connector (its installer pipes curl into sh)",
+          "status": "studied: ranked next steps in docs/ABSORBED.md"
+        },
+        {
+          "name": "OpenJarvis (open-jarvis/openjarvis)",
+          "from": "https://github.com/open-jarvis/openjarvis @ b94a9b2 (2026-10-15)",
+          "license": "Apache-2.0",
+          "ships": "reference only",
+          "stockMac": false,
+          "rea": "rejected as a connector (install scripts pipe curl into sh)",
+          "status": "absorbed: connectors run without Kingmaker’s keys, in their own process group (lib/connectors.mjs connectorEnv)"
+        },
+        {
+          "name": "QwenPaw (agentscope-ai/QwenPaw)",
+          "from": "https://github.com/agentscope-ai/QwenPaw @ df035cb (2026-10-16)",
+          "license": "Apache-2.0",
+          "ships": "reference only",
+          "stockMac": false,
+          "rea": "rejected as a connector (an installer pipes curl into sh)",
+          "status": "absorbed: REA rules as data, deny lists not findings, re-read on change, owner acknowledgements bound to the code (lib/rea-rules.mjs)"
+        }
+      ]
+    }
+  }
+}

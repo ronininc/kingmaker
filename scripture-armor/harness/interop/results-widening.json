@@ -1,0 +1,59 @@
+{
+  "results": [
+    {
+      "label": "W1 fresh legitimate request serves through the relay (API called once, answer return-matches)",
+      "ok": true,
+      "detail": "status=200 apiDelta=1 match=true"
+    },
+    {
+      "label": "W2 second DISTINCT request (fresh canary) serves — the replay ledger does not false-fire",
+      "ok": true,
+      "detail": "status=200 apiDelta=1 match=true"
+    },
+    {
+      "label": "W3 replayed REQUEST is refused at the relay BEFORE execution (API count unchanged) + package-replay beacon",
+      "ok": true,
+      "detail": "status=400 apiDelta=0 replayBeacons=1 body=\"relay error: armor-native: package canary already served — replay refused (83675\""
+    },
+    {
+      "label": "W4 EXPIRED package is refused at the relay (API count unchanged) + package-expired beacon",
+      "ok": true,
+      "detail": "status=400 apiDelta=0 expiredBeacons=1 body=\"relay error: armor-native: package expired 2026-10-25T16:11:16.820Z — refused\""
+    },
+    {
+      "label": "W5 package from a never-enrolled sender still refused at the pin (API count unchanged) + beacon",
+      "ok": true,
+      "detail": "status=400 apiDelta=0 senderBeacons=1"
+    },
+    {
+      "label": "W6 bit-flipped packet in transit still killed at the relay (no API call)",
+      "ok": true,
+      "detail": "status=400 apiDelta=0"
+    },
+    {
+      "label": "W7 frame-strip still useless both ways (body-only and frame-only refused, no API call)",
+      "ok": true,
+      "detail": "bodyOnly=400 frameOnly=400 apiDelta=0"
+    },
+    {
+      "label": "W8a fresh package opens at the guest peer and its ack opens engine-side",
+      "ok": true,
+      "detail": "status=200 opened=1"
+    },
+    {
+      "label": "W8b replayed package REFUSED at the peer (opened count unchanged) + package-replay beacon in guest evidence",
+      "ok": true,
+      "detail": "status=400 opened=1 refused=1 replayBeacons=1 lastRefusal=\"armor-native: package canary already served — replay refused (092596ee-da9b-412d-8062-b6b7\""
+    },
+    {
+      "label": "W8c EXPIRED package refused at the peer (opened count unchanged) + package-expired beacon in guest evidence",
+      "ok": true,
+      "detail": "status=400 opened=1 expiredBeacons=1 lastRefusal=\"armor-native: package expired 2026-10-25T16:11:17.101Z — refused\""
+    },
+    {
+      "label": "W8d second DISTINCT package opens at the peer — no false replay/expiry refusal",
+      "ok": true,
+      "detail": "status=200 opened=2"
+    }
+  ]
+}

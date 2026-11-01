@@ -1,0 +1,37 @@
+POST /contribute HTTP/1.1
+host: 127.0.0.1:18712
+connection: keep-alive
+content-type: application/vnd.scripture-armor; v=3
+accept: */*
+accept-language: *
+sec-fetch-mode: cors
+user-agent: node
+accept-encoding: gzip, deflate
+content-length: 2214
+
+SCRIPTURE-ARMOR v3
+{"v":3,"canary":"15d4faee-b6e6-49c1-8d82-1e0bb7954cf5","created":"2026-10-25T17:11:11.882Z","expiry":null,"commit":"0a028b8d68409dbf8bb6de931786374724f95d0c3b843cb7c577cbfe04329553","sender_sign_fp":"0b94a56739295051979794b7707528d8f169fa0c539b6ae0f17de4df42910379","sender_sign_pub":"mBiH1mb4737U5mgod2nlGYW1-f7BqO2ZI7OqjNXY8D8","recipient_seal_fp":"b1a4baf21a73b42332740c70c5e10bde2111b13a4c44fa5762b41d850818afe7","armor_seed":"+xfZ2oKWt/NGOdPwZWvIIA==","eph_pub":"CRrhgGg_-zB2HOpYgLTLAOB4pWi716B0ntZtzAvjbU8","key_nonce":"T8eyMx/ecffGC7IV","key_ct":"Gr/tyD+AllANJ++QAgnl+YhgG2rSG53/bjnCa6kuS+JSIVpG1BGxlSsMT9IacJEZ","file_nonce":"UMuDn68k2ZZQce/5","scan_verdict":null,"scan_digest":null,"scan_report":null,"scan_override":null,"armor_tier":null,"sig":"98zPlMuToOQS21cLwG1/1YpEHsrX+1I1Q86wUoTuymWjQxCvF/AX6WtIWL6LBWxPlobSMKPSDck+yq0ql5Z7Ag=="}
+𐘍𐘇𐘐𐘑𒀊𒀴𐘚𐘩𒀱𐘷𒀷𒀥𐘦𒀁𒀫𒀸𐘜𐘧𒀭𐘿𒀈𒀱𐘚𒀙𐘢𐘮𒀃𐘒𒀟𐘾𐘘𐘃𐘫
+𒀞𐘦𐘟𐘜𒀂𐘿𒀽𒀮𐘻𒀨𐘪𐘠𐘛𒀹𒀓𒀛𐘢𐘖𒀜𐘖𒀨𒀦𐘵𒀻
+𐘬𐘄𐘾𒀒𒀜𐘶𒀘𐘬𒀝𒀸𐘄𒀴𐘰𒀻𒀋𐘍𒀢𐘛𐘺𐘐𒀙𒀧𒀃𒀑𐘶𒀜
+𐘶𐘠𐘵𒀘𐘧𒀑𒀲𐘦𒀬𐘙𒀎𐘉𒀁𐘖𒀦𒀥𐘥𐘟𐘛𐘜
+𒀇𐘝𒀤𒀑𒀨𐘙𐘉𐘸𒀽𐘁𐘨𒀏𐘉𐘸𒀽𒀴𒀠𒀹𒀒𐘞𒀁𒀚𒀨𐘝
+𒀜𐘟𐘵𐘉𒀦𒀦𒀌𒀌𐘁𒀐𐘔𐘷𐘬𐘑𐘄𐘻𒀃𐘜𐘱𐘋𒀕𐘷𐘒𐘽𐘓𒀉𒀍
+𐘢𐘨𒀻𒀢𒀣𐘾𒀵𐘓𒀰𒀫𒀉𒀚𐘻𐘄𒀝𒀖𐘹𒀊𒀸𒀻𒀦𐘋𒀪
+𐘁𐘘𐘿𒀃𒀲𐘠𒀖𒀺𐘤𐘉𐘟𒀨𐘡𐘏𐘇𐘏𒀊𒀦𒀼𐘢𐘡𒀘𒀚
+POST /forget HTTP/1.1
+host: 127.0.0.1:18712
+connection: keep-alive
+content-type: application/vnd.scripture-armor; v=3
+accept: */*
+accept-language: *
+sec-fetch-mode: cors
+user-agent: node
+accept-encoding: gzip, deflate
+content-length: 1293
+
+SCRIPTURE-ARMOR v3
+{"v":3,"canary":"3a2059f4-6b37-4727-b774-7e9e5b2a08fb","created":"2026-10-25T17:11:11.949Z","expiry":null,"commit":"12c76012ce2cafd106e0fd0cce2beb58c6c300a1701967363e42492ab5ed8129","sender_sign_fp":"0b94a56739295051979794b7707528d8f169fa0c539b6ae0f17de4df42910379","sender_sign_pub":"mBiH1mb4737U5mgod2nlGYW1-f7BqO2ZI7OqjNXY8D8","recipient_seal_fp":"b1a4baf21a73b42332740c70c5e10bde2111b13a4c44fa5762b41d850818afe7","armor_seed":"u4FbvPOlPduxEb9XyF11cQ==","eph_pub":"-_z_2gHlqHkbxQD_Sixk1Q97l-jern0r4nhBCzvDPU8","key_nonce":"SkWmteUqy9IdJqMB","key_ct":"J3CwJuGFklY2+73GvPxSDAK66qlwDb1fI63rtmGxsTMVKVV5PjRf3wOpl6AVeB/v","file_nonce":"XEvvGvEez+s0I0G2","scan_verdict":null,"scan_digest":null,"scan_report":null,"scan_override":null,"armor_tier":null,"sig":"xHSxXiLA5QS6QnyQGvrDdky/vAsgXTPbntEL3J1ETGB4CKfkVas9Yku9yY7DkuMfGfbVmTA4FojVhXYwbsAjDA=="}
+𐘡𒀄𒀕𒀛𐘎𒀆𒀉𐘖𐘽𐘥𐘘𐘚𒀂𐘕𐘟𒀽𒀄𒀩𒀓𒀫𐘕𐘱
+𒀶𒀕𒀕𒀌𐘽𒀃𒀻𐘃𒀍𐘝𒀶𒀾𒀢𐘟𐘟𒀠𐘪𐘽𐘫𒀚𒀠𐘞𒀡𐘇
+𒀨𐘱𒀁𐘺𐘇𐘎𐘪𒀐𐘗

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-label="KINGMAKER IDLE DASHBOARD visual validation">
+  <rect width="1280" height="720" fill="#030712"/>
+  <text x="34" y="48" fill="#e8f6ff" font-family="Arial" font-size="28" font-weight="700">KINGMAKER IDLE DASHBOARD</text>
+  <text x="34" y="82" fill="#d8f3ff" font-family="Arial" font-size="15">Sovereign parent shell</text>
+  <rect x="28" y="112" width="210" height="496" rx="16" fill="#07111f" stroke="#17355a"/>
+  <text x="54" y="154" fill="#86c8ff" font-family="Arial" font-size="14">MODULE NAVIGATION</text>
+  <text x="54" y="206" fill="#dceeff" font-family="Arial" font-size="14">Kingmaker</text>
+  <text x="54" y="248" fill="#dceeff" font-family="Arial" font-size="14">Solomon</text>
+  <text x="54" y="290" fill="#dceeff" font-family="Arial" font-size="14">Titan</text>
+  <text x="54" y="332" fill="#dceeff" font-family="Arial" font-size="14">CodeGen</text>
+  <text x="54" y="374" fill="#dceeff" font-family="Arial" font-size="14">Fabrication</text>
+  <text x="54" y="416" fill="#dceeff" font-family="Arial" font-size="14">Operations</text>
+  <circle cx="640" cy="326" r="150" fill="none" stroke="#d8f3ff" stroke-width="8" stroke-opacity=".92"/>
+  <circle cx="640" cy="326" r="206" fill="none" stroke="#2f91ff" stroke-width="2" stroke-opacity=".25"/>
+  <text x="590" y="366" fill="#ffffff" font-family="Arial" font-size="110" text-anchor="middle">♛</text>
+  <rect x="306" y="520" width="668" height="78" rx="16" fill="#081426" stroke="#1d4b77"/>
+  <text x="330" y="554" fill="#dceeff" font-family="Arial" font-size="16">Solomon • Titan • CodeGen • Fabrication • Operations • Memory • System Status • Settings</text>
+  <text x="330" y="580" fill="#86c8ff" font-family="Arial" font-size="13">State machine: standby emblem center → working dashboard replaces emblem</text>
+  <rect x="1008" y="112" width="238" height="496" rx="16" fill="#07111f" stroke="#17355a"/>
+  <text x="1032" y="154" fill="#86c8ff" font-family="Arial" font-size="14">SYSTEM SUMMARY</text>
+  <text x="1032" y="214" fill="#dceeff" font-family="Arial" font-size="14">Governance locked</text>
+  <text x="1032" y="254" fill="#dceeff" font-family="Arial" font-size="14">Memory engaged</text>
+  <text x="1032" y="294" fill="#dceeff" font-family="Arial" font-size="14">Integrity 98.7%</text>
+  <text x="1032" y="356" fill="#d8f3ff" font-family="Arial" font-size="14">Truthful status only</text>
+</svg>

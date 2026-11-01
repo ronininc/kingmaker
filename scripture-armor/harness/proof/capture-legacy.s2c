@@ -1,0 +1,11 @@
+HTTP/1.1 200 OK
+content-type: application/json
+Date: Sun, 25 Oct 2026 17:11:12 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+dd
+{"receipt":{"installationId":"inst-proof-1","packetId":"pkt-proof-1","accepted":true,"at":"2026-10-25T17:11:12.296Z","signature":"tu+JtE+xBcIl58OlpgNuiDrIbrGTleinxQp5vWo1bE2x9+tVtt4cAW7G7RVM6WDRBAnCEJ3jUh022XaKgOrhAQ=="}}
+0
+

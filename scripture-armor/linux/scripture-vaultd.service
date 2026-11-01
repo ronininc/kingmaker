@@ -1,0 +1,69 @@
+# Scripture Armor vault daemon — SYSTEM systemd unit template.
+# Rendered by linux/install-daemon.sh --mode service (placeholders
+# substituted with the owner's real paths) and installed to
+# /etc/systemd/system/scripture-vaultd.service. The per-user twin is
+# linux/scripture-vaultd-user.service.
+#
+# CORRECTED 2026-10-26 against the ecosystem's original pattern —
+# solomon.service (Solomon headless server, TSS desktop/linux/) —
+# after the service-material sweep found it. Adopted from it: the
+# hardening block, the health-gated start, RestartPreventExitStatus,
+# KillMode/TimeoutStopSec, Type=exec. Deliberate divergences from
+# solomon.service, each with its reason:
+#   - User= is the OWNER, not a dedicated service account, and
+#     state lives in the owner's identity store (__IDENTITY_DIR__,
+#     under the owner's home), not /var/lib: vaultd is owner-bound
+#     by design — the identity it serves from is the owner's.
+#   - ProtectHome is NOT set (the one hardening line not adopted):
+#     it would hide the identity store under $HOME from the daemon.
+#     ProtectSystem=full leaves $HOME writable, which the identity
+#     store requires.
+#   - The health gate (ExecStartPost) polls vaultd's own owner
+#     status call — "started" means the status call answered ok,
+#     not just that the process exists. Solomon's --wait-healthy
+#     discipline, vaultd's probe; the 60s start timeout reflects
+#     vaultd's fast, model-free start (Solomon allows 330s).
+#   - Logs append to the owner's log file: the armor mirrors the
+#     macOS daemon's file logging; Solomon logs to the journal.
+
+[Unit]
+Description=Scripture Armor vault daemon (vaultd)
+Documentation=file:__REPO_DIR__/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=__OWNER_USER__
+ExecStart=__NODE_BIN__ __REPO_DIR__/vaultd.mjs serve --identity-dir __IDENTITY_DIR__ --socket __IDENTITY_DIR__/vaultd.sock
+ExecStartPost=/bin/sh -c 'for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do __NODE_BIN__ __REPO_DIR__/vaultd.mjs status --identity-dir __IDENTITY_DIR__ >/dev/null 2>&1 && exit 0; sleep 1; done; exit 1'
+TimeoutStartSec=60
+WorkingDirectory=__REPO_DIR__
+Environment=HOME=__OWNER_HOME__
+Environment=PATH=__PATH_VALUE__
+Restart=always
+RestartSec=5
+# 78 (EX_CONFIG) = vaultd's serve startup refused on configuration
+# grounds (no identity in the store, or a non-private socket
+# directory); restarting cannot fix those. vaultd exits 78 for
+# exactly those two startup failures.
+RestartPreventExitStatus=78
+KillMode=mixed
+TimeoutStopSec=30
+LimitNOFILE=65536
+StandardOutput=append:__LOG_PATH__
+StandardError=append:__LOG_PATH__
+# Hardening, adopted from solomon.service — the subset compatible
+# with a daemon whose state lives in the owner's home (ProtectHome
+# deliberately absent; see header).
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectControlGroups=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target

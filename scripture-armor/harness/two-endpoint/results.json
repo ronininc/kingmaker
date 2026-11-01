@@ -1,0 +1,132 @@
+{
+  "at": "2026-10-25T10:22:58.591Z",
+  "topology": "host <-> QEMU slirp hostfwd (127.0.0.1 ports) <-> Alpine guest (DHCP 10.0.2.15)",
+  "peer_sign_fp": "8c3e5abdde8b847e22c9024cb3c08d12df0eeb536868a5b1ab23cbf0ce77c042",
+  "rogue_sign_fp": "b7b96f714e8d37f6baecc0b377c4f0ce816bcf77c22db314f0289f92e66ec900",
+  "timings_ms": {
+    "package": 1017,
+    "flow": 301
+  },
+  "results": [
+    {
+      "label": "setup: guest peer identity block arrived over the link and parses",
+      "ok": true,
+      "detail": "",
+      "kind": "proof"
+    },
+    {
+      "label": "P1 package round trip host→guest→host completes through armor-egress package mode",
+      "ok": true,
+      "detail": "ms=1017 status=200",
+      "kind": "proof"
+    },
+    {
+      "label": "P2 guest recovered the payload byte-for-byte (its own hash of what arrived == host hash of what was sent)",
+      "ok": true,
+      "detail": "guest=f9169164fc1a9e4f075c68ef1f15099d63316b3f5767be55e22172ecffaabf74 host=f9169164fc1a9e4f075c68ef1f15099d63316b3f5767be55e22172ecffaabf74",
+      "kind": "proof"
+    },
+    {
+      "label": "P3 engine recovered the guest payload byte-for-byte (ack hash == hash of body the engine opened)",
+      "ok": true,
+      "detail": "",
+      "kind": "proof"
+    },
+    {
+      "label": "P4 provenance: return-matched, answered by the enrolled guest peer identity",
+      "ok": true,
+      "detail": "answered_by=8c3e5abdde8b847e22c9024cb3c08d12df0eeb536868a5b1ab23cbf0ce77c042",
+      "kind": "proof"
+    },
+    {
+      "label": "P5 guest-side evidence independently records the same payload hash (peer process, not the reply)",
+      "ok": true,
+      "detail": "evidence=f9169164fc1a9e4f075c68ef1f15099d63316b3f5767be55e22172ecffaabf74",
+      "kind": "proof"
+    },
+    {
+      "label": "F1 Addendum K flow round trip across the link echoes the payload",
+      "ok": true,
+      "detail": "ms=301",
+      "kind": "proof"
+    },
+    {
+      "label": "F2 RETURN-HASH LOOP: guest chain receipt verifies against the sent chain",
+      "ok": true,
+      "detail": "head=5bbef9d9e71db29540f46d2b09e5d4e8f194a7179849d5385cd42145972cf47a",
+      "kind": "proof"
+    },
+    {
+      "label": "N1 response forged by an UNENROLLED keypair naming the real canary is REFUSED at the responder pin",
+      "ok": true,
+      "detail": "err=armor-native: package from unexpected sender b7b96f714e8d37f6baecc0b377c4f0ce816bcf77c22db314f0289f92e66ec900  rogue_fp=b7b96f714e8d37f6baecc0b377c4f0ce816bcf77c22db314f0289f92e66ec900",
+      "kind": "proof"
+    },
+    {
+      "label": "N1b the refusal beaconed on the engine, naming the rogue fingerprint",
+      "ok": true,
+      "detail": "",
+      "kind": "proof"
+    },
+    {
+      "label": "N2 rogue response naming a never-sent canary is refused — at the sender pin, before return-match",
+      "ok": true,
+      "detail": "armor-native: package from unexpected sender b7b96f714e8d37f6baecc0b377c4f0ce816bcf77c22db314f0289f92e66ec900 — refused",
+      "kind": "proof"
+    },
+    {
+      "label": "N2b the refusal is in the engine beacon record",
+      "ok": true,
+      "detail": "",
+      "kind": "proof"
+    },
+    {
+      "label": "N3 well-formed package from an UNENROLLED sender is REFUSED by the guest peer (sender pinning)",
+      "ok": true,
+      "detail": "http=400 opened 1→1 refused 0→1",
+      "kind": "proof"
+    },
+    {
+      "label": "N3c the peer-side refusal beaconed (peer beacon record, reported via guest evidence)",
+      "ok": true,
+      "detail": "beacons=1 last_refusal=armor-native: package from unexpected sender f8a10515b06f4ec102aae15acc602a5d99fd74720465d6b28a8ee37721375bef — refused",
+      "kind": "proof"
+    },
+    {
+      "label": "N3b package addressed to a different recipient is refused by the peer (recipient check)",
+      "ok": true,
+      "detail": "http=400",
+      "kind": "proof"
+    },
+    {
+      "label": "W1 tap capture (package leg) shows Scripture Armor v3 packages",
+      "ok": true,
+      "detail": "",
+      "kind": "proof"
+    },
+    {
+      "label": "W2 tap capture does NOT show the payload marker or plaintext",
+      "ok": true,
+      "detail": "",
+      "kind": "proof"
+    },
+    {
+      "label": "W3 tap capture does NOT show the forged payload in the clear",
+      "ok": true,
+      "detail": "",
+      "kind": "proof"
+    },
+    {
+      "label": "W4 wire bodies are glyph armor (PUA / Linear A / Cuneiform ranges)",
+      "ok": true,
+      "detail": "",
+      "kind": "proof"
+    },
+    {
+      "label": "W5 flow-leg capture carries sealed flow frames (hello + body_b64), no plaintext payload",
+      "ok": true,
+      "detail": "",
+      "kind": "proof"
+    }
+  ]
+}

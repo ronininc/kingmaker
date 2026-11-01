@@ -1,0 +1,36 @@
+HTTP/1.1 200 OK
+content-type: application/vnd.scripture-armor; v=3
+Date: Sun, 25 Oct 2026 17:11:11 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+776
+SCRIPTURE-ARMOR v3
+{"v":3,"canary":"a7e8dedc-4866-40f9-88ed-35711899184e","created":"2026-10-25T17:11:11.929Z","expiry":null,"commit":"03ade2099b1f04ac06514e4f8c01c2482a4fb0e0538bc57c124c9f3ceaa2568e","sender_sign_fp":"eae1c7ef8aa74ed9976f36203e91f6927e4c14a3d000a26532fcf2d97472f97a","sender_sign_pub":"n1_JCSqphWifLcWbMC4fzm9QFscCIWqHry5gjvgUxm4","recipient_seal_fp":"06d36b8d0045e8673f716426ed640db96dbcf7acc8c96b9f05ee9b6e1c54021a","armor_seed":"9pK3Y4qldofTgyYyGQKq8g==","eph_pub":"QvBRXD1_G3Wxw75XYrdLgfSwogs4vQei_ZOor9PV9Tg","key_nonce":"Wxqe4Ee/aAc6i1fy","key_ct":"KNpdYRcKjfsU6QT1uDNvPaE5kbr5W+0iPBuz5YvuEqcdvH0fyOBharSOFZlXoXku","file_nonce":"wkOEecP7QwUiUMHK","scan_verdict":null,"scan_digest":null,"scan_report":null,"scan_override":null,"armor_tier":null,"sig":"+mbCeYi6TQBjBjEaNLgnzUAoFO8HQ7aBoxs5MTnfBPCC6RTsFSI4dxRuYc6D2y1ajz8SfOuoktJc9rJ598FwBg=="}
+𒀗𒀸𒀋𒀵𒀎𐘮𒀶𒀝𐘿𒀗𒀊𐘬𒀻𐘳𒀫𒀋𒀒𐘎𐘉𒀯𐘻𐘘𒀨𐘩𒀃𒀀𒀵𒀏𐘯𐘷𒀼𒀢
+𒀑𐘬𒀵𐘜𐘥𐘛𐘫𐘖𒀔𒀛𒀍𐘨𐘤𐘎𒀦𐘦𒀧𐘼𐘂𐘽𐘥𒀌𐘤
+𐘊𐘺𐘐𐘽𒀦𒀁𐘄𒀋𐘈𐘵𐘆𒀎𒀿𒀟𒀮𒀫𐘈𐘟𐘄𐘁𒀤𐘭𐘶𒀞
+𐘒𐘍𐘣𐘙𐘔𐘲𒀛𒀭𒀝𒀇𒀥𐘎𐘹𒀀𐘽𒀺𐘒𒀜𐘄𒀯𐘯𒀘𐘈𐘡𒀁𐘿𒀗𒀭𐘷𐘍𐘥𐘑𐘍
+𐘼𐘰𒀱𒀛𐘵𐘚𒀓𒀳𐘿𒀪𐘅𐘐𐘐𐘧𒀕𐘁𐘅𒀱𐘙𒀉𐘀𐘺𐘇𐘪𐘇𒀢𐘉𐘨𐘡𐘺𒀤𐘀
+𐘿𐘋𒀇𐘈𐘂𐘵𒀅𐘿𐘻𒀵𐘞𒀧𐘈𐘺𒀺𒀉𒀁𒀹𒀔𒀵𐘿
+𒀴𒀧
+
+0
+
+HTTP/1.1 200 OK
+content-type: application/vnd.scripture-armor; v=3
+Date: Sun, 25 Oct 2026 17:11:11 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+4bd
+SCRIPTURE-ARMOR v3
+{"v":3,"canary":"a38c9522-a713-403a-9ccb-cdc9da1c5276","created":"2026-10-25T17:11:11.971Z","expiry":null,"commit":"0fdf92b0a110af322c91c5d825811d5343cbec811421d953e7d1453f27175533","sender_sign_fp":"eae1c7ef8aa74ed9976f36203e91f6927e4c14a3d000a26532fcf2d97472f97a","sender_sign_pub":"n1_JCSqphWifLcWbMC4fzm9QFscCIWqHry5gjvgUxm4","recipient_seal_fp":"06d36b8d0045e8673f716426ed640db96dbcf7acc8c96b9f05ee9b6e1c54021a","armor_seed":"HUZDSwcaiUioPITWOky0Tw==","eph_pub":"wohbJk7ph0wCHR0uT5o2x96WC41nDiRN4tyNBxlS4Sw","key_nonce":"zHj32s7JllSMCrVB","key_ct":"RzVWWglfzdWegOD50BAQ5KmnV5lbqGQEs1il5Z0GBRqWJKdnEbkHR3EDSq+E2M6N","file_nonce":"BrVnY/Hbv9qC0NtN","scan_verdict":null,"scan_digest":null,"scan_report":null,"scan_override":null,"armor_tier":null,"sig":"o5Vm3dszJ1F1xiowqaNc4nFFssgjIeHMSDcn5t+pv/1JECL0GMG4LkIN8Izg1MkPOxd3uACHVXiLqJygxH7NCw=="}
+𒀻𒀇𐘝𒀺𐘌𒀫𒀾𐘂𐘛𐘱𒀴𐘙𒀕𒀯𐘊𐘸𐘸𒀓𐘄𐘁𒀺𐘟
+𐘓𐘋𒀡𒀄𒀋𒀶𐘅𒀰𒀲𐘹𒀁𐘘𐘯𒀋𒀟𒀎𒀅𐘗𒀌𐘰𒀼𐘹𐘙𐘜𐘰
+
+
+0
+

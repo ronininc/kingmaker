@@ -1,0 +1,294 @@
+{
+  "results": [
+    {
+      "label": "L1 relay GET https://api.github.com/zen completes through the wrap",
+      "ok": true,
+      "detail": "status=200 ms=2018 body=\"Anything added dilutes everything else.\""
+    },
+    {
+      "label": "L1b zen provenance: mode relay, return-matched, answered by the relay identity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "L2 relay POST https://httpbin.org/post completes through the wrap",
+      "ok": true,
+      "detail": "status=200 ms=1247"
+    },
+    {
+      "label": "L2b request body survived the round trip byte-for-byte (echo hash match)",
+      "ok": true,
+      "detail": "sent sha=6aa96d3be5a37f07… echoed sha=6aa96d3be5a37f07…"
+    },
+    {
+      "label": "L2c parsed JSON round trip intact",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "L2d the API received the Authorization value — delivered INSIDE the envelope, applied by the relay",
+      "ok": true,
+      "detail": "api saw: Bearer LIVE-FIRE-SECRE…"
+    },
+    {
+      "label": "L3 relay GET https://httpbin.org/headers completes; API-side header set captured for the exposure audit",
+      "ok": true,
+      "detail": "Accept, Accept-Encoding, Accept-Language, Host, Sec-Fetch-Mode, User-Agent, X-Amzn-Trace-Id"
+    },
+    {
+      "label": "L4 engine↔relay wire shows Scripture Armor v3 packages",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "L4b wire does NOT show the secret header value",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "L4c wire does NOT show the POST payload marker or plaintext",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "L4d wire does NOT show the zen response plaintext",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "L4e wire does NOT name the target hosts (destination inside the envelope only)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "L4f wire body is glyph armor (PUA / Linear A / Cuneiform ranges)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "L4g captured package parses as a v3 frame; field set recorded for the exposure audit",
+      "ok": true,
+      "detail": "v, canary, created, expiry, commit, sender_sign_fp, sender_sign_pub, recipient_seal_fp, armor_seed, eph_pub, key_nonce, key_ct, file_nonce, scan_verdict, scan_digest, scan_report, scan_override, armor_tier, sig"
+    },
+    {
+      "label": "L5 package round trip over the non-loopback interface completes",
+      "ok": false,
+      "detail": "fetch failed cause=ECONNRESET read ECONNRESET"
+    },
+    {
+      "label": "L5d control: the peer IS bound and accepts TCP on the non-loopback interface",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "L5e control: PLAINTEXT http to the same address fails identically — transport-level, armor not involved",
+      "ok": true,
+      "detail": "ECONNRESET read ECONNRESET"
+    },
+    {
+      "label": "L5c non-loopback wire shows packages only — no payload marker in the clear",
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "label": "L6 native policy WITHOUT the relay refuses the same real-API call (fail-closed)",
+      "ok": true,
+      "detail": "armor-egress: refused — target not enrolled and policy is native (target-not-enrolled): ht"
+    },
+    {
+      "label": "L6b a fresh install with NO enrollments at all refuses too",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "L6c both refusals are in the beacon record",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "evidence": {
+    "timings": {
+      "zen_roundtrip_ms": 2018,
+      "post_roundtrip_ms": 1247,
+      "headers_roundtrip_ms": 112
+    },
+    "relayLeg": [
+      {
+        "url": "https://api.github.com/zen",
+        "ms": 1952,
+        "status": 200
+      },
+      {
+        "url": "https://httpbin.org/post",
+        "ms": 1191,
+        "status": 200
+      },
+      {
+        "url": "https://httpbin.org/headers",
+        "ms": 99,
+        "status": 200
+      }
+    ],
+    "frameFields": {
+      "v": "3",
+      "canary": "196e0bee-bb6e-4738-ae8b-ba9ca752e437",
+      "created": "2026-10-25T09:29:51.722Z",
+      "expiry": "null",
+      "commit": "661d5092650f415cb3d25e520d9fb76db0ac6fe7d4255cf6",
+      "sender_sign_fp": "443cedf2cbda3283dbf2579c50e52825c2c3b4063031aabe",
+      "sender_sign_pub": "mtEvgZ9JCWJHhnMOyZFuKfrQ1mFfurMjEvYdEpb1mjI",
+      "recipient_seal_fp": "30b3cd27be013e1ef35c1438ddcab7b2b559b7d7f32cf651",
+      "armor_seed": "Y8sZqu+jkJLp8PaNJkg2zw==",
+      "eph_pub": "3ksfdGDuZuoK6uhZmKrRqh3YEBGm-OMc4-b_kVBJ204",
+      "key_nonce": "zHveU7AtQplDq6br",
+      "key_ct": "mMIa1HaZb29Fjz0fSSPs4VmuycZ4zXylw2rWBrfWeu3SxEUW",
+      "file_nonce": "KJWfEJGQjL5+ueXS",
+      "scan_verdict": "null",
+      "scan_digest": "null",
+      "scan_report": "null",
+      "scan_override": "null",
+      "armor_tier": "null",
+      "sig": "xV4oWg2LGx/ldTnBXQzwvZiU+X8O/54z1Jo8tGZtbypEZPng"
+    },
+    "apiSawHeaders": {
+      "Accept": "*/*",
+      "Accept-Encoding": "br, gzip, deflate",
+      "Accept-Language": "*",
+      "Host": "httpbin.org",
+      "Sec-Fetch-Mode": "cors",
+      "User-Agent": "node",
+      "X-Amzn-Trace-Id": "Root=1-6addcc13-7752752835c23dd72734bbae"
+    },
+    "apiSawOrigin": "104.29.196.211",
+    "zen": {
+      "status": 200,
+      "body_sha256": "350b3f01817326b570872936c7b18f3d420b960f217c0896a115658737d94874",
+      "body_len": 39
+    },
+    "l5_transport_error": "fetch failed cause=ECONNRESET read ECONNRESET",
+    "l5_plain_control": {
+      "ok": false,
+      "error": "ECONNRESET read ECONNRESET"
+    },
+    "provenance": [
+      {
+        "at": "2026-10-25T09:29:51.729Z",
+        "kind": "wrap",
+        "purpose": "live-fire-zen",
+        "canary": "196e0bee-bb6e-4738-ae8b-ba9ca752e437",
+        "to_seal_fp": "30b3cd27be013e1ef35c1438ddcab7b2b559b7d7f32cf6517f2b282fce575fdd",
+        "digest_kind": "commit",
+        "registration": {
+          "synced": 0,
+          "queued": 1,
+          "refused": 0
+        }
+      },
+      {
+        "at": "2026-10-25T09:29:53.736Z",
+        "kind": "return-match",
+        "canary": "196e0bee-bb6e-4738-ae8b-ba9ca752e437",
+        "purpose": "live-fire-zen",
+        "ok": true
+      },
+      {
+        "at": "2026-10-25T09:29:53.736Z",
+        "kind": "egress",
+        "purpose": "live-fire-zen",
+        "target": "https://api.github.com/zen",
+        "mode": "relay",
+        "status": 200,
+        "canary": "196e0bee-bb6e-4738-ae8b-ba9ca752e437",
+        "answered_by_sign_fp": "8bd52d4333f5027198cf5b5669a1281c1d6cfa3c0390a6d0e718607ab40488ce",
+        "return_match": true,
+        "via_relay": "estate-relay"
+      },
+      {
+        "at": "2026-10-25T09:29:53.740Z",
+        "kind": "wrap",
+        "purpose": "live-fire-post",
+        "canary": "a38bb59c-f3b5-4480-8d1d-957a148eb145",
+        "to_seal_fp": "30b3cd27be013e1ef35c1438ddcab7b2b559b7d7f32cf6517f2b282fce575fdd",
+        "digest_kind": "commit",
+        "registration": {
+          "synced": 0,
+          "queued": 2,
+          "refused": 0
+        }
+      },
+      {
+        "at": "2026-10-25T09:29:54.984Z",
+        "kind": "return-match",
+        "canary": "a38bb59c-f3b5-4480-8d1d-957a148eb145",
+        "purpose": "live-fire-post",
+        "ok": true
+      },
+      {
+        "at": "2026-10-25T09:29:54.984Z",
+        "kind": "egress",
+        "purpose": "live-fire-post",
+        "target": "https://httpbin.org/post",
+        "mode": "relay",
+        "status": 200,
+        "canary": "a38bb59c-f3b5-4480-8d1d-957a148eb145",
+        "answered_by_sign_fp": "8bd52d4333f5027198cf5b5669a1281c1d6cfa3c0390a6d0e718607ab40488ce",
+        "return_match": true,
+        "via_relay": "estate-relay"
+      },
+      {
+        "at": "2026-10-25T09:29:54.988Z",
+        "kind": "wrap",
+        "purpose": "live-fire-headers",
+        "canary": "168c3aa3-35af-4902-884d-a067d98bc207",
+        "to_seal_fp": "30b3cd27be013e1ef35c1438ddcab7b2b559b7d7f32cf6517f2b282fce575fdd",
+        "digest_kind": "commit",
+        "registration": {
+          "synced": 0,
+          "queued": 3,
+          "refused": 0
+        }
+      },
+      {
+        "at": "2026-10-25T09:29:55.096Z",
+        "kind": "return-match",
+        "canary": "168c3aa3-35af-4902-884d-a067d98bc207",
+        "purpose": "live-fire-headers",
+        "ok": true
+      },
+      {
+        "at": "2026-10-25T09:29:55.096Z",
+        "kind": "egress",
+        "purpose": "live-fire-headers",
+        "target": "https://httpbin.org/headers",
+        "mode": "relay",
+        "status": 200,
+        "canary": "168c3aa3-35af-4902-884d-a067d98bc207",
+        "answered_by_sign_fp": "8bd52d4333f5027198cf5b5669a1281c1d6cfa3c0390a6d0e718607ab40488ce",
+        "return_match": true,
+        "via_relay": "estate-relay"
+      },
+      {
+        "at": "2026-10-25T09:29:55.401Z",
+        "kind": "wrap",
+        "purpose": "live-fire-package",
+        "canary": "f6d01b98-85c4-4fe8-aa43-ddecdb4e779d",
+        "to_seal_fp": "6ae2a0731248fd5de1d0a7200d7c63e811ad132fdf5f770ae1fc7ed3a128cea4",
+        "digest_kind": "commit",
+        "registration": {
+          "synced": 0,
+          "queued": 4,
+          "refused": 0
+        }
+      },
+      {
+        "at": "2026-10-25T09:29:55.775Z",
+        "kind": "beacon",
+        "event": "egress-refused-unenrolled",
+        "mode": "refused",
+        "purpose": "live-fire-control",
+        "target": "https://api.github.com/zen",
+        "detail": "native policy: target-not-enrolled"
+      }
+    ]
+  }
+}

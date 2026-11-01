@@ -1,0 +1,14 @@
+POST /contribute HTTP/1.1
+host: 127.0.0.1:18722
+connection: keep-alive
+content-type: application/json
+x-fleet-install: inst-proof-1
+x-fleet-proof: d8ab97d73a29e06736457de11f4ebc87908c4b4b8f5f93f8b5090e6b777a6671
+accept: */*
+accept-language: *
+sec-fetch-mode: cors
+user-agent: node
+accept-encoding: gzip, deflate
+content-length: 282
+
+{"packet":{"installationId":"inst-proof-1","packetId":"pkt-proof-1","kind":"fleet-learning","payload":{"marker":"PLAINTEXT-MARKER-7f3d9c","manifestSha256":"bb5a615af9cd0bba19e60f26c68cfc34b888af310ee01c8fd624a94b657a9d21","note":"operational knowledge, personal data stays local"}}}

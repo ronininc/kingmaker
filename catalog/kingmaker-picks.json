@@ -1,0 +1,14 @@
+{
+  "why": "The strongest abliterated models a 24 GB Apple-silicon Mac can run, chosen 2026-10-15. Base models by current local benchmarks (Qwen3.8-27B and Qwen3.6-27B lead single-machine open models; Gemma 4 for images). Heretic builds preferred: published tests show the least capability loss (Qwen3.5-4B MMLU 74.38 base vs 74.28 Heretic vs 68.48 Huihui). Each file is capped at 16 GB, about what macOS lets the GPU use on a 24 GB Mac. Every download is checked against Hugging Bay's recorded SHA-256.",
+  "maxGbPerFile": 16,
+  "picks": [
+    { "role": "best overall", "id": "hf-model-0bserverx-qwen3-8-27b-heretic-abliterated-uncensored-gguf" },
+    { "role": "coding alternate", "id": "hf-model-mradermacher-qwen3-6-27b-heretic-i1-gguf" },
+    { "role": "big multimodal", "id": "hf-model-mradermacher-gemma-4-31b-it-heretic-i1-gguf" },
+    { "role": "coder (fast MoE)", "id": "hf-model-mradermacher-qwen3-coder-30b-a3b-instruct-heretic-i1-gguf" },
+    { "role": "everyday writer", "id": "hf-model-mradermacher-qwen3-8-9b-heretic-uncensored-i1-gguf" },
+    { "role": "fast", "id": "hf-model-mradermacher-qwen3-5-4b-heretic-i1-gguf" },
+    { "role": "router", "id": "hf-model-mradermacher-qwen3-5-2b-heretic-i1-gguf" },
+    { "role": "small multimodal", "id": "hf-model-jmingo-gemma-4-e4b-it-ultra-uncensored-heretic-ud-gguf" }
+  ]
+}

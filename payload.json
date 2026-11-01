@@ -1,0 +1,1892 @@
+{
+ "schema": "kingmaker.payload/1",
+ "version": "4.4.0",
+ "count": 377,
+ "files": [
+  {
+   "path": "COMMERCIAL-LICENSE.md",
+   "size": 1372,
+   "sha256": "dd1d43c172fd4d696ecd32e5c048c50bd30d6d58c381d58829780700d5fc549d"
+  },
+  {
+   "path": "LICENSE",
+   "size": 5106,
+   "sha256": "6ef542ef6b9ec45aca5a3062cb90a252c40ab65f275ac87c4f1985f6d115283b"
+  },
+  {
+   "path": "TERMS.md",
+   "size": 8023,
+   "sha256": "bb6f90ec691021f3063500d3838cdc37d5d30920d3fa51b2c2ca9a6c692d0f27"
+  },
+  {
+   "path": "THIRD_PARTY_NOTICES.md",
+   "size": 8324,
+   "sha256": "cf8f1661749547b77fd00afb1b6c6cd08fa317fd99a987b585aecd88416cc97d"
+  },
+  {
+   "path": "assets/kingmaker-idle-dashboard.svg",
+   "size": 2496,
+   "sha256": "a80a94f652384ef2e1b7e124d8278d0233355de5dfbc9fcad527240277db693f"
+  },
+  {
+   "path": "assets/ronin-crest-site.png",
+   "size": 1166265,
+   "sha256": "50e883b46d7f0d10acfc37dc6b5327f636144ce6044e4b626418c67e58b7e10c"
+  },
+  {
+   "path": "assets/ronin-inc-crest-512.png",
+   "size": 271681,
+   "sha256": "597970cb79ddc3fdacd4c635b9be702663550aca5c417a71ec387874fd3263fd"
+  },
+  {
+   "path": "assets/ronin-inc-crest.png",
+   "size": 1166265,
+   "sha256": "50e883b46d7f0d10acfc37dc6b5327f636144ce6044e4b626418c67e58b7e10c"
+  },
+  {
+   "path": "bin/kingmaker",
+   "size": 2796,
+   "sha256": "487a0622e526c6966d254397374c49c9cf69f7194fe6e7dff9a7ca9dadb23366"
+  },
+  {
+   "path": "bin/sol-ghost",
+   "size": 2796,
+   "sha256": "487a0622e526c6966d254397374c49c9cf69f7194fe6e7dff9a7ca9dadb23366"
+  },
+  {
+   "path": "catalog/HARDWARE_OUTCOMES.md",
+   "size": 10575,
+   "sha256": "c66e9bfcd8be188dd58d42dc1b87f87c910f85c715fa23d02f746fccb980c502"
+  },
+  {
+   "path": "catalog/bench/bench_concurrent.py",
+   "size": 2249,
+   "sha256": "41e457a281cc46eb5022a7b570c29cca82e2eb114f681bc04c16a534900004ce"
+  },
+  {
+   "path": "catalog/bench/bench_host.jsonl",
+   "size": 13650,
+   "sha256": "0722c72290f03577ffcb7d624dc830f71c31ba99b71f74d5d2eab2b82f4f2fd5"
+  },
+  {
+   "path": "catalog/bench/bench_models.py",
+   "size": 3092,
+   "sha256": "a37b188d860d494b9a67408e88e74424b791f5578f50349536f99e4a7fd418fe"
+  },
+  {
+   "path": "catalog/bench/conc_8gb.json",
+   "size": 1374,
+   "sha256": "1b527f907ac67eb49acc2fa61dd0f64f80e0d37890c76fb41b84c41640c807f4"
+  },
+  {
+   "path": "catalog/bench/eval_host.jsonl",
+   "size": 11826,
+   "sha256": "3fba1a48353d81e59f8aea988c5a262f3b1823a761a2c729ec7e3e73eb48e5ed"
+  },
+  {
+   "path": "catalog/bench/eval_host_long.jsonl",
+   "size": 1646,
+   "sha256": "6710d6c7adf28dca72a41c1e9e0f541a4cda07719bcbcbd360126ed064c75b33"
+  },
+  {
+   "path": "catalog/bench/eval_models.py",
+   "size": 3633,
+   "sha256": "e23f34f2051578a29e9658b596f5ede9a872840a7695d7c25f98ebb62447884f"
+  },
+  {
+   "path": "catalog/bench/m5-pro-24gb-as-8gb.json",
+   "size": 265008,
+   "sha256": "ae7e60f9e98f209a4be036186efc95e0d4dba4d206c60202fcc5bc456250850c"
+  },
+  {
+   "path": "catalog/bench/m5-pro-24gb.json",
+   "size": 348415,
+   "sha256": "9d879ff59c99ed1c3e3c511499c1cd4ad46fdf29c9d5944eca3a6bf588f3f2bd"
+  },
+  {
+   "path": "catalog/bench/vm/m5-pro-virtual-16gb.json",
+   "size": 68865,
+   "sha256": "0ff96350b581132f4705a4d4e9cf59c6a67d49d11ba50245d670c9a2be706e64"
+  },
+  {
+   "path": "catalog/bench/vm/m5-pro-virtual-8gb.json",
+   "size": 83904,
+   "sha256": "f162ffbf212ba5ccf04217b9d927f9f4904c6c84bd16384e88ec1a8803303be7"
+  },
+  {
+   "path": "catalog/churn/2026-10-15.md",
+   "size": 229,
+   "sha256": "38047f820149e63a6f45328af51343857d01c7a822c91ae327288334eb4f9bc5"
+  },
+  {
+   "path": "catalog/churn/state.json",
+   "size": 192616,
+   "sha256": "6d6c6f49ff81454d45a3e7dd88c0c926ec36bc023707aa6ff7c170e8779c3c12"
+  },
+  {
+   "path": "catalog/essentials.json",
+   "size": 1581,
+   "sha256": "19b40fece47572545845a18e5dd4259174be1073e6831855650abc168c9cb629"
+  },
+  {
+   "path": "catalog/extensions.json",
+   "size": 5595,
+   "sha256": "62c58439b225c80961eccc527e99c91039603a7ddfc3ab40e41c91dbf2535f24"
+  },
+  {
+   "path": "catalog/kingmaker-picks.json",
+   "size": 1336,
+   "sha256": "6c537985a9453af80c52150d1249a687db87f1875226626cb9ec8e1ff9c05fd3"
+  },
+  {
+   "path": "catalog/kronos.json",
+   "size": 2685,
+   "sha256": "f704f5e642495f2742468a73bf5672fa301384889b5ec64d819e18ee5c8c51e9"
+  },
+  {
+   "path": "catalog/scrape/build_hb.py",
+   "size": 10305,
+   "sha256": "83576b4991de6773401833b9a0ba5f0b4001afce4ea0177fd64a9241ca869780"
+  },
+  {
+   "path": "catalog/scrape/files_hb.py",
+   "size": 2616,
+   "sha256": "84f25b157de28abd2a8068a1b4c4c07f957468ca409d63c2785bcdb4a8bd4ddd"
+  },
+  {
+   "path": "catalog/scrape/scrape_hb.py",
+   "size": 2267,
+   "sha256": "96ca0b5085c7bd62170303ad25134570e557b5883cd44d21d8fe82496461079e"
+  },
+  {
+   "path": "core/pack.json",
+   "size": 22113,
+   "sha256": "288e380cfbdb3b1e9431b57c35707cded98d0e05e2630e027817e1031a38d9fc"
+  },
+  {
+   "path": "lib/abliterate-model.mjs",
+   "size": 3826,
+   "sha256": "3e6dd811bf1badd3778a2698282b1dd4d2c76b16d344de3684a98ab67f568f2c"
+  },
+  {
+   "path": "lib/absorb.mjs",
+   "size": 9461,
+   "sha256": "67b9c6d656d7e76cd7848aa78dc305ac4fdcd61248f7f998e3098c2d77223a76"
+  },
+  {
+   "path": "lib/ad-video.mjs",
+   "size": 20267,
+   "sha256": "9d9711f1fabbd4313cdc9614ca3f2200cc33062a1b62b83efb0a98b02ca2a654"
+  },
+  {
+   "path": "lib/addon-core.mjs",
+   "size": 1124,
+   "sha256": "8b34249fe630260e4c72b20f5145a5bbe97a2d60b9cf6fed185c27f9e03cfe87"
+  },
+  {
+   "path": "lib/addon-entitlement.mjs",
+   "size": 4436,
+   "sha256": "8f86db1cee6ac836d4f978b3676d936989c40b51ceefcc706c4c2a2ef673ea71"
+  },
+  {
+   "path": "lib/addons.mjs",
+   "size": 19965,
+   "sha256": "f44b28fe27e96820b1e968556ab735ab589ee2a83acb71d891685723123e3a7e"
+  },
+  {
+   "path": "lib/announcements.mjs",
+   "size": 5432,
+   "sha256": "05124041e582403cc854b20381efe68058887ae44a631300f2ef03db503ebe57"
+  },
+  {
+   "path": "lib/armor-egress.mjs",
+   "size": 13962,
+   "sha256": "23181d39e245fb36cc72fe49918f1a14d1647a46842d9e131e64a95337112ca1"
+  },
+  {
+   "path": "lib/armor-native.mjs",
+   "size": 20329,
+   "sha256": "a6e136c45b770d5fbb31e089bd74aa7c978b6c52363b148215e3b706d929474e"
+  },
+  {
+   "path": "lib/artcraft.mjs",
+   "size": 37263,
+   "sha256": "8b1bbb5fac3b26c44c34612a57ce033f1015d6195827d2a637e6da168566c30f"
+  },
+  {
+   "path": "lib/artifacts.mjs",
+   "size": 3459,
+   "sha256": "a6d9f07bcbf79e75cb5f882ef829230715f4ef1bac1742bb759e2c05b94201f5"
+  },
+  {
+   "path": "lib/audit-chain.mjs",
+   "size": 3438,
+   "sha256": "b73338158df59d6cfc808de6f3eb55bc36ac5e6f267d07c3f278d24fca6eb9e5"
+  },
+  {
+   "path": "lib/automaton.mjs",
+   "size": 18046,
+   "sha256": "c043e34913a1a2f5c60ad9f99c39e9d5b1c0dab8adf95dca51ede8af1ab39497"
+  },
+  {
+   "path": "lib/background.mjs",
+   "size": 3835,
+   "sha256": "74d5cc68384249c58d3fcc90319cd77227f8ef298cddeda3f5edee63fc5641bc"
+  },
+  {
+   "path": "lib/bar-events.mjs",
+   "size": 1083,
+   "sha256": "3ee60969f00ecd7a0ba9a14e49ef29cc2321ba36d69ef9741b0dd001d0345dfe"
+  },
+  {
+   "path": "lib/bar-guard.mjs",
+   "size": 4798,
+   "sha256": "f627feeca6491bf2236d59980a7a9fd8b1cd479798073d21e69b129850575f53"
+  },
+  {
+   "path": "lib/bench-cli.mjs",
+   "size": 24548,
+   "sha256": "3bdd9f99473d3db7f7c7d3545a8cde9b33489e3bc216721a2dc5d7ee5b848826"
+  },
+  {
+   "path": "lib/brain-library.mjs",
+   "size": 21943,
+   "sha256": "7701d75063764cef152700cce585a65f06f4f86ac4ef24847c0310bd1abee963"
+  },
+  {
+   "path": "lib/brain-memory.mjs",
+   "size": 6853,
+   "sha256": "5c5ec20ed7f57a27e4f72fc4c2ca859455dece026b69a1bd43662274aa79897a"
+  },
+  {
+   "path": "lib/bridge-keys.mjs",
+   "size": 3315,
+   "sha256": "ab9643bf2cb6432cbb61e756a7d82d5da9fa8ce5b3721b2ca506f0497f387cb0"
+  },
+  {
+   "path": "lib/bridge-metrics.mjs",
+   "size": 2778,
+   "sha256": "388e0cfeea1972b6362e3164f78a088a4df7dc621e6593db379b971452298d6d"
+  },
+  {
+   "path": "lib/bridge-tripwire.mjs",
+   "size": 2138,
+   "sha256": "56ad6b49deb2a8382830037398e16f3875865d3f128bf087266bbe46fd636c90"
+  },
+  {
+   "path": "lib/calibration.mjs",
+   "size": 6893,
+   "sha256": "2b8d892946f1c16f94878d498634f82503a8c13644b8bcfa2fa0b31191c5fe0b"
+  },
+  {
+   "path": "lib/chatgpt-brain.mjs",
+   "size": 8299,
+   "sha256": "80d5c5b609f59c0c6abaddae312f7ecea7c3d5ceccf0c7dbc037a6b81f346595"
+  },
+  {
+   "path": "lib/chrome.mjs",
+   "size": 4070,
+   "sha256": "5ceabbbe55564eed805c40b1178cb259338427fce310f9402c4290961ffbf126"
+  },
+  {
+   "path": "lib/claude-brain.mjs",
+   "size": 15898,
+   "sha256": "bd017c51f936c4fb9e58015f566d6dcc65caf9412b571007dc30861b5a1af47e"
+  },
+  {
+   "path": "lib/cli.mjs",
+   "size": 234453,
+   "sha256": "96265a6531dbb436b2a545eecda51ae9a423d4cd42c6b60cb689eb4a54ca7340"
+  },
+  {
+   "path": "lib/client.mjs",
+   "size": 11664,
+   "sha256": "f178c68e80fd88e3414a84d113c0b7951affc9fd532ba9bf87f4d357e3047469"
+  },
+  {
+   "path": "lib/codebase-memory.mjs",
+   "size": 5496,
+   "sha256": "6692e7d3b0d950b099e09a738743191bb47da39cadfd8cf75ca2ff5cbe69d38e"
+  },
+  {
+   "path": "lib/codegen.mjs",
+   "size": 3982,
+   "sha256": "35907cf9d3a98bc7eea5d34014e9f26a92a8fc035f46e02b3667965132fd5b4e"
+  },
+  {
+   "path": "lib/cold-start.mjs",
+   "size": 6508,
+   "sha256": "02408244a17167aaae1181f4232f75abb71e2d0bf4b1612515f14bcb3e7e0c9c"
+  },
+  {
+   "path": "lib/command-list.mjs",
+   "size": 10008,
+   "sha256": "1e0e8c513da2f16ec077ba257182c11a92514d993d25b56473ffd1cc295444b5"
+  },
+  {
+   "path": "lib/compute-governor.mjs",
+   "size": 4370,
+   "sha256": "6ba783d9043fc6c53701cbf027c644d0b18c5075c6e5d616d2b2552a1c9edd6d"
+  },
+  {
+   "path": "lib/connectors.mjs",
+   "size": 29970,
+   "sha256": "dcb2a23dea29d9643e12a75ab1a293f8af59a19f48e95c8efda4a711e2375853"
+  },
+  {
+   "path": "lib/core-pack.mjs",
+   "size": 7943,
+   "sha256": "4585c5ed4777f917208cb78280515529d236bd6010df102c4974b3fe551aae83"
+  },
+  {
+   "path": "lib/darkweb-search.mjs",
+   "size": 4482,
+   "sha256": "d722afc6aaf51880bbda6ff0df96645290b6f231e1677c815149a36ec9d46d38"
+  },
+  {
+   "path": "lib/datasets.mjs",
+   "size": 7441,
+   "sha256": "e9ddd22c84a4787e9690edace54ecfe7a5f8b566a1cc6eda3006b5ff7a4825a4"
+  },
+  {
+   "path": "lib/decision-router.mjs",
+   "size": 6340,
+   "sha256": "0d2dff756e0490de41b3f2c91732bdcd72fbb361d677498f7fdbcc5752b6b40e"
+  },
+  {
+   "path": "lib/deterministic-archive.mjs",
+   "size": 4234,
+   "sha256": "99d81e5bfad3c05a3dc669edce098338c79076f5d13010ad4c6323a39d7ca589"
+  },
+  {
+   "path": "lib/device-candidates.mjs",
+   "size": 25120,
+   "sha256": "7f90500bc1fcbdca29073f55928560faa37d77e494b6812fabd00dfb16ab3c02"
+  },
+  {
+   "path": "lib/device-desk.mjs",
+   "size": 23354,
+   "sha256": "5a67e682c55a152b0e0373bc2143df1732cfac58cee3107c835cb6f7025f6b70"
+  },
+  {
+   "path": "lib/device-keys.mjs",
+   "size": 28689,
+   "sha256": "bc809b45cca3ee99c37a7383c609967fdfbf270fce6f96fdbaf7b3a7e38a7eb6"
+  },
+  {
+   "path": "lib/device-scan.mjs",
+   "size": 44301,
+   "sha256": "3dd4832e5becca1a58b907f9483ea75f3adc6085abcd9357efebc31069fba857"
+  },
+  {
+   "path": "lib/device-tools.mjs",
+   "size": 14015,
+   "sha256": "387d6aa8aeeb88a10d0c238aa4b342098033551371e7f76e935438c3d8c87bd1"
+  },
+  {
+   "path": "lib/duress.mjs",
+   "size": 14373,
+   "sha256": "0ebe38c40f73a70b13519feac9455f86afabb19ed1d5f42ea1488cb07ba45256"
+  },
+  {
+   "path": "lib/edge0-candidate.json",
+   "size": 1657,
+   "sha256": "be4a7e26e91cea4f1c0a539760261e0cf5aacb5e4c5fa4775a14a9fa1cb94a72"
+  },
+  {
+   "path": "lib/egress-guard.mjs",
+   "size": 1634,
+   "sha256": "2d13f4ea2cedd2d51c6ffa10d001cfddc95f84aba20f16b722dcd34e65a3a008"
+  },
+  {
+   "path": "lib/enroll.mjs",
+   "size": 8106,
+   "sha256": "94f8bc293bb26694a61579887e080bb5ecffb346e8ccb373857f0b89ea03d4b9"
+  },
+  {
+   "path": "lib/eviction-policy.mjs",
+   "size": 8349,
+   "sha256": "5eb5f119c41e003c2de70faf2c6bca6bf726e37cf1620908108a3404dba0c352"
+  },
+  {
+   "path": "lib/evidence.mjs",
+   "size": 13090,
+   "sha256": "d0a4ae2f7d89df261cdc82105c4d559e43489311e8fa665c5f332bf51285dd7f"
+  },
+  {
+   "path": "lib/extensions.mjs",
+   "size": 15027,
+   "sha256": "7b034fa20140f2bca1280ac69fe6c40eb3fd5f211ee3861d1e2ea8d66602a11f"
+  },
+  {
+   "path": "lib/fabrication.mjs",
+   "size": 2594,
+   "sha256": "54f1ef101ef2bbb9c6b504a0a959eb072a4f62b4d5106fbb6735f19cecdb775f"
+  },
+  {
+   "path": "lib/fast-route.mjs",
+   "size": 12978,
+   "sha256": "5d1cffb629b3b2714817184abf247726cec72f0c5fbe678b0472bec29c4653b6"
+  },
+  {
+   "path": "lib/field-photo.mjs",
+   "size": 14726,
+   "sha256": "5a1f4452527e9853c365b8536a7c192c9b25354b2b7a506bd261c0b96cd4f172"
+  },
+  {
+   "path": "lib/first-run.mjs",
+   "size": 4825,
+   "sha256": "ab8ea7d2308cc31dbed2ec170edc96c15cf77ac3580a93a589b681832f8b7f66"
+  },
+  {
+   "path": "lib/fleet-distribution.mjs",
+   "size": 3834,
+   "sha256": "48f50e089137b4b1ef339c134f40706e1e5f91079f58e3f604045d046389c917"
+  },
+  {
+   "path": "lib/fleet-learning.mjs",
+   "size": 3553,
+   "sha256": "86f65d737f461b6963cc1adcdef3f8af35f068cd42554af3d687d422de4ce000"
+  },
+  {
+   "path": "lib/fleet-transport.mjs",
+   "size": 8236,
+   "sha256": "12b89dd149cfb192617ceb27fd53d8d58855a12444a5833f1b48302fcd10ea55"
+  },
+  {
+   "path": "lib/flow.mjs",
+   "size": 4018,
+   "sha256": "cc3157b81078f11dc6007e2af78fa6e466876b5f50cd23c2a8635649c272f611"
+  },
+  {
+   "path": "lib/follow-up.mjs",
+   "size": 4757,
+   "sha256": "e2945002cea0da6b9debc54de49c5d33d00d4cc82af97a428809d3aa4a219f97"
+  },
+  {
+   "path": "lib/fork.mjs",
+   "size": 4016,
+   "sha256": "59d57d1aac510a6ec538ea3ded746788c8867dd00f9febca185a9c06b51c75d5"
+  },
+  {
+   "path": "lib/governance-spine.mjs",
+   "size": 2175,
+   "sha256": "8ca7780f0949b692092f43dd293cc769ea702fca766c3c85edf10a1e10ebe8ed"
+  },
+  {
+   "path": "lib/grok-brain.mjs",
+   "size": 7614,
+   "sha256": "0858b2d5f7ba3791e34af45ac5fa418db788c6a7d12073a4b099c7c65004c3c9"
+  },
+  {
+   "path": "lib/hash-util.mjs",
+   "size": 1530,
+   "sha256": "a29d70c8942642282136a14fd23c9a0fd1c96ed6cb3f8b781ffc9adf7162b40c"
+  },
+  {
+   "path": "lib/health.mjs",
+   "size": 11363,
+   "sha256": "c33c897abd8aa21a9454e1a1a8de02dff523b15ed35c5059c27c27a60db5be7c"
+  },
+  {
+   "path": "lib/huggingbay-catalog.json",
+   "size": 582097,
+   "sha256": "adc193d533b09b8506401dc79409accfd6ae1bc6c9259c2ac6e0e222108092e5"
+  },
+  {
+   "path": "lib/huggingbay.mjs",
+   "size": 21563,
+   "sha256": "ee7aa086434ec1c362c1078f6d2a2d84b67b1b81d512ef6bfd80c5a3004b4af8"
+  },
+  {
+   "path": "lib/idle-gaps.mjs",
+   "size": 4116,
+   "sha256": "c5bc98b84c06dda15743878a659a4793cb0adea8ef5479d2c4ecd4a222f4eefb"
+  },
+  {
+   "path": "lib/image-lane.mjs",
+   "size": 5569,
+   "sha256": "dc79d19b48b4958fb9720edafce0bca47cf665bf99801a2cde48d03434f965e4"
+  },
+  {
+   "path": "lib/ingestion-guard.mjs",
+   "size": 2664,
+   "sha256": "c067bda550da751e3ab50e6ca067c0968c1cacf130ad779e5c959185bcd32e38"
+  },
+  {
+   "path": "lib/install-config.mjs",
+   "size": 8914,
+   "sha256": "b93695ad027ab293fae8a8829c25869049d6434b774f456d87d7f12693110e9f"
+  },
+  {
+   "path": "lib/instructions.mjs",
+   "size": 13946,
+   "sha256": "ad86349cf681a05b0a28d49c9e848627bcba4d5af375c5892e1aa75a5e34792b"
+  },
+  {
+   "path": "lib/integrity.mjs",
+   "size": 5087,
+   "sha256": "4e53d793eeef65cb035e8340ad687f78c5a6ced2a4bf4c9e3119fa25d8f609aa"
+  },
+  {
+   "path": "lib/interaction-owner.mjs",
+   "size": 2628,
+   "sha256": "fd62d0efaf2e2dfdae0326718ceb0185e2deaf3731c37b79b3964591c6e21585"
+  },
+  {
+   "path": "lib/iphone-bridge.mjs",
+   "size": 29247,
+   "sha256": "df69e4fb489c7b45da830a0a131c207260f64ab82a44c92e2284c74f7b672472"
+  },
+  {
+   "path": "lib/iphone-cli.mjs",
+   "size": 7422,
+   "sha256": "71355712581cdc6562a8f7af76351df4e920fa5196400eb4b59487334817aa94"
+  },
+  {
+   "path": "lib/iphone-dnc.mjs",
+   "size": 5020,
+   "sha256": "de0d3b6dfd71f4d24bb6edb3a1790744c271896b6e0047a259231ce5bf94dcdf"
+  },
+  {
+   "path": "lib/iphone-mcp.mjs",
+   "size": 7266,
+   "sha256": "04d142a6221d94d7e375ea7593403ea94068050e41d9eda11ddefa04d6ffceda"
+  },
+  {
+   "path": "lib/iphone-policy.mjs",
+   "size": 10883,
+   "sha256": "413fed3f9a1c6b8ecafdfebad804fcc82273191800407836b231d8674e574391"
+  },
+  {
+   "path": "lib/job-inbox.mjs",
+   "size": 15432,
+   "sha256": "ec494565252ef660d581e2a3d76d5b415c22b3c80454a34477500db7d26ea38a"
+  },
+  {
+   "path": "lib/k-office.d.mts",
+   "size": 1522,
+   "sha256": "a9548a9d2df12a281d40190af2e9b15dbe89ff07c27f01a10f22ce1dfb58e941"
+  },
+  {
+   "path": "lib/k-office.mjs",
+   "size": 15302,
+   "sha256": "02e59ffec53f6d7421b1d35c25f3902f02a9dab0b1127527dadbb06b9c07040f"
+  },
+  {
+   "path": "lib/kbucks-ledger.mjs",
+   "size": 3210,
+   "sha256": "c27e27d4a7f8ce44516878bdbd42237cbb9fa3e031014b1aafc7a006ab195449"
+  },
+  {
+   "path": "lib/key-acquire.mjs",
+   "size": 14296,
+   "sha256": "8f97d98f8248b5b582972498bdf01fd74d76b79a0e541f2526bb54add7a9a573"
+  },
+  {
+   "path": "lib/keychain-seal.mjs",
+   "size": 5853,
+   "sha256": "1e6d2485c2dcd73f0a7b6434762512c0588d9837d679afa82aa0840deed82158"
+  },
+  {
+   "path": "lib/keys.mjs",
+   "size": 17335,
+   "sha256": "323a9940f203ca23cda7b31b62bdcc0e49d2e5262636f60e4f6b75c17fb33370"
+  },
+  {
+   "path": "lib/kill-switch.mjs",
+   "size": 757,
+   "sha256": "9f634096dd3cf7ee08d6bb548c3da72a298eae047a22922ecb5dd9d969dc6f30"
+  },
+  {
+   "path": "lib/kingmaker-facts.mjs",
+   "size": 2144,
+   "sha256": "86e68cdc6fa9db7e1783f7a12b6d80efea4ff0fadc854510335e621f5c32b97f"
+  },
+  {
+   "path": "lib/kingmaker-home.mjs",
+   "size": 5026,
+   "sha256": "8fae8641ca1caf221ad344d9c4b9c9dcf379c8bc50d5c20a6a0bbf4eb07ef92f"
+  },
+  {
+   "path": "lib/kingmaker-release-public.pem",
+   "size": 800,
+   "sha256": "b8c3a8c560b0d2e1f8245baf799e3f61add14cfb4b21ac26020041bf52659706"
+  },
+  {
+   "path": "lib/kingmaker.mjs",
+   "size": 1106,
+   "sha256": "7e9ba0f9c05918d65c462d619ad406dfbb07962afd3fb6bc7b3f0479ba91facb"
+  },
+  {
+   "path": "lib/knowledge.mjs",
+   "size": 27829,
+   "sha256": "ed9b8cb37b4ae6494562a9c7a8bf8e21a18a1b52ddaf9458a60c337459c72802"
+  },
+  {
+   "path": "lib/lang.mjs",
+   "size": 7239,
+   "sha256": "a8f7d2ae83d4bf022b51ecccf09dfac896c3ba08e97a3d37368da471aafb00d2"
+  },
+  {
+   "path": "lib/learning.mjs",
+   "size": 10779,
+   "sha256": "c9cfbf17b5d4ed5ddcf1ea2ff2528a08ff0ed88210c8c8e9fdb451cfb3286be9"
+  },
+  {
+   "path": "lib/library-scan.mjs",
+   "size": 16067,
+   "sha256": "71ceef3f7d24a7d9aad346f3a257f8422d4fe768124e6ca26ea0c05d38c68b9e"
+  },
+  {
+   "path": "lib/local-turn.mjs",
+   "size": 3077,
+   "sha256": "24a6f8cffd483e88637b152aa9f255747544fe573007c80c191e9c36584ba41a"
+  },
+  {
+   "path": "lib/mac-profiles.mjs",
+   "size": 21076,
+   "sha256": "03ae8ca1c280e13508e7fdef667b0ef6e57429dcd589b6540e85b8daa06f4960"
+  },
+  {
+   "path": "lib/mcp.mjs",
+   "size": 24921,
+   "sha256": "86fd412d3c40bde750da11a292036860b88ac86cd7e3b4b5b3892306e6d6311e"
+  },
+  {
+   "path": "lib/meeting.mjs",
+   "size": 3982,
+   "sha256": "3c47b4f40da18fb797b32243366d07136d0055cffdb34ba8e0a0440ff85a73ac"
+  },
+  {
+   "path": "lib/merchant.mjs",
+   "size": 3742,
+   "sha256": "92a68fca8fd498d76f8e73d9598c18339d396b0b9c353115008aa1cdf00bea3c"
+  },
+  {
+   "path": "lib/metrics-history.mjs",
+   "size": 6183,
+   "sha256": "d80d09c58ff2d6ad35e045e2989dfcffef4e1bf2d43aba080758c98f5f26b5a8"
+  },
+  {
+   "path": "lib/model-bench.mjs",
+   "size": 33659,
+   "sha256": "5c16373660a13deda655b1cf4a95f949b4c84a80bf557741fa2010d036f78cbf"
+  },
+  {
+   "path": "lib/model-candidate.mjs",
+   "size": 2326,
+   "sha256": "84698e6fcd70504bb72ce3c5cd2f2ef92758e89705f9d84e5b81e8fa1fe6cfbe"
+  },
+  {
+   "path": "lib/model-condense.mjs",
+   "size": 3361,
+   "sha256": "3a6f9af50e647f0687c2c372090efe4528ef43a82158a21ab5075bd05e5f4bc1"
+  },
+  {
+   "path": "lib/model-discovery.mjs",
+   "size": 5841,
+   "sha256": "71b665f443a7e4f317042530a4032e0a2e529fd894a40bc0cc6da120a64f399b"
+  },
+  {
+   "path": "lib/model-ingestion.mjs",
+   "size": 9123,
+   "sha256": "9906d17c0b94edcd166407758c0802fac845463eca729336f47202cd66b0a3e1"
+  },
+  {
+   "path": "lib/model-pin-registry.mjs",
+   "size": 2378,
+   "sha256": "6607861779a4b200676041cd057683f0175fa198c5e2b1438dac539262825ee7"
+  },
+  {
+   "path": "lib/model-scan.mjs",
+   "size": 7658,
+   "sha256": "2b0987e5c3ca905f8c393a13c213dbd0f86ad5ea340e87b39643e1de733ae27a"
+  },
+  {
+   "path": "lib/model-triage.mjs",
+   "size": 4191,
+   "sha256": "6c35bba6b43224f5b9c88f63f725692fb2232a168b0c289e0b7e86e39626feb0"
+  },
+  {
+   "path": "lib/model-warm.mjs",
+   "size": 9365,
+   "sha256": "3f765a6505d557c01bfa3b85c3bf767dcd6bcbfe8d50789afb4a943093cfa15b"
+  },
+  {
+   "path": "lib/models.mjs",
+   "size": 8133,
+   "sha256": "696b6e4e5cc62a01520d4672a39496a2e398fa5e34ba5d6b9b41b43395901170"
+  },
+  {
+   "path": "lib/next-suggest.mjs",
+   "size": 4178,
+   "sha256": "0458bab555e485b6eb0de4a5b152ef6685862a505de1b1cb9394bae0340e4914"
+  },
+  {
+   "path": "lib/office.mjs",
+   "size": 17397,
+   "sha256": "e985617f3e9da13d6f38f6a954949ac55e166c14d5d730438b80a5456802c132"
+  },
+  {
+   "path": "lib/ollama-runtime.mjs",
+   "size": 8573,
+   "sha256": "d2bd9dd3b4bb8ace3727d864409c5f5b642c0851a6aba75f9eff3b3aab62473c"
+  },
+  {
+   "path": "lib/owner-voice.mjs",
+   "size": 13054,
+   "sha256": "10879b6b83ea63426044adf4da4b73ede3c7a3454db197e7f23c80558618b301"
+  },
+  {
+   "path": "lib/pacer.mjs",
+   "size": 9326,
+   "sha256": "93b351e9de985c172977a57ca687e88eb7f3d04e19f6487f9f21870f6534edc1"
+  },
+  {
+   "path": "lib/paths.mjs",
+   "size": 12731,
+   "sha256": "22d480a00f8f19fea7b05aab67d79a0fefeab78f44c1064dce36b32fd7b1c36d"
+  },
+  {
+   "path": "lib/payload.mjs",
+   "size": 6314,
+   "sha256": "04de204370d315d7b20a5390072b39c2290b1264459c6426c07f6fca8d3c6a86"
+  },
+  {
+   "path": "lib/permission-gate.mjs",
+   "size": 5197,
+   "sha256": "645aa69af8dc6c49e3ed23db11a52eb3f558235ac3d9f02dcf54713b95699bdc"
+  },
+  {
+   "path": "lib/personalization.mjs",
+   "size": 23155,
+   "sha256": "508b0cef0d9413415c3913a800827fb51843acd58526e1b8f0ddb6d43e6116fd"
+  },
+  {
+   "path": "lib/phone-companion.mjs",
+   "size": 94115,
+   "sha256": "145b0106a1cf0f42bc69fe2e3ec4f09d1f30aef06b5ebdad49abfc0dfa3e2cbf"
+  },
+  {
+   "path": "lib/phone-icon.mjs",
+   "size": 476,
+   "sha256": "ad08109e4e490b715611205142ef3200768eb2a85452a66205699e3685b1fa23"
+  },
+  {
+   "path": "lib/phone-ring.mjs",
+   "size": 5817,
+   "sha256": "ceeef526bd760836ebf256e82d55684b24e33524dde4f3bcfaa9863aad010811"
+  },
+  {
+   "path": "lib/phone-voice.mjs",
+   "size": 3764,
+   "sha256": "05caffc046e5276788fe867a9cf975c916c2a074ac5c1a869316d0f7d65fcacc"
+  },
+  {
+   "path": "lib/phone.mjs",
+   "size": 6171,
+   "sha256": "ff511feca0a7e70aaadb5e965c7dd655b839d4c86dc6d93b8e4509cd6b6bd563"
+  },
+  {
+   "path": "lib/power.mjs",
+   "size": 1755,
+   "sha256": "3994d1c2c531a53440414ab8698da730f29cf361bf418fd0cea23ea909eb8280"
+  },
+  {
+   "path": "lib/profile.mjs",
+   "size": 21183,
+   "sha256": "c4dbeb8e6affcc7f4107844018ba0b61a2908c6d0459afe18a8e47a2739e3a56"
+  },
+  {
+   "path": "lib/project-twin.mjs",
+   "size": 2778,
+   "sha256": "8115c836cf701800b6a6caa747372a53b58172ce8a54b6ad481266f601c4a5e9"
+  },
+  {
+   "path": "lib/rea-rules.mjs",
+   "size": 11581,
+   "sha256": "1d302f3b099ecac583ebf92ed23cf1e526299b68595d2e078f13d65ee0fb2782"
+  },
+  {
+   "path": "lib/rea.mjs",
+   "size": 21221,
+   "sha256": "f1dc25dc59faa3c8aa5bf9168d78d58dd555b0c6697406e0ea5149933f2cc8b9"
+  },
+  {
+   "path": "lib/reflex-layer.mjs",
+   "size": 9593,
+   "sha256": "9ab1dd00646021346efae9342a2b095b3d555389ab574f58ca613f2550fc4353"
+  },
+  {
+   "path": "lib/reflex-producers.mjs",
+   "size": 8705,
+   "sha256": "e2da43d17ec624348ed75d5397b36c4b16445b0da1736ad0b6d033f8e94211ea"
+  },
+  {
+   "path": "lib/reflex-seat.mjs",
+   "size": 13532,
+   "sha256": "1f8f5520f7a6a87caf08f798991b66ca6c6dee4e2bd9abf9cd66779471956914"
+  },
+  {
+   "path": "lib/release-identity.json",
+   "size": 390,
+   "sha256": "4846c4eaf55ed18f04c5905954f36dc3729df2fa0cbbb87f9516da539674ea72"
+  },
+  {
+   "path": "lib/release-identity.mjs",
+   "size": 5272,
+   "sha256": "bff38f15c7f2abfb210d7697d4d3c4b1422bce19215d3f3c5f4b69eb7dd9baef"
+  },
+  {
+   "path": "lib/release-manifest.mjs",
+   "size": 22293,
+   "sha256": "a9d323f94727d50bc61d01912e265292695358bd83e9437c2837aa086f23769d"
+  },
+  {
+   "path": "lib/release-platforms.mjs",
+   "size": 8692,
+   "sha256": "c602f621c7cd8d089ebde8129478134f5a45fb3f5ec3bc5d95a82437d65247a2"
+  },
+  {
+   "path": "lib/release-pubkey.mjs",
+   "size": 1041,
+   "sha256": "51f42213bb42982892d295ad29088f88dfdcea657978e6cfd825ea68fcae83c9"
+  },
+  {
+   "path": "lib/release-signing.mjs",
+   "size": 4726,
+   "sha256": "7d32256ea554388d65ea649d6332a2ff1e68aa326af6476144263b15208373de"
+  },
+  {
+   "path": "lib/research.mjs",
+   "size": 2944,
+   "sha256": "5fded89dd83f63ded97dfae52d9248698753fe424d7b843fe1ccb55b203d3dfa"
+  },
+  {
+   "path": "lib/resident-engine.mjs",
+   "size": 10464,
+   "sha256": "c9880113648447d0e2f4abedec31041c6ba3abfdea99cf72973892c15588e001"
+  },
+  {
+   "path": "lib/ring.mjs",
+   "size": 6080,
+   "sha256": "e2a1678520464c87def032e3efcbfc310663b92eb584d10c4cd78395f598b557"
+  },
+  {
+   "path": "lib/ronin-install-cert-public.pem",
+   "size": 178,
+   "sha256": "7be415825211f2dcf6367614c27b6b4759b66206e75b5f0a17ae39c49607ea1b"
+  },
+  {
+   "path": "lib/ronin-installer.mjs",
+   "size": 12908,
+   "sha256": "268a89149d46f7d24605dc08ef3f3400fb32a88e220a55d436c4c4f52e723cd4"
+  },
+  {
+   "path": "lib/rrf.mjs",
+   "size": 3225,
+   "sha256": "f98006d7c3405cfcba959fdabaaf737567b8b078d8e976ace32af7a8efbe6fde"
+  },
+  {
+   "path": "lib/runtime-degrade.mjs",
+   "size": 3450,
+   "sha256": "8e6e7795c58e56d36f878472e44b84b0677ac1b025e869072eca6507a2b860b9"
+  },
+  {
+   "path": "lib/runtime.mjs",
+   "size": 14673,
+   "sha256": "7c07f75211ff9ac3b93afd838121ca63ef411d52f83e17054467b29217e5e39a"
+  },
+  {
+   "path": "lib/session.mjs",
+   "size": 20333,
+   "sha256": "b0f625eee2158ce3675ad02e4bdf0bf2a747a80f3ec905a3165106aece405ab7"
+  },
+  {
+   "path": "lib/sharing.mjs",
+   "size": 9833,
+   "sha256": "e3f55f5fba0dd38d364936cb12418cec5bc9ba28400cc5fbe97187517c5a6ef4"
+  },
+  {
+   "path": "lib/siri.mjs",
+   "size": 3315,
+   "sha256": "5a826d6b27f9604d9a58fc1f1c782757a49af5e238b5ae89c2370b5aadf6e9c4"
+  },
+  {
+   "path": "lib/skill-create.mjs",
+   "size": 1958,
+   "sha256": "4badb2c9e0f67e82033b3a08620d7b03b7bf18c8d68b472788d876db640633c4"
+  },
+  {
+   "path": "lib/soak-evidence.mjs",
+   "size": 7943,
+   "sha256": "7c6c51203c195c15e4d21ad15fd8c1627d3a51e6289aec94dbe45fd57643e1c0"
+  },
+  {
+   "path": "lib/soak-fixtures.mjs",
+   "size": 2326,
+   "sha256": "888ba6443c8044a8598cbdfad4eb7566979717217f048b4dd823f316abf68b21"
+  },
+  {
+   "path": "lib/soak-work.mjs",
+   "size": 17236,
+   "sha256": "656e360822c5cc7d6ff41867a0bcbebcdfd2e55065a16b801c93ea378e4f15f9"
+  },
+  {
+   "path": "lib/titan-adapt.mjs",
+   "size": 3518,
+   "sha256": "4174ec6bd54255aaa73bd627655f1444b946e983ede42a540eeba5aa86fce4d9"
+  },
+  {
+   "path": "lib/token-meter.mjs",
+   "size": 5772,
+   "sha256": "0040f8f211240e1fc67740019254996949e6e6bbde6218f7d7bfd8f874ff571d"
+  },
+  {
+   "path": "lib/tool-call.mjs",
+   "size": 7517,
+   "sha256": "6a0eafa23a93ce5fb922437da3d680d8eea119450e5f86535c4dd79f237c0024"
+  },
+  {
+   "path": "lib/trading-agents-cli.mjs",
+   "size": 2970,
+   "sha256": "3c876f51aa64ffb1cbe93575a6d2a764fa88a7e0f5b63fa24e9c830c5370d561"
+  },
+  {
+   "path": "lib/trading-agents-driver.py",
+   "size": 2386,
+   "sha256": "5519c594d6a57cf38aad80e3529e022108dcd8094b2cb593f2ef7928b7841983"
+  },
+  {
+   "path": "lib/trading-agents.mjs",
+   "size": 12841,
+   "sha256": "ccb83d14513f3ca8dd329484d63b8391268727de25b2283d379b5fb506f3c544"
+  },
+  {
+   "path": "lib/turn-chain.mjs",
+   "size": 3038,
+   "sha256": "76ae2ab85b361a2e239f39e1aeab42b9e67bb36e597b9d5c6e7f11bb4853d851"
+  },
+  {
+   "path": "lib/ubi-grant.mjs",
+   "size": 4366,
+   "sha256": "3f2e78adf9d81a97e82727a4af42d1be2107eea85b0bd5019928289cd5b8084f"
+  },
+  {
+   "path": "lib/universal-file-handler.mjs",
+   "size": 7316,
+   "sha256": "4ae8643fdf91f5c7532d73db09842d55d95c9c2d177c568b9d8c9f2708e61b1e"
+  },
+  {
+   "path": "lib/update-notify.mjs",
+   "size": 2156,
+   "sha256": "5d942ee1268c24986400227585bbb7b186f3e2b4fd6ffaf699630f2c70e7fae6"
+  },
+  {
+   "path": "lib/update.mjs",
+   "size": 30782,
+   "sha256": "788060c0b292022e969f85e6a20d6c17f7ed862354fee5c2fc7f4ee41ce6e2dc"
+  },
+  {
+   "path": "lib/voice-ledger.mjs",
+   "size": 4601,
+   "sha256": "938399070c2b7435c355b1f047146516b1097d99e46e6a4bcfc0358f71543c1c"
+  },
+  {
+   "path": "lib/voice.mjs",
+   "size": 54361,
+   "sha256": "4c75284a3bc200e3f21f0b35eda3559b0f57e5d6fb7b760d50c175ac5f2ee7a8"
+  },
+  {
+   "path": "lib/web-push.mjs",
+   "size": 4444,
+   "sha256": "9e7623ce63fdd4cb7ccdbf937f09931dab81b71cbe6fcf1bd4179d7ee48961c9"
+  },
+  {
+   "path": "light-runtime/index.html",
+   "size": 15624,
+   "sha256": "23fd192ed8ccc84f88888b3cc6e8e7bba5acec1c2c877fcca8cf4c0e7c4a60de"
+  },
+  {
+   "path": "light-runtime/server.mjs",
+   "size": 7188,
+   "sha256": "8fab515d63f4bd0fc72af3fba289d0d380023d51ad9fe913137b6d380d079d72"
+  },
+  {
+   "path": "light-runtime/state-schema.mjs",
+   "size": 9916,
+   "sha256": "7c43050584c6d45abfd1ecada22fd050396057b9a7472d5d9a75beb7063ce989"
+  },
+  {
+   "path": "package.json",
+   "size": 2561,
+   "sha256": "c3272c7f33358831b09f45b83d03d95d0e354bf2e2c1636164da2364fef1189d"
+  },
+  {
+   "path": "scripture-armor/.gitignore",
+   "size": 228,
+   "sha256": "57fec5cc7c176f0d4d5a0f8157594c804ee8c588cb6995d35159de34b0d524d1"
+  },
+  {
+   "path": "scripture-armor/CORRECTION-2026-10-26.md",
+   "size": 7307,
+   "sha256": "1188ef2a1bf951742ff52601ca60108ac795e7f71cfed56f126647b54b411311"
+  },
+  {
+   "path": "scripture-armor/DEFAULT-DAEMON-REPORT.md",
+   "size": 7476,
+   "sha256": "7e12dd1bddb5296f68d83619a686da70e1a7c76f55587c734a2a50eddedd3d1d"
+  },
+  {
+   "path": "scripture-armor/FIX-REPORT-419.md",
+   "size": 9271,
+   "sha256": "917e8f73aa89fe383627e9c4ea2a6047753225fb23346b212dce2a6a8a0dea60"
+  },
+  {
+   "path": "scripture-armor/FIX-REPORT.md",
+   "size": 17505,
+   "sha256": "e2c7bfdf2034cf0428e4171fbe719c8bb5e21306ce84d991218fdc45a8410a17"
+  },
+  {
+   "path": "scripture-armor/FORMAT.md",
+   "size": 4928,
+   "sha256": "23d17e1954d08ef3071a46b2d680180177d35cbdd51d92d969cfd3f75ee2b486"
+  },
+  {
+   "path": "scripture-armor/GEMINI-FIX-REPORT.md",
+   "size": 10752,
+   "sha256": "7b6fb83f311c1df7dbfaede885862e5728763975423f0c1d6ec07d2c875d4a6e"
+  },
+  {
+   "path": "scripture-armor/GEMINI-REVIEW-VERIFICATION.md",
+   "size": 17091,
+   "sha256": "de4d7e15b88c516d9d9eff7e53b1dcb57bfcc744b38644620ebd42440d14a172"
+  },
+  {
+   "path": "scripture-armor/INDEPENDENT-RERUN-2026-10-26.md",
+   "size": 5265,
+   "sha256": "af8094bb10e44b32ce510ee135a2775af0e5e5a3195530b9d14198158687dfbb"
+  },
+  {
+   "path": "scripture-armor/LICENSE",
+   "size": 11358,
+   "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+   "path": "scripture-armor/MULTIPLATFORM-INSTALLER-REPORT.md",
+   "size": 16473,
+   "sha256": "c8d612129a60fa0e9b7b878282f5454d46a8beea841be4beff630da309b6f771"
+  },
+  {
+   "path": "scripture-armor/OPEN-SURFACES.md",
+   "size": 11001,
+   "sha256": "6a88666efe8ff2ac4eee9ee2fb88bb4546d0d86aec2a656c69085a2a397cc34d"
+  },
+  {
+   "path": "scripture-armor/PHASE2-REPORT.md",
+   "size": 11037,
+   "sha256": "fda03735b172a189a21fafd9e84f9e2f7f4bdc176998f1c461ac11b968bbd010"
+  },
+  {
+   "path": "scripture-armor/PHASE3-REPORT.md",
+   "size": 12008,
+   "sha256": "a7e7a4bf85c79ccc026e59d5f2cbe39b131fb97b22b8c85fc846c2d3c9c5e587"
+  },
+  {
+   "path": "scripture-armor/PHASE4-REPORT.md",
+   "size": 17112,
+   "sha256": "273fce4b766faa823e2f3f3e7f727f222738db094665c03c401e6ef3eb37a358"
+  },
+  {
+   "path": "scripture-armor/PUSH-TO-PRODUCTION-2026-10-26.md",
+   "size": 4259,
+   "sha256": "8d4dbe9718a0c7192da7d94a6ae1647ab91de6c47dc13ef31104c452f2b31acf"
+  },
+  {
+   "path": "scripture-armor/README.md",
+   "size": 46596,
+   "sha256": "8ff03ab0072bbe84f0e15b01018c39c271623d2dda79c879825733600c49cc0e"
+  },
+  {
+   "path": "scripture-armor/REFIT-SUMMARY.md",
+   "size": 6427,
+   "sha256": "7c8313175d0603970d739122fc032dad8b182863fce3168246a35e74c6a9ad75"
+  },
+  {
+   "path": "scripture-armor/RELEASE-READINESS.md",
+   "size": 20556,
+   "sha256": "974701440a36cea373a9b4e806957eacef3ccb5908bd51552a414080e7705a32"
+  },
+  {
+   "path": "scripture-armor/SHIP-SHEET.md",
+   "size": 2115,
+   "sha256": "42cc05892adbba9e377a679e71894cebdd3a487b77bc8b6d7a80293bda83846e"
+  },
+  {
+   "path": "scripture-armor/airlock.mjs",
+   "size": 17300,
+   "sha256": "1813ba0357cd4a84297bec46d7f771b68c1fe0d0810b17b5eaf081aa5c638907"
+  },
+  {
+   "path": "scripture-armor/armor.mjs",
+   "size": 119210,
+   "sha256": "ea2ff10eea605debcfca03c854ed02daa6c202c8e6133805afd448573d2ff61e"
+  },
+  {
+   "path": "scripture-armor/cell.mjs",
+   "size": 11415,
+   "sha256": "49c8e3aa35a0d8c2dafa9a0cf83f62af7db43dcf1ac22777b2092a88f4df8eef"
+  },
+  {
+   "path": "scripture-armor/dns-profiles/android-private-dns.md",
+   "size": 2069,
+   "sha256": "185d4fac83deb0bf68e35e2ebc5e868072c96de99516864f8445a8e4f9aece92"
+  },
+  {
+   "path": "scripture-armor/dns-profiles/linux-resolved.conf",
+   "size": 1269,
+   "sha256": "c549a4574a717b039b88a49d553ba66101873fc4bf3a717e9da2d3a52c578910"
+  },
+  {
+   "path": "scripture-armor/dns-profiles/linux-stubby.yaml",
+   "size": 1409,
+   "sha256": "160f1b6729834b2ae5f5843c0559999a9b57c05bf89023f1b8719be7c7b5ce39"
+  },
+  {
+   "path": "scripture-armor/dns-profiles/scripture-armor-dns.mobileconfig",
+   "size": 4649,
+   "sha256": "1838ae623411ebadd3a05ebcf94c99ff0dea8c0e9890949e9493cbde5c469331"
+  },
+  {
+   "path": "scripture-armor/dns-profiles/windows-doh.md",
+   "size": 2630,
+   "sha256": "3b42daffcbd9b522d2b65a0f8a65321495db57c1851f437fe6e02cea80318fb2"
+  },
+  {
+   "path": "scripture-armor/ghidra-scripts/ScriptureScan.java",
+   "size": 16635,
+   "sha256": "bd1eee0213e85c8c429039f5c44c8436111d4e2e041ca16b61f250a1e6773f81"
+  },
+  {
+   "path": "scripture-armor/harness/BUILD-REPORT.md",
+   "size": 14220,
+   "sha256": "2080e2ea6935c4a7878ee7b3337ec4da2511541efdd7749218db403a7c8c22e8"
+  },
+  {
+   "path": "scripture-armor/harness/FIX-REPORT.md",
+   "size": 20549,
+   "sha256": "0d79232c6fc0f4f7a6da74e90b8ef7e1f7237cae3eed1fb50a3834a789330ce2"
+  },
+  {
+   "path": "scripture-armor/harness/INTEROP-REPORT.md",
+   "size": 16589,
+   "sha256": "e909730cc6db58175a07b753e2bc705a6a124668b57735689209543427d0f0e6"
+  },
+  {
+   "path": "scripture-armor/harness/LIVE-FIRE-REPORT.md",
+   "size": 14725,
+   "sha256": "bb86f79b6f3a865b48f6370f846b4a2ad47fc274a95c99fe62f7efdc2079f970"
+  },
+  {
+   "path": "scripture-armor/harness/TWO-ENDPOINT-PROOF.md",
+   "size": 12162,
+   "sha256": "96b1492afe34e87875fb1a8fe94733788bbd0f5f2503ba8a40f0eebe593e158f"
+  },
+  {
+   "path": "scripture-armor/harness/interop/capture-interop-relay.c2s",
+   "size": 7093145,
+   "sha256": "ebc47b38604093178fe9aca73de85cc3a9988bdf9aecb502677cc56a123b39d3"
+  },
+  {
+   "path": "scripture-armor/harness/interop/capture-interop-relay.s2c",
+   "size": 7493487,
+   "sha256": "f4999616cf858cd9b44b1677472e40c377a5838dd205dce11359ec7c1a481e5d"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/engine-block.txt",
+   "size": 200,
+   "sha256": "233697ffca96ba71459625fd8b3a3a8b0dcbef47f000db37485bbcd344d1352e"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/engine/lib/armor-native.mjs",
+   "size": 16197,
+   "sha256": "2d84c08d2ecea03e138bc7236a072af9d932b751c8e2cc09ed43f56d5f2cd7ab"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/evidence.json",
+   "size": 790,
+   "sha256": "fc2c9444bcc78f0acdc90f57a65c6fdb06081e81e2501a5302b18bd96a2291dd"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/peer-block.txt",
+   "size": 188,
+   "sha256": "fcffba6aa0160ba8d7897eb40f7a61d771167be15fb7b18d8510263488db117d"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/peer-server.mjs",
+   "size": 6900,
+   "sha256": "11a2c3dc653d279b6b91dc3354ff06e2eadff3b828b675e8113b3c9261baac3a"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/rogue-server.mjs",
+   "size": 2702,
+   "sha256": "319d12a7136d02879d5bab3560e59c4b9387488ce7fcf639321ab4f1329afe7c"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/airlock.mjs",
+   "size": 11969,
+   "sha256": "6c24dcc6a0a773adbce57a6d4e6017eb15b6f18a954505e45e9d36f84801ef7b"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/armor.mjs",
+   "size": 99861,
+   "sha256": "56dbb5b6e0954fdcd6fb034626697be451095b81690fb787f57d0476c0b9b66e"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/cell.mjs",
+   "size": 11415,
+   "sha256": "49c8e3aa35a0d8c2dafa9a0cf83f62af7db43dcf1ac22777b2092a88f4df8eef"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/custody.mjs",
+   "size": 12983,
+   "sha256": "004305328998d9b23db3fb503138cf2811bc2a62fc6cace191195343601cc33c"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/launch.mjs",
+   "size": 4418,
+   "sha256": "40cb4d696774baf6b48ca18d5ea30b25b13854bedd4ebbe3d4a279b1cf503819"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/package.json",
+   "size": 527,
+   "sha256": "d1d8bd81a9be752f3db0e50b9dbb8cef0a8ed88a7d31daf91264b5bc0a992ce0"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/refit-estate.mjs",
+   "size": 16243,
+   "sha256": "8f41004e50c3ba168224a43ae846019b18757fae5b5681d98d4ef43eacab0047"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/refit-gates.mjs",
+   "size": 21004,
+   "sha256": "e6d361d0f38ce64d55391106528e69c0e58bc7b92ff52b3fe7f3f73190f8adee"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/refit-net.mjs",
+   "size": 17372,
+   "sha256": "1067bf31daf1bc009113572eeacc77351c04d2745c3371233af75318bdb8d485"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/refit-store.mjs",
+   "size": 15589,
+   "sha256": "225bbe0834aa35519d7eb03210e4d24eaef61ac1f5f5df100b12e192ce82c0cb"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/scan.mjs",
+   "size": 42184,
+   "sha256": "666b3d86a904983c05dc4daafb64c4dd610e8f75fbf580034dbf97208f372649"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/terms.mjs",
+   "size": 6720,
+   "sha256": "b167408c72fb3d2309cb73409103a789259ffd1cf7ae3c90cfcaceeec10f4b80"
+  },
+  {
+   "path": "scripture-armor/harness/interop/guest-run-widening/scripture-armor/vaultd.mjs",
+   "size": 171293,
+   "sha256": "34b8ca5b0416fc662c944224e5cdfd6051c16ee7db3632327e3076636b8b813c"
+  },
+  {
+   "path": "scripture-armor/harness/interop/probe-served-ledger-restart.mjs",
+   "size": 2899,
+   "sha256": "3bb0126ce4005d6f9b139c794450005d717d3097a8ca1a8f7a5cf5d865f81bb7"
+  },
+  {
+   "path": "scripture-armor/harness/interop/results-widening.json",
+   "size": 2502,
+   "sha256": "ff7ef747ef1a2b40883fb606b5642788d59b54ebf62339fd6b8f9ffe69588fd5"
+  },
+  {
+   "path": "scripture-armor/harness/interop/results.json",
+   "size": 49703,
+   "sha256": "aa1e463a127d55cca5c13025c0ae5ff0cfccb3438f02ced3d4b5189bcb53e921"
+  },
+  {
+   "path": "scripture-armor/harness/interop/run-interop-widening.mjs",
+   "size": 13901,
+   "sha256": "289ee9bab566bb93fe8328dcce73fbfda69563416f87ec44b97da7ab4a7dbae4"
+  },
+  {
+   "path": "scripture-armor/harness/interop/run-interop.mjs",
+   "size": 33447,
+   "sha256": "43d5d5f9c3cbb44a1d0ee14519cc34d3d171dbe7247078998390874bab59a4eb"
+  },
+  {
+   "path": "scripture-armor/harness/interop/run-output.txt",
+   "size": 12218,
+   "sha256": "21456827f1808ecefeb16b873f3362db9bda0eca947ffec8527a2170b0613244"
+  },
+  {
+   "path": "scripture-armor/harness/live-fire/capture-live-peer.c2s",
+   "size": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "scripture-armor/harness/live-fire/capture-live-peer.s2c",
+   "size": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "scripture-armor/harness/live-fire/capture-live-relay.c2s",
+   "size": 6156,
+   "sha256": "5afc0564f57ed7fd67e4ccacc7c139eea94fd18baab49fb311e9fbc8789602f4"
+  },
+  {
+   "path": "scripture-armor/harness/live-fire/capture-live-relay.s2c",
+   "size": 15473,
+   "sha256": "f445df3ca4679b869d980cca7756b7ebe4dc29a4442417f6cdfb5bff76907b09"
+  },
+  {
+   "path": "scripture-armor/harness/live-fire/results.json",
+   "size": 9519,
+   "sha256": "7a3696fdcdf088f387c57d0b358958354e2cccb467f879b032534d35839aaba2"
+  },
+  {
+   "path": "scripture-armor/harness/live-fire/run-live-fire.mjs",
+   "size": 15942,
+   "sha256": "2618f4aeab53258dd58fd6486c1b0dbeda7baaf05d5800a08d1791077440b31c"
+  },
+  {
+   "path": "scripture-armor/harness/proof/capture-fleet.c2s",
+   "size": 4013,
+   "sha256": "427c55bd1b387a017a9ae12f6a0b85d7721d8015d467a1ffa3e8340cd73673eb"
+  },
+  {
+   "path": "scripture-armor/harness/proof/capture-fleet.s2c",
+   "size": 3513,
+   "sha256": "efcde405a3d7cbd8138b18c4028b7401253d67959626aefe071aa55a79b0814b"
+  },
+  {
+   "path": "scripture-armor/harness/proof/capture-legacy.c2s",
+   "size": 628,
+   "sha256": "c4d49539c8bd76f7c9a008059620f10731c37962462783f1a897abd124eadad2"
+  },
+  {
+   "path": "scripture-armor/harness/proof/capture-legacy.s2c",
+   "size": 395,
+   "sha256": "647aaadb98e3708db8446c8ad786c815c3e2339522967b3770dad16c4c6becaf"
+  },
+  {
+   "path": "scripture-armor/harness/proof/capture-relay.c2s",
+   "size": 2132,
+   "sha256": "c4ee080695b6ea0986098550fb8d7d6b89a011d191429083c0641a00b9fc1fa9"
+  },
+  {
+   "path": "scripture-armor/harness/proof/capture-relay.s2c",
+   "size": 2568,
+   "sha256": "0754bf9d5147ee963b10b4c30bf7c0e2a6ddf1bd3a4d686fcc060d590934a8c7"
+  },
+  {
+   "path": "scripture-armor/harness/proof/fleet-host.mjs",
+   "size": 4295,
+   "sha256": "2b2eb2f99cd8186a5db452e711e13bf8df55a4fd07eed3a10ee48abdba3c56ac"
+  },
+  {
+   "path": "scripture-armor/harness/proof/proof-output.txt",
+   "size": 4086,
+   "sha256": "8f731d33cd012b85add434f8ec582ba7ae8d71a30e49c610753a379fa331fc0c"
+  },
+  {
+   "path": "scripture-armor/harness/proof/relay.mjs",
+   "size": 3178,
+   "sha256": "5f95556292229fdb120a3eae7e60164f3a73ea42c1ca0c2fb8e29f780505d89e"
+  },
+  {
+   "path": "scripture-armor/harness/proof/run-proof.mjs",
+   "size": 17256,
+   "sha256": "e6388588b4762b2fa31a516eb7bf3398c91c5587763710e3639d619b96b79b0f"
+  },
+  {
+   "path": "scripture-armor/harness/proof/tap.mjs",
+   "size": 1357,
+   "sha256": "a82845b5a4700933d8a72f00d285fcd84f2212150941a22e391d674ad21a42fe"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/capture-flow.c2s",
+   "size": 711,
+   "sha256": "67dbd514de1a4cf7c39066306427d74aa04050320f200338cec1144e6af04e47"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/capture-flow.s2c",
+   "size": 1315,
+   "sha256": "e434b3ae5ef932aa64c3465f19523f86da2d55434b2144ab7998cb3ee608a718"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/capture-vm.c2s",
+   "size": 2131,
+   "sha256": "ede820421a61ecf72c118b362fa5cafb913633210856210a32eb562c57e6910a"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/capture-vm.s2c",
+   "size": 2941,
+   "sha256": "101ca4b0b4b547c9cdcba26c8b14ce5e01368767f8120e2a029cc91e8229e2a8"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/drive-vm.log",
+   "size": 72184,
+   "sha256": "c16074e5093204b6cdb00eaf4e3bf13e0668b5caee568bd4efcedbc1597a7401"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/drive-vm.py",
+   "size": 4719,
+   "sha256": "6caca38cb5533dc0e33009be6bae4cd15f1519992757a4b46ad6e3c99a121952"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/driver.out",
+   "size": 275,
+   "sha256": "8802b385ed86684b9e6ff392246e1ef9e9a927c8088623b35ec0a78172f93640"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/engine/lib/armor-native.mjs",
+   "size": 16197,
+   "sha256": "2d84c08d2ecea03e138bc7236a072af9d932b751c8e2cc09ed43f56d5f2cd7ab"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/peer-server.mjs",
+   "size": 6900,
+   "sha256": "11a2c3dc653d279b6b91dc3354ff06e2eadff3b828b675e8113b3c9261baac3a"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/rogue-server.mjs",
+   "size": 2702,
+   "sha256": "319d12a7136d02879d5bab3560e59c4b9387488ce7fcf639321ab4f1329afe7c"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/airlock.mjs",
+   "size": 11969,
+   "sha256": "6c24dcc6a0a773adbce57a6d4e6017eb15b6f18a954505e45e9d36f84801ef7b"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/armor.mjs",
+   "size": 99861,
+   "sha256": "56dbb5b6e0954fdcd6fb034626697be451095b81690fb787f57d0476c0b9b66e"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/cell.mjs",
+   "size": 11415,
+   "sha256": "49c8e3aa35a0d8c2dafa9a0cf83f62af7db43dcf1ac22777b2092a88f4df8eef"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/custody.mjs",
+   "size": 12983,
+   "sha256": "004305328998d9b23db3fb503138cf2811bc2a62fc6cace191195343601cc33c"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/launch.mjs",
+   "size": 4418,
+   "sha256": "40cb4d696774baf6b48ca18d5ea30b25b13854bedd4ebbe3d4a279b1cf503819"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/package.json",
+   "size": 527,
+   "sha256": "d1d8bd81a9be752f3db0e50b9dbb8cef0a8ed88a7d31daf91264b5bc0a992ce0"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/refit-estate.mjs",
+   "size": 16243,
+   "sha256": "8f41004e50c3ba168224a43ae846019b18757fae5b5681d98d4ef43eacab0047"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/refit-gates.mjs",
+   "size": 21004,
+   "sha256": "e6d361d0f38ce64d55391106528e69c0e58bc7b92ff52b3fe7f3f73190f8adee"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/refit-net.mjs",
+   "size": 17372,
+   "sha256": "1067bf31daf1bc009113572eeacc77351c04d2745c3371233af75318bdb8d485"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/refit-store.mjs",
+   "size": 15589,
+   "sha256": "225bbe0834aa35519d7eb03210e4d24eaef61ac1f5f5df100b12e192ce82c0cb"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/scan.mjs",
+   "size": 42184,
+   "sha256": "666b3d86a904983c05dc4daafb64c4dd610e8f75fbf580034dbf97208f372649"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/terms.mjs",
+   "size": 6720,
+   "sha256": "b167408c72fb3d2309cb73409103a789259ffd1cf7ae3c90cfcaceeec10f4b80"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-bundle/scripture-armor/vaultd.mjs",
+   "size": 171293,
+   "sha256": "34b8ca5b0416fc662c944224e5cdfd6051c16ee7db3632327e3076636b8b813c"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-src/peer-server.mjs",
+   "size": 6900,
+   "sha256": "11a2c3dc653d279b6b91dc3354ff06e2eadff3b828b675e8113b3c9261baac3a"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/guest-src/rogue-server.mjs",
+   "size": 2702,
+   "sha256": "319d12a7136d02879d5bab3560e59c4b9387488ce7fcf639321ab4f1329afe7c"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/results.json",
+   "size": 4673,
+   "sha256": "976a96a9512af3754456a3cdcc1accc1abe31ac278708c92ed93c8af3020a10b"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/run-two-endpoint.mjs",
+   "size": 13796,
+   "sha256": "deb5b10534bbcac69c3130741a5d03a0c4d108aaa70774d28c0d3756f4b35711"
+  },
+  {
+   "path": "scripture-armor/harness/two-endpoint/share/engine-block.txt",
+   "size": 200,
+   "sha256": "713c44c096df29c4499b8c9ed8a4a5cb12a4f3bfc4d91862178824c103ba707a"
+  },
+  {
+   "path": "scripture-armor/launch.mjs",
+   "size": 5485,
+   "sha256": "20e5b545783b6bfb2b561f9c6b85aa71aee640e3b1e12d370b0e05073f9def78"
+  },
+  {
+   "path": "scripture-armor/linux/install-armor.sh",
+   "size": 5387,
+   "sha256": "2274959bddd8bd3f37ea060e6706e28cb3733d6b644f59feb770bae7cd569778"
+  },
+  {
+   "path": "scripture-armor/linux/install-daemon.sh",
+   "size": 11867,
+   "sha256": "01e16fab873968f40efbeed66b20b4642397253a1ad6fb19aefb18cd20150138"
+  },
+  {
+   "path": "scripture-armor/linux/scripture-vaultd-user.service",
+   "size": 1797,
+   "sha256": "c536d4bbb65627f1d9ea6b2f8df291bc734a9cf6d3381316a3c65bb57c2bb01d"
+  },
+  {
+   "path": "scripture-armor/linux/scripture-vaultd.service",
+   "size": 3079,
+   "sha256": "aad750d738917cb521e29578569c185c5e021da14d56ae96f036456846e9a98b"
+  },
+  {
+   "path": "scripture-armor/mac/breach-scan.sh",
+   "size": 4667,
+   "sha256": "01a3ae10c0a64ff3ca3ed0cd11356a4d41c41df7fc1e3f2b751176899a07a8ff"
+  },
+  {
+   "path": "scripture-armor/mac/install-armor.sh",
+   "size": 4973,
+   "sha256": "00875234f9aef023cc94926be84f53566e93ec85667c1d32dfea5666d8e309c3"
+  },
+  {
+   "path": "scripture-armor/mac/install-daemon.sh",
+   "size": 8596,
+   "sha256": "422e8e18be56a2f2811358b77976c64ea8182e9149cc740dc8c685768d8d8cf2"
+  },
+  {
+   "path": "scripture-armor/mac/org.ronininc.scripture-vaultd.plist",
+   "size": 1339,
+   "sha256": "ee21aaa558669df4b8dddfd9e40bc98711e3579a1d2aec4560b9c6d5f662cc06"
+  },
+  {
+   "path": "scripture-armor/open-standalone.mjs",
+   "size": 7764,
+   "sha256": "eb85fb681bc8637f872c028bc35dcfa42386c32c68b7b8d53f16d0acbe21709d"
+  },
+  {
+   "path": "scripture-armor/package.json",
+   "size": 795,
+   "sha256": "96c8bc39ad4f1f0c120b2a59b8bdc5a95f84534d198d6aa25b807b42b0b7445d"
+  },
+  {
+   "path": "scripture-armor/refit-net.mjs",
+   "size": 17372,
+   "sha256": "1067bf31daf1bc009113572eeacc77351c04d2745c3371233af75318bdb8d485"
+  },
+  {
+   "path": "scripture-armor/scan.mjs",
+   "size": 40296,
+   "sha256": "455c8cb4fd3671df21ae5aa49eaba273cf1bb3a3bbd187023acc34bf025a6989"
+  },
+  {
+   "path": "scripture-armor/terms.mjs",
+   "size": 6720,
+   "sha256": "b167408c72fb3d2309cb73409103a789259ffd1cf7ae3c90cfcaceeec10f4b80"
+  },
+  {
+   "path": "scripture-armor/test/craft-helper.mjs",
+   "size": 1382,
+   "sha256": "0cb2a6294ec619495b8324db34e1250c879a46c962bd27f42a52fd68e6413fbf"
+  },
+  {
+   "path": "scripture-armor/test/fixtures-cell/echohash.mjs",
+   "size": 2246,
+   "sha256": "25c6036d2d0635ee46515db76e5a7c15b616c80e069caef443151496b3d04e5e"
+  },
+  {
+   "path": "scripture-armor/test/fixtures-cell/emitunk.mjs",
+   "size": 1462,
+   "sha256": "d2fa380be98ab1f7385e02580e9cb36aa1294aea3b3f27d706885f139a6daa69"
+  },
+  {
+   "path": "scripture-armor/test/fixtures-cell/sleeper.mjs",
+   "size": 424,
+   "sha256": "89aeee4c4f0a71aa2798c7ab21ca49a5690add91eaf3661e258df273889de9f6"
+  },
+  {
+   "path": "scripture-armor/test/fixtures-cell/spawner-bad.mjs",
+   "size": 1706,
+   "sha256": "125f932ee817a32481616c3fe58dccb4b129d1091dc0ba8860bf9f370aeb7f5a"
+  },
+  {
+   "path": "scripture-armor/test/fixtures-cell/spawner-clean.mjs",
+   "size": 1574,
+   "sha256": "0d701aba7dd0030576bbba13afd854179b373cfde80b37e8a8dae39022a4bca1"
+  },
+  {
+   "path": "scripture-armor/test/fixtures-cell/tierprobe.mjs",
+   "size": 1535,
+   "sha256": "2ff663f54a1f1c62ce4c378006d97baeb9c60cff8a319e2db488175898ca957d"
+  },
+  {
+   "path": "scripture-armor/test/fixtures-cell/tooluser.mjs",
+   "size": 2381,
+   "sha256": "5f21b117ebfd3170725a4496d54eed254ac8e96b042cab4f75df1a88f79eba9a"
+  },
+  {
+   "path": "scripture-armor/test/fixtures-cell/trywrite.mjs",
+   "size": 1839,
+   "sha256": "af4c15a51b1740d6d1e4e9ac3c8d470dff52c335ec4e0ae2254839f35fa9e79f"
+  },
+  {
+   "path": "scripture-armor/test/fixtures-src/bad.c",
+   "size": 642,
+   "sha256": "f580a3f9b82dfe15514474c6c2048e085c441c90bc36ba88625f15061c240bc0"
+  },
+  {
+   "path": "scripture-armor/test/fixtures-src/clean.c",
+   "size": 558,
+   "sha256": "1d9aee51a514a419cc9c98bdb6a4a29d5f1ec816e47a8e49c702facbaf010a33"
+  },
+  {
+   "path": "scripture-armor/test/mesh-tee.mjs",
+   "size": 1051,
+   "sha256": "081a133738461ed0c61b2a551047e802bcd9ddf15fd7bf9d0706eafd899e8e71"
+  },
+  {
+   "path": "scripture-armor/test/run-tests-gemini-fix.mjs",
+   "size": 20045,
+   "sha256": "dab6eb4d852f4e713cb08f8aa5b2a745901feee3007918ee1ff0187fa2c6ebe5"
+  },
+  {
+   "path": "scripture-armor/test/run-tests-v2-airlock.mjs",
+   "size": 30871,
+   "sha256": "022f1b03bddbceb0fe604ed37c3e9744cc3450666915136a5ec370598a9008b5"
+  },
+  {
+   "path": "scripture-armor/test/run-tests-v2-cell.mjs",
+   "size": 43292,
+   "sha256": "df1ce77816570659076fbde1415cd4427077c984f388aaee3103cd2098375e83"
+  },
+  {
+   "path": "scripture-armor/test/run-tests-v2-estate.mjs",
+   "size": 36086,
+   "sha256": "09175b945a7fce561dbe50eefb3be9633cd50886319c4cd1886b63e15580e693"
+  },
+  {
+   "path": "scripture-armor/test/run-tests-v2-phase4.mjs",
+   "size": 41262,
+   "sha256": "a32e0ad8a88d2560cc4c210c36cf8e9a98d94ad05060303824c9b93fa7a14d8a"
+  },
+  {
+   "path": "scripture-armor/test/run-tests-v2-scan.mjs",
+   "size": 40962,
+   "sha256": "36c3d531981af3e66af2972d00fa2db9b910c5a280d5f2bff77bf5e02851e403"
+  },
+  {
+   "path": "scripture-armor/test/run-tests-v4-pq.mjs",
+   "size": 8576,
+   "sha256": "795badf93206f608cac0f92ea50a97027943307a9785a678c4e5f57f02bf38a4"
+  },
+  {
+   "path": "scripture-armor/test/run-tests.mjs",
+   "size": 46466,
+   "sha256": "ff2953a1681d2672747b76e7665f256ee90923e5aa585c5f8491061f340d93ee"
+  },
+  {
+   "path": "scripture-armor/vaultd.mjs",
+   "size": 182080,
+   "sha256": "a227bf9e4263102484f20c59ac4d100b7462c7c83c462b661a7167b389c6ccd9"
+  },
+  {
+   "path": "scripture-armor/windows/install-armor.ps1",
+   "size": 12600,
+   "sha256": "4723b85f9d6ed5649404ea29d8ed855bb9e76860b369cf5ce274c523debd5b6d"
+  },
+  {
+   "path": "vendor/fleet/fleet-packet.mjs",
+   "size": 29583,
+   "sha256": "3475a67658fd2959dcc902d192694bbab6f859bc8837406bc4ff07033e57c976"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/LICENSE-APACHE",
+   "size": 11357,
+   "sha256": "0cff1a8ac2a381870a2c57cbe9b25f95bea0925b39b7fbf6a04ec23df7c77760"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/LICENSE-MIT",
+   "size": 1131,
+   "sha256": "6287e7084fb9e9eded3267c677aa378bc03dffc72bbebdc559ade163f249d467"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/NOTICE",
+   "size": 1167,
+   "sha256": "ec7ee07a5b59fedca407549ff73de894090df9f6cdcd7c397e619d3c8afaf5ac"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/catalog/public_registry.json",
+   "size": 22526,
+   "sha256": "7b4c5b8e5a07cbe86a46670cfe264c60caff90e327d15a9e4a54998cc8505269"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/catalog/registry.json",
+   "size": 57022,
+   "sha256": "45997b60cc5b4ce1a8313b36d3171c5c4be09b76eb19eb53aa88087f5e9be466"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/__init__.py",
+   "size": 138,
+   "sha256": "468664c1931bf97f93258feb95f008aaac1e70f1b5b005f30eea613db192031f"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/3d-cad/SKILL.md",
+   "size": 9728,
+   "sha256": "d99e3052894ed51547623664f7347c9297948f4949920417c51085153eacdcbd"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/game-development/SKILL.md",
+   "size": 9404,
+   "sha256": "927218fdf6f39a4403424b021dfe8c0a5aefcca3ba2dd8cbd16cd227550827ff"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/image-design/SKILL.md",
+   "size": 9745,
+   "sha256": "98a4f88c6a8d24e40a0720dc4e133cad9e57f88062447e4e9bc584ddb9c1c41d"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/knowledge-research/SKILL.md",
+   "size": 11071,
+   "sha256": "52e005e3170ff0b79c8ff85713384acdceced872f3a16823b572af557f45d36b"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/SKILL.md",
+   "size": 49425,
+   "sha256": "2bee5c8492b8cb36f6246aba321781c70af56ae69d854b9a3e5eea2dfd87e5cc"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/references/art-direction-review.md",
+   "size": 5105,
+   "sha256": "bf0cdadb51857e2510cfa430efdab783d7110025570394759494974b1b590bda"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/references/captions.md",
+   "size": 17391,
+   "sha256": "48f120cda98673dac5f40429189b5e2c8cf2d2644d1f1bc3138a9115ce29c6c0"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/references/nle-shotcut-kdenlive.md",
+   "size": 4305,
+   "sha256": "f80a2d02a04537054432475443f1511275d5475a810e155303793d1e33d44068"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/references/render-doctor.md",
+   "size": 6103,
+   "sha256": "bb35d6274cf1b502a29e02de4f661e73aa0f06c8e91b07ccc35e590a10893d46"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/references/sound-design.md",
+   "size": 7889,
+   "sha256": "b2e0b6b239ec5a4f8345d4460a3c365d9a2138f884e72e8a0e782a59444592bd"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/references/source-triage.md",
+   "size": 6245,
+   "sha256": "9e93e499e0efd5663539ccdb7efc62bd33c16f3a3f487330ea1849e27c977963"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/references/story-structure-audio.md",
+   "size": 7540,
+   "sha256": "f9d8c6cca4eb23ebcc8aa98bb138a3fcc48da862bfc2b4bf441244201bbf0781"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/_matrix_data/video-creation/scripts/video_doctor.py",
+   "size": 99239,
+   "sha256": "f7559a686d9d2c0491b54651d6e2935477c5a4f4339560baa0d9ae07464803db"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/analytics.py",
+   "size": 606,
+   "sha256": "ac50fc8a24f46ddbbd5b461f37da5bb21cce187510175bd4600f00364ff750d1"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/cli.py",
+   "size": 41223,
+   "sha256": "472339601f5503828c251314b396b1a9b56dff55513561b07d3a80f7c819dfb4"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/installer.py",
+   "size": 21146,
+   "sha256": "fd7a53ec90590b077d24ac17da2656b4be07dec67ddb807c1714e4a8fc952b3e"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/matrix.py",
+   "size": 21314,
+   "sha256": "84370d3366afc301dfb17b94ec0cce7d50ee1ede8e7cd8baae635c7234c80e2e"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/matrix_skill.py",
+   "size": 14381,
+   "sha256": "0ee29b42c25a618348fe08484bfecfe4bcfc36ecbfbb913329fbfccde310ed8f"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/preview.py",
+   "size": 67090,
+   "sha256": "ca31a8b545e3689de0a26a3609fb69905dfb0b7e300bc7a083d2403b303dd749"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/registry.py",
+   "size": 3942,
+   "sha256": "f2b929bb3b28bfa327c284d87f79059f0c5503b6da28aa895c401a8196d8f023"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/cli_hub/ronin.py",
+   "size": 960,
+   "sha256": "0a67ab3cc31ce24ea0b024516682354d87bd6f8835eca7679f3b4151ea1f3fd9"
+  },
+  {
+   "path": "vendor/kingmaker-cli-hub/kingmaker-cli-hub",
+   "size": 763,
+   "sha256": "a6d9badb09091d0bb8892f68db459eaffda68c71924517cb874e45456efa0968"
+  },
+  {
+   "path": "vendor/office/THIRD_PARTY_LICENSES.txt",
+   "size": 157073,
+   "sha256": "47bb686d360728a4824a105c90a34467075bba6e277d6dcf2327228ddcb4081b"
+  },
+  {
+   "path": "vendor/office/office-libs.mjs",
+   "size": 1948447,
+   "sha256": "948b264e7472327621cce95287a8d13d899f64fc50b68172b438498d2e4ce383"
+  }
+ ]
+}

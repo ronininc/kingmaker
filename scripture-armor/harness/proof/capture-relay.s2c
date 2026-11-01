@@ -1,0 +1,22 @@
+HTTP/1.1 200 OK
+content-type: application/vnd.scripture-armor; v=3
+Date: Sun, 25 Oct 2026 17:11:12 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+945
+SCRIPTURE-ARMOR v3
+{"v":3,"canary":"ac19a72c-f1c0-4979-904d-7eea7be722e1","created":"2026-10-25T17:11:12.850Z","expiry":null,"commit":"b47af9cdbac295091840edfc0940bdf92bb36257523e183e0a6eb50ef4d08534","sender_sign_fp":"37fbf12c79c65c645c1eb3811cc80dcab12c4271427286aa3db6499e0ea79d5a","sender_sign_pub":"mFzEJ-sZ9c7piw1NIKnhqYZyqrEwRvPkzmkcShh3hVk","recipient_seal_fp":"06d36b8d0045e8673f716426ed640db96dbcf7acc8c96b9f05ee9b6e1c54021a","armor_seed":"SmT7zPEK2HuM4SY8h9yv0w==","eph_pub":"PpnSaAjEN0DinHvGBgKxHOAzrhqcDMTd-07Qin5ncn8","key_nonce":"HJITq1Io+27O39G4","key_ct":"EokqrQ8JHhNXlSyk1A4mFvCNcqaOziNu5bo7LTg8reQ0aNCbB+6xgC8qI5ljtaPv","file_nonce":"GRLoazlbKGRvQykn","scan_verdict":null,"scan_digest":null,"scan_report":null,"scan_override":null,"armor_tier":null,"sig":"tE+VdPizPCu8bUBRBQyZjT2feAhEaI/aMlyFhj4jGFCufSPFl53IPGYYF4rZccZBptKkwUtmgItf2m1tlG0GAQ=="}
+𒀴𐘁𒀊𐘭𐘵𒀗𒀆𐘚𐘤𐘺𐘻𐘬𒀷𒀭𒀚𒀣𐘜𐘉𐘖𐘉𐘁𐘧𐘷𐘼𒀠
+𐘺𐘲𒀦𐘯𒀎𐘻𒀲𐘧𐘂𒀓𐘩𒀽𐘥𒀫𐘨𐘙𐘋𐘺𒀣𒀁𒀗𒀋𐘟𐘣𒀹𐘠𐘫𒀫𒀶
+𐘹𒀪𐘬𒀎𐘖𐘐𒀁𒀊𐘄𐘌𒀐𐘆𒀈𐘍𒀫𒀚𐘀𒀮𐘺𐘟𒀿𐘹𐘐𐘯
+𒀊𒀝𒀋𐘋𒀋𐘂𐘟𐘪𐘬𐘬𐘈𒀚𒀑𒀐𒀸𐘈𒀖𐘍𒀾𒀄𒀡𒀏𐘀𒀣𐘦𒀥
+𐘇𒀂𐘇𒀦𐘒𐘿𒀷𒀀𐘒𒀺𐘿𐘘𐘲𐘢𒀆𒀇𒀺𐘼𐘿𐘪𒀎𐘄𐘎𒀩𒀁𒀕𒀀𒀃
+𐘱𐘟𒀋𒀓𒀒𐘴𐘃𐘦𒀮𒀩𒀋𒀠𒀶𐘄𐘱𐘟𒀐𒀲𒀽𐘂
+𐘂𒀷𒀚𒀛𒀡𒀅𒀭𒀗𒀇𒀵𒀨𐘎𒀼𒀞𒀽𒀛𒀄𐘷𒀫𒀦𐘔𐘮
+𐘲𐘛𐘰𒀫𐘮𐘨𒀚𒀒𐘶𐘑𒀱𐘧𒀍𐘇𐘅𒀴𐘮𐘩𒀀𐘿𐘒𐘄𒀈𐘋𒀬𒀽𒀤𐘲𐘱
+𐘲𐘪𐘉𐘐𐘽𐘽𒀞𒀔𒀍𐘎𐘵𐘭𐘙𐘆𐘶𐘦𐘆𐘘𒀞𐘐
+
+0
+

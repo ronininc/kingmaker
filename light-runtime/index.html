@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kingmaker — Light Runtime</title>
+<style>
+  /* The light runtime's window (design ruling 2026-10-21): a case file that learned typography.
+     True black field, one amber accent used like a highlighter pen, monospace throughout.
+     Claims carry sources; nothing decorative that isn't evidence. */
+  :root {
+    --field: #08080a; --rail: #0b0b0d; --card: #101013; --line: #26262b; --active: #17171b;
+    --ink: #d7d7db; --dim: #8a8a92; --faint: #66666e; --amber: #f5c518; --tile: #f2f2f4;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #000; }
+  body {
+    font-family: var(--mono); color: var(--ink); min-height: 100vh;
+    display: flex; align-items: flex-start; justify-content: center; padding: 28px 18px;
+  }
+  .window {
+    width: 1060px; max-width: 100%; background: var(--field);
+    border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+  }
+  /* Title bar: three dots (two graphite, one amber), the name in wide-tracked caps, the pill. */
+  .titlebar {
+    display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .dot { width: 11px; height: 11px; border-radius: 50%; background: #2c2c31; flex: none; }
+  .dot.amber { background: var(--amber); }
+  .product { margin-left: 8px; font-size: 13px; font-weight: 700; letter-spacing: 3px; color: #fff; }
+  .version { font-size: 10px; letter-spacing: 1px; color: var(--faint); text-transform: uppercase; }
+  .pill {
+    margin-left: auto; background: var(--tile); color: #000; border-radius: 999px;
+    font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 5px 11px; white-space: nowrap;
+  }
+  .body { display: flex; min-height: 520px; }
+  /* Nav rail: near-black, 10px tracked uppercase; the active item is white with a 2px amber bar. */
+  .rail {
+    width: 118px; flex: none; background: var(--rail); border-right: 1px solid var(--line);
+    padding: 14px 0; display: flex; flex-direction: column; gap: 2px;
+  }
+  .rail button {
+    all: unset; cursor: pointer; font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--dim); padding: 9px 12px 9px 14px; border-left: 2px solid transparent;
+  }
+  .rail button:hover { color: var(--ink); }
+  .rail button.active { background: var(--active); color: #fff; border-left-color: var(--amber); }
+  .main { flex: 1; padding: 20px 22px 8px; min-width: 0; }
+  .pane-title { font-size: 15px; font-weight: 800; letter-spacing: 3px; color: #fff; text-transform: uppercase; margin: 0 0 4px; }
+  .pane-sub { font-size: 10px; letter-spacing: 1px; color: var(--faint); text-transform: uppercase; margin: 0 0 16px; }
+  /* Evidence cards: a 9px tracked-gray header, 12.5px body, a 9px uppercase source line. */
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin: 0 0 10px; }
+  .card-head { font-size: 9px; letter-spacing: 1.5px; color: var(--dim); text-transform: uppercase; margin-bottom: 7px; }
+  .card-body { font-size: 12.5px; line-height: 1.55; color: var(--ink); overflow-wrap: anywhere; }
+  .card-src { font-size: 9px; letter-spacing: 1px; color: var(--faint); text-transform: uppercase; margin-top: 8px; }
+  /* The marker: the one line per card that carries the proof, highlighted like the attack ads. */
+  mark { background: var(--amber); color: #000; padding: 0 2px; font-weight: 700; }
+  .cursor { display: inline-block; vertical-align: -2px; margin-left: 1px; }
+  /* Ticker tiles: inverted blocks, heavy value on top, one-word label under. */
+  .tiles { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0 18px; }
+  .tile { background: var(--tile); color: #000; border-radius: 6px; padding: 10px 14px 8px; min-width: 128px; }
+  .tile .v { font-size: 19px; font-weight: 800; letter-spacing: 0.5px; }
+  .tile .l { font-size: 9px; letter-spacing: 2px; color: #55555c; text-transform: uppercase; margin-top: 3px; }
+  .rows { font-size: 12px; line-height: 1.9; color: var(--ink); }
+  .rows .k { color: var(--faint); text-transform: uppercase; font-size: 10px; letter-spacing: 1px; margin-right: 10px; }
+  .note { font-size: 11.5px; color: var(--dim); line-height: 1.6; }
+  /* The gates: the owner's three switches — the only write this surface performs. */
+  .switch-row { display: flex; align-items: center; gap: 12px; padding: 11px 2px; border-bottom: 1px solid var(--line); }
+  .switch-row .what { flex: 1; }
+  .switch-row .name { font-size: 12px; color: #fff; letter-spacing: 1px; text-transform: uppercase; }
+  .switch-row .why { font-size: 10.5px; color: var(--faint); margin-top: 2px; line-height: 1.5; }
+  .switch {
+    flex: none; width: 46px; height: 24px; border-radius: 999px; border: 1px solid var(--line);
+    background: var(--card); position: relative; cursor: pointer; padding: 0;
+  }
+  .switch::after {
+    content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--dim); transition: left .12s ease, background .12s ease;
+  }
+  .switch[aria-checked="true"]::after { left: 25px; background: var(--amber); }
+  .footer { border-top: 1px solid var(--line); padding: 12px 22px 16px; }
+  .footer .plain { font-size: 11px; color: var(--dim); line-height: 1.6; }
+  .footer .closing { font-size: 13px; font-weight: 800; letter-spacing: 3px; color: #fff; text-transform: uppercase; margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="window">
+  <div class="titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot amber"></span>
+    <span class="product">KINGMAKER</span>
+    <span class="version" id="surface-tag">LIGHT RUNTIME</span>
+    <span class="pill" id="status-pill">…</span>
+  </div>
+  <div class="body">
+    <nav class="rail" id="rail"></nav>
+    <main class="main" id="main"></main>
+  </div>
+  <div class="footer">
+    <div class="plain" id="footer-line">Every number on this wall comes from this Mac's own files. An absent source reads UNMEASURED — never a guess.</div>
+    <div class="closing">Service · Function · Power · To The People</div>
+  </div>
+</div>
+<script>
+  'use strict';
+  const $ = (tag, cls, text) => { const el = document.createElement(tag); if (cls) el.className = cls; if (text !== undefined) el.textContent = text; return el; };
+  const PANES = ['Overview', 'Router', 'Evidence Wall', 'Library', 'Gates', 'Audit Chain'];
+  let state = null;
+  let pane = 'Overview';
+
+  const rail = document.getElementById('rail');
+  for (const name of PANES) {
+    const b = $('button', null, name);
+    b.dataset.pane = name;
+    b.addEventListener('click', () => { pane = name; render(); });
+    rail.appendChild(b);
+  }
+
+  const fmt = (v, suffix) => (v === null || v === undefined ? 'UNMEASURED' : `${Math.round(v * 10) / 10}${suffix || ''}`);
+  const timeOf = (iso) => (iso ? String(iso).slice(11, 19) : '——');
+
+  function markerBody(card) {
+    // The card body with its one proof line under the amber marker and the cursor parked at its edge.
+    const span = $('span');
+    if (card.marker && card.body.includes(card.marker)) {
+      const [before, after] = [card.body.slice(0, card.body.indexOf(card.marker)), card.body.slice(card.body.indexOf(card.marker) + card.marker.length)];
+      span.append(before, $('mark', null, card.marker), cursor(), after);
+    } else span.textContent = card.body;
+    return span;
+  }
+  function cursor() {
+    // The white pointer with the black outline, frozen at the highlight's edge (a design element).
+    const s = $('span', 'cursor');
+    s.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 3 L19 12 L12.5 13.5 L15 21 L12 22 L9.5 14.5 L6 18 Z" fill="#fff" stroke="#000" stroke-width="1.6"/></svg>';
+    return s;
+  }
+  function cardEl(card) {
+    const c = $('article', 'card');
+    c.append($('div', 'card-head', `CUT ${card.n} · ${timeOf(card.at)} · ${card.label}`));
+    const body = $('div', 'card-body'); body.append(markerBody(card)); c.append(body);
+    c.append($('div', 'card-src', `SOURCE — ${card.source}`));
+    return c;
+  }
+  function tilesEl(tiles) {
+    const row = $('div', 'tiles');
+    for (const t of tiles) {
+      const tile = $('div', 'tile');
+      tile.append($('div', 'v', t.value), $('div', 'l', t.label));
+      row.append(tile);
+    }
+    return row;
+  }
+  function rowsEl(pairs) {
+    const box = $('div', 'rows');
+    for (const [k, v] of pairs) {
+      const line = $('div');
+      line.append($('span', 'k', k), document.createTextNode(v === null || v === undefined || v === '' ? 'UNMEASURED' : String(v)));
+      box.append(line);
+    }
+    return box;
+  }
+  function head(title, sub) {
+    const frag = document.createDocumentFragment();
+    frag.append($('h1', 'pane-title', title), $('p', 'pane-sub', sub));
+    return frag;
+  }
+
+  function renderOverview(main) {
+    main.append(head('Overview', 'This Mac · this runtime · live from its own files'));
+    main.append(tilesEl(state.tiles));
+    const m = state.meter;
+    main.append(rowsEl([
+      ['Decode', m.decodeTokS === null ? null : `${fmt(m.decodeTokS)} tok/s`],
+      ['Prefill', m.prefillTokS === null ? null : `${fmt(m.prefillTokS)} tok/s`],
+      ['Generated', m.generated], ['Prompt', m.prompt],
+      ['Machine', state.machine ? state.machine.label : null],
+      ['Chip', state.machine ? [state.machine.chip, state.machine.model].filter(Boolean).join(' · ') || null : null],
+      ['Writer est', state.machine && state.machine.writerTokSEstimate ? `${state.machine.writerTokSEstimate} tok/s (reference bench, scaled)` : null],
+      ['10M proof', state.proof ? state.proof.status : 'UNRUN'],
+    ]));
+    if (state.evidence.length) {
+      main.append($('p', 'pane-sub', 'LATEST EVIDENCE'));
+      main.append(cardEl(state.evidence[0]));
+    }
+  }
+
+  function renderRouter(main) {
+    main.append(head('Router', 'The profile this Mac runs, and the reflex seat beside the worker'));
+    if (!state.router) { main.append($('p', 'note', 'No profile resolved on this machine yet — the router pane reads UNMEASURED until Kingmaker profiles this Mac.')); return; }
+    const r = state.router;
+    main.append(rowsEl([
+      ['Writer', r.writer], ['Router', r.router], ['Coder', r.coder], ['Vision', r.vision], ['Reasoning', r.reasoning],
+      ['Context', r.context ? `${r.context / 1024}k` : null],
+      ['At once', r.concurrent], ['Max resident', r.maxResidentGb ? `${r.maxResidentGb} GB` : null],
+    ]));
+    main.append($('p', 'pane-sub', 'REFLEX SEAT'));
+    if (!r.seat) main.append($('p', 'note', 'No seat plan computed for this profile.'));
+    else if (r.seat.active) main.append(rowsEl([
+      ['Seat', `${r.seat.model} — pinned, never evicted`],
+      ['Pair', `${r.seat.seatGb} GB seat + a worker up to ${r.seat.workerGb} GB = ${r.seat.pairGb} GB of the ${r.seat.budgetGb} GiB GPU budget`],
+    ]));
+    else main.append($('p', 'note', `Not pinned — ${r.seat.reason || 'the strict single-model rule stands'}.`));
+    main.append($('p', 'pane-sub', 'SWITCHES'));
+    main.append(rowsEl([
+      ['Reflex layer', state.status.reflexOn ? 'ON' : 'OFF'],
+      ['Seat pin', state.status.pinOn ? 'ON' : 'OFF'],
+    ]));
+  }
+
+  function renderEvidence(main) {
+    main.append(head('Evidence Wall', 'Verdicts this machine has actually produced — newest first'));
+    if (!state.evidence.length) { main.append($('p', 'note', 'No verdicts on file in the light state dir yet. When the 10-minute proof runs or a verdict is recorded, its card lands here with its source named. Nothing is backfilled and nothing is invented.')); return; }
+    for (const card of state.evidence) main.append(cardEl(card));
+  }
+
+  function renderLibrary(main) {
+    main.append(head('Library', 'What this surface can honestly show'));
+    main.append($('p', 'note', 'The light state carries no library source: the skill library is indexed by the governed runtime, not by this window. This pane stays empty rather than dress a guess as a shelf — when a library index file joins the light state dir, its entries land here as cards with their sources named.'));
+  }
+
+  const SWITCHES = [
+    ['proofRun', 'Arm the 10-minute proof', 'An intent flag only: scripts/run-10m-proof.mjs reads it. Arming starts nothing by itself.'],
+    ['reflex', 'Reflex layer', 'System One answers decision-shaped turns before a reasoning brain wakes. Off restores the pre-reflex flow exactly.'],
+    ['reflexPin', 'Reflex seat pin', 'On a single-slot profile, the decision model stays pinned beside the worker so a reflex call never pays a model switch.'],
+  ];
+  function renderGates(main) {
+    main.append(head('Gates', 'The owner\u2019s three switches — the only write this surface performs'));
+    for (const [key, name, why] of SWITCHES) {
+      const row = $('div', 'switch-row');
+      const what = $('div', 'what');
+      what.append($('div', 'name', name), $('div', 'why', why));
+      const sw = $('button', 'switch');
+      sw.setAttribute('role', 'switch');
+      sw.setAttribute('aria-checked', String(Boolean(state.control[key])));
+      sw.setAttribute('aria-label', name);
+      sw.addEventListener('click', async () => {
+        sw.disabled = true;
+        try {
+          const r = await fetch('/control', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ [key]: !state.control[key] }) });
+          const j = await r.json();
+          if (j.ok) state.control = j.control;
+        } catch { /* the next poll re-reads the truth from the file */ }
+        await load();
+      });
+      row.append(what, sw);
+      main.append(row);
+    }
+    main.append($('p', 'note', 'A switch approves nothing, sends nothing, and starts nothing itself. It records the owner\u2019s intent where the governed pieces read it.'));
+  }
+
+  function renderAudit(main) {
+    main.append(head('Audit Chain', 'The same verdicts, as a chain — what was decided, in order'));
+    main.append(rowsEl([
+      ['State schema', state.schema], ['Assembled', state.generatedAt], ['Control file', state.files.control],
+      ['Proof report', state.files.proofReport], ['Verdicts file', state.files.verdicts],
+      ['Entries', state.evidence.length],
+    ]));
+    for (const card of state.evidence) main.append(cardEl(card));
+    if (!state.evidence.length) main.append($('p', 'note', 'The chain is empty: no verdicts recorded in this state dir yet.'));
+  }
+
+  const RENDER = { 'Overview': renderOverview, 'Router': renderRouter, 'Evidence Wall': renderEvidence, 'Library': renderLibrary, 'Gates': renderGates, 'Audit Chain': renderAudit };
+
+  function render() {
+    document.getElementById('status-pill').textContent = state ? state.status.pill : 'STATE UNREACHABLE';
+    document.getElementById('surface-tag').textContent = state ? state.surface : 'LIGHT RUNTIME';
+    for (const b of rail.children) b.classList.toggle('active', b.dataset.pane === pane);
+    const main = document.getElementById('main');
+    main.replaceChildren();
+    if (!state) { main.append($('p', 'note', 'The light runtime\u2019s state could not be read. This window invents nothing in its place.')); return; }
+    RENDER[pane](main);
+  }
+
+  async function load() {
+    try { state = await (await fetch('/state', { cache: 'no-store' })).json(); }
+    catch { state = null; }
+    render();
+  }
+  load();
+  setInterval(load, 5000);
+</script>
+</body>
+</html>

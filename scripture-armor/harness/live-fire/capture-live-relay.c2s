@@ -1,0 +1,56 @@
+POST / HTTP/1.1
+host: 127.0.0.1:19712
+connection: keep-alive
+content-type: application/vnd.scripture-armor; v=3
+accept: */*
+accept-language: *
+sec-fetch-mode: cors
+user-agent: node
+accept-encoding: gzip, deflate
+content-length: 1534
+
+SCRIPTURE-ARMOR v3
+{"v":3,"canary":"196e0bee-bb6e-4738-ae8b-ba9ca752e437","created":"2026-10-25T09:29:51.722Z","expiry":null,"commit":"661d5092650f415cb3d25e520d9fb76db0ac6fe7d4255cf6c2cecf5fe7f37101","sender_sign_fp":"443cedf2cbda3283dbf2579c50e52825c2c3b4063031aabe72bf96c3f111413e","sender_sign_pub":"mtEvgZ9JCWJHhnMOyZFuKfrQ1mFfurMjEvYdEpb1mjI","recipient_seal_fp":"30b3cd27be013e1ef35c1438ddcab7b2b559b7d7f32cf6517f2b282fce575fdd","armor_seed":"Y8sZqu+jkJLp8PaNJkg2zw==","eph_pub":"3ksfdGDuZuoK6uhZmKrRqh3YEBGm-OMc4-b_kVBJ204","key_nonce":"zHveU7AtQplDq6br","key_ct":"mMIa1HaZb29Fjz0fSSPs4VmuycZ4zXylw2rWBrfWeu3SxEUW6g/L+DK8p3Rb6cTS","file_nonce":"KJWfEJGQjL5+ueXS","scan_verdict":null,"scan_digest":null,"scan_report":null,"scan_override":null,"armor_tier":null,"sig":"xV4oWg2LGx/ldTnBXQzwvZiU+X8O/54z1Jo8tGZtbypEZPngdT8EBm8goq4ZqtC+crP42YzeU590wXVAXz0DAg=="}
+𒀾𐘺𒀶𐘝𐘒𒀾𐘏𐘞𐘁𐘌𒀧𒀯𐘳𐘷𐘚𐘳𐘁𐘔𐘒𒀜𒀄𒀢
+𐘗𐘝𒀓𒀮𐘜𐘄𒀔𐘼𐘏𒀘𐘌𒀊𒀶𒀸𒀾𐘈𒀗𐘹𐘪𒀟𒀨𒀆𐘳𒀑𒀓𒀬𒀡
+𒀘𒀶𒀅𒀳𒀖𒀊𒀑𒀳𐘇𐘑𐘫𐘚𐘒𒀇𒀂𐘜𒀤𒀐𐘧𐘕𐘵𒀎
+𒀏𐘠𒀙𒀨𒀼𒀘𐘁𐘬𐘺𐘷𐘨𐘉𐘿𐘷𐘊𐘇𒀆𒀀𐘇𐘍𒀉𒀴𒀭
+POST / HTTP/1.1
+host: 127.0.0.1:19712
+connection: keep-alive
+content-type: application/vnd.scripture-armor; v=3
+accept: */*
+accept-language: *
+sec-fetch-mode: cors
+user-agent: node
+accept-encoding: gzip, deflate
+content-length: 2338
+
+SCRIPTURE-ARMOR v3
+{"v":3,"canary":"a38bb59c-f3b5-4480-8d1d-957a148eb145","created":"2026-10-25T09:29:53.738Z","expiry":null,"commit":"4468475eb2ca00ed4910ffa9075422eba59d9c7af82ca0900e8b7b9800d58730","sender_sign_fp":"443cedf2cbda3283dbf2579c50e52825c2c3b4063031aabe72bf96c3f111413e","sender_sign_pub":"mtEvgZ9JCWJHhnMOyZFuKfrQ1mFfurMjEvYdEpb1mjI","recipient_seal_fp":"30b3cd27be013e1ef35c1438ddcab7b2b559b7d7f32cf6517f2b282fce575fdd","armor_seed":"ch970Y6KGn+L3wXh5qIcPQ==","eph_pub":"sP2ncPs5tsWPz24Q8auyxbtrszhGVpd81j84w6hRQWY","key_nonce":"N7bruERtwB/6yjUD","key_ct":"KIvt7vDtPxe9Z/Ep77etcGBbJtjvNYt7EriD38hCaqOIeH+EagSdl8lN1f7cfptr","file_nonce":"rRHy7LWf7LFX+o+c","scan_verdict":null,"scan_digest":null,"scan_report":null,"scan_override":null,"armor_tier":null,"sig":"g0YMmcTFOXXIym9NXw1Ll1kTFHY922PEdBSm6sQu/DT9PxcK2UklwZ08WgQ5qMhToqIh3lnkpWnQ2x1p08lsCQ=="}
+𒀘𒀨𒀲𐘖𐘷𒀬𒀪𒀴𒀅𒀙𐘻𐘬𒀯𐘵𒀤𐘊𒀽𐘦𐘢𐘿𐘷𐘌𒀫𒀑𐘄
+𒀈𐘵𒀋𐘁𐘁𒀰𒀄𐘀𒀢𐘝𐘦𐘰𒀊𐘍𒀹𒀅𐘳𒀰𐘖𒀐𐘛𐘴
+𐘎𐘺𒀰𐘛𐘮𐘷𐘙𐘈𐘽𐘖𐘾𒀁𒀫𐘠𒀵𒀽𒀹𒀰𐘨𐘣𐘙𐘎𒀝
+𐘬𒀃𒀱𒀃𒀓𐘙𒀒𐘈𒀱𐘭𒀱𒀔𐘯𒀙𒀘𐘪𐘎𒀈𒀁𐘃𐘭𐘒𐘈𐘨𐘱𐘉𐘎𐘈
+𒀂𐘺𐘶𒀙𒀷𐘭𒀾𐘊𒀗𒀙𐘞𐘛𒀏𒀜𐘖𐘆𒀰𒀓𒀉𐘺𐘏𒀰𒀕𐘫𒀘𒀉
+𒀜𐘩𐘫𐘹𒀆𐘸𐘎𐘐𒀭𐘿𐘩𐘜𐘥𒀼𐘳𐘛𐘦𒀹𒀹𐘔𒀔
+𒀯𒀂𐘯𐘬𐘛𐘴𒀖𒀘𐘿𒀱𒀅𐘜𐘸𐘋𐘴𐘳𒀲𐘁𒀔𒀐𐘊𐘴𒀔𐘍𐘯𐘕𒀽𐘿𒀦𒀀
+𐘷𒀩𒀯𒀻𐘿𐘩𒀫𐘂𐘶𐘩𐘉𒀠𐘧𐘙𒀛𒀛𒀎𐘃𐘽
+𒀜𐘑𒀵𐘲𐘀𒀲𒀉𒀁𒀞𒀂𐘃𒀨𒀢𒀂𒀉𐘣𒀁𐘽
+POST / HTTP/1.1
+host: 127.0.0.1:19712
+connection: keep-alive
+content-type: application/vnd.scripture-armor; v=3
+accept: */*
+accept-language: *
+sec-fetch-mode: cors
+user-agent: node
+accept-encoding: gzip, deflate
+content-length: 1549
+
+SCRIPTURE-ARMOR v3
+{"v":3,"canary":"168c3aa3-35af-4902-884d-a067d98bc207","created":"2026-10-25T09:29:54.985Z","expiry":null,"commit":"48885f67e520363325b67a94a9c44e0214fabb49cba96bb98c154b55da0ee2a8","sender_sign_fp":"443cedf2cbda3283dbf2579c50e52825c2c3b4063031aabe72bf96c3f111413e","sender_sign_pub":"mtEvgZ9JCWJHhnMOyZFuKfrQ1mFfurMjEvYdEpb1mjI","recipient_seal_fp":"30b3cd27be013e1ef35c1438ddcab7b2b559b7d7f32cf6517f2b282fce575fdd","armor_seed":"U6eKlpbBLACX5Wwke+gSKw==","eph_pub":"AvIGgz_kUsphC-1-8sIzdaCXlzMBsOCh4eFKYAGDijY","key_nonce":"D7mL+1X2zwhKqy/I","key_ct":"w9zKDthN1A9rVNvwnOatR577bOeqrXy3PhiXWYOxsed4FbHl/EsOQWSiiCI3AtLE","file_nonce":"6o08fALruudheq2z","scan_verdict":null,"scan_digest":null,"scan_report":null,"scan_override":null,"armor_tier":null,"sig":"5BmsyPe7JMqlGo60Vv7r8eN1xaPpqh8Zeu1k5nRXKYLStR79NogSpAwZmjyZG5ZMOrRwMG9wKR31mm7WrdcpAA=="}
+𒀩𒀻𐘋𒀅𐘍𐘑𒀒𐘒𒀜𒀰𐘆𒀐𒀢𐘋𐘫𐘌𒀼𒀷𒀗𒀎𒀻𒀝𒀃𒀛𒀥𒀄
+𒀐𐘔𐘷𐘳𒀾𒀵𐘂𒀬𒀖𒀼𐘖𐘅𐘭𒀰𒀾𐘥𐘮𐘠𐘑𐘆𐘬𐘏𒀻𐘠𐘰𒀱
+𐘢𒀔𒀩𐘲𒀟𐘡𒀆𐘢𐘅𒀈𐘋𒀀𒀔𒀓𐘷𐘻𐘘𐘒𐘺𐘫𐘼𐘈𐘭𒀇𐘿𐘵𒀖
+𐘅𐘵𒀏𒀚𐘶𒀕𒀭𒀢𒀪𒀓𒀼𒀋𒀘𒀴𒀼𐘲𒀏𐘇𒀏𒀯𒀽𐘊𐘓𐘔𒀫𐘎𐘼

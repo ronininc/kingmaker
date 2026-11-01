@@ -1,0 +1,37 @@
+{
+  "name": "kingmaker",
+  "version": "4.4.0",
+  "private": true,
+  "description": "Kingmaker: a Mac agent with no window. Your Mac's own apps are the screen, voice drives it, its engine governs every step, the Hands of Horus do the clicking.",
+  "type": "module",
+  "bin": {
+    "kingmaker": "bin/kingmaker",
+    "sol-ghost": "bin/sol-ghost"
+  },
+  "scripts": {
+    "test": "node --test --test-force-exit \"test/*.test.mjs\" \"addons/*/test/*.test.mjs\"",
+    "test:armor": "node scripture-armor/test/run-tests.mjs && node scripture-armor/test/run-tests-v2-scan.mjs && node scripture-armor/test/run-tests-v2-phase4.mjs && node scripture-armor/test/run-tests-v2-cell.mjs && node scripture-armor/test/run-tests-v2-airlock.mjs && node scripture-armor/test/run-tests-v2-estate.mjs && node scripture-armor/test/run-tests-v4-pq.mjs && node scripture-armor/test/run-tests-gemini-fix.mjs",
+    "test:all": "npm test && npm run test:os && npm run test:armor && npm run typecheck",
+    "proof:floor": "node --test --test-force-exit addons/meeting-notes/test/floor-participant.test.mjs addons/meeting-notes/test/floor-addon.test.mjs addons/meeting-notes/test/floor-participant-stt.test.mjs addons/meeting-notes/test/floor-participant-audio.test.mjs addons/meeting-notes/test/floor-participant-audio-e2e.test.mjs addons/meeting-notes/test/floor-participant-e2e.test.mjs addons/meeting-notes/test/floor-participant-orosolu.test.mjs",
+    "build:webrtc-vendor": "addons/meeting-notes/scripts/build-webrtc-vendor.sh",
+    "build:floor-addon": "node addons/meeting-notes/scripts/build-floor-addon.mjs",
+    "icons": "swift scripts/make-icons.swift .",
+    "build:app": "scripts/build-app.sh",
+    "build:installer": "scripts/build-installer.sh",
+    "release:parts": "node scripts/release-parts.mjs",
+    "proof:owner-voice": "node --experimental-sqlite ${KINGMAKER_ENGINE_SRC:?set KINGMAKER_ENGINE_SRC to the engine source checkout}/server/node_modules/tsx/dist/cli.mjs test/owner-voice.proof.mjs",
+    "proof:owner-keys": "node --experimental-sqlite ${KINGMAKER_ENGINE_SRC:?set KINGMAKER_ENGINE_SRC to the engine source checkout}/server/node_modules/tsx/dist/cli.mjs test/owner-keys.proof.mjs",
+    "build:addon": "node addons/build-addon.mjs",
+    "typecheck": "tsc --noEmit",
+    "test:os": "tsx test-os/federation-collector.test.ts && tsx test-os/record-of-dissent.test.ts"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0"
+  }
+}

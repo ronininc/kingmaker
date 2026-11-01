@@ -1,0 +1,3 @@
+{"mesh":1,"type":"flow-hello","from_label":"kingmaker-engine","from_sign_fp":"860a70e8181ed335fb51aea436e865d9ec41cfb4b408f59ee8dcff59d8de9082","from_seal_fp":"4d87674f05da97ec5040b0ad5c349997c169c9bbf5abc12dce08359fce2852c1","from_sign_pub":"7X_b-lpgWYbMAwv0aQ-qZhQ27yYaXWhdBqAJVrRzEwc","to_seal_fp":null,"at":"2026-10-25T10:22:56.308Z","nonce":"217781a6-5250-40a8-a101-50e7ce8f3789","body":{"flow_id":"c3a690a5-0175-4b7b-b550-70d5f6dd4c1b","eph_pub":"jMO5nEb4zH9aGNCE4WRizCMicznmc-epIwIu19TyRiI","mesh_addr":null},"sig":"0N1MN3nLaI80K76RTLalGNoRsccsxuKohDx3MImxxoQUiP9sD2JzxXUx3/ksbVe+96VDxX2SgzHK01Q7Jzy7Ag=="}
+{"counter":1,"body_b64":"rPO8PApodKbgbccdmOksFYplYm3IAOb5wpSzq5rKzq4y"}
+{"receipt_request":true}
