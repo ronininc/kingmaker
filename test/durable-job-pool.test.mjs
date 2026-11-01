@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { chmodSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
@@ -67,4 +67,27 @@ test('failed local execution retries with bounded backoff and terminal evidence'
   const failed = await dispatcher.runOne(); assert.equal(failed.state, 'failed');
   assert.deepEqual(failed.evidence, { kind: 'failure', reason: 'controlled failure' });
   assert.equal(pool.get(job.id).state, 'failed'); pool.close();
+});
+
+test('database, WAL, and SHM remain owner-only under a permissive umask', () => {
+  const dir = temp(); const queueDir = join(dir, 'private-queue');
+  mkdirSync(queueDir, { mode: 0o700 });
+  const old = process.umask(0o000);
+  try {
+    const db = join(queueDir, 'jobs.sqlite');
+    const pool = createDurableJobPool({ path: db, id: () => 'durable_modes' });
+    pool.submit({ text: 'private job text', idempotencyKey: 'fixture:durable:modes' });
+    for (const path of [db, `${db}-wal`, `${db}-shm`]) assert.equal(lstatSync(path).mode & 0o077, 0, path);
+    pool.close();
+  } finally { process.umask(old); }
+});
+
+test('unsafe existing directories and database symlinks are rejected', () => {
+  const dir = temp(); const publicDir = join(dir, 'public-queue');
+  mkdirSync(publicDir, { mode: 0o700 }); chmodSync(publicDir, 0o755);
+  assert.throws(() => createDurableJobPool({ path: join(publicDir, 'jobs.sqlite') }), /JOB_DIRECTORY_NOT_PRIVATE/);
+  const privateDir = join(dir, 'private-queue'); mkdirSync(privateDir, { mode: 0o700 });
+  const target = join(privateDir, 'target'); writeFileSync(target, 'not a database', { mode: 0o600 });
+  symlinkSync(target, join(privateDir, 'jobs.sqlite'));
+  assert.throws(() => createDurableJobPool({ path: join(privateDir, 'jobs.sqlite') }), /UNSAFE_JOB_DATABASE/);
 });
