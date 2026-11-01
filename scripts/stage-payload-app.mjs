@@ -9,6 +9,8 @@ import { tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkPayload, payloadProblem } from '../lib/payload.mjs';
+import { verifyManifestBytes } from '../lib/release-signing.mjs';
+import { RELEASE_PUBLIC_KEY_PEM } from '../lib/release-pubkey.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -30,6 +32,18 @@ function safeArchiveEntries(payload) {
 }
 
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
+export function trustedPayloadFromSignedManifest({ manifestBytes, signature, publicKeyPem = RELEASE_PUBLIC_KEY_PEM }) {
+  const bytes = Buffer.isBuffer(manifestBytes) ? manifestBytes : Buffer.from(manifestBytes);
+  if (!publicKeyPem || !verifyManifestBytes(bytes, String(signature ?? '').trim(), publicKeyPem)) throw new Error('release manifest signature is invalid');
+  let manifest;
+  try { manifest = JSON.parse(bytes); } catch { throw new Error('signed release manifest is not JSON'); }
+  if (manifest.schema !== 'kingmaker.release/1') throw new Error('signed release manifest schema is not kingmaker.release/1');
+  const unit = manifest.units?.macos;
+  if (!unit || !/^[a-f0-9]{64}$/.test(String(unit.sha256 ?? ''))) throw new Error('signed release manifest has no macOS payload sha256');
+  const version = unit.payloadVersion ?? manifest.version;
+  if (!version) throw new Error('signed release manifest has no payload version');
+  return Object.freeze({ sha256: unit.sha256, version: String(version), verified: true });
+}
 function allFiles(root) {
   const found = [];
   const walk = (dir, prefix = '') => {
@@ -42,13 +56,15 @@ function allFiles(root) {
   walk(root); return found.sort();
 }
 
-export function stagePayloadApp({ payload, wrapper, out, expectedSha256, expectedVersion, identity = null, fixtureAdhoc = false, resources = join(ROOT, 'app', 'Resources'), infoPlist = join(ROOT, 'app', 'Info.plist') }) {
+export function stagePayloadApp({ payload, wrapper, out, trustedPayload = null, expectedSha256, expectedVersion, identity = null, fixtureAdhoc = false, resources = join(ROOT, 'app', 'Resources'), infoPlist = join(ROOT, 'app', 'Info.plist') }) {
   payload = resolve(payload); wrapper = resolve(wrapper); out = resolve(out);
   if (!existsSync(payload)) throw new Error(`no payload at ${payload}`);
   if (!existsSync(wrapper)) throw new Error(`no native wrapper at ${wrapper}`);
   if (basename(out) !== 'Kingmaker.app') throw new Error('output must be named Kingmaker.app');
   if (fixtureAdhoc && process.env.KINGMAKER_FIXTURE_BUILD !== '1') throw new Error('ad-hoc signing is fixture-only (set KINGMAKER_FIXTURE_BUILD=1 in an isolated test)');
   if (!fixtureAdhoc && !identity) throw new Error('production staging requires an explicit Kingmaker Release signing identity');
+  if (!fixtureAdhoc && trustedPayload?.verified !== true) throw new Error('production staging requires a payload pin from a signature-verified release manifest');
+  if (trustedPayload) { expectedSha256 = trustedPayload.sha256; expectedVersion = trustedPayload.version; }
   if (!/^[a-f0-9]{64}$/.test(String(expectedSha256 ?? ''))) throw new Error('an externally trusted payload sha256 is required');
   if (!expectedVersion) throw new Error('an externally trusted payload version is required');
   const archiveSha = sha256(readFileSync(payload));
@@ -101,6 +117,12 @@ export function stagePayloadApp({ payload, wrapper, out, expectedSha256, expecte
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const value = (flag) => { const i = process.argv.indexOf(flag); return i > 0 ? process.argv[i + 1] : null; };
   const fixtureAdhoc = process.argv.includes('--fixture-adhoc');
-  const result = stagePayloadApp({ payload: value('--payload'), wrapper: value('--wrapper'), out: value('--out'), expectedSha256: value('--payload-sha256'), expectedVersion: value('--payload-version'), identity: value('--identity'), fixtureAdhoc });
+  let trustedPayload = null;
+  if (!fixtureAdhoc) {
+    const manifest = value('--release-manifest'), sig = value('--release-signature');
+    if (!manifest || !sig) throw new Error('production staging requires --release-manifest and --release-signature');
+    trustedPayload = trustedPayloadFromSignedManifest({ manifestBytes: readFileSync(manifest), signature: readFileSync(sig, 'utf8') });
+  }
+  const result = stagePayloadApp({ payload: value('--payload'), wrapper: value('--wrapper'), out: value('--out'), trustedPayload, expectedSha256: fixtureAdhoc ? value('--payload-sha256') : null, expectedVersion: fixtureAdhoc ? value('--payload-version') : null, identity: value('--identity'), fixtureAdhoc });
   console.log(`staged ${result.out}: Kingmaker ${result.version}, ${result.files} verified payload files${result.fixture ? ' (FIXTURE, ad-hoc signed)' : ''}`);
 }

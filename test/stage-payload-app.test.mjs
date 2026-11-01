@@ -6,7 +6,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 import { buildPayload } from '../scripts/build-payload.mjs';
-import { stagePayloadApp } from '../scripts/stage-payload-app.mjs';
+import { stagePayloadApp, trustedPayloadFromSignedManifest } from '../scripts/stage-payload-app.mjs';
+import { generateReleaseKeypair, signManifestBytes } from '../lib/release-signing.mjs';
 
 const hash = (file) => createHash('sha256').update(readFileSync(file)).digest('hex');
 const fixtureWrapper = (dir) => { const wrapper = join(dir, 'wrapper'); writeFileSync(wrapper, '#!/bin/sh\nexit 0\n'); chmodSync(wrapper, 0o755); return wrapper; };
@@ -65,6 +66,23 @@ test('external payload digest is required and enforced', () => {
     const built = buildPayload({ out: join(dir, 'built') }); process.env.KINGMAKER_FIXTURE_BUILD = '1';
     assert.throws(() => stagePayloadApp({ payload: built.tar, wrapper: fixtureWrapper(dir), out: join(dir, 'Kingmaker.app'), expectedSha256: '0'.repeat(64), expectedVersion: built.version, fixtureAdhoc: true }), /sha256 mismatch/);
   } finally { delete process.env.KINGMAKER_FIXTURE_BUILD; rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('production payload pin is derived from a signature-verified release manifest', () => {
+  const { publicKeyPem, privateKeyPem } = generateReleaseKeypair();
+  const manifestBytes = Buffer.from(JSON.stringify({ schema: 'kingmaker.release/1', version: '4.4.2-recovered.0', units: { macos: { sha256: 'a'.repeat(64), payloadVersion: '4.4.2-recovered.0' } } }));
+  const signature = signManifestBytes(manifestBytes, privateKeyPem);
+  assert.deepEqual(trustedPayloadFromSignedManifest({ manifestBytes, signature, publicKeyPem }), { sha256: 'a'.repeat(64), version: '4.4.2-recovered.0', verified: true });
+  assert.throws(() => trustedPayloadFromSignedManifest({ manifestBytes: Buffer.from(`${manifestBytes} `), signature, publicKeyPem }), /signature is invalid/);
+});
+
+test('production staging rejects unverified direct digest and version pins', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'km-stage-trust-'));
+  try {
+    const payload = join(dir, 'payload.tar'), wrapper = join(dir, 'wrapper');
+    writeFileSync(payload, 'bytes'); writeFileSync(wrapper, 'wrapper');
+    assert.throws(() => stagePayloadApp({ payload, wrapper, out: join(dir, 'Kingmaker.app'), identity: 'fixture identity', expectedSha256: hash(payload), expectedVersion: 'fixture' }), /signature-verified release manifest/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
 test('production staging fails closed without release identity', () => {
