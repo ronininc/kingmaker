@@ -16,7 +16,10 @@
   ],
   "registration": {
     "target": "ronininc/kingmaker-brain-library",
-    "state": "staged-not-registered",
-    "reason": "The actual kingmaker.brain-library/1 schema accepts model/device/benchmark data only; it has no inert architecture-reference entry type. No parallel live registry was created."
+    "state": "registered-local-schema",
+    "librarySchema": "kingmaker.brain-library/1",
+    "libraryField": "references",
+    "contentSha256": "4c723f2274fef6d0b285ddd4ff248211cb37fb674d8e9f73c2acaa40e5c00c5b",
+    "reason": "Registered in the existing library as a backward-compatible reference-only entry. It is not a model, skill, tool, prompt, or executable input; no parallel registry was created."
   }
 }

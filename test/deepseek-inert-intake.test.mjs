@@ -4,7 +4,9 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
 
+import { buildLibrary, INERT_REFERENCES, referenceSelectableAs } from '../lib/brain-library.mjs';
 import { ingest } from '../lib/ingestion-guard.mjs';
+import { payloadFiles } from '../lib/payload.mjs';
 
 const root = path.resolve('quarantine/deepseek-dsh-superagent-prototype');
 
@@ -30,7 +32,7 @@ test('DeepSeek prototype intake remains provenance-bound, inert, and untrusted',
   assert.equal(registration.mode, 'architecture-reference-only');
   assert.equal(registration.executable, false);
   assert.deepEqual(registration.capabilities, []);
-  assert.equal(registration.registration.state, 'staged-not-registered');
+  assert.equal(registration.registration.state, 'registered-local-schema');
   for (const capability of [
     'shell', 'filesystem-write', 'network', 'credentials', 'package-install',
     'subagents', 'external-messaging', 'auto-merge', 'permission-change',
@@ -56,4 +58,34 @@ test('DeepSeek prototype intake remains provenance-bound, inert, and untrusted',
   }
   assert.doesNotMatch(reference, /(?:npm|pnpm|yarn)\s+(?:install|run)|danger-full-access|cordis\.patch|src\/app\/sessions/iu);
   assert.match(reference, /This reference grants no capability\./u);
+});
+
+test('brain library reads the reference back exactly and never selects or packages it as code', () => {
+  const legacy = buildLibrary({ references: [], now: '2026-11-01T00:00:00.000Z' });
+  const library = buildLibrary({ now: '2026-11-01T00:00:00.000Z' });
+  const reference = library.references.find((item) => item.id === 'deepseek-dsh-superagent-prototype-6337fc8');
+
+  assert.ok(reference);
+  assert.equal(reference.type, 'knowledge-reference');
+  assert.equal(reference.trust, 'untrusted-reference');
+  assert.equal(reference.executionDisabled, true);
+  assert.deepEqual(reference.selectableAs, []);
+  assert.deepEqual(reference.capabilities, []);
+  assert.equal(sha256(reference.content), reference.contentSha256);
+  assert.equal(reference.contentSha256, INERT_REFERENCES[0].contentSha256);
+  for (const lane of ['model', 'skill', 'tool', 'prompt', 'worker', 'executable']) {
+    assert.equal(referenceSelectableAs(reference, lane), false);
+  }
+  assert.ok(!library.models.some((model) => model.tag === reference.id));
+  assert.ok(!library.bigOptions.some((model) => model.tag === reference.id));
+
+  // Adding the optional field is backward-compatible: every pre-existing lane is byte-equivalent.
+  for (const field of ['schema', 'repo', 'updatedAt', 'source', 'devices', 'classes', 'models', 'bigOptions', 'bench']) {
+    assert.deepEqual(library[field], legacy[field], field);
+  }
+
+  // The release manifest is allowlisted and cannot include quarantine, the source archive, or audit-only files.
+  const packaged = payloadFiles(path.resolve('.'));
+  assert.ok(!packaged.some((name) => name.startsWith('quarantine/')));
+  assert.ok(!packaged.some((name) => name.includes('dsh-superagent-prototype')));
 });
