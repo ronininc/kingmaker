@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 import { createIdentity, signPayload, signRevocation } from '../scripture-armor/armor.mjs';
-import { createArmorRevocationChecker, createDockChallengeStore, createKingmakerArmorProofVerifier } from '../lib/install-docking-runtime.mjs';
+import { createArmorRevocationChecker, createDockChallengeStore, createKingmakerArmorProofVerifier, createKingmakerInstallProof } from '../lib/install-docking-runtime.mjs';
 import { createLauncherDockGate } from '../lib/install-docking.mjs';
 
 const deviceSha256 = 'a'.repeat(64);
@@ -34,6 +34,35 @@ test('concrete Armor verifier binds signature, embedded fingerprint, challenge a
   assert.equal((await verify({ challenge, issuedAt, proof: altered })).ok, false);
   const other = fixture(); t.after(() => rmSync(other.root, { recursive: true, force: true }));
   assert.equal((await verify({ challenge, issuedAt, proof: proof(other.identity, challenge, issuedAt) })).ok, false);
+});
+
+test('proof producer uses the installed Armor identity and fails closed on trust or revocation', async (t) => {
+  const root = mkdtempSync(join(tmpdir(), 'kingmaker-proof-')); chmodSync(root, 0o700);
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const identity = createIdentity(join(root, 'armor', 'identity'), 'Kingmaker fixture');
+  const issuedAt = Date.parse('2026-11-01T00:00:00Z'); const challenge = 'challenge_producer01';
+  const produced = await createKingmakerInstallProof({
+    state: root, challenge, issuedAt, installIdentity: expectedInstallIdentity,
+    checkRevocation: async ({ senderSignFp }) => { assert.equal(senderSignFp, identity.signFp); return false; },
+    now: () => issuedAt,
+  });
+  const verify = createKingmakerArmorProofVerifier({
+    expectedArmorIdentity: produced.armorIdentity,
+    expectedInstallIdentity,
+  });
+  assert.equal((await verify({ challenge, issuedAt, proof: produced.proof })).ok, true);
+  assert.deepEqual(produced.armorIdentity.keyTypes, ['X25519', 'Ed25519', 'ML-KEM-768', 'ML-DSA-65']);
+  await assert.rejects(() => createKingmakerInstallProof({
+    state: root, challenge, issuedAt, installIdentity: expectedInstallIdentity, now: () => issuedAt,
+  }), /TRUSTED_REVOCATION_PROVIDER_REQUIRED/);
+  await assert.rejects(() => createKingmakerInstallProof({
+    state: root, challenge, issuedAt, installIdentity: expectedInstallIdentity,
+    checkRevocation: async () => true, now: () => issuedAt,
+  }), /KINGMAKER_ARMOR_IDENTITY_REVOKED/);
+  await assert.rejects(() => createKingmakerInstallProof({
+    state: join(root, 'missing'), challenge, issuedAt, installIdentity: expectedInstallIdentity,
+    checkRevocation: async () => false, now: () => issuedAt,
+  }), /KINGMAKER_ARMOR_IDENTITY_REQUIRED/);
 });
 
 test('durable challenge consumption survives restart and permits only one winner', async (t) => {
