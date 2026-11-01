@@ -14,6 +14,22 @@
       "where": "core/skills/<name>/SKILL.md",
       "items": [
         {
+          "name": "dsh-superagent-feishu",
+          "license": "MIT",
+          "from": "https://github.com/deepseek-ai/dsh-superagent-prototype @ 6337fc823ce20251c8de8085948165c81aaa701e",
+          "status": "imported, disabled by KINGMAKER-SKILL-POLICY.json",
+          "stockMac": false,
+          "needs": "reviewed host-enforced orchestrator_read and scoped Feishu/lark adapters; no prompt may supply this authority"
+        },
+        {
+          "name": "dsh-superagent-github",
+          "license": "MIT",
+          "from": "https://github.com/deepseek-ai/dsh-superagent-prototype @ 6337fc823ce20251c8de8085948165c81aaa701e",
+          "status": "imported, disabled by KINGMAKER-SKILL-POLICY.json",
+          "stockMac": false,
+          "needs": "reviewed host-enforced orchestrator and scoped GitHub read/reply adapters with owner approval for writes"
+        },
+        {
           "name": "website-build-standard",
           "license": "Ronin Inc (source-available with Kingmaker)",
           "status": "in core/skills",
