@@ -41,6 +41,15 @@ test('idempotency covers adapter identity and cancellation remains terminal', ()
   assert.equal(pool.cancel(job.id).state, 'cancelled'); assert.equal(pool.claim('worker'), null); pool.close();
 });
 
+test('governed intake may preserve a safe external job id but cannot reuse it', () => {
+  const pool = createDurableJobPool({ path: join(temp(), 'jobs.sqlite') });
+  const job = pool.submit({ jobId: 'external-job:0001', text: 'scoped manifest', idempotencyKey: 'fixture:external:0001' });
+  assert.equal(job.id, 'external-job:0001');
+  assert.throws(() => pool.submit({ jobId: 'external-job:0001', text: 'different manifest', idempotencyKey: 'fixture:external:0002' }), /JOB_ID_CONFLICT/);
+  assert.throws(() => pool.submit({ jobId: '../unsafe', text: 'x', idempotencyKey: 'fixture:external:0003' }), /BAD_JOB_ID/);
+  pool.close();
+});
+
 test('dispatcher executes a controlled job through the real local adapter and records evidence', async () => {
   const dir = temp(); const output = join(dir, 'backend-result.txt');
   const pool = createDurableJobPool({ path: join(dir, 'jobs.sqlite'), id: () => 'durable_backend' });
@@ -54,7 +63,7 @@ test('dispatcher executes a controlled job through the real local adapter and re
   const done = await dispatcher.runOne();
   assert.equal(done.id, job.id); assert.equal(done.state, 'done');
   assert.equal(readFileSync(output, 'utf8'), 'local backend proof');
-  assert.deepEqual(pool.events(job.id).map((x) => x.event), ['submitted', 'claimed', 'acknowledged', 'completed']);
+  assert.deepEqual(pool.events(job.id).map((x) => x.event), ['submitted', 'claimed', 'acknowledged', 'started', 'evidence_recorded', 'completed']);
   pool.close();
 });
 
