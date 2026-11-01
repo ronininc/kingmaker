@@ -59,11 +59,14 @@ function allFiles(root) {
   walk(root); return found.sort();
 }
 
-export function stagePayloadApp({ payload, wrapper, engine, out, releaseManifestBytes = null, releaseSignature = null, expectedSha256, expectedVersion, identity = null, fixtureAdhoc = false, resources = join(ROOT, 'app', 'Resources'), infoPlist = join(ROOT, 'app', 'Info.plist') }) {
-  payload = resolve(payload); wrapper = resolve(wrapper); engine = resolve(engine); out = resolve(out);
+export function stagePayloadApp({ payload, wrapper, engine, engineResources, out, releaseManifestBytes = null, releaseSignature = null, expectedSha256, expectedVersion, identity = null, fixtureAdhoc = false, resources = join(ROOT, 'app', 'Resources'), infoPlist = join(ROOT, 'app', 'Info.plist') }) {
+  payload = resolve(payload); wrapper = resolve(wrapper); engine = resolve(engine); engineResources = resolve(engineResources); out = resolve(out);
   if (!existsSync(payload)) throw new Error(`no payload at ${payload}`);
   if (!existsSync(wrapper)) throw new Error(`no native wrapper at ${wrapper}`);
   if (!existsSync(engine)) throw new Error(`no engine runtime at ${engine}`);
+  for (const required of ['app.asar/desktop/headless-server.mjs', 'kingmaker-runtime/server/index.mjs']) {
+    if (!existsSync(join(engineResources, required))) throw new Error(`engine resource tree is incomplete: missing ${required}`);
+  }
   if (basename(out) !== 'Kingmaker.app') throw new Error('output must be named Kingmaker.app');
   if (fixtureAdhoc && process.env.KINGMAKER_FIXTURE_BUILD !== '1') throw new Error('ad-hoc signing is fixture-only (set KINGMAKER_FIXTURE_BUILD=1 in an isolated test)');
   if (!fixtureAdhoc && !identity) throw new Error('production staging requires an explicit Kingmaker Release signing identity');
@@ -105,6 +108,7 @@ export function stagePayloadApp({ payload, wrapper, engine, out, releaseManifest
     cpSync(engine, join(out, 'Contents', 'MacOS', 'KingmakerEngine'));
     execFileSync('chmod', ['755', join(out, 'Contents', 'MacOS', 'KingmakerEngine')]);
     if (existsSync(resources)) cpSync(resources, join(out, 'Contents', 'Resources'), { recursive: true });
+    cpSync(engineResources, join(out, 'Contents', 'Resources'), { recursive: true });
     cpSync(runtime, join(out, 'Contents', 'Resources', 'sol-ghost'), { recursive: true, preserveTimestamps: true });
     const plist = readFileSync(infoPlist, 'utf8').replaceAll('@VERSION@', proof.version).replaceAll('@SOLOMON_BUILD@', 'recovered payload adapter');
     writeFileSync(join(out, 'Contents', 'Info.plist'), plist);
@@ -134,6 +138,6 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     if (!manifest || !sig) throw new Error('production staging requires --release-manifest and --release-signature');
     releaseManifestBytes = readFileSync(manifest); releaseSignature = readFileSync(sig, 'utf8');
   }
-  const result = stagePayloadApp({ payload: value('--payload'), wrapper: value('--wrapper'), engine: value('--engine'), out: value('--out'), releaseManifestBytes, releaseSignature, expectedSha256: fixtureAdhoc ? value('--payload-sha256') : null, expectedVersion: fixtureAdhoc ? value('--payload-version') : null, identity: value('--identity'), fixtureAdhoc });
+  const result = stagePayloadApp({ payload: value('--payload'), wrapper: value('--wrapper'), engine: value('--engine'), engineResources: value('--engine-resources'), out: value('--out'), releaseManifestBytes, releaseSignature, expectedSha256: fixtureAdhoc ? value('--payload-sha256') : null, expectedVersion: fixtureAdhoc ? value('--payload-version') : null, identity: value('--identity'), fixtureAdhoc });
   console.log(`staged ${result.out}: Kingmaker ${result.version}, ${result.files} verified payload files${result.fixture ? ' (FIXTURE, ad-hoc signed)' : ''}`);
 }

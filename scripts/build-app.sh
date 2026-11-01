@@ -8,7 +8,11 @@ here="$(cd "$(dirname "$0")/.." && pwd -P)"
 app="$here/dist/Kingmaker.app"
 version="$(sed -n 's/.*"version": "\([^"]*\)".*/\1/p' "$here/package.json" | head -1)"
 : "${KINGMAKER_ENGINE_BINARY:?set KINGMAKER_ENGINE_BINARY to the reviewed engine runtime executable}"
+: "${KINGMAKER_ENGINE_RESOURCES:?set KINGMAKER_ENGINE_RESOURCES to the reviewed packaged engine resource tree}"
 [ -x "$KINGMAKER_ENGINE_BINARY" ] || { echo "KINGMAKER_ENGINE_BINARY is not executable: $KINGMAKER_ENGINE_BINARY" >&2; exit 2; }
+for required in app.asar/desktop/headless-server.mjs kingmaker-runtime/server/index.mjs; do
+  [ -f "$KINGMAKER_ENGINE_RESOURCES/$required" ] || { echo "engine resource tree is incomplete: missing $required" >&2; exit 2; }
+done
 rm -rf "$app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources/sol-ghost"
 swiftc -O -o "$app/Contents/MacOS/Kingmaker" "$here/app/Kingmaker.swift" -framework AppKit -framework ApplicationServices -framework QuartzCore -framework ServiceManagement
@@ -19,6 +23,7 @@ chmod 755 "$app/Contents/MacOS/KingmakerEngine"
 # Kingmaker's own uv: extensions that run on Python (Blender's MCP) need it, and a stock Mac has none.
 [ -x "$here/app/Resources/bin/uv" ] || "$here/scripts/fetch-uv.sh"
 cp -R "$here/app/Resources/." "$app/Contents/Resources/"
+cp -R "$KINGMAKER_ENGINE_RESOURCES/." "$app/Contents/Resources/"
 # Kingmaker itself goes in as ONE file, never folder by folder (lib/payload.mjs): the payload holds the code, the CLI
 # Hub, the catalogs, the built-in skills and the licences with the list of every file, checked before it is handed on.
 # Never addons/: paid add-ons arrive signed, through Ronin Launcher.
