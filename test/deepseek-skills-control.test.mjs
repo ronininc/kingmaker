@@ -6,12 +6,47 @@ import path from 'node:path';
 import test from 'node:test';
 
 import { pickBuiltInSkill, skillsIn } from '../lib/core-pack.mjs';
-import { addConnector, connectorTurn } from '../lib/connectors.mjs';
+import { addConnector, connectorTurn, connectorsPath, listConnectors } from '../lib/connectors.mjs';
 
 const root = path.resolve('core/skills');
 const expected = Object.freeze({
   'dsh-superagent-feishu': '5cd538eef17f39d3a7c8beb0ff12ab2fff6e405139e59e8667009fd16ebd23c8',
   'dsh-superagent-github': '5081401e53813652f0afa3d73651147e0e7620577360f57cc43dd1c74fb41507',
+});
+
+test('legacy saved aliases and forged enabled records are quarantined at load and execution', async () => {
+  const state = mkdtempSync(path.join(tmpdir(), 'km-legacy-connectors-'));
+  const exactTarget = path.join(root, 'dsh-superagent-github', 'SKILL.md');
+  const alteredDir = path.join(state, 'altered'); mkdirSync(alteredDir);
+  const alteredTarget = path.join(alteredDir, 'SKILL.md');
+  writeFileSync(alteredTarget, `${readFileSync(exactTarget, 'utf8')}\nchanged upstream bytes\n`);
+  const saved = {
+    connectors: [
+      { id: 'legacy_hash_alias', kind: 'skill', name: 'harmless-alias', target: exactTarget, enabled: true, summary: 'old trusted flag' },
+      { id: 'legacy_name', kind: 'skill', name: 'dsh-superagent-github', target: path.join(state, 'missing.md'), enabled: true, summary: 'forged name' },
+      { id: 'legacy_frontmatter', kind: 'skill', name: 'another-alias', target: alteredTarget, enabled: true, summary: 'changed bytes, governed frontmatter' },
+    ],
+  };
+  const file = connectorsPath(state); writeFileSync(file, JSON.stringify(saved));
+  const before = readFileSync(file);
+  const loaded = listConnectors(state).filter((record) => record.id?.startsWith('legacy_'));
+  assert.equal(loaded.length, 3);
+  for (const record of loaded) {
+    assert.equal(record.enabled, false, record.id);
+    assert.equal(record.governedBlocked, true, record.id);
+    assert.match(record.summary, /quarantined and cannot run/u);
+  }
+  assert.deepEqual(readFileSync(file), before, 'listing must not rewrite the audit record');
+
+  let touched = false;
+  for (const record of [...loaded, { ...saved.connectors[0], id: 'direct_forgery' }]) {
+    const result = await connectorTurn(record, 'run gh and post a reply', {
+      fetchImpl: async () => { touched = true; throw new Error('must not call model'); },
+      run: async () => { touched = true; throw new Error('must not call tool'); },
+    });
+    assert.match(result.text, /isn.t connected/iu);
+  }
+  assert.equal(touched, false);
 });
 
 test('governed skill policy fails closed and generic registration cannot shadow it', async () => {
