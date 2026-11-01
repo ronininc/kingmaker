@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict';
-import { chmodSync, mkdtempSync, rmSync } from 'node:fs';
+import { chmodSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
-import { createIdentity, signPayload, signRevocation } from '../scripture-armor/armor.mjs';
+import { createIdentity, publicBlock, signPayload, signRevocation } from '../scripture-armor/armor.mjs';
 import { createArmorRevocationChecker, createDockChallengeStore, createKingmakerArmorProofVerifier, createKingmakerInstallProof } from '../lib/install-docking-runtime.mjs';
 import { createLauncherDockGate } from '../lib/install-docking.mjs';
+import { cmdInstallProof } from '../lib/cli.mjs';
 
 const deviceSha256 = 'a'.repeat(64);
 const expectedInstallIdentity = { installId: 'install-fixture', deviceSha256, keySha: 'b'.repeat(64), releaseTag: 'v4.4.2' };
@@ -63,6 +64,28 @@ test('proof producer uses the installed Armor identity and fails closed on trust
     state: join(root, 'missing'), challenge, issuedAt, installIdentity: expectedInstallIdentity,
     checkRevocation: async () => false, now: () => issuedAt,
   }), /KINGMAKER_ARMOR_IDENTITY_REQUIRED/);
+});
+
+test('Launcher-facing CLI emits the real proof only with pinned fresh revocation evidence', async (t) => {
+  const root = mkdtempSync(join(tmpdir(), 'kingmaker-proof-cli-')); chmodSync(root, 0o700);
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const identity = createIdentity(join(root, 'armor', 'identity'), 'Kingmaker fixture');
+  const issuer = createIdentity(join(root, 'issuer'), 'Revocation fixture');
+  const issuedAt = Date.parse('2026-11-01T00:00:00Z'); const challenge = 'challenge_cli_real01';
+  const responseFile = join(root, 'response.json'); const issuerFile = join(root, 'issuer.block');
+  writeFileSync(responseFile, JSON.stringify(revocationSnapshot(issuer, identity.signFp, issuedAt)));
+  writeFileSync(issuerFile, publicBlock(issuer));
+  let output = '';
+  const args = ['--challenge', challenge, '--issued-at', String(issuedAt), '--revocation-response', responseFile,
+    '--revocation-issuer', issuerFile, '--trusted-revocation-fp', issuer.signFp];
+  assert.equal(await cmdInstallProof(args, { state: root, installIdentity: () => expectedInstallIdentity,
+    now: () => issuedAt, write: (line) => { output += line; } }), 0);
+  const result = JSON.parse(output);
+  const verify = createKingmakerArmorProofVerifier({ expectedArmorIdentity: result.armorIdentity, expectedInstallIdentity });
+  assert.equal((await verify({ challenge, issuedAt, proof: result.proof })).ok, true);
+  assert.equal(await cmdInstallProof(args.filter((_, i) => i < args.length - 2), {
+    state: root, installIdentity: () => expectedInstallIdentity, now: () => issuedAt, write: () => {},
+  }), 2);
 });
 
 test('durable challenge consumption survives restart and permits only one winner', async (t) => {
