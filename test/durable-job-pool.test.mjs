@@ -34,6 +34,25 @@ test('lease tokens fence a stale worker after expiry and restart', () => {
   pool.close();
 });
 
+test('a running worker renews its fenced lease', () => {
+  const dir = temp(), db = join(dir, 'queue', 'jobs.sqlite'); let clock = 1_000;
+  const pool = createDurableJobPool({ path: db, now: () => clock, leaseMs: 20, token: () => 'renew-token' });
+  const submitted = pool.submit({ text: 'renew me', idempotencyKey: 'fixture:renew:0001' });
+  const claimed = pool.claim('renew-worker'); pool.acknowledge(claimed.id, 'renew-worker', claimed.leaseToken);
+  clock += 10; const renewed = pool.renewLease(claimed.id, 'renew-worker', claimed.leaseToken);
+  assert.equal(renewed.leaseUntil, clock + 20); clock += 15; assert.equal(pool.complete(submitted.id, 'renew-worker', claimed.leaseToken, { kind: 'renewed' }).state, 'done');
+  pool.close();
+});
+
+test('dispatcher heartbeats a long asynchronous analysis', async () => {
+  const dir = temp(), pool = createDurableJobPool({ path: join(dir, 'queue', 'jobs.sqlite'), leaseMs: 30 });
+  const job = pool.submit({ text: 'bounded long task', idempotencyKey: 'fixture:heartbeat:0001', adapter: 'slow-fixture' });
+  const dispatcher = createJobDispatcher({ pool, workerId: 'heartbeat-worker', heartbeatMs: 10,
+    adapters: { 'slow-fixture': async () => { await new Promise((resolve) => setTimeout(resolve, 75)); return { kind: 'slow-fixture' }; } } });
+  const done = await dispatcher.runOne(); assert.equal(done.state, 'done');
+  assert.ok(pool.events(job.id).filter((x) => x.event === 'lease_renewed').length >= 2); pool.close();
+});
+
 test('idempotency covers adapter identity and cancellation remains terminal', () => {
   const pool = createDurableJobPool({ path: join(temp(), 'jobs.sqlite'), id: () => 'durable_cancel' });
   const job = pool.submit({ text: 'same text', idempotencyKey: 'fixture:durable:0003', adapter: 'kingmaker-local' });
