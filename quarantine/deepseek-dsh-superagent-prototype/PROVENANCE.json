@@ -10,6 +10,14 @@
     "path": "dsh-superagent-prototype-6337fc8.tar",
     "sha256": "d299c4f495e22b60c4e2e064151232dd6ccdab24d6dbc3912a0afc91aff85901"
   },
+  "sanitizedEntry": {
+    "path": "SANITIZED-INERT-REFERENCE.md",
+    "sha256": "0c673e2e4dfadd6f68dae2d2a1df11aa888d426261ab5c756427d181a1e2e408"
+  },
+  "publishedReference": {
+    "id": "deepseek-dsh-superagent-prototype-6337fc8",
+    "sha256": "4c723f2274fef6d0b285ddd4ff248211cb37fb674d8e9f73c2acaa40e5c00c5b"
+  },
   "custody": "quarantine-only; source and archive are never executable inputs",
   "executed": false
 }

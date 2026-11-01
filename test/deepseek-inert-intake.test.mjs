@@ -26,6 +26,8 @@ test('DeepSeek prototype intake remains provenance-bound, inert, and untrusted',
   assert.equal(provenance.license, 'MIT');
   assert.equal(provenance.executed, false);
   assert.equal(sha256(archive), provenance.archive.sha256);
+  assert.equal(sha256(reference), provenance.sanitizedEntry.sha256);
+  assert.equal(registration.registration.entryFileSha256, provenance.sanitizedEntry.sha256);
 
   assert.equal(registration.schema, 'kingmaker.inert-reference-candidate/1');
   assert.equal(registration.trust, 'untrusted');
@@ -60,7 +62,9 @@ test('DeepSeek prototype intake remains provenance-bound, inert, and untrusted',
   assert.match(reference, /This reference grants no capability\./u);
 });
 
-test('brain library reads the reference back exactly and never selects or packages it as code', () => {
+test('brain library reads the reference back exactly and never selects or packages it as code', async () => {
+  const provenance = await loadJson('PROVENANCE.json');
+  const registration = await loadJson('REGISTRATION.json');
   const legacy = buildLibrary({ references: [], now: '2026-11-01T00:00:00.000Z' });
   const library = buildLibrary({ now: '2026-11-01T00:00:00.000Z' });
   const reference = library.references.find((item) => item.id === 'deepseek-dsh-superagent-prototype-6337fc8');
@@ -73,6 +77,9 @@ test('brain library reads the reference back exactly and never selects or packag
   assert.deepEqual(reference.capabilities, []);
   assert.equal(sha256(reference.content), reference.contentSha256);
   assert.equal(reference.contentSha256, INERT_REFERENCES[0].contentSha256);
+  assert.equal(reference.contentSha256, registration.registration.publishedContentSha256);
+  assert.equal(reference.contentSha256, provenance.publishedReference.sha256);
+  assert.equal(reference.id, provenance.publishedReference.id);
   for (const lane of ['model', 'skill', 'tool', 'prompt', 'worker', 'executable']) {
     assert.equal(referenceSelectableAs(reference, lane), false);
   }
