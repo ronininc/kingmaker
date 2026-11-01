@@ -1,0 +1,15 @@
+{
+  "schema": "kingmaker.quarantined-source/1",
+  "source": "https://github.com/deepseek-ai/dsh-superagent-prototype",
+  "commit": "6337fc823ce20251c8de8085948165c81aaa701e",
+  "tree": "3efbb036e5a56183c6bf642e2e1856a1f64e7be3",
+  "commitDate": "2026-10-31T20:05:39+08:00",
+  "fileCount": 216,
+  "license": "MIT",
+  "archive": {
+    "path": "dsh-superagent-prototype-6337fc8.tar",
+    "sha256": "d299c4f495e22b60c4e2e064151232dd6ccdab24d6dbc3912a0afc91aff85901"
+  },
+  "custody": "quarantine-only; source and archive are never executable inputs",
+  "executed": false
+}

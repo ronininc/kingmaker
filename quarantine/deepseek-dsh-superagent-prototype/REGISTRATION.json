@@ -1,0 +1,22 @@
+{
+  "schema": "kingmaker.inert-reference-candidate/1",
+  "id": "deepseek-dsh-superagent-prototype-6337fc8",
+  "trust": "untrusted",
+  "mode": "architecture-reference-only",
+  "entry": "SANITIZED-INERT-REFERENCE.md",
+  "riskReport": "RISK-REPORT.md",
+  "licenseNotice": "MIT-NOTICE.txt",
+  "sourceProvenance": "PROVENANCE.json",
+  "executable": false,
+  "capabilities": [],
+  "blockedCapabilities": [
+    "shell", "powershell", "filesystem-write", "filesystem-edit", "process-control",
+    "network", "web", "credentials", "account-setup", "package-install", "subagents",
+    "external-messaging", "github-write", "feishu-write", "auto-merge", "permission-change"
+  ],
+  "registration": {
+    "target": "ronininc/kingmaker-brain-library",
+    "state": "staged-not-registered",
+    "reason": "The actual kingmaker.brain-library/1 schema accepts model/device/benchmark data only; it has no inert architecture-reference entry type. No parallel live registry was created."
+  }
+}
