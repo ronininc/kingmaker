@@ -39,7 +39,7 @@ test('Launcher verifies Kingmaker then reports the same fresh installation to CR
   const expectedArmorIdentity = { senderSignFp: 'kingmaker-fp', keyTypes };
   const install = { ok: true, issuer: 'kingmaker', ...expectedArmorIdentity, ...expectedInstallIdentity };
   const used = new Set();
-  const gate = createLauncherDockGate({ expectedInstallIdentity, expectedArmorIdentity, now: () => t, verifyKingmaker: async ({ proof }) => proof === 'kingmaker-ok' ? install : { ok: false }, reportToCrm: async ({ install: got }) => ({ ok: true, issuer: 'ronin-crm', installId: got.installId, deviceSha256: got.deviceSha256, keyTypes: got.keyTypes }), checkRevocation: async () => false, consumeChallenge: async ({ challenge }) => !used.has(challenge) && !!used.add(challenge) });
+  const gate = createLauncherDockGate({ expectedInstallIdentity, expectedArmorIdentity, now: () => t, verifyKingmaker: async ({ proof }) => proof === 'kingmaker-ok' ? install : { ok: false }, reportToCrm: async ({ install: got }) => ({ ok: true, eventId: 'event', state: 'valid', certifiedInstallationId: got.installId, deviceSha256: got.deviceSha256 }), checkRevocation: async () => false, consumeChallenge: async ({ challenge }) => !used.has(challenge) && !!used.add(challenge) });
   const request = { challenge: 'challenge_1234567890', issuedAt: t, kingmakerProof: 'kingmaker-ok' };
   assert.equal((await gate({ ...request, kingmakerProof: 'wrong' })).reason, 'kingmaker_mismatch');
   assert.equal((await gate(request)).ok, true);
@@ -52,7 +52,7 @@ test('Launcher refuses a CRM receipt for another installation', async () => {
   const keyTypes = ['X25519', 'Ed25519', 'ML-KEM-768', 'ML-DSA-65'];
   const expectedInstallIdentity = { installId: 'install-A', deviceSha256: device, keySha: 'b'.repeat(64), releaseTag: 'v4.4.2' };
   const expectedArmorIdentity = { senderSignFp: 'fp', keyTypes };
-  const gate = createLauncherDockGate({ expectedInstallIdentity, expectedArmorIdentity, now: () => 5, verifyKingmaker: async () => ({ ok: true, issuer: 'kingmaker', ...expectedArmorIdentity, ...expectedInstallIdentity }), reportToCrm: async () => ({ ok: true, issuer: 'ronin-crm', keyTypes, installId: 'install-B', deviceSha256: device }), checkRevocation: async () => false, consumeChallenge: async () => true });
+  const gate = createLauncherDockGate({ expectedInstallIdentity, expectedArmorIdentity, now: () => 5, verifyKingmaker: async () => ({ ok: true, issuer: 'kingmaker', ...expectedArmorIdentity, ...expectedInstallIdentity }), reportToCrm: async () => ({ ok: true, eventId: 'event', state: 'valid', certifiedInstallationId: 'install-B', deviceSha256: device }), checkRevocation: async () => false, consumeChallenge: async () => true });
   assert.equal((await gate({ challenge: 'challenge_abcdefghijkl', issuedAt: 5 })).reason, 'crm_report_rejected');
 });
 

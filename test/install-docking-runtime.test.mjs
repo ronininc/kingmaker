@@ -57,7 +57,7 @@ test('Launcher gate runs concrete Armor verification and durable replay refusal'
     checkRevocation: createArmorRevocationChecker({ trustedIssuerSignFp: issuer.signFp, now: () => issuedAt,
       fetchSnapshot: async (fp) => revocationSnapshot(issuer, fp, issuedAt), resolveSignPub: () => null }),
     consumeChallenge: store.consumeChallenge,
-    reportToCrm: async ({ install }) => ({ ok: true, issuer: 'ronin-crm', installId: install.installId, deviceSha256: install.deviceSha256, keyTypes: install.keyTypes }),
+    reportToCrm: async ({ install }) => ({ ok: true, eventId: 'event', state: 'valid', certifiedInstallationId: install.installId, deviceSha256: install.deviceSha256 }),
     now: () => issuedAt,
   });
   const request = { challenge, issuedAt, kingmakerProof: proof(f.identity, challenge, issuedAt) };
