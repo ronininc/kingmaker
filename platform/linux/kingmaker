@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+root="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)"
+command -v node >/dev/null 2>&1 || { echo "Kingmaker requires Node.js 22 or newer." >&2; exit 2; }
+exec node "$root/sol-ghost/lib/kingmaker.mjs" "$@"
