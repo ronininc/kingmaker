@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
-import { createLauncherCrmIdentityClient, createProductionLauncherIdentityReporter, launcherIdentityCanonicalJson, verifyLauncherReportInputs, verifyLauncherReportInputsForFixture } from '../lib/launcher-crm-identity-client.mjs';
+import { createInstallCertificateStatusProviderForFixture, createLauncherCrmIdentityClient, createProductionLauncherIdentityReporter, launcherIdentityCanonicalJson, verifyLauncherReportInputs, verifyLauncherReportInputsForFixture } from '../lib/launcher-crm-identity-client.mjs';
 import { pubkeyFingerprint, signManifestBytes } from '../lib/release-signing.mjs';
 import { createIdentity, signPayload } from '../scripture-armor/armor.mjs';
 
@@ -13,7 +13,8 @@ const certKeys = generateKeyPairSync('ec', { namedCurve: 'P-256' });
 const releaseKeys = generateKeyPairSync('rsa', { modulusLength: 2048 });
 process.env.NODE_ENV = 'test'; process.env.KINGMAKER_DOUBLE_FIXTURE_GATE = '1';
 const releasePublicPem = releaseKeys.publicKey.export({ format: 'pem', type: 'spki' });
-const install = { installId: '11111111-1111-4111-8111-111111111111', deviceSha256: 'a'.repeat(64), keySha: pubkeyFingerprint(releasePublicPem).replace(/\s+/g, '').toLowerCase(), releaseTag: 'v4.4.2' };
+const updateBearer = 'fixture-update-bearer';
+const install = { installId: '11111111-1111-4111-8111-111111111111', deviceSha256: 'a'.repeat(64), keySha: createHash('sha256').update(updateBearer).digest('hex'), releaseTag: 'v4.4.2' };
 const appBytes = Buffer.from('exact-app-archive-bytes');
 const appSha256 = createHash('sha256').update(appBytes).digest('hex');
 const claims = { schema: 'ronin.install-cert/1', issuer: 'ronin-update-host', bundleId: 'com.ronininc.solghost', issuedAt: '2026-11-02T00:00:00Z', ...install };
@@ -44,7 +45,10 @@ test('free report derives certificate and release fields from verified bytes', a
   const f = fixture(); const p = (await f.client.report({ verified: verified() })).payload;
   assert.equal(p.identityProfile, 'free'); assert.deepEqual(p.armorKeyTypes, []);
   assert.equal(p.certifiedInstallationId, install.installId); assert.equal(p.releaseTag, install.releaseTag);
-  assert.equal(p.releaseKeySha, install.keySha); assert.equal(p.appSha256, appSha256); assert.equal(p.manifestDigest.length, 64);
+  assert.equal(p.updateKeySha, install.keySha);
+  assert.equal(p.releaseSigningKeySha, pubkeyFingerprint(releasePublicPem).replace(/\s+/g, '').toLowerCase());
+  assert.notEqual(p.updateKeySha, p.releaseSigningKeySha);
+  assert.equal(p.appSha256, appSha256); assert.equal(p.manifestDigest.length, 64);
   assert.equal('hostname' in p || 'serial' in p || 'inventory' in p, false);
 });
 
@@ -82,10 +86,33 @@ test('certificate and paid Armor revocation are derived from current providers',
   rmSync(dir, { recursive: true, force: true });
 });
 
+test('signed certificate status is nonce, tuple, freshness and issuer bound', async () => {
+  const nonce = 'n'.repeat(32); const at = 1000; let seenUrl;
+  const status = (overrides = {}) => {
+    const certDigest = createHash('sha256').update(launcherIdentityCanonicalJson(cert)).digest('base64url');
+    const payload = { schema: 'ronin.install-cert-status/1', issuer: 'ronin-update-host', nonce,
+      installId: install.installId, deviceSha256: install.deviceSha256, keySha: install.keySha,
+      releaseTag: install.releaseTag, certDigest, bundleId: 'com.ronininc.solghost', complete: true,
+      current: true, revoked: false, issuedAt: at, expiresAt: at + 120, ...overrides };
+    const bytes = Buffer.from(JSON.stringify(payload));
+    return { payload: bytes.toString(), sig: createSign('sha256').update(bytes).sign({ key: certKeys.privateKey, dsaEncoding: 'der' }).toString('base64'), alg: 'ES256' };
+  };
+  const provider = (envelope) => createInstallCertificateStatusProviderForFixture({ baseUrl: 'https://status.invalid', bearer: updateBearer,
+    now: () => at, nonceFactory: () => nonce, fetchImpl: async (url) => { seenUrl = String(url); return new Response(JSON.stringify(envelope), { status: 200 }); } }, trust.installCertPublicKeyPem);
+  assert.deepEqual(await provider(status())({ installCertificate: cert, ...install }), { current: true, revoked: false, installId: install.installId, keySha: install.keySha, releaseTag: install.releaseTag });
+  assert.match(seenUrl, /cert-status/); assert.match(seenUrl, new RegExp(`nonce=${nonce}`));
+  await assert.rejects(() => provider(status({ issuer: 'attacker' }))({ installCertificate: cert, ...install }), /UNTRUSTED/);
+  await assert.rejects(() => provider(status({ complete: false }))({ installCertificate: cert, ...install }), /UNTRUSTED/);
+  await assert.rejects(() => provider(status({ expiresAt: at }))({ installCertificate: cert, ...install }), /UNTRUSTED/);
+  await assert.rejects(() => provider(status({ revoked: true }))({ installCertificate: cert, ...install }).then((v) => { if (v.revoked) throw new Error('REVOKED'); }), /REVOKED/);
+  const replay = provider(status()); await replay({ installCertificate: cert, ...install });
+  await assert.rejects(() => replay({ installCertificate: cert, ...install }), /NONCE_REPLAY/);
+});
+
 test('fixture trust and caller-selected Armor pins cannot enter production composition', async () => {
   assert.throws(() => createLauncherCrmIdentityClient({ baseUrl: 'https://crm.invalid', bearerToken: 'fixture-token', applicationId: 'app', memberId: 'member', providerRegistrationId: 'reg', provider: 'launcher', providerPublicJwk: reportKeys.publicKey.export({ format: 'jwk' }), expectedArmorIdentity: { senderSignFp: 'attacker', keyTypes }, checkInstallCertificateStatus: async () => ({ current: true }), signReport: async () => ({ keyId: 'k', value: 'v' }), fetchImpl: async () => { throw new Error('SHOULD_NOT_FETCH'); } }), /STATUS_AUTHORITY_UNAVAILABLE/);
   assert.throws(() => createProductionLauncherIdentityReporter({ fixtureMode: true }), /TRUST_OVERRIDE_FORBIDDEN/);
   assert.throws(() => createProductionLauncherIdentityReporter({ expectedArmorIdentity: { senderSignFp: 'attacker' } }), /TRUST_OVERRIDE_FORBIDDEN/);
-  assert.throws(() => createProductionLauncherIdentityReporter({ installCertificateStatusProvider: async () => ({ current: true, revoked: false }) }), /STATUS_CALLBACK_FORBIDDEN/);
-  await assert.rejects(() => createProductionLauncherIdentityReporter({}).report({ verified: {} }), /STATUS_AUTHORITY_UNAVAILABLE/);
+  assert.throws(() => createProductionLauncherIdentityReporter({ installCertificateStatusProvider: async () => ({ current: true, revoked: false }) }), /INSTALL_STATUS_CONFIG_INVALID/);
+  assert.throws(() => createProductionLauncherIdentityReporter({}), /INSTALL_STATUS_CONFIG_INVALID/);
 });
