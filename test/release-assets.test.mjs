@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { ARMOR_RELEASE_ASSETS, releaseAssetProblems, verifyPhysicalReleaseAssets } from '../lib/release-assets.mjs';
+import { finalizeInstallerRelease } from '../lib/installer-finalize.mjs';
 
 const h = 'a'.repeat(64);
 const manifest = {
@@ -58,4 +59,14 @@ test('mounted CLI and installer build entrypoints fail closed on unverified rele
   assert.notEqual(cli.status, 0); assert.match(`${cli.stdout}${cli.stderr}`, /governed verifier unavailable|missing/);
   const build = spawnSync('/bin/sh', ['scripts/build-installer.sh', '--manifest', mp, '--no-dmg'], { cwd: new URL('..', import.meta.url), encoding: 'utf8' });
   assert.notEqual(build.status, 0); assert.match(`${build.stdout}${build.stderr}`, /not sound|detached signature|manifest/);
+});
+
+test('fixture finalizer staples before checking final bytes and exposes missing Armor verifier', async () => {
+  const calls = [];
+  await assert.rejects(() => finalizeInstallerRelease({
+    image: '/fixture/Kingmaker-Installer-v4.4.2.dmg', identity: 'Developer ID Application: Fixture', notaryProfile: 'fixture-profile',
+    notarize: async () => { calls.push('notarytool'); calls.push('stapler'); },
+    verify: async () => { calls.push('verify'); throw new Error('Scripture Armor envelope: governed verifier unavailable; refusing publication'); },
+  }), /governed verifier unavailable/);
+  assert.deepEqual(calls, ['notarytool', 'stapler', 'verify']);
 });

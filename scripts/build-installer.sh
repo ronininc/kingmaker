@@ -127,22 +127,6 @@ rm -rf "$stage"
 [ "$identity" = "-" ] || codesign --force --sign "$identity" --timestamp "$image"
 echo "built $image ($(du -h "$image" | cut -f1))"
 
-case "$identity" in
-  "Developer ID Application:"*)
-    if [ -n "${KINGMAKER_NOTARY_PROFILE:-}" ]; then
-      xcrun notarytool submit "$image" --keychain-profile "$KINGMAKER_NOTARY_PROFILE" --wait
-      xcrun stapler staple "$image"
-      echo "notarized and stapled $image"
-    else
-      echo "NOT notarized: set KINGMAKER_NOTARY_PROFILE (xcrun notarytool store-credentials) to notarize this Developer ID build."
-    fi ;;
-  *) echo "NOT notarized: notarization needs a Developer ID Application identity (KINGMAKER_SIGN_IDENTITY) and KINGMAKER_NOTARY_PROFILE." ;;
-esac
-
-# Verify the final bytes after any notarization/stapling mutation.
 if [ -n "$manifest" ] && [ "$draft" = 0 ]; then
-  node "$here/scripts/check-release-assets.mjs" "$manifest" "$image" || {
-    echo "✗ built DMG is not publishable; release assets or governed Armor verification are incomplete" >&2
-    exit 4
-  }
+  node "$here/scripts/finalize-installer-release.mjs" "$manifest" "$image" || exit 4
 fi
