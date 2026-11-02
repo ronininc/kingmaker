@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, writeFileSync, symlinkSync, unlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { ARMOR_RELEASE_ASSETS, releaseAssetProblems, verifyPhysicalReleaseAssets } from '../lib/release-assets.mjs';
 
 const h = 'a'.repeat(64);
@@ -43,7 +44,18 @@ test('physical gate hashes every required asset and requires real signature and 
   writeFileSync(join(dir, m.parts[0].name), part); writeFileSync(join(dir, ARMOR_RELEASE_ASSETS[0]), 'changed');
   assert.match((await verifyPhysicalReleaseAssets({ manifestPath: mp, assetsDir: dir, installerDmg: dmg, verifySignature: () => false, verifyArmor: async () => false })).problems.join('\n'), /signature does not verify|cryptographic verification failed/);
   assert.match((await verifyPhysicalReleaseAssets({ manifestPath: mp, assetsDir: dir, installerDmg: dmg, verifySignature: () => true })).problems.join('\n'), /governed verifier unavailable/);
+  const wrongDmg = join(dir, 'Kingmaker-Installer-v9.9.9.dmg'); writeFileSync(wrongDmg, 'dmg');
+  assert.match((await verifyPhysicalReleaseAssets({ manifestPath: mp, assetsDir: dir, installerDmg: wrongDmg, verifySignature: () => true, verifyArmor: async () => true })).problems.join('\n'), /expected Kingmaker-Installer-v4\.4\.2\.dmg/);
   writeFileSync(join(dir, ARMOR_RELEASE_ASSETS[0]), 'real');
   unlinkSync(join(dir, m.parts[0].name)); symlinkSync(mp, join(dir, m.parts[0].name));
   assert.match((await verifyPhysicalReleaseAssets({ manifestPath: mp, assetsDir: dir, installerDmg: dmg, verifySignature: () => true, verifyArmor: async () => true })).problems.join('\n'), /not a regular non-symlink file/);
+});
+
+test('mounted CLI and installer build entrypoints fail closed on unverified release assets', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'kingmaker-release-cli-')), mp = join(dir, 'kingmaker-manifest.json'), dmg = join(dir, 'Kingmaker-Installer-v4.4.2.dmg');
+  writeFileSync(mp, JSON.stringify(manifest)); writeFileSync(dmg, 'dmg');
+  const cli = spawnSync(process.execPath, ['scripts/check-release-assets.mjs', mp, dmg], { cwd: new URL('..', import.meta.url), encoding: 'utf8' });
+  assert.notEqual(cli.status, 0); assert.match(`${cli.stdout}${cli.stderr}`, /governed verifier unavailable|missing/);
+  const build = spawnSync('/bin/sh', ['scripts/build-installer.sh', '--manifest', mp, '--no-dmg'], { cwd: new URL('..', import.meta.url), encoding: 'utf8' });
+  assert.notEqual(build.status, 0); assert.match(`${build.stdout}${build.stderr}`, /not sound|detached signature|manifest/);
 });
