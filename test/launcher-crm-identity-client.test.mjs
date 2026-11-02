@@ -37,12 +37,16 @@ function fixture(expectedArmorIdentity = null, overrides = {}) {
     fetchImpl: async (url, init) => { calls.push({ url: String(url), body: JSON.parse(init.body) });
       if (String(url).endsWith('/challenge')) return new Response(JSON.stringify({ schema: 'ronin.launcher.identity-challenge/v1', challengeId: 'cid', challenge: 'challenge-value-1234', expiresAt: 1240, pairingId: 'pid', pairingInstallId: 'legacy' }), { status: 201 });
       payload = JSON.parse(init.body).signedReport.payload;
-      return new Response(JSON.stringify({ ok: true, eventId: 'eid', state: payload.state, certifiedInstallationId: payload.certifiedInstallationId, deviceSha256: payload.deviceSha256, verifiedAt: payload.issuedAt }), { status: 201 }); } });
+      return new Response(JSON.stringify({ ok: true, eventId: 'eid', state: payload.state, current: true, currentState: payload.state,
+        identityProfile: payload.identityProfile, certifiedInstallationId: payload.certifiedInstallationId, deviceSha256: payload.deviceSha256,
+        releaseBinding: { releaseTag: payload.releaseTag, updateKeySha: payload.updateKeySha, releaseSigningKeySha: payload.releaseSigningKeySha },
+        signedProviderClaims: { appSha256: payload.appSha256, manifestDigest: payload.manifestDigest }, verifiedAt: payload.issuedAt }), { status: 201 }); } });
   return { client, calls, payload: () => payload };
 }
 
 test('free report derives certificate and release fields from verified bytes', async () => {
   const f = fixture(); const p = (await f.client.report({ verified: verified() })).payload;
+  assert.equal(p.schema, 'ronin.launcher.identity-report/v2');
   assert.equal(p.identityProfile, 'free'); assert.deepEqual(p.armorKeyTypes, []);
   assert.equal(p.certifiedInstallationId, install.installId); assert.equal(p.releaseTag, install.releaseTag);
   assert.equal(p.updateKeySha, install.keySha);
