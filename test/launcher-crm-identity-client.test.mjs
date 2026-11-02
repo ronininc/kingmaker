@@ -27,9 +27,11 @@ const raw = { installCertificate: cert, deviceSha256: install.deviceSha256, mani
 const verified = () => verifyLauncherReportInputsForFixture(raw, trust);
 const keyTypes = ['X25519', 'Ed25519', 'ML-KEM-768', 'ML-DSA-65'];
 
-function fixture(expectedArmorIdentity = null) {
+function fixture(expectedArmorIdentity = null, overrides = {}) {
   let payload; const calls = [];
   const client = createLauncherCrmIdentityClient({ baseUrl: 'https://crm.invalid', bearerToken: 'fixture-token', applicationId: 'app', memberId: 'member', providerRegistrationId: 'reg', provider: 'launcher', providerPublicJwk: reportKeys.publicKey.export({ format: 'jwk' }), expectedArmorIdentity, fixtureMode: true, now: () => 1000,
+    checkInstallCertificateStatus: async () => ({ current: true, revoked: false, installId: install.installId, keySha: install.keySha, releaseTag: install.releaseTag }),
+    checkArmorRevocation: async () => false, ...overrides,
     signReport: async (p) => ({ keyId: 'report-key', value: sign(null, Buffer.from(launcherIdentityCanonicalJson(p)), reportKeys.privateKey).toString('base64url') }),
     fetchImpl: async (url, init) => { calls.push({ url: String(url), body: JSON.parse(init.body) });
       if (String(url).endsWith('/challenge')) return new Response(JSON.stringify({ schema: 'ronin.launcher.identity-challenge/v1', challengeId: 'cid', challenge: 'challenge-value-1234', expiresAt: 1240, pairingId: 'pid', pairingInstallId: 'legacy' }), { status: 201 });
@@ -70,13 +72,18 @@ test('paid profile requires a genuine challenge-bound Armor proof', async (t) =>
   await assert.rejects(() => fixture().client.report({ verified: verified(), kingmakerProof: proof }), /PAID_ARMOR_TRUST_NOT_CONFIGURED/);
 });
 
-test('revoked or incomplete dropped state fails closed', async () => {
-  await assert.rejects(() => fixture().client.report({ verified: verified(), certRevoked: true }), /INVALID_VALID/);
-  await assert.rejects(() => fixture().client.report({ verified: verified(), state: 'dropped' }), /INVALID_DROPPED/);
+test('certificate and paid Armor revocation are derived from current providers', async () => {
+  await assert.rejects(() => fixture(null, { checkInstallCertificateStatus: async () => ({ current: true, revoked: true, installId: install.installId, keySha: install.keySha, releaseTag: install.releaseTag }) }).client.report({ verified: verified() }), /CERTIFICATE_STATUS_INVALID/);
+  await assert.rejects(() => fixture(null, { checkInstallCertificateStatus: async () => null }).client.report({ verified: verified() }), /CERTIFICATE_STATUS_INVALID/);
+  const dir = mkdtempSync(join(tmpdir(), 'launcher-crm-revoked-')); const armor = createIdentity(join(dir, 'identity'), 'fixture');
+  const expected = { senderSignFp: armor.signFp, keyTypes };
+  const proof = signPayload(armor, { type: 'kingmaker.install-proof/1', nonce: 'challenge-value-1234', at: new Date(1000000).toISOString(), body: { schema: 'kingmaker.install-proof/1', challenge: 'challenge-value-1234', issuedAt: 1000000, ...install } });
+  await assert.rejects(() => fixture(expected, { checkArmorRevocation: async () => true }).client.report({ verified: verified(), kingmakerProof: proof }), /ARMOR_IDENTITY_REVOKED/);
+  rmSync(dir, { recursive: true, force: true });
 });
 
 test('fixture trust and caller-selected Armor pins cannot enter production composition', async () => {
-  const prodClient = createLauncherCrmIdentityClient({ baseUrl: 'https://crm.invalid', bearerToken: 'fixture-token', applicationId: 'app', memberId: 'member', providerRegistrationId: 'reg', provider: 'launcher', providerPublicJwk: reportKeys.publicKey.export({ format: 'jwk' }), expectedArmorIdentity: { senderSignFp: 'attacker', keyTypes }, signReport: async () => ({ keyId: 'k', value: 'v' }), fetchImpl: async () => { throw new Error('SHOULD_NOT_FETCH'); } });
+  const prodClient = createLauncherCrmIdentityClient({ baseUrl: 'https://crm.invalid', bearerToken: 'fixture-token', applicationId: 'app', memberId: 'member', providerRegistrationId: 'reg', provider: 'launcher', providerPublicJwk: reportKeys.publicKey.export({ format: 'jwk' }), expectedArmorIdentity: { senderSignFp: 'attacker', keyTypes }, checkInstallCertificateStatus: async () => ({ current: true }), signReport: async () => ({ keyId: 'k', value: 'v' }), fetchImpl: async () => { throw new Error('SHOULD_NOT_FETCH'); } });
   await assert.rejects(() => prodClient.report({ verified: verified() }), /INPUT_REQUIRED/);
   assert.throws(() => createProductionLauncherIdentityReporter({ fixtureMode: true }), /TRUST_OVERRIDE_FORBIDDEN/);
   assert.throws(() => createProductionLauncherIdentityReporter({ expectedArmorIdentity: { senderSignFp: 'attacker' } }), /TRUST_OVERRIDE_FORBIDDEN/);
