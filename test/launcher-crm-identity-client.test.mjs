@@ -117,6 +117,6 @@ test('fixture trust and caller-selected Armor pins cannot enter production compo
   assert.throws(() => createLauncherCrmIdentityClient({ baseUrl: 'https://crm.invalid', bearerToken: 'fixture-token', applicationId: 'app', memberId: 'member', providerRegistrationId: 'reg', provider: 'launcher', providerPublicJwk: reportKeys.publicKey.export({ format: 'jwk' }), expectedArmorIdentity: { senderSignFp: 'attacker', keyTypes }, checkInstallCertificateStatus: async () => ({ current: true }), signReport: async () => ({ keyId: 'k', value: 'v' }), fetchImpl: async () => { throw new Error('SHOULD_NOT_FETCH'); } }), /STATUS_AUTHORITY_UNAVAILABLE/);
   assert.throws(() => createProductionLauncherIdentityReporter({ fixtureMode: true }), /TRUST_OVERRIDE_FORBIDDEN/);
   assert.throws(() => createProductionLauncherIdentityReporter({ expectedArmorIdentity: { senderSignFp: 'attacker' } }), /TRUST_OVERRIDE_FORBIDDEN/);
-  assert.throws(() => createProductionLauncherIdentityReporter({ installCertificateStatusProvider: async () => ({ current: true, revoked: false }) }), /INSTALL_STATUS_CONFIG_INVALID/);
-  assert.throws(() => createProductionLauncherIdentityReporter({}), /INSTALL_STATUS_CONFIG_INVALID/);
+  assert.throws(() => createProductionLauncherIdentityReporter({ installCertificateStatusProvider: async () => ({ current: true, revoked: false }) }), /INSTALL_STATUS_ORIGIN_UNAVAILABLE/);
+  assert.throws(() => createProductionLauncherIdentityReporter({}), /INSTALL_STATUS_ORIGIN_UNAVAILABLE/);
 });

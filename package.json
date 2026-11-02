@@ -1,6 +1,7 @@
 {
   "name": "kingmaker",
-  "version": "4.4.2-recovered.0",
+  "version": "4.4.2",
+  "roninProvenance": "Recovered source baseline; see RECOVERY.md and release build metadata.",
   "private": true,
   "description": "Kingmaker: a Mac agent with no window. Your Mac's own apps are the screen, voice drives it, its engine governs every step, the Hands of Horus do the clicking.",
   "type": "module",

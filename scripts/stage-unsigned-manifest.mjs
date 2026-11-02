@@ -9,7 +9,7 @@ import { buildManifest, sha256sums, verifyParts } from '../lib/release-manifest.
 const [archiveArg, launcherArg, outArg] = process.argv.slice(2);
 if (!archiveArg || !launcherArg || !outArg) { console.error('usage: stage-unsigned-manifest.mjs <app-archive> <launcher-zip> <manifest-out>'); process.exit(2); }
 const archive = resolve(archiveArg), launcher = resolve(launcherArg), out = resolve(outArg), hash = (p) => createHash('sha256').update(readFileSync(p)).digest('hex');
-const version = '4.4.2-recovered.0', tag = 'v4.4.2-recovered.0';
+const version = '4.4.2', tag = 'v4.4.2';
 const part = { name: basename(archive), size: statSync(archive).size, sha256: hash(archive) };
 const launch = { name: 'Ronin Launcher.app', bundleId: 'org.ronininc.launcher', version: '0.3.13-local-unproven', archive: basename(launcher), format: 'zip', url: null, size: statSync(launcher).size, sha256: hash(launcher), required: true };
 const manifest = buildManifest({ version, tag, app: { bundleId: 'com.ronininc.solghost', version, signing: 'ad-hoc; fixture only', unpackedBytes: null }, archive: { name: part.name, size: part.size, sha256: part.sha256 }, parts: [part], partSize: part.size, launcher: launch, requires: { macos: '14.0', arch: 'arm64' } });

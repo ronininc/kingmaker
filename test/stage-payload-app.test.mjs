@@ -28,7 +28,7 @@ test('verified raw payload stages into the installer app layout', () => {
     const out = join(dir, 'Kingmaker.app');
     process.env.KINGMAKER_FIXTURE_BUILD = '1';
     const result = stagePayloadApp({ payload: built.tar, wrapper, engine: fixtureEngine(dir), engineResources: fixtureEngineResources(dir), out, expectedSha256: built.sha256, expectedVersion: built.version, fixtureAdhoc: true, resources: join(dir, 'none') });
-    assert.equal(result.version, '4.4.2-recovered.0');
+    assert.equal(result.version, '4.4.2');
     assert.ok(result.files > 300);
     assert.match(readFileSync(join(out, 'Contents', 'Info.plist'), 'utf8'), /4\.4\.2-recovered\.0/);
     execFileSync('codesign', ['--verify', '--deep', '--strict', out]);
@@ -77,10 +77,10 @@ test('external payload digest is required and enforced', () => {
 
 test('production payload pin is derived from a signature-verified release manifest', () => {
   const { publicKeyPem, privateKeyPem } = generateReleaseKeypair();
-  const manifestBytes = Buffer.from(JSON.stringify({ schema: 'kingmaker.release/1', version: '4.4.2-recovered.0', units: { macos: { sha256: 'a'.repeat(64), payloadVersion: '4.4.2-recovered.0' } } }));
+  const manifestBytes = Buffer.from(JSON.stringify({ schema: 'kingmaker.release/1', version: '4.4.2', units: { macos: { sha256: 'a'.repeat(64), payloadVersion: '4.4.2' } } }));
   const signature = signManifestBytes(manifestBytes, privateKeyPem);
   process.env.KINGMAKER_FIXTURE_BUILD = '1';
-  assert.deepEqual(trustedPayloadFromSignedManifest({ manifestBytes, signature, fixturePublicKeyPem: publicKeyPem }), { sha256: 'a'.repeat(64), version: '4.4.2-recovered.0', verified: true });
+  assert.deepEqual(trustedPayloadFromSignedManifest({ manifestBytes, signature, fixturePublicKeyPem: publicKeyPem }), { sha256: 'a'.repeat(64), version: '4.4.2', verified: true });
   assert.throws(() => trustedPayloadFromSignedManifest({ manifestBytes: Buffer.from(`${manifestBytes} `), signature, fixturePublicKeyPem: publicKeyPem }), /signature is invalid/);
   delete process.env.KINGMAKER_FIXTURE_BUILD;
 });
