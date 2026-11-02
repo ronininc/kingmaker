@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import test from 'node:test';
 import { createDurableJobPool } from '../lib/durable-job-pool.mjs';
 import { createJobDispatcher } from '../lib/job-dispatcher.mjs';
-import { createExternalDispatchReceiptVerifier, createLocalStaticReviewAdapter, externalSecurityManifestSha256, EXTERNAL_REVIEW_ADAPTER } from '../lib/external-review-adapter.mjs';
+import { createExternalDispatchReceiptVerifier, createLocalStaticReviewAdapter, externalSecurityManifestSha256, normalizeExternalSecurityManifest, EXTERNAL_REVIEW_ADAPTER } from '../lib/external-review-adapter.mjs';
 
 const temp=()=>mkdtempSync(join(tmpdir(),'external-review-'));
 const externalJobId='11111111-1111-4111-8111-111111111111',boardJobId='22222222-2222-4222-8222-222222222222',nativeOpportunityId='44444444-4444-4444-8444-444444444444';
@@ -34,6 +34,11 @@ test('adapter refuses pending scope, digest, policy, method, source or id wideni
 
 test('adapter rejects a source-root alias before reading Git objects',async()=>{
   const repo=fixtureRepo(),dir=temp(),source=join(dir,'alias');symlinkSync(repo.root,source);const m=dispatch(source,repo.commit),pool=createDurableJobPool({path:join(dir,'queue','jobs.sqlite'),maxAttempts:1});pool.submit({jobId:externalJobId,text:JSON.stringify(m),idempotencyKey:'external:alias:fixture',adapter:EXTERNAL_REVIEW_ADAPTER,attempts:1});const adapter=createLocalStaticReviewAdapter({allowedRoots:[dir],...trust});const out=await createJobDispatcher({pool,workerId:'little-brother-local-test',adapters:{[EXTERNAL_REVIEW_ADAPTER]:adapter}}).runOne();assert.equal(out.state,'failed');pool.close();
+});
+
+test('source root identifiers exactly match the CRM 1..128 contract',()=>{
+  for(const value of ['a','ab','x'.repeat(120),'x'.repeat(128)])assert.equal(normalizeExternalSecurityManifest({...manifest(),sourceRootId:value}).sourceRootId,value);
+  for(const value of ['','x'.repeat(129),'bad/root','bad root'])assert.throws(()=>normalizeExternalSecurityManifest({...manifest(),sourceRootId:value}),/EXTERNAL_SCOPE_INCOMPLETE/);
 });
 
 test('CRM Ed25519 receipt binds exact fresh scope, registered authority and one nonce',async()=>{
