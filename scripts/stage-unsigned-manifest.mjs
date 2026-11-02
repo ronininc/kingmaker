@@ -15,7 +15,7 @@ const launch = { name: 'Ronin Launcher.app', bundleId: 'org.ronininc.launcher', 
 const manifest = buildManifest({ version, tag, app: { bundleId: 'com.ronininc.solghost', version, signing: 'ad-hoc; fixture only', unpackedBytes: null }, archive: { name: part.name, size: part.size, sha256: part.sha256 }, parts: [part], partSize: part.size, launcher: launch, requires: { macos: '14.0', arch: 'arm64' } });
 writeFileSync(out, `${JSON.stringify(manifest, null, 2)}\n`);
 writeFileSync(resolve(dirname(out), 'SHA256SUMS'), sha256sums([part, { name: launch.archive, sha256: launch.sha256 }, { name: basename(out), sha256: hash(out) }]));
-writeFileSync(resolve(dirname(out), 'NON-PUBLISHABLE.txt'), 'UNSIGNED LOCAL STAGING ONLY\nMissing: governed manifest signature, Scripture Armor envelope, issuance provenance, Developer ID/notarization, Installer DMG.\nLauncher 0.3.13 zip was made from the installed local app; exact source provenance is unavailable.\n');
+writeFileSync(resolve(dirname(out), 'NON-PUBLISHABLE.txt'), 'UNSIGNED LOCAL STAGING ONLY\nMissing: governed manifest signature, issuance provenance, Developer ID/notarization, Installer DMG.\nOptional paid Scripture Armor envelope is not present and is not required for free Kingmaker.\nLauncher 0.3.13 zip was made from the installed local app; exact source provenance is unavailable.\n');
 const checked = await verifyParts(manifest, dirname(out), { forRelease: true });
 if (!checked.ok) throw new Error(checked.problems.join('; '));
 console.log(JSON.stringify({ manifest: out, app: manifest.app, parts: manifest.parts, launcher: manifest.launcher, verified: true }, null, 2));

@@ -16,19 +16,19 @@ const manifest = {
 };
 const complete = ['kingmaker-manifest.json', 'kingmaker-manifest.json.sig', 'Kingmaker-v4.4.2.part01', ...ARMOR_RELEASE_ASSETS];
 
-test('production release requires archive pin, signature and complete Armor envelope', () => {
+test('free release requires archive pin and signature while complete Armor remains valid', () => {
   assert.deepEqual(releaseAssetProblems({ manifest, assets: complete }), []);
   const legacy = { ...manifest, app: undefined, units: { macos: { sha256: h } } };
   assert.match(releaseAssetProblems({ manifest: legacy, assets: complete }).join('\n'), /app\.sha256/);
   assert.match(releaseAssetProblems({ manifest, assets: complete.filter((n) => n !== 'kingmaker-manifest.json.sig') }).join('\n'), /missing kingmaker-manifest\.json\.sig/);
 });
 
-test('partial Armor envelope is fatal and transitional absence is only explicit opt-in', () => {
+test('free release may omit Armor but partial or explicitly-required Armor is fatal', () => {
   const partial = complete.filter((n) => !ARMOR_RELEASE_ASSETS.includes(n)).concat(ARMOR_RELEASE_ASSETS[0]);
   assert.match(releaseAssetProblems({ manifest, assets: partial }).join('\n'), /partial Scripture Armor envelope/);
   const unsealed = complete.filter((n) => !ARMOR_RELEASE_ASSETS.includes(n));
-  assert.match(releaseAssetProblems({ manifest, assets: unsealed }).join('\n'), /missing mandatory Scripture Armor envelope/);
-  assert.deepEqual(releaseAssetProblems({ manifest, assets: unsealed, requireArmor: false }), []);
+  assert.deepEqual(releaseAssetProblems({ manifest, assets: unsealed }), []);
+  assert.match(releaseAssetProblems({ manifest, assets: unsealed, requireArmor: true }).join('\n'), /missing mandatory Scripture Armor envelope/);
 });
 
 test('physical gate hashes every required asset and requires real signature and Armor verifiers', async () => {
@@ -38,6 +38,8 @@ test('physical gate hashes every required asset and requires real signature and 
   const mp = join(dir, 'kingmaker-manifest.json'), dmg = join(dir, 'Kingmaker-Installer-v4.4.2.dmg');
   writeFileSync(mp, JSON.stringify(m)); writeFileSync(`${mp}.sig`, 'fixture-signature');
   writeFileSync(join(dir, m.parts[0].name), part); writeFileSync(join(dir, m.launcher.archive), launcher); writeFileSync(dmg, 'dmg');
+  assert.equal((await verifyPhysicalReleaseAssets({ manifestPath: mp, assetsDir: dir, installerDmg: dmg, verifySignature: () => true })).ok, true);
+  assert.match((await verifyPhysicalReleaseAssets({ manifestPath: mp, assetsDir: dir, installerDmg: dmg, requireArmor: true, verifySignature: () => true })).problems.join('\n'), /missing mandatory Scripture Armor envelope/);
   for (const name of ARMOR_RELEASE_ASSETS) writeFileSync(join(dir, name), `fixture:${name}`);
   assert.equal((await verifyPhysicalReleaseAssets({ manifestPath: mp, assetsDir: dir, installerDmg: dmg, verifySignature: () => true, verifyArmor: async () => true })).ok, true);
   writeFileSync(join(dir, m.parts[0].name), 'tampered');

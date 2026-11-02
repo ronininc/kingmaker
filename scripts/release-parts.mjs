@@ -464,12 +464,16 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
   // gate does not get a publish command.
   const gate = await verifyStagedRelease({ manifest, partsDir: outDir, sourceApp: app, stageDir: join(outDir, '.gate-stage'), signature: argv.includes('--skip-codesign') ? 'skip' : 'require', requireIssuance: true });
   if (!gate.ok) { print(`✗ The staged release fails the gate: ${gate.problems.join('; ')}`); return 1; }
+  // Free Kingmaker is authenticated by the signed release manifest and its
+  // Launcher-pinned hashes. Armor assets are optional here; when present the
+  // physical gate verifies the complete set and refuses a partial envelope.
   const assets = await verifyPhysicalReleaseAssets({ manifestPath: join(outDir, MANIFEST_FILE), assetsDir: outDir, requireInstallerDmg: false });
   if (!assets.ok) { print(`✗ The publication assets fail the gate: ${assets.problems.join('; ')}`); return 1; }
   print('✓ staged gate: the archived app is identical to the inspected app, passes the installer signature test, and its installer + launcher were built from this release\'s tree (issuance)');
   print('Not published. To publish (the operator\'s call):');
   const sigAsset = keyPath ? ` ${JSON.stringify(join(outDir, sigName))}` : '';
-  print(`  gh release create ${tag} --repo ${manifest.repo} --draft --title "Kingmaker ${facts.version}" ${split.parts.map((p) => JSON.stringify(join(outDir, p.name))).join(' ')} ${JSON.stringify(join(outDir, launcher.archive))} ${JSON.stringify(join(outDir, MANIFEST_FILE))}${sigAsset} ${ARMOR_RELEASE_ASSETS.map((n) => JSON.stringify(join(outDir, n))).join(' ')} ${JSON.stringify(join(outDir, 'SHA256SUMS'))} "<Kingmaker-Installer-${tag}.dmg>"`);
+  const armorAssetArgs = ARMOR_RELEASE_ASSETS.filter((n) => existsSync(join(outDir, n))).map((n) => JSON.stringify(join(outDir, n))).join(' ');
+  print(`  gh release create ${tag} --repo ${manifest.repo} --draft --title "Kingmaker ${facts.version}" ${split.parts.map((p) => JSON.stringify(join(outDir, p.name))).join(' ')} ${JSON.stringify(join(outDir, launcher.archive))} ${JSON.stringify(join(outDir, MANIFEST_FILE))}${sigAsset}${armorAssetArgs ? ` ${armorAssetArgs}` : ''} ${JSON.stringify(join(outDir, 'SHA256SUMS'))} "<Kingmaker-Installer-${tag}.dmg>"`);
   print(`Then build the installer around this manifest: scripts/build-installer.sh --manifest ${join(outDir, MANIFEST_FILE)}`);
   return 0;
 }
