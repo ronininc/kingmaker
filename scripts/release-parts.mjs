@@ -473,7 +473,9 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
   print('Not published. To publish (the operator\'s call):');
   const sigAsset = keyPath ? ` ${JSON.stringify(join(outDir, sigName))}` : '';
   const armorAssetArgs = ARMOR_RELEASE_ASSETS.filter((n) => existsSync(join(outDir, n))).map((n) => JSON.stringify(join(outDir, n))).join(' ');
-  print(`  gh release create ${tag} --repo ${manifest.repo} --draft --title "Kingmaker ${facts.version}" ${split.parts.map((p) => JSON.stringify(join(outDir, p.name))).join(' ')} ${JSON.stringify(join(outDir, launcher.archive))} ${JSON.stringify(join(outDir, MANIFEST_FILE))}${sigAsset}${armorAssetArgs ? ` ${armorAssetArgs}` : ''} ${JSON.stringify(join(outDir, 'SHA256SUMS'))} "<Kingmaker-Installer-${tag}.dmg>"`);
+  const nonMacAssetArgs = platformObjects({ version: manifest.version, platforms: manifest.platforms, dir: outDir })
+    .map((object) => JSON.stringify(object.file)).join(' ');
+  print(`  gh release create ${tag} --repo ${manifest.repo} --draft --title "Kingmaker ${facts.version}" ${split.parts.map((p) => JSON.stringify(join(outDir, p.name))).join(' ')}${nonMacAssetArgs ? ` ${nonMacAssetArgs}` : ''} ${JSON.stringify(join(outDir, launcher.archive))} ${JSON.stringify(join(outDir, MANIFEST_FILE))}${sigAsset}${armorAssetArgs ? ` ${armorAssetArgs}` : ''} ${JSON.stringify(join(outDir, 'SHA256SUMS'))} "<Kingmaker-Installer-${tag}.dmg>"`);
   print(`Then build the installer around this manifest: scripts/build-installer.sh --manifest ${join(outDir, MANIFEST_FILE)}`);
   return 0;
 }
