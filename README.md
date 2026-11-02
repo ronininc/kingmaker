@@ -331,7 +331,7 @@ The engine's ArtCraft adapter drives seven open-source creative apps from `story
 
 ## Licence
 
-Free for personal and noncommercial use under the [PolyForm Noncommercial License 1.0.0](LICENSE). Kingmaker is source-available, not open source: any commercial use, by any company, needs a written licence from Ronin Inc. Contact **ronininc2026@gmail.com**. See [COMMERCIAL-LICENSE.md](COMMERCIAL-LICENSE.md); contributions are covered by [CONTRIBUTING.md](CONTRIBUTING.md).
+Free for personal and noncommercial use under the [PolyForm Noncommercial License 1.0.0](LICENSE). Kingmaker is source-available, not open source: any commercial use, by any company, needs a written licence from Ronin Inc. Contact **ronininc@mail.grokbot.com**. See [COMMERCIAL-LICENSE.md](COMMERCIAL-LICENSE.md); contributions are covered by [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Fine print
 
