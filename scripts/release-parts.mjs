@@ -48,6 +48,7 @@ import { buildManifest, cleanTempParts, DEFAULT_REPO, issuanceProblems, MANIFEST
 import { verifyStagedRelease } from './release-gate.mjs';
 import { signManifestBytes, verifyManifestBytes, pubkeyFingerprint } from '../lib/release-signing.mjs';
 import { RELEASE_PUBLIC_KEY_PEM } from '../lib/release-pubkey.mjs';
+import { ARMOR_RELEASE_ASSETS, verifyPhysicalReleaseAssets } from '../lib/release-assets.mjs';
 import { PACKS } from '../lib/mac-profiles.mjs';
 import { ABLITERATED_CODERS, ABLITERATED_LARGE_BRAIN, ABLITERATED_MODELS, BRAIN_ROLES, LARGE_BRAIN_MIN_GB, LARGE_CODER_MIN_GB } from '../lib/profile.mjs';
 
@@ -463,10 +464,12 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
   // gate does not get a publish command.
   const gate = await verifyStagedRelease({ manifest, partsDir: outDir, sourceApp: app, stageDir: join(outDir, '.gate-stage'), signature: argv.includes('--skip-codesign') ? 'skip' : 'require', requireIssuance: true });
   if (!gate.ok) { print(`✗ The staged release fails the gate: ${gate.problems.join('; ')}`); return 1; }
+  const assets = await verifyPhysicalReleaseAssets({ manifestPath: join(outDir, MANIFEST_FILE), assetsDir: outDir, requireInstallerDmg: false });
+  if (!assets.ok) { print(`✗ The publication assets fail the gate: ${assets.problems.join('; ')}`); return 1; }
   print('✓ staged gate: the archived app is identical to the inspected app, passes the installer signature test, and its installer + launcher were built from this release\'s tree (issuance)');
   print('Not published. To publish (the operator\'s call):');
   const sigAsset = keyPath ? ` ${JSON.stringify(join(outDir, sigName))}` : '';
-  print(`  gh release create ${tag} --repo ${manifest.repo} --draft --title "Kingmaker ${facts.version}" ${split.parts.map((p) => JSON.stringify(join(outDir, p.name))).join(' ')} ${JSON.stringify(join(outDir, launcher.archive))} ${JSON.stringify(join(outDir, MANIFEST_FILE))}${sigAsset} ${JSON.stringify(join(outDir, 'SHA256SUMS'))} "<Kingmaker Installer DMG>"`);
+  print(`  gh release create ${tag} --repo ${manifest.repo} --draft --title "Kingmaker ${facts.version}" ${split.parts.map((p) => JSON.stringify(join(outDir, p.name))).join(' ')} ${JSON.stringify(join(outDir, launcher.archive))} ${JSON.stringify(join(outDir, MANIFEST_FILE))}${sigAsset} ${ARMOR_RELEASE_ASSETS.map((n) => JSON.stringify(join(outDir, n))).join(' ')} ${JSON.stringify(join(outDir, 'SHA256SUMS'))} "<Kingmaker-Installer-${tag}.dmg>"`);
   print(`Then build the installer around this manifest: scripts/build-installer.sh --manifest ${join(outDir, MANIFEST_FILE)}`);
   return 0;
 }

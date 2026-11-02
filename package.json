@@ -19,6 +19,7 @@
     "build:app": "scripts/build-app.sh",
     "build:installer": "scripts/build-installer.sh",
     "release:parts": "node scripts/release-parts.mjs",
+    "release:check-assets": "node scripts/check-release-assets.mjs",
     "proof:owner-voice": "node --experimental-sqlite ${KINGMAKER_ENGINE_SRC:?set KINGMAKER_ENGINE_SRC to the engine source checkout}/server/node_modules/tsx/dist/cli.mjs test/owner-voice.proof.mjs",
     "proof:owner-keys": "node --experimental-sqlite ${KINGMAKER_ENGINE_SRC:?set KINGMAKER_ENGINE_SRC to the engine source checkout}/server/node_modules/tsx/dist/cli.mjs test/owner-keys.proof.mjs",
     "build:addon": "node addons/build-addon.mjs",

@@ -127,6 +127,16 @@ rm -rf "$stage"
 [ "$identity" = "-" ] || codesign --force --sign "$identity" --timestamp "$image"
 echo "built $image ($(du -h "$image" | cut -f1))"
 
+# Publication gate checks the actual DMG, app archive parts, Launcher archive,
+# exact manifest signature and complete Scripture Armor envelope. It fails
+# closed while the governed Armor verifier is unavailable.
+if [ -n "$manifest" ] && [ "$draft" = 0 ]; then
+  node "$here/scripts/check-release-assets.mjs" "$manifest" "$image" || {
+    echo "✗ built DMG is not publishable; release assets or governed Armor verification are incomplete" >&2
+    exit 4
+  }
+fi
+
 case "$identity" in
   "Developer ID Application:"*)
     if [ -n "${KINGMAKER_NOTARY_PROFILE:-}" ]; then

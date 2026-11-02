@@ -1,16 +1,14 @@
 #!/usr/bin/env node
 // Offline pre-publication check. This never signs or uploads anything.
 
-import { readFileSync } from 'node:fs';
-import { basename } from 'node:path';
-import { assertReleaseAssets } from '../lib/release-assets.mjs';
+import { dirname, resolve } from 'node:path';
+import { verifyPhysicalReleaseAssets } from '../lib/release-assets.mjs';
 
-const manifestPath = process.argv[2];
-const assetPaths = process.argv.slice(3);
-if (!manifestPath || !assetPaths.length) {
-  console.error('usage: check-release-assets.mjs <kingmaker-manifest.json> <asset>...');
+const manifestPath = process.argv[2], installerDmg = process.argv[3];
+if (!manifestPath || !installerDmg) {
+  console.error('usage: check-release-assets.mjs <kingmaker-manifest.json> <Kingmaker-Installer-*.dmg>');
   process.exit(2);
 }
-const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-assertReleaseAssets({ manifest, assets: assetPaths.map(basename) });
-console.log(`release asset contract OK (${assetPaths.length} assets)`);
+const verdict = await verifyPhysicalReleaseAssets({ manifestPath: resolve(manifestPath), assetsDir: dirname(resolve(manifestPath)), installerDmg: resolve(installerDmg) });
+if (!verdict.ok) { for (const p of verdict.problems) console.error(`✗ ${p}`); process.exit(1); }
+console.log('release asset contract OK');
