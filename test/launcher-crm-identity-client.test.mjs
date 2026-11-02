@@ -4,14 +4,16 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
-import { createLauncherCrmIdentityClient, launcherIdentityCanonicalJson, verifyLauncherReportInputs } from '../lib/launcher-crm-identity-client.mjs';
-import { signManifestBytes } from '../lib/release-signing.mjs';
+import { createLauncherCrmIdentityClient, createProductionLauncherIdentityReporter, launcherIdentityCanonicalJson, verifyLauncherReportInputs, verifyLauncherReportInputsForFixture } from '../lib/launcher-crm-identity-client.mjs';
+import { pubkeyFingerprint, signManifestBytes } from '../lib/release-signing.mjs';
 import { createIdentity, signPayload } from '../scripture-armor/armor.mjs';
 
 const reportKeys = generateKeyPairSync('ed25519');
 const certKeys = generateKeyPairSync('ec', { namedCurve: 'P-256' });
 const releaseKeys = generateKeyPairSync('rsa', { modulusLength: 2048 });
-const install = { installId: '11111111-1111-4111-8111-111111111111', deviceSha256: 'a'.repeat(64), keySha: 'b'.repeat(64), releaseTag: 'v4.4.2' };
+process.env.NODE_ENV = 'test'; process.env.KINGMAKER_DOUBLE_FIXTURE_GATE = '1';
+const releasePublicPem = releaseKeys.publicKey.export({ format: 'pem', type: 'spki' });
+const install = { installId: '11111111-1111-4111-8111-111111111111', deviceSha256: 'a'.repeat(64), keySha: pubkeyFingerprint(releasePublicPem).replace(/\s+/g, '').toLowerCase(), releaseTag: 'v4.4.2' };
 const appBytes = Buffer.from('exact-app-archive-bytes');
 const appSha256 = createHash('sha256').update(appBytes).digest('hex');
 const claims = { schema: 'ronin.install-cert/1', issuer: 'ronin-update-host', bundleId: 'com.ronininc.solghost', issuedAt: '2026-11-02T00:00:00Z', ...install };
@@ -20,13 +22,14 @@ const cert = { payload: certBytes.toString(), sig: createSign('sha256').update(c
 const manifest = { schema: 'kingmaker.release/1', product: 'Kingmaker', tag: install.releaseTag, app: { sha256: appSha256 } };
 const manifestBytes = Buffer.from(JSON.stringify(manifest));
 const releasePrivate = releaseKeys.privateKey.export({ format: 'pem', type: 'pkcs8' });
-const raw = { installCertificate: cert, deviceSha256: install.deviceSha256, installCertPublicKeyPem: certKeys.publicKey.export({ format: 'pem', type: 'spki' }), manifestBytes, manifestSignature: signManifestBytes(manifestBytes, releasePrivate), releasePublicKeyPem: releaseKeys.publicKey.export({ format: 'pem', type: 'spki' }), appBytes, now: () => Date.parse('2026-11-02T00:01:00Z') };
-const verified = () => verifyLauncherReportInputs(raw);
+const trust = { installCertPublicKeyPem: certKeys.publicKey.export({ format: 'pem', type: 'spki' }), releasePublicKeyPem: releasePublicPem };
+const raw = { installCertificate: cert, deviceSha256: install.deviceSha256, manifestBytes, manifestSignature: signManifestBytes(manifestBytes, releasePrivate), appBytes, now: () => Date.parse('2026-11-02T00:01:00Z') };
+const verified = () => verifyLauncherReportInputsForFixture(raw, trust);
 const keyTypes = ['X25519', 'Ed25519', 'ML-KEM-768', 'ML-DSA-65'];
 
 function fixture(expectedArmorIdentity = null) {
   let payload; const calls = [];
-  const client = createLauncherCrmIdentityClient({ baseUrl: 'https://crm.invalid', bearerToken: 'fixture-token', applicationId: 'app', memberId: 'member', providerRegistrationId: 'reg', provider: 'launcher', providerPublicJwk: reportKeys.publicKey.export({ format: 'jwk' }), expectedArmorIdentity, now: () => 1000,
+  const client = createLauncherCrmIdentityClient({ baseUrl: 'https://crm.invalid', bearerToken: 'fixture-token', applicationId: 'app', memberId: 'member', providerRegistrationId: 'reg', provider: 'launcher', providerPublicJwk: reportKeys.publicKey.export({ format: 'jwk' }), expectedArmorIdentity, fixtureMode: true, now: () => 1000,
     signReport: async (p) => ({ keyId: 'report-key', value: sign(null, Buffer.from(launcherIdentityCanonicalJson(p)), reportKeys.privateKey).toString('base64url') }),
     fetchImpl: async (url, init) => { calls.push({ url: String(url), body: JSON.parse(init.body) });
       if (String(url).endsWith('/challenge')) return new Response(JSON.stringify({ schema: 'ronin.launcher.identity-challenge/v1', challengeId: 'cid', challenge: 'challenge-value-1234', expiresAt: 1240, pairingId: 'pid', pairingInstallId: 'legacy' }), { status: 201 });
@@ -46,11 +49,14 @@ test('free report derives certificate and release fields from verified bytes', a
 test('forged labels, certificates, digests, tags and app bytes cannot create verified input', async () => {
   const f = fixture();
   await assert.rejects(() => f.client.report({ verified: { ...verified() }, identityProfile: 'paid-armor', providerAttestation: { armor: 'verified' } }), /INPUT_REQUIRED/);
-  assert.throws(() => verifyLauncherReportInputs({ ...raw, installCertificate: { ...cert, sig: 'forged' } }), /CERTIFICATE_NOT_VERIFIED/);
-  assert.throws(() => verifyLauncherReportInputs({ ...raw, appBytes: Buffer.from('tampered') }), /RELEASE_INSTALL_BINDING/);
+  assert.throws(() => verifyLauncherReportInputsForFixture({ ...raw, installCertificate: { ...cert, sig: 'forged' } }, trust), /CERTIFICATE_NOT_VERIFIED/);
+  assert.throws(() => verifyLauncherReportInputsForFixture({ ...raw, appBytes: Buffer.from('tampered') }, trust), /RELEASE_INSTALL_BINDING/);
   const wrong = Buffer.from(JSON.stringify({ ...manifest, tag: 'v9.9.9' }));
-  assert.throws(() => verifyLauncherReportInputs({ ...raw, manifestBytes: wrong, manifestSignature: signManifestBytes(wrong, releasePrivate) }), /RELEASE_INSTALL_BINDING/);
-  assert.throws(() => verifyLauncherReportInputs({ ...raw, manifestSignature: 'forged' }), /MANIFEST_NOT_VERIFIED/);
+  assert.throws(() => verifyLauncherReportInputsForFixture({ ...raw, manifestBytes: wrong, manifestSignature: signManifestBytes(wrong, releasePrivate) }, trust), /RELEASE_INSTALL_BINDING/);
+  assert.throws(() => verifyLauncherReportInputsForFixture({ ...raw, manifestSignature: 'forged' }, trust), /MANIFEST_NOT_VERIFIED/);
+  assert.throws(() => verifyLauncherReportInputs({ ...raw, installCertPublicKeyPem: trust.installCertPublicKeyPem }), /TRUST_ROOT_OVERRIDE_FORBIDDEN/);
+  const substituted = generateKeyPairSync('rsa', { modulusLength: 2048 });
+  assert.throws(() => verifyLauncherReportInputsForFixture(raw, { ...trust, releasePublicKeyPem: substituted.publicKey.export({ format: 'pem', type: 'spki' }) }), /RELEASE_KEY_MISMATCH|MANIFEST_NOT_VERIFIED/);
 });
 
 test('paid profile requires a genuine challenge-bound Armor proof', async (t) => {
@@ -67,4 +73,11 @@ test('paid profile requires a genuine challenge-bound Armor proof', async (t) =>
 test('revoked or incomplete dropped state fails closed', async () => {
   await assert.rejects(() => fixture().client.report({ verified: verified(), certRevoked: true }), /INVALID_VALID/);
   await assert.rejects(() => fixture().client.report({ verified: verified(), state: 'dropped' }), /INVALID_DROPPED/);
+});
+
+test('fixture trust and caller-selected Armor pins cannot enter production composition', async () => {
+  const prodClient = createLauncherCrmIdentityClient({ baseUrl: 'https://crm.invalid', bearerToken: 'fixture-token', applicationId: 'app', memberId: 'member', providerRegistrationId: 'reg', provider: 'launcher', providerPublicJwk: reportKeys.publicKey.export({ format: 'jwk' }), expectedArmorIdentity: { senderSignFp: 'attacker', keyTypes }, signReport: async () => ({ keyId: 'k', value: 'v' }), fetchImpl: async () => { throw new Error('SHOULD_NOT_FETCH'); } });
+  await assert.rejects(() => prodClient.report({ verified: verified() }), /INPUT_REQUIRED/);
+  assert.throws(() => createProductionLauncherIdentityReporter({ fixtureMode: true }), /TRUST_OVERRIDE_FORBIDDEN/);
+  assert.throws(() => createProductionLauncherIdentityReporter({ expectedArmorIdentity: { senderSignFp: 'attacker' } }), /TRUST_OVERRIDE_FORBIDDEN/);
 });
