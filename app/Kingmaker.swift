@@ -2454,7 +2454,7 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
       for (name, id) in KingmakerBar.automationTargets where KingmakerBar.automationAllowed(id, ask: false) != true {
         guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: id) else { continue }
         pending = true
-        let ask = { DispatchQueue.global().async { if KingmakerBar.automationAllowed(id, ask: true) == false { DispatchQueue.main.async { [weak self] in self?.append(who: "", "Automation for \(name) is off: System Settings → Privacy & Security → Automation → Kingmaker → \(name).") } }; refresh() } }
+        let ask = { [weak self] in DispatchQueue.global().async { [weak self] in if KingmakerBar.automationAllowed(id, ask: true) == false { DispatchQueue.main.async { [weak self] in self?.append(who: "", "Automation for \(name) is off: System Settings → Privacy & Security → Automation → Kingmaker → \(name).") } }; refresh() } }
         if NSRunningApplication.runningApplications(withBundleIdentifier: id).isEmpty {
           let cfg = NSWorkspace.OpenConfiguration(); cfg.activates = false; cfg.hides = true
           NSWorkspace.shared.openApplication(at: url, configuration: cfg) { _, _ in DispatchQueue.global().asyncAfter(deadline: .now() + 1.5) { ask() } }
