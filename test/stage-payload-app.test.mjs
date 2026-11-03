@@ -54,12 +54,12 @@ test('verified raw payload stages into the installer app layout', () => {
     writeFileSync(join(engineResources, 'voice-runtime', 'framework-target'), 'framework bytes\n');
     symlinkSync('framework-target', join(engineResources, 'voice-runtime', 'framework-current'));
     const result = stagePayloadApp({ payload: built.tar, wrapper, engine: fixtureEngine(dir), engineResources, out, expectedSha256: built.sha256, expectedVersion: built.version, fixtureAdhoc: true, resources: join(dir, 'none') });
-    assert.equal(result.version, '4.4.2');
+    assert.equal(result.version, '4.4.3');
     assert.ok(result.files > 100, 'the governed Kingmaker payload should contain its complete runtime tree');
     for (const file of ['lib/cli.mjs', 'core/pack.json', 'catalog/essentials.json', 'scripture-armor/armor.mjs']) {
       assert.ok(readFileSync(join(out, 'Contents', 'Resources', 'sol-ghost', file)).length > 0, `missing required payload file ${file}`);
     }
-    assert.match(readFileSync(join(out, 'Contents', 'Info.plist'), 'utf8'), /<key>CFBundleShortVersionString<\/key><string>4\.4\.2<\/string>/);
+    assert.match(readFileSync(join(out, 'Contents', 'Info.plist'), 'utf8'), /<key>CFBundleShortVersionString<\/key><string>4\.4\.3<\/string>/);
     assert.equal(readlinkSync(join(out, 'Contents', 'Resources', 'voice-runtime', 'framework-current')), 'framework-target');
     execFileSync('codesign', ['--verify', '--deep', '--strict', out]);
   } finally { delete process.env.KINGMAKER_FIXTURE_BUILD; rmSync(dir, { recursive: true, force: true }); }
@@ -107,10 +107,10 @@ test('external payload digest is required and enforced', () => {
 
 test('production payload pin is derived from a signature-verified release manifest', () => {
   const { publicKeyPem, privateKeyPem } = generateReleaseKeypair();
-  const manifestBytes = Buffer.from(JSON.stringify({ schema: 'kingmaker.release/1', version: '4.4.2', units: { macos: { sha256: 'a'.repeat(64), payloadVersion: '4.4.2' } } }));
+  const manifestBytes = Buffer.from(JSON.stringify({ schema: 'kingmaker.release/1', version: '4.4.3', units: { macos: { sha256: 'a'.repeat(64), payloadVersion: '4.4.3' } } }));
   const signature = signManifestBytes(manifestBytes, privateKeyPem);
   process.env.KINGMAKER_FIXTURE_BUILD = '1';
-  assert.deepEqual(trustedPayloadFromSignedManifest({ manifestBytes, signature, fixturePublicKeyPem: publicKeyPem }), { sha256: 'a'.repeat(64), version: '4.4.2', verified: true });
+  assert.deepEqual(trustedPayloadFromSignedManifest({ manifestBytes, signature, fixturePublicKeyPem: publicKeyPem }), { sha256: 'a'.repeat(64), version: '4.4.3', verified: true });
   assert.throws(() => trustedPayloadFromSignedManifest({ manifestBytes: Buffer.from(`${manifestBytes} `), signature, fixturePublicKeyPem: publicKeyPem }), /signature is invalid/);
   delete process.env.KINGMAKER_FIXTURE_BUILD;
 });
