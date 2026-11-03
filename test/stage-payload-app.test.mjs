@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -35,10 +35,14 @@ test('verified raw payload stages into the installer app layout', () => {
     const wrapper = fixtureWrapper(dir);
     const out = join(dir, 'Kingmaker.app');
     process.env.KINGMAKER_FIXTURE_BUILD = '1';
-    const result = stagePayloadApp({ payload: built.tar, wrapper, engine: fixtureEngine(dir), engineResources: fixtureEngineResources(dir), out, expectedSha256: built.sha256, expectedVersion: built.version, fixtureAdhoc: true, resources: join(dir, 'none') });
+    const engineResources = fixtureEngineResources(dir);
+    writeFileSync(join(engineResources, 'voice-runtime', 'framework-target'), 'framework bytes\n');
+    symlinkSync('framework-target', join(engineResources, 'voice-runtime', 'framework-current'));
+    const result = stagePayloadApp({ payload: built.tar, wrapper, engine: fixtureEngine(dir), engineResources, out, expectedSha256: built.sha256, expectedVersion: built.version, fixtureAdhoc: true, resources: join(dir, 'none') });
     assert.equal(result.version, '4.4.2');
     assert.ok(result.files > 300);
     assert.match(readFileSync(join(out, 'Contents', 'Info.plist'), 'utf8'), /<key>CFBundleShortVersionString<\/key><string>4\.4\.2<\/string>/);
+    assert.equal(readlinkSync(join(out, 'Contents', 'Resources', 'voice-runtime', 'framework-current')), 'framework-target');
     execFileSync('codesign', ['--verify', '--deep', '--strict', out]);
   } finally { delete process.env.KINGMAKER_FIXTURE_BUILD; rmSync(dir, { recursive: true, force: true }); }
 });

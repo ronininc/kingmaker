@@ -106,8 +106,14 @@ export function stagePayloadApp({ payload, wrapper, engine, engineResources, out
     execFileSync('chmod', ['755', join(out, 'Contents', 'MacOS', 'Kingmaker')]);
     cpSync(engine, join(out, 'Contents', 'MacOS', 'KingmakerEngine'));
     execFileSync('chmod', ['755', join(out, 'Contents', 'MacOS', 'KingmakerEngine')]);
-    if (existsSync(resources)) cpSync(resources, join(out, 'Contents', 'Resources'), { recursive: true });
-    cpSync(engineResources, join(out, 'Contents', 'Resources'), { recursive: true });
+    if (existsSync(resources)) cpSync(resources, join(out, 'Contents', 'Resources'), { recursive: true, verbatimSymlinks: true });
+    // Runtime frameworks contain bundle-relative symlinks (for example
+    // Python.framework/Versions/Current). Node's default cpSync behavior
+    // resolves their destinations against the source tree and rewrites them
+    // as absolute links. That makes the staged app point outside itself and
+    // codesign correctly refuses it. Preserve the already-validated relative
+    // link text byte-for-byte when moving the runtime into the bundle.
+    cpSync(engineResources, join(out, 'Contents', 'Resources'), { recursive: true, verbatimSymlinks: true });
     cpSync(runtime, join(out, 'Contents', 'Resources', 'sol-ghost'), { recursive: true, preserveTimestamps: true });
     const plist = readFileSync(infoPlist, 'utf8').replaceAll('@VERSION@', proof.version).replaceAll('@SOLOMON_BUILD@', 'recovered payload adapter');
     writeFileSync(join(out, 'Contents', 'Info.plist'), plist);
