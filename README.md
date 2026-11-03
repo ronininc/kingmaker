@@ -17,7 +17,7 @@ Updates are authenticated separately from per-install identity and paid entitlem
 
 1. the signed release manifest binds the public app/archive bytes;
 2. the Launcher/install certificate binds an installation to its current release using its opaque installation hash and proof of possession;
-3. paid Scripture Armor is an optional entitlement/profile on top of the embedded integrity protections, not a prerequisite for free Kingmaker.
+3. Scripture Armor is a separate paid product with its own UI, daemon and installers. Free Kingmaker carries only the three shared compatibility modules its governed transport imports; installing Kingmaker does not install or entitle the standalone scanning-protection product.
 
 Kingmaker checks its configured HTTPS update host on launch and wake (not on a background timer). `kingmaker update --setup` stores the update URL and the installation's existing update key through stdin; `kingmaker update --check` never manufactures a key or trusts an unsigned replacement.
 
