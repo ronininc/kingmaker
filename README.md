@@ -11,7 +11,7 @@ Kingmaker is Ronin's governed local AI control surface for **macOS, Linux, and W
 
 ## 4.4.2 release status
 
-The repository version and release schema are 4.4.2. Source tests and a complete local macOS staging build pass, including the 9-component runtime-closure check and deep payload verification. That staging app is **ad hoc signed and non-publishable**. The governed Kingmaker Release identity is present in the Keychain and has an encrypted vault backup, but a flagship/public release still requires final signing of the exact app bytes, regeneration of all hashes and parts after signing, the manifest signature, the complete Armor release envelope, and the final physical release gate. Do not describe a local staging archive as the public release.
+The repository version and release schema are 4.4.2. Source tests and a complete local macOS staging build pass, including the 9-component runtime-closure check and deep payload verification. That staging app is **ad hoc signed and non-publishable**. The public Kingmaker Release certificate and an encrypted P12 vault backup exist, but macOS must report the matching private key as a valid code-signing identity before it can sign production bytes. A flagship/public release then requires final signing of the exact app bytes, regeneration of all hashes and parts after signing, the manifest signature, and the final physical release gate. A free release may omit Scripture Armor entirely; an Armor-bearing paid release must carry and cryptographically verify the complete three-file Armor envelope. Do not describe a local staging archive as the public release.
 
 Updates are authenticated separately from per-install identity and paid entitlement:
 
@@ -333,7 +333,7 @@ The engine's ArtCraft adapter drives seven open-source creative apps from `story
 
 ## Known gaps (4.4.2, honest)
 
-- **The reviewed 4.4.2 source is not yet a public signed release.** The complete local Mac candidate is ad hoc signed. Final bytes still have to be signed first, then re-archived and re-hashed; only then can the manifest and Armor envelope be sealed and the post-signing physical gate run. The published 4.4.1 assets do not satisfy the 4.4.2 gate.
+- **The reviewed 4.4.2 source is not yet a public signed release.** The complete local Mac candidate is ad hoc signed. Final bytes still have to be signed first, then re-archived and re-hashed; only then can the manifest be signed, any paid Armor envelope be sealed, and the post-signing physical gate run. The published 4.4.1 assets do not satisfy the 4.4.2 gate.
 - **Linux and Windows outputs are portable candidates, not native acceptance proof.** They share the verified 4.4.2 payload and have deterministic platform launchers, but still need native host tests and their production signatures/installers. The Mac build cannot certify those results.
 - **System software it doesn't bundle** comes with the installer: Ollama and the models, the Hands of Horus, sox, SearXNG (Kingmaker starts an installed `ollama serve` when none is running). ghost-os stays an optional fallback for the hands. Blender, Godot and Chrome are found where they're installed.
 - **The desktop app's first-run installer and knowledge-library offer are pop-ups in its window,** so they don't run headless. The runtime still reports what's missing.
