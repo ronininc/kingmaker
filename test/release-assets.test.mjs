@@ -12,7 +12,7 @@ const manifest = {
   schema: 'kingmaker.release/1', product: 'Kingmaker', repo: 'ronininc/kingmaker', tag: 'v4.4.2', version: '4.4.2',
   app: { name: 'Kingmaker.app', bundleId: 'com.ronininc.solghost', size: 12, sha256: h },
   parts: [{ name: 'Kingmaker-v4.4.2.part01', size: 12, sha256: h }],
-  launcher: { name: 'Ronin Launcher.app', archive: 'Ronin-Launcher.zip', format: 'zip', sha256: h, size: 12, required: true, url: null },
+  launcher: { name: 'Ronin Launcher.app', archive: 'Ronin-Launcher.zip', format: 'zip', sha256: h, size: 12, required: true, url: null, sourceRepo: 'ronininc/ronin-launcher', sourceCommit: 'b'.repeat(40) },
 };
 const complete = ['kingmaker-manifest.json', 'kingmaker-manifest.json.sig', 'Kingmaker-v4.4.2.part01', ...ARMOR_RELEASE_ASSETS];
 

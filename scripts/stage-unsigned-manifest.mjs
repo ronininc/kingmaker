@@ -11,7 +11,8 @@ if (!archiveArg || !launcherArg || !outArg) { console.error('usage: stage-unsign
 const archive = resolve(archiveArg), launcher = resolve(launcherArg), out = resolve(outArg), hash = (p) => createHash('sha256').update(readFileSync(p)).digest('hex');
 const version = '4.4.2', tag = 'v4.4.2';
 const part = { name: basename(archive), size: statSync(archive).size, sha256: hash(archive) };
-const launch = { name: 'Ronin Launcher.app', bundleId: 'org.ronininc.launcher', version: '0.3.13-local-unproven', archive: basename(launcher), format: 'zip', url: null, size: statSync(launcher).size, sha256: hash(launcher), required: true };
+const launch = { name: 'Ronin Launcher.app', bundleId: 'org.ronininc.launcher', version: '0.3.13-local-unproven', archive: basename(launcher), format: 'zip', url: null, size: statSync(launcher).size, sha256: hash(launcher), required: true,
+  sourceRepo: 'unproven/local-artifact', sourceCommit: '0'.repeat(40) };
 const manifest = buildManifest({ version, tag, app: { bundleId: 'com.ronininc.solghost', version, signing: 'ad-hoc; fixture only', unpackedBytes: null }, archive: { name: part.name, size: part.size, sha256: part.sha256 }, parts: [part], partSize: part.size, launcher: launch, requires: { macos: '14.0', arch: 'arm64' } });
 writeFileSync(out, `${JSON.stringify(manifest, null, 2)}\n`);
 writeFileSync(resolve(dirname(out), 'SHA256SUMS'), sha256sums([part, { name: launch.archive, sha256: launch.sha256 }, { name: basename(out), sha256: hash(out) }]));
