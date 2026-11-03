@@ -48,6 +48,7 @@ import { buildManifest, cleanTempParts, DEFAULT_REPO, issuanceProblems, MANIFEST
 import { verifyStagedRelease } from './release-gate.mjs';
 import { signManifestBytes, verifyManifestBytes, pubkeyFingerprint } from '../lib/release-signing.mjs';
 import { RELEASE_PUBLIC_KEY_PEM } from '../lib/release-pubkey.mjs';
+import { REQUIRED_RUNTIMES } from './runtime-closure.mjs';
 import { ARMOR_RELEASE_ASSETS, verifyPhysicalReleaseAssets } from '../lib/release-assets.mjs';
 import { PACKS } from '../lib/mac-profiles.mjs';
 import { ABLITERATED_CODERS, ABLITERATED_LARGE_BRAIN, ABLITERATED_MODELS, BRAIN_ROLES, LARGE_BRAIN_MIN_GB, LARGE_CODER_MIN_GB } from '../lib/profile.mjs';
@@ -184,7 +185,7 @@ export function engineSourceMaps(root) {
 }
 
 /** What the app is: bundle id, version, engine build, signing authority, unpacked size. Throws when it is not Kingmaker. */
-export const REQUIRED_RUNTIMES = Object.freeze(['kingmaker-runtime', 'voice-runtime', 'guardrails-runtime', 'guardrails-config', 'agent-runtime', 'knowledge-runtime', 'playwright-browsers', 'chrome-connector', 'sol-ghost', 'app.asar']);
+export { REQUIRED_RUNTIMES } from './runtime-closure.mjs';
 
 /** [4.3] The oldest bundled Node a release may carry: 24.22.1 has the Node2Shell fix (CVE-2026-111497,
  *  the Brotli out-of-bounds write). The engine build holds the same floor (GHOST_MIN_BUNDLED_NODE). */

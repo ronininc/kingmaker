@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { checkPayload, payloadProblem } from '../lib/payload.mjs';
 import { verifyManifestBytes } from '../lib/release-signing.mjs';
 import { RELEASE_PUBLIC_KEY_PEM } from '../lib/release-pubkey.mjs';
+import { validateEngineRuntimeClosure } from './runtime-closure.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -64,9 +65,7 @@ export function stagePayloadApp({ payload, wrapper, engine, engineResources, out
   if (!existsSync(payload)) throw new Error(`no payload at ${payload}`);
   if (!existsSync(wrapper)) throw new Error(`no native wrapper at ${wrapper}`);
   if (!existsSync(engine)) throw new Error(`no engine runtime at ${engine}`);
-  for (const required of ['app.asar/desktop/headless-server.mjs', 'kingmaker-runtime/server/index.mjs']) {
-    if (!existsSync(join(engineResources, required))) throw new Error(`engine resource tree is incomplete: missing ${required}`);
-  }
+  validateEngineRuntimeClosure(engineResources);
   if (basename(out) !== 'Kingmaker.app') throw new Error('output must be named Kingmaker.app');
   if (fixtureAdhoc && process.env.KINGMAKER_FIXTURE_BUILD !== '1') throw new Error('ad-hoc signing is fixture-only (set KINGMAKER_FIXTURE_BUILD=1 in an isolated test)');
   if (!fixtureAdhoc && !identity) throw new Error('production staging requires an explicit Kingmaker Release signing identity');

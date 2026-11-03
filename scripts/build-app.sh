@@ -10,9 +10,7 @@ version="$(sed -n 's/.*"version": "\([^"]*\)".*/\1/p' "$here/package.json" | hea
 : "${KINGMAKER_ENGINE_BINARY:?set KINGMAKER_ENGINE_BINARY to the reviewed engine runtime executable}"
 : "${KINGMAKER_ENGINE_RESOURCES:?set KINGMAKER_ENGINE_RESOURCES to the reviewed packaged engine resource tree}"
 [ -x "$KINGMAKER_ENGINE_BINARY" ] || { echo "KINGMAKER_ENGINE_BINARY is not executable: $KINGMAKER_ENGINE_BINARY" >&2; exit 2; }
-for required in app.asar/desktop/headless-server.mjs kingmaker-runtime/server/index.mjs; do
-  [ -f "$KINGMAKER_ENGINE_RESOURCES/$required" ] || { echo "engine resource tree is incomplete: missing $required" >&2; exit 2; }
-done
+node "$here/scripts/runtime-closure.mjs" "$KINGMAKER_ENGINE_RESOURCES"
 rm -rf "$app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources/sol-ghost"
 swiftc -O -o "$app/Contents/MacOS/Kingmaker" "$here/app/Kingmaker.swift" -framework AppKit -framework ApplicationServices -framework QuartzCore -framework ServiceManagement
