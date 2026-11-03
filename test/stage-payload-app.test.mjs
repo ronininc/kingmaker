@@ -178,3 +178,15 @@ test('runtime closure requires actual voice, frontend and backend marker files',
     }
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+test('runtime closure permits only symlinks contained inside their component', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'km-runtime-links-'));
+  try {
+    const root = fixtureEngineResources(join(dir, 'root'));
+    writeFileSync(join(root, 'voice-runtime', 'inside'), 'inside\n');
+    symlinkSync('inside', join(root, 'voice-runtime', 'safe-link'));
+    assert.doesNotThrow(() => validateEngineRuntimeClosure(root));
+    symlinkSync('/etc/passwd', join(root, 'voice-runtime', 'escape-link'));
+    assert.throws(() => validateEngineRuntimeClosure(root), /runtime symlink escapes component/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { lstatSync, readdirSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { lstatSync, readdirSync, realpathSync } from 'node:fs';
+import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // The engine build owns these resources. sol-ghost is deliberately separate: it
@@ -33,12 +33,22 @@ function realFiles(root, relative = '') {
   for (const name of readdirSync(dir)) {
     const rel = relative ? `${relative}/${name}` : name;
     const st = lstatSync(join(root, rel));
-    if (st.isSymbolicLink() || (!st.isDirectory() && !st.isFile())) throw new Error(`unsafe runtime entry: ${rel}`);
+    if (st.isSymbolicLink()) {
+      let target;
+      try { target = realpathSync(join(root, rel)); } catch { throw new Error(`broken runtime symlink: ${rel}`); }
+      const inside = relativePath(realpathSync(root), target);
+      if (inside === '..' || inside.startsWith('../')) throw new Error(`runtime symlink escapes component: ${rel}`);
+      found.push(rel);
+      continue;
+    }
+    if (!st.isDirectory() && !st.isFile()) throw new Error(`unsafe runtime entry: ${rel}`);
     if (st.isDirectory()) found.push(...realFiles(root, rel));
     else found.push(rel);
   }
   return found;
 }
+
+const relativePath = (root, target) => relative(resolve(root), resolve(target));
 
 export function validateEngineRuntimeClosure(root) {
   root = resolve(root);
