@@ -61,6 +61,8 @@ whether one replaces a pick.
   }
   md += `\n## For bigger Macs (options, not measured here)\n\nListed for when a bigger Mac arrives. Never picked automatically, not benchmarked here, and the weights are linked upstream, not republished. These do not run in Ollama.\n\n| Model | Licence | For | Files | Runtime |\n|---|---|---|---|---|\n`;
   for (const o of lib.bigOptions ?? []) md += `| [${o.tag}](${o.links[0]})${o.links[1] ? ` · [GGUF](${o.links[1]})` : ''}<br><small>${o.params}${o.context ? `, ${o.context} context` : ''}. ${o.note}</small> | ${o.license} | ${o.forRamGb.join(' / ')} GB Macs | ${o.files.map((f) => `${f.quant} ${f.gb} GB`).join(', ')} | ${o.runtime} |\n`;
+  md += `\n## Applications\n\nReviewed optional applications are version-pinned and published as immutable Brain Library release assets. Kingmaker verifies the asset SHA-256, installs it outside the signed base app, and gives it an isolated runtime.\n\n| Application | Version | Licence | Source | Install and use |\n|---|---|---|---|---|\n`;
+  for (const app of lib.applications ?? []) md += `| ${app.name}<br><small>${app.summary}</small> | ${app.version} | ${app.license} | [commit ${app.sourceCommit.slice(0, 8)}](${app.source}/commit/${app.sourceCommit}) | \`kingmaker models library pull ${app.id}\`<br>\`kingmaker models library use ${app.id}\` |\n`;
   md += `\n## Install a pick with Kingmaker\n\n\`\`\`\nkingmaker models library pull <tag>      # downloads the parts, checks every SHA-256, loads it into Ollama\nkingmaker models setup --pack <class>    # a whole pack\nkingmaker models bench                   # measure this Mac; then: kingmaker models library submit\n\`\`\`\n\nSubmissions are scanned, then reviewed by the owner: see [CONTRIBUTING.md](CONTRIBUTING.md).\n\nEach model keeps its own licence: see [NOTICE.md](NOTICE.md). A model without a licence on its card is listed and\nmeasured here, but its weights are not republished.\n`;
   return md;
 }
@@ -150,7 +152,7 @@ if (cmd === 'build') {
   writeFileSync(join(dir, 'README.md'), readme(lib));
   writeFileSync(join(dir, 'NOTICE.md'), notice(lib));
   writeGuard(dir);
-  console.log(`✓ ${dir}: ${lib.devices.length} Mac configurations, ${lib.classes.length} classes (${lib.classes.filter((c) => c.status === 'measured').length} measured), ${lib.models.length} models (${lib.models.filter((m) => m.status === 'pick').length} picks), ${lib.bench.length} bench files.`);
+  console.log(`✓ ${dir}: ${lib.devices.length} Mac configurations, ${lib.classes.length} classes (${lib.classes.filter((c) => c.status === 'measured').length} measured), ${lib.models.length} models (${lib.models.filter((m) => m.status === 'pick').length} picks), ${(lib.applications ?? []).length} applications, ${lib.bench.length} bench files.`);
   void CHIP_BANDWIDTH;
 } else if (cmd === 'weights') {
   const lib = readJson(join(dir, 'library.json'), null);
