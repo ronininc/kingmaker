@@ -2,9 +2,9 @@
 
 ### Become digitally sovereign for free today.
 
-**Your Mac, working — not just talking. A console for local AI: type, speak, or drive it from your tools. Your data never leaves.**
+**A governed AI runtime with a native Mac console and Windows/Linux runtime installer candidates. Type, speak on supported surfaces, or connect your tools.**
 
-Kingmaker is a Mac agent with a menu-bar console ("the bar"): a chat UI with a sidebar, a model picker, an Artifacts tab, and a Skills tab — plus voice control, a CLI, an MCP surface your other tools can drive, and an iPhone bridge. Say the wake word or type; it proposes the action, you approve, and the Hands of Horus drive your real Mac apps. Every step is governed, every action is on the audit chain, and your data stays in `~/Library/Application Support/sol-ghost/runtime`.
+Kingmaker combines a governed runtime, CLI and MCP surface with a native Apple silicon macOS app. The Mac app includes a menu-bar/chat interface and platform-specific voice and app-control adapters. Windows x64 and Linux x64 have governed runtime installer candidates requiring Node.js 22+; native UI, voice and credential-store parity remain unverified. Local inference runs on your device; opted-in cloud brains and connected services can send request data to those services.
 
 Source-available under [PolyForm Noncommercial 1.0.0](LICENSE). Free for personal use.
 
@@ -13,13 +13,13 @@ Source-available under [PolyForm Noncommercial 1.0.0](LICENSE). Free for persona
 ## Quick answers
 
 **What is Kingmaker?**
-Kingmaker is a Mac agent built by Ronin Inc: a menu-bar console, voice control, CLI, and MCP surface for running AI on your own Mac. It routes work to interchangeable AI brains (local or cloud), governs every step with approval gates, and keeps your data on your machine.
+Kingmaker is Ronin Inc's governed AI runtime. Its native app targets Apple silicon macOS; Windows x64/Linux x64 runtime installer candidates require Node.js 22+. Local and opted-in cloud brains operate through Kingmaker's approval boundaries. See [platform support and exact release evidence](docs/PLATFORM-SUPPORT.md).
 
 **Is Kingmaker open source?**
 Kingmaker is source-available under the PolyForm Noncommercial 1.0.0 license, free for personal use. The public repository is [github.com/ronininc/kingmaker](https://github.com/ronininc/kingmaker). It is not closed-source and is not distributed only through private channels.
 
 **Where do I download Kingmaker?**
-From [ronininc.org/kingmaker](https://ronininc.org/kingmaker) or the [GitHub releases page](https://github.com/ronininc/kingmaker/releases). Every release ships a signed installer; the release manifest is signature-verified before install.
+From [ronininc.org/kingmaker](https://ronininc.org/kingmaker) or the [GitHub releases page](https://github.com/ronininc/kingmaker/releases). Check the exact platform assets and signed metadata. The [platform-installer release](https://github.com/ronininc/kingmaker/releases/tag/v4.4.3-platform-installers.1) includes Windows/Linux runtime archives and a Launcher DMG; it does not include a complete Kingmaker Mac installer unit.
 
 **Who makes Kingmaker?**
 Ronin Inc, founded by Robbie G. Kingmaker is the uncensored local engine; Solomon is the governed business product built on the same core.
@@ -38,9 +38,11 @@ Five surfaces, one engine:
 
 ## Install
 
-**You need:** Apple silicon Mac, macOS 14+, **≈ 29 GB free** (the 18.5 GB knowledge library is a required step; Kingmaker keeps 20 GB free and pauses heavy jobs below that). Intel Macs, Windows, and Linux do not install.
+The steps below describe the native macOS path. For Windows x64/Linux x64 runtime candidates, use the [exact platform release](https://github.com/ronininc/kingmaker/releases/tag/v4.4.3-platform-installers.1) and its signed metadata; see [requirements and acceptance limits](docs/PLATFORM-SUPPORT.md).
 
-1. **Download:** [Kingmaker Installer DMG](https://ronininc.org/download/kingmaker) (or from the [latest release](https://github.com/ronininc/kingmaker/releases))
+**You need:** Apple silicon Mac, macOS 14+, **≈ 29 GB free** (the 18.5 GB knowledge library is a required step; Kingmaker keeps 20 GB free and pauses heavy jobs below that). The native installer targets Apple silicon macOS. Windows x64/Linux x64 runtime installer candidates require Node.js 22+; native UI/voice/credential-store parity remains unverified. See [platform evidence](docs/PLATFORM-SUPPORT.md).
+
+1. **Download:** [Kingmaker Installer DMG](https://ronininc.org/download/kingmaker) (verify that its release supplies a complete signed Mac install unit; the platform archive release does not)
 2. **Open the DMG**, double-click the installer
 3. **Pick your wake word**, click **Download & Install**
 4. **Allow** Microphone, Accessibility, and Screen Recording when asked
@@ -167,7 +169,7 @@ Rotating key agreement between the user's devices. Two keys born at setup, mutua
 
 ### Compute — LIVE, next target in the pipeline
 
-Live today: the governor, condense, degrade, and fast-route modules. Measured on an 8GB M3: 145MB idle, 22s cold boot, 5s warm.
+Live today: the governor, condense, degrade, and fast-route modules. Historical measurements on a specific 8 GB Apple M3 Mac: 145 MB idle, 22 s cold boot, 5 s warm. These are not cross-platform or current-release performance guarantees.
 
 Next target: **Edge0-35B-A3B** — a 35B sparse MoE (40 layers, 256 experts, 4 active per token) streaming in **under 3 GiB of active RAM** at 14.9–17.7 tok/s, Apache-2.0 licensed. Edge0's models are already in the Hugging Bay catalog; the 35B is through pipeline Stages 1–2. **Status: triaged FLAG — no published hash, first-time publisher, needs human eyes before it goes near the library.**
 
@@ -256,3 +258,6 @@ Measured 2026-10-09 (MacBook Air M3, 8 GB). Full numbers in `catalog/`.
 ## License
 
 PolyForm Noncommercial 1.0.0 — free for personal use. [Commercial licenses](COMMERCIAL-LICENSE.md) available. See [TERMS.md](TERMS.md) and [PRIVACY.md](PRIVACY.md).
+
+
+Platform requirements, exact release/source provenance and scoped performance evidence: [Platform support](docs/PLATFORM-SUPPORT.md).
