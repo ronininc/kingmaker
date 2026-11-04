@@ -38,6 +38,7 @@ test('full Brain Library view includes DeepSeek V4.1 Flash large-system option',
 test('MoneyPrinterTurbo is a pinned, hash-bound application rather than a model', () => {
   const library = buildLibrary({ now: '2026-11-03T00:00:00.000Z' });
   const app = library.applications.find((item) => item.id === 'moneyprinterturbo');
+  assert.equal(library.license, 'PolyForm-Noncommercial-1.0.0');
   assert.ok(app);
   assert.equal(app.sourceCommit, 'c8dbf96e9dfee43b30f7c3f440175d6bd4de61de');
   assert.equal(app.sha256, '49ad90d90df5683d5cc9c688d9e2bbd40913b345c7501844842698c6ef9aa536');

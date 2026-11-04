@@ -41,6 +41,10 @@ The local models [Kingmaker](https://github.com/ronininc/Kingmaker) suggests for
 benchmarks behind each pick, and the weights. Abliterated and uncensored builds are preferred wherever one measured
 well. Machine-readable: [\`library.json\`](library.json) (schema: [\`schema/library.schema.json\`](schema/library.schema.json)).
 
+The Brain Library's catalog, schema, benchmarks, documentation, and library tooling are source-available under the
+[PolyForm Noncommercial License 1.0.0](LICENSE), the same license as Kingmaker. Third-party models, weights, and
+applications retain their own licenses as listed in [NOTICE.md](NOTICE.md).
+
 **Picks come from measurements, not claims.** Every Mac that runs \`kingmaker models bench\` adds its results to
 [\`bench/\`](bench/). A class is **measured** once its own results are in, and an **estimate** until then. So the more
 Macs that test, the more of this table is measured. A 30-day churn scan finds new builds, and a benchmark decides
@@ -70,7 +74,7 @@ whether one replaces a pick.
 function notice(lib) {
   let md = '# Notices\n\nThe weights published in this repo\'s releases keep their own licences:\n\n';
   for (const m of lib.models.filter((x) => x.redistributable)) md += `- \`${m.tag}\`: ${m.license}. From ${m.from}${m.base ? `, based on ${m.base}` : ''}. Changes: abliteration or quantization by the builders named, not by Ronin Inc.\n`;
-  md += '\nApache-2.0: https://www.apache.org/licenses/LICENSE-2.0. The library\'s own files (library.json, the schema, the bench results) are published by Ronin Inc for anyone to use.\n';
+  md += '\nApache-2.0: https://www.apache.org/licenses/LICENSE-2.0.\n\nThe Brain Library\'s own catalog, schema, benchmarks, documentation, and library tooling are Copyright (c) 2026 Ronin Inc. and licensed under the PolyForm Noncommercial License 1.0.0 in [LICENSE](LICENSE). Third-party models, weights, and applications retain their own licenses; inclusion does not relicense them.\n';
   return md;
 }
 
