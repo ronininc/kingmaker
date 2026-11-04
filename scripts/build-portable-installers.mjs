@@ -21,15 +21,20 @@ export function buildPortableInstallers({ payload, out, version } = {}) {
     if (!proof.ok || proof.version !== version) throw new Error(payloadProblem(proof) || `payload version ${proof.version} does not match ${version}`);
     const linuxRoot = join(scratch, `Kingmaker-${version}-linux-x64`), windowsRoot = join(scratch, `Kingmaker-${version}-windows-x64`);
     mkdirSync(linuxRoot); mkdirSync(windowsRoot);
-    cpSync(runtime, join(linuxRoot, 'sol-ghost'), { recursive: true }); cpSync(runtime, join(windowsRoot, 'sol-ghost'), { recursive: true });
+    cpSync(runtime, join(linuxRoot, 'engine'), { recursive: true }); cpSync(runtime, join(windowsRoot, 'engine'), { recursive: true });
+    const identity = (platform) => ({ schema: 'kingmaker.unit/1', unit: 'kingmaker', version, platform, arch: 'x64' });
+    writeFileSync(join(linuxRoot, 'UNIT.json'), `${JSON.stringify(identity('linux'), null, 2)}\n`);
+    writeFileSync(join(windowsRoot, 'UNIT.json'), `${JSON.stringify(identity('windows'), null, 2)}\n`);
     cpSync(join(ROOT, 'platform/linux/kingmaker'), join(linuxRoot, 'kingmaker')); execFileSync('chmod', ['755', join(linuxRoot, 'kingmaker')]);
     cpSync(join(ROOT, 'platform/windows/kingmaker.cmd'), join(windowsRoot, 'kingmaker.cmd'));
+    cpSync(join(ROOT, 'platform/linux/install.sh'), join(linuxRoot, 'install.sh')); execFileSync('chmod', ['755', join(linuxRoot, 'install.sh')]);
+    cpSync(join(ROOT, 'platform/windows/install.ps1'), join(windowsRoot, 'install.ps1'));
     cpSync(join(ROOT, 'platform/PORTABLE-NOTES.txt'), join(linuxRoot, 'PORTABLE-NOTES.txt')); cpSync(join(ROOT, 'platform/PORTABLE-NOTES.txt'), join(windowsRoot, 'PORTABLE-NOTES.txt'));
     const linux = join(out, `Kingmaker-${version}-linux-x64.tar.gz`), windows = join(out, `Kingmaker-${version}-windows-x64.zip`);
     execFileSync('tar', ['-czf', linux, '-C', scratch, `Kingmaker-${version}-linux-x64`], { env: { ...process.env, COPYFILE_DISABLE: '1' } });
     execFileSync('ditto', ['-c', '-k', '--keepParent', windowsRoot, windows]);
     const artifacts = [{ platform: 'linux', name: linux.split('/').at(-1), size: readFileSync(linux).length, sha256: sha(linux) }, { platform: 'windows', name: windows.split('/').at(-1), size: readFileSync(windows).length, sha256: sha(windows) }];
-    writeFileSync(join(out, 'portable-artifacts.json'), `${JSON.stringify({ schema: 'kingmaker.portable-artifacts/1', version, status: 'native-acceptance-pending', artifacts }, null, 2)}\n`);
+    writeFileSync(join(out, 'portable-artifacts.json'), `${JSON.stringify({ schema: 'kingmaker.portable-artifacts/1', version, status: 'installer-candidate', artifacts }, null, 2)}\n`);
     return artifacts;
   } finally { rmSync(scratch, { recursive: true, force: true }); }
 }

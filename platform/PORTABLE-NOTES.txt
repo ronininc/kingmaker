@@ -1,10 +1,11 @@
-Kingmaker portable runtime bundle
+Kingmaker install unit
 
-This is the reviewed Kingmaker Node runtime, not the native macOS control-surface app.
-It requires Node.js 22 or newer. Local model/GPU acceleration is supplied by the
-operator's Ollama installation. NVIDIA drivers and CUDA are not bundled or modified.
+This is the reviewed Kingmaker Node runtime with a rollback-safe per-user installer,
+not the native macOS control-surface app. It requires Node.js 22 or newer. Local
+model/GPU acceleration is supplied by the operator's Ollama installation. NVIDIA
+drivers and CUDA are not bundled or modified.
 Voice, macOS UI automation, Keychain, and native Launcher integration are unavailable
 unless a reviewed native adapter for this platform is installed separately.
 
-No bundle is production-installable until its native platform tests, detached release
-signature, exact manifest pins, and governed Launcher enrollment all pass.
+The signed Ronin release manifest must pin this unit before the authenticated updater
+can deliver it. Native UI/voice adapters still require their own platform acceptance.
