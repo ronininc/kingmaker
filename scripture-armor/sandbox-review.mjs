@@ -38,6 +38,12 @@ export function macReviewPolicy({node,codeRoot,root,readRoots=[],readFiles=[],pr
 }
 export async function reviewUploadedFile(bytes,name,{readRoots=[],protectedRoots=[]}={}) {
   if(!Buffer.isBuffer(bytes)||!bytes.length||bytes.length>16*1024*1024||typeof name!=='string'||name.length>256||/[\0\r\n]/.test(name))throw Error('A single nonempty file up to 16 MiB is required.');
+  // Linux lane (owner ruling 2026-11-05: the lane ships in the product):
+  // the namespace sandbox in sandbox-review-linux.mjs, behind this same
+  // interface and the same guards. It refuses on its own when no lane is
+  // available, so the fail-closed throw below still governs every platform
+  // without a lane — review never runs unsandboxed.
+  if(process.platform==='linux'){const {reviewUploadedFile:linuxReview}=await import('./sandbox-review-linux.mjs');return linuxReview(bytes,name,{readRoots,protectedRoots});}
   if(process.platform!=='darwin'||!fs.existsSync('/usr/bin/sandbox-exec')||process.getuid?.()===0)throw Error('An unprivileged OS review sandbox is unavailable; review was not run.');
   const node=fs.realpathSync(process.execPath),root=fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'armor-review-')));
   fs.chmodSync(root,0o700);const input=path.join(root,'upload'),scratch=path.join(root,'scratch');

@@ -48,7 +48,6 @@ while [ $# -gt 0 ]; do
     --wake-word) WAKE="${2:-}"; shift 2 ;;
     --manifest) MANIFEST="${2:-}"; shift 2 ;;
     --require-signed) REQUIRE_SIGNED=1; shift ;;
-    --release-pubkey) RELEASE_PUBKEY="${2:-}"; shift 2 ;;
     --source) SOURCE="${2:-}"; shift 2 ;;
     --base-url) BASE_URL="${2:-}"; shift 2 ;;
     --prefix) PREFIX="${2:-}"; shift 2 ;;

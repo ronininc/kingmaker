@@ -95,7 +95,14 @@ test('the engine feeds it: its queue, and the meter on its own model calls', () 
   const src = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
   const cli = src('lib/cli.mjs');
   assert.match(cli, /metrics: \(\) => bridgeMetrics\(\{ state: paths\.state, jobs: \(\) => \(\{ \.\.\.work \}\), tokens: meterSnapshot \}\)/);
-  assert.match(cli, /work\.queued\+\+;\s*typedTurns = typedTurns\.then\(async \(\) => \{ work\.queued--; work\.running\+\+; try \{ return await fn\(\); \} finally \{ work\.running--; \} \}\);/);
-  assert.equal((cli.match(/typedTurns = typedTurns\.then\(/g) || []).length, 1, 'every turn goes through queueTurn');
+  // The queue itself lives in lib/bar-events.mjs (createBarTurnQueue) since the
+  // bar refactor; cli.mjs constructs it once over the shared `work` counters and
+  // the queue performs the same queued/running accounting the inline chain did.
+  assert.match(cli, /const queueTurn = createBarTurnQueue\(\{ work,/);
+  const queue = src('lib/bar-events.mjs');
+  assert.match(queue, /work\.queued\+\+;/);
+  assert.match(queue, /work\.queued--; work\.running\+\+;/);
+  assert.match(queue, /try \{ return await fn\(\); \}\s*finally \{[\s\S]*?work\.running--;/);
+  assert.equal((cli.match(/typedTurns = queueTurn\(/g) || []).length, 1, 'every typed turn goes through queueTurn');
   // Each model call site records itself: test/metrics-history.test.mjs.
 });

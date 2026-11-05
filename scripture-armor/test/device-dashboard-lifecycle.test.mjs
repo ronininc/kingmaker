@@ -49,7 +49,10 @@ test('real local account activation starts scanning automatically and Scan devic
     const upload=await local('/api/review/upload',{method:'POST',headers:{...headers,'content-type':'application/octet-stream','x-armor-filename':'inert.json'},body:Buffer.from('{"inertUpload":true}')});
     assert.equal(upload.status,200,await upload.clone().text());
     const reviewed=(await upload.json()).review;
-    assert.equal(reviewed.sandbox,'macos-seatbelt');assert.equal(reviewed.targetExecuted,false);assert.equal(reviewed.format,'JSON');
+    // Platform-conditional (owner ruling 2026-11-05): darwin reviews run in
+    // the Seatbelt lane, linux reviews in the shipped namespace lane; each
+    // platform asserts its own lane identity.
+    assert.equal(reviewed.sandbox,process.platform==='darwin'?'macos-seatbelt':'linux-namespace');assert.equal(reviewed.targetExecuted,false);assert.equal(reviewed.format,'JSON');
     assert.equal((await post('/api/review/link',{url:'https://127.0.0.1/'})).status,400);
     const flagged=path.join(scope,'flagged-fixture.js');fs.writeFileSync(flagged,['ev','al'].join('')+'("1+1");');
     assert.equal((await post('/api/review/native-file',{path:flagged})).status,403);

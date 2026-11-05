@@ -396,7 +396,7 @@ test('coder: the abliterated 1.5b, stepping up to the abliterated 7b only on a 1
   assert.equal(abliteratedCoder([small, large], 32), large);
   assert.equal(abliteratedCoder([small], 32), small, 'a big machine without the 7b keeps the 1.5b');
   assert.equal(abliteratedCoder([large], 8), null, 'the 7b alone on 8 GB: nothing pinned, the engine keeps its own coder');
-  assert.equal(abliteratedCoder(['qwen2.5-coder:1.5b'], 32), null);
+  assert.equal(abliteratedCoder(['qwen2.5-coder:1.5b'], 32), 'qwen2.5-coder:1.5b', 'no abliterated coder installed: the stock provisioned coder is the documented fallback (lib/profile.mjs)');
   const pins = abliteratedModelEnv([small, large], {}, 32);
   assert.equal(pins.SOLOMON_LOCAL_CODING_MODEL, large);
   assert.equal(pins.SOLOMON_SNIPPET_MODEL, large);

@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Kingmaker — Light Runtime</title>
+<style>
+  /* The light runtime's window (design ruling 2026-10-21): a case file that learned typography.
+     True black field, one amber accent used like a highlighter pen, monospace throughout.
+     Claims carry sources; nothing decorative that isn't evidence. */
+  :root {
+    --field: #08080a; --rail: #0b0b0d; --card: #101013; --line: #26262b; --active: #17171b;
+    --ink: #d7d7db; --dim: #8a8a92; --faint: #66666e; --amber: #f5c518; --tile: #f2f2f4;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #000; }
+  body {
+    font-family: var(--mono); color: var(--ink); min-height: 100vh;
+    display: flex; align-items: flex-start; justify-content: center; padding: 28px 18px;
+  }
+  .window {
+    width: 1060px; max-width: 100%; background: var(--field);
+    border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+  }
+  /* Title bar: three dots (two graphite, one amber), the name in wide-tracked caps, the pill. */
+  .titlebar {
+    display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .dot { width: 11px; height: 11px; border-radius: 50%; background: #2c2c31; flex: none; }
+  .dot.amber { background: var(--amber); }
+  .product { margin-left: 8px; font-size: 13px; font-weight: 700; letter-spacing: 3px; color: #fff; }
+  .version { font-size: 10px; letter-spacing: 1px; color: var(--faint); text-transform: uppercase; }
+  .pill {
+    margin-left: auto; background: var(--tile); color: #000; border-radius: 999px;
+    font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 5px 11px; white-space: nowrap;
+  }
+  .body { display: flex; min-height: 520px; }
+  /* Nav rail: near-black, 10px tracked uppercase; the active item is white with a 2px amber bar. */
+  .rail {
+    width: 118px; flex: none; background: var(--rail); border-right: 1px solid var(--line);
+    padding: 14px 0; display: flex; flex-direction: column; gap: 2px;
+  }
+  .rail button {
+    all: unset; cursor: pointer; font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--dim); padding: 9px 12px 9px 14px; border-left: 2px solid transparent;
+  }
+  .rail button:hover { color: var(--ink); }
+  .rail button.active { background: var(--active); color: #fff; border-left-color: var(--amber); }
+  .main { flex: 1; padding: 20px 22px 8px; min-width: 0; }
+  .pane-title { font-size: 15px; font-weight: 800; letter-spacing: 3px; color: #fff; text-transform: uppercase; margin: 0 0 4px; }
+  .pane-sub { font-size: 10px; letter-spacing: 1px; color: var(--faint); text-transform: uppercase; margin: 0 0 16px; }
+  /* Evidence cards: a 9px tracked-gray header, 12.5px body, a 9px uppercase source line. */
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin: 0 0 10px; }
+  .card-head { font-size: 9px; letter-spacing: 1.5px; color: var(--dim); text-transform: uppercase; margin-bottom: 7px; }
+  .card-body { font-size: 12.5px; line-height: 1.55; color: var(--ink); overflow-wrap: anywhere; }
+  .card-src { font-size: 9px; letter-spacing: 1px; color: var(--faint); text-transform: uppercase; margin-top: 8px; }
+  /* The marker: the one line per card that carries the proof, highlighted like the attack ads. */
+  mark { background: var(--amber); color: #000; padding: 0 2px; font-weight: 700; }
+  .cursor { display: inline-block; vertical-align: -2px; margin-left: 1px; }
+  /* Ticker tiles: inverted blocks, heavy value on top, one-word label under. */
+  .tiles { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0 18px; }
+  .tile { background: var(--tile); color: #000; border-radius: 6px; padding: 10px 14px 8px; min-width: 128px; }
+  .tile .v { font-size: 19px; font-weight: 800; letter-spacing: 0.5px; }
+  .tile .l { font-size: 9px; letter-spacing: 2px; color: #55555c; text-transform: uppercase; margin-top: 3px; }
+  .rows { font-size: 12px; line-height: 1.9; color: var(--ink); }
+  .rows .k { color: var(--faint); text-transform: uppercase; font-size: 10px; letter-spacing: 1px; margin-right: 10px; }
+  .note { font-size: 11.5px; color: var(--dim); line-height: 1.6; }
+  /* The gates: the owner's three switches — the only write this surface performs. */
+  .switch-row { display: flex; align-items: center; gap: 12px; padding: 11px 2px; border-bottom: 1px solid var(--line); }
+  .switch-row .what { flex: 1; }
+  .switch-row .name { font-size: 12px; color: #fff; letter-spacing: 1px; text-transform: uppercase; }
+  .switch-row .why { font-size: 10.5px; color: var(--faint); margin-top: 2px; line-height: 1.5; }
+  .switch {
+    flex: none; width: 46px; height: 24px; border-radius: 999px; border: 1px solid var(--line);
+    background: var(--card); position: relative; cursor: pointer; padding: 0;
+  }
+  .switch::after {
+    content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--dim); transition: left .12s ease, background .12s ease;
+  }
+  .switch[aria-checked="true"]::after { left: 25px; background: var(--amber); }
+  .footer { border-top: 1px solid var(--line); padding: 12px 22px 16px; }
+  .footer .plain { font-size: 11px; color: var(--dim); line-height: 1.6; }
+  .footer .closing { font-size: 13px; font-weight: 800; letter-spacing: 3px; color: #fff; text-transform: uppercase; margin-top: 6px; }
+  /* The ask box: the window is a runtime, not a poster — the owner talks here. */
+  .askbox { display: flex; gap: 10px; margin: 0 0 14px; }
+  .askbox textarea {
+    flex: 1; background: var(--card); border: 1px solid var(--line); border-radius: 8px; color: var(--ink);
+    font-family: var(--mono); font-size: 12.5px; line-height: 1.55; padding: 10px 12px; resize: vertical; min-height: 44px;
+  }
+  .askbox textarea:focus { outline: 1px solid var(--amber); }
+  .askbox button {
+    flex: none; align-self: flex-start; background: var(--amber); color: #000; border: 0; border-radius: 8px;
+    font-family: var(--mono); font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+    padding: 12px 18px; cursor: pointer;
+  }
+  .askbox button:disabled { background: var(--line); color: var(--dim); cursor: wait; }
+  .seatline { font-size: 10.5px; color: var(--dim); letter-spacing: 0.5px; margin: 0 0 14px; line-height: 1.6; }
+  .seatline b { color: var(--ink); }
+  /* The voice: the ear and the mouth report their own states on their own line, in the
+     seat line's shape; a spoken answer's controls live on its card, and the readback
+     never touches the answer's text. */
+  .voicebar { font-size: 10.5px; color: var(--dim); letter-spacing: 0.5px; margin: 0 0 14px; line-height: 1.6; }
+  .voicebar b { color: var(--ink); }
+  .minibtn {
+    background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 6px;
+    font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 7px 12px; cursor: pointer; flex: none; align-self: center;
+  }
+  .minibtn:hover { border-color: var(--amber); color: #fff; }
+  .minibtn:disabled { color: var(--faint); cursor: wait; }
+  .speechline { font-size: 11px; color: var(--dim); line-height: 1.6; align-self: center; }
+  /* Failure cards: the registry's cards (light-runtime/failures.mjs). A failed turn is the
+     loudest thing on the wall — an inverted amber strip over an amber-ruled card, above the
+     stats, never under them. Held turns take the inverted tile strip instead. */
+  .card.failed { border-color: var(--amber); }
+  .card.heldcard { border-color: var(--tile); }
+  .fail-strip {
+    font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 6px 8px; border-radius: 4px; margin-bottom: 9px; background: var(--amber); color: #000;
+  }
+  .fail-strip.held { background: var(--tile); }
+</style>
+</head>
+<body>
+<div class="window">
+  <div class="titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot amber"></span>
+    <span class="product">KINGMAKER</span>
+    <span class="version" id="surface-tag">LIGHT RUNTIME</span>
+    <span class="pill" id="status-pill">…</span>
+  </div>
+  <div class="body">
+    <nav class="rail" id="rail"></nav>
+    <main class="main" id="main"></main>
+  </div>
+  <div class="footer">
+    <div class="plain" id="footer-line">Every number on this wall comes from this Mac's own files. An absent source reads UNMEASURED — never a guess.</div>
+    <div class="closing">Service · Function · Power · To The People</div>
+  </div>
+</div>
+<script>
+  'use strict';
+  const $ = (tag, cls, text) => { const el = document.createElement(tag); if (cls) el.className = cls; if (text !== undefined) el.textContent = text; return el; };
+  const PANES = ['Ask', 'Overview', 'Router', 'Evidence Wall', 'Library', 'Gates', 'Audit Chain'];
+  let state = null;
+  let pane = 'Ask';
+  // The ask path (v2): this window talks. `asks` holds the server's ask views; `seat` is the
+  // in-tab browser engine's own state, reported by the seat module itself.
+  let asks = [];
+  // The turn registry (/failures): failed and held turns from EVERY surface, read from the
+  // engine's own transcript — including turns no ask card on this page ever carried.
+  let failures = [];
+  let seat = { state: 'boot', detail: 'the browser seat has not reported yet' };
+  // The approval loop: the engine's waiting proposals, read from /proposals; the owner's
+  // approve/cancel lands here, in the window — no console ritual. Results are the engine's
+  // own lines, kept per proposal id.
+  let proposals = { ok: false, proposals: [] };
+  const proposalResults = {};
+  // The daemon feeds (/api/*, light-runtime/feeds.mjs): the governed-turn daemon's own
+  // records — activity, router records, guardrail gates, the ledger, the library, health,
+  // models, conversations. Each is kept whole per endpoint; a lost read keeps the last true
+  // value, exactly like the lists above. Turn history is fetched per conversation once the
+  // conversations feed names them.
+  let feedActivity = null, feedRouter = null, feedGates = null, feedAudit = null,
+      feedLibrary = null, feedHealth = null, feedModels = null, feedConvs = null;
+  const feedTurns = {};
+  // The voice (light-runtime/voice/voice.mjs, loaded through the voice artifact's verified
+  // session handoff): its state line is its own report, shown as such. `speechByAsk` holds
+  // each card's spoken-readback state — a speech event never rewrites an answer's text.
+  let voice = { ear: 'boot', speech: 'idle', detail: 'the voice module has not reported yet', sttAvailable: null, ttsAvailable: null, lastSpeech: null };
+  let voiceCtl = null;
+  const speechByAsk = {};
+
+  const rail = document.getElementById('rail');
+  for (const name of PANES) {
+    const b = $('button', null, name);
+    b.dataset.pane = name;
+    b.addEventListener('click', () => { pane = name; render(); });
+    rail.appendChild(b);
+  }
+
+  const fmt = (v, suffix) => (v === null || v === undefined ? 'UNMEASURED' : `${Math.round(v * 10) / 10}${suffix || ''}`);
+  const timeOf = (iso) => (iso ? String(iso).slice(11, 19) : '——');
+
+  function markerBody(card) {
+    // The card body with its one proof line under the amber marker and the cursor parked at its edge.
+    const span = $('span');
+    if (card.marker && card.body.includes(card.marker)) {
+      const [before, after] = [card.body.slice(0, card.body.indexOf(card.marker)), card.body.slice(card.body.indexOf(card.marker) + card.marker.length)];
+      span.append(before, $('mark', null, card.marker), cursor(), after);
+    } else span.textContent = card.body;
+    return span;
+  }
+  function cursor() {
+    // The white pointer with the black outline, frozen at the highlight's edge (a design element).
+    const s = $('span', 'cursor');
+    s.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 3 L19 12 L12.5 13.5 L15 21 L12 22 L9.5 14.5 L6 18 Z" fill="#fff" stroke="#000" stroke-width="1.6"/></svg>';
+    return s;
+  }
+  function cardEl(card) {
+    const c = $('article', 'card');
+    c.append($('div', 'card-head', `CUT ${card.n} · ${timeOf(card.at)} · ${card.label}`));
+    const body = $('div', 'card-body'); body.append(markerBody(card)); c.append(body);
+    c.append($('div', 'card-src', `SOURCE — ${card.source}`));
+    return c;
+  }
+  function tilesEl(tiles) {
+    const row = $('div', 'tiles');
+    for (const t of tiles) {
+      const tile = $('div', 'tile');
+      tile.append($('div', 'v', t.value), $('div', 'l', t.label));
+      row.append(tile);
+    }
+    return row;
+  }
+  function rowsEl(pairs) {
+    const box = $('div', 'rows');
+    for (const [k, v] of pairs) {
+      const line = $('div');
+      line.append($('span', 'k', k), document.createTextNode(v === null || v === undefined || v === '' ? 'UNMEASURED' : String(v)));
+      box.append(line);
+    }
+    return box;
+  }
+  function head(title, sub) {
+    const frag = document.createDocumentFragment();
+    frag.append($('h1', 'pane-title', title), $('p', 'pane-sub', sub));
+    return frag;
+  }
+  // A plain record card for the daemon feeds: the head line already formed, the body the
+  // record's own words, the source named — the wall's grammar, without a verdict's marker.
+  function recordCardEl(headText, bodyText, source) {
+    const c = $('article', 'card');
+    c.append($('div', 'card-head', headText));
+    if (bodyText) { const b = $('div', 'card-body'); b.textContent = bodyText; c.append(b); }
+    if (source) c.append($('div', 'card-src', `SOURCE — ${source}`));
+    return c;
+  }
+
+  function renderOverview(main) {
+    main.append(head('Overview', 'This Mac · this runtime · live from its own files'));
+    renderFailures(main);
+    main.append(tilesEl(state.tiles));
+    const m = state.meter;
+    main.append(rowsEl([
+      ['Decode', m.decodeTokS === null ? null : `${fmt(m.decodeTokS)} tok/s`],
+      ['Prefill', m.prefillTokS === null ? null : `${fmt(m.prefillTokS)} tok/s`],
+      ['Generated', m.generated], ['Prompt', m.prompt],
+      ['Machine', state.machine ? state.machine.label : null],
+      ['Chip', state.machine ? [state.machine.chip, state.machine.model].filter(Boolean).join(' · ') || null : null],
+      ['Writer est', state.machine && state.machine.writerTokSEstimate ? `${state.machine.writerTokSEstimate} tok/s (reference bench, scaled)` : null],
+      ['10M proof', state.proof ? state.proof.status : 'UNRUN'],
+    ]));
+    if (state.evidence.length) {
+      main.append($('p', 'pane-sub', 'LATEST EVIDENCE'));
+      main.append(cardEl(state.evidence[0]));
+    }
+    main.append($('p', 'pane-sub', 'ACTIVITY — WHAT THE MACHINE DID'));
+    if (!feedActivity) main.append($('p', 'note', 'The activity feed has not answered yet.'));
+    else if (!feedActivity.items.length) main.append($('p', 'note', 'No activity on record: the daemon\u2019s conversation store, its background-task registry and this runtime\u2019s timing records are all empty or absent on this machine. Real zeros — nothing is backfilled.'));
+    else for (const it of feedActivity.items.slice(0, 20)) main.append(activityCardEl(it));
+    if (feedHealth) {
+      main.append($('p', 'pane-sub', 'THE DAEMON'));
+      main.append(rowsEl([
+        ['State file', feedHealth.daemon.present ? `present · pid ${feedHealth.daemon.pid ?? 'UNRECORDED'} · port ${feedHealth.daemon.port ?? 'UNRECORDED'}` : 'absent — the daemon has not run under this state dir'],
+        ['Ledger store', feedHealth.store.present ? `present · ${feedHealth.store.tables.join(', ') || 'no tables yet'}` : 'absent — no database written yet'],
+        ['Background tasks', feedHealth.tasks.present ? 'registry present' : 'absent'],
+        ['Voice turns', feedHealth.voiceTurns === null ? 'UNMEASURED — no tally file is named for this runtime (SOLOMON_VOICE_TURNS_PATH)' : feedHealth.voiceTurns.present ? `${feedHealth.voiceTurns.total} on record` : 'the named tally file is not there yet'],
+      ]));
+    }
+  }
+
+  function activityCardEl(it) {
+    if (it.kind === 'turn') return recordCardEl(`TURN · ${timeOf(it.at)} · ${String(it.mode || 'governed').toUpperCase()} · CONVERSATION ${String(it.conversationId || '').slice(0, 18)}`, it.text, feedActivity.sources.turnsSource);
+    if (it.kind === 'task') return recordCardEl(`BACKGROUND TASK · ${timeOf(it.at)} · ${String(it.status || '').toUpperCase()}`, `${it.title}${it.taskKind ? ` — ${it.taskKind}` : ''}`, feedActivity.sources.tasksSource);
+    return recordCardEl(`TIMING · ${timeOf(it.at)}`, `Turn ${it.totalMs !== null && it.totalMs !== undefined ? `${(it.totalMs / 1000).toFixed(1)} s` : 'UNMEASURED'}${it.route ? ` · route ${it.route}` : ''}`, 'per-turn timing records — the light runtime\u2019s own logs/server.log');
+  }
+
+  function renderRouter(main) {
+    main.append(head('Router', 'The profile this Mac runs, and the reflex seat beside the worker'));
+    if (!state.router) { main.append($('p', 'note', 'No profile resolved on this machine yet — the router pane reads UNMEASURED until Kingmaker profiles this Mac.')); renderRouterRecords(main); return; }
+    const r = state.router;
+    main.append(rowsEl([
+      ['Writer', r.writer], ['Router', r.router], ['Coder', r.coder], ['Vision', r.vision], ['Reasoning', r.reasoning],
+      ['Context', r.context ? `${r.context / 1024}k` : null],
+      ['At once', r.concurrent], ['Max resident', r.maxResidentGb ? `${r.maxResidentGb} GB` : null],
+    ]));
+    main.append($('p', 'pane-sub', 'REFLEX SEAT'));
+    if (!r.seat) main.append($('p', 'note', 'No seat plan computed for this profile.'));
+    else if (r.seat.active) main.append(rowsEl([
+      ['Seat', `${r.seat.model} — pinned, never evicted`],
+      ['Pair', `${r.seat.seatGb} GB seat + a worker up to ${r.seat.workerGb} GB = ${r.seat.pairGb} GB of the ${r.seat.budgetGb} GiB GPU budget`],
+    ]));
+    else main.append($('p', 'note', `Not pinned — ${r.seat.reason || 'the strict single-model rule stands'}.`));
+    main.append($('p', 'pane-sub', 'SWITCHES'));
+    main.append(rowsEl([
+      ['Reflex layer', state.status.reflexOn ? 'ON' : 'OFF'],
+      ['Seat pin', state.status.pinOn ? 'ON' : 'OFF'],
+    ]));
+    renderRouterRecords(main);
+  }
+
+  function renderRouterRecords(main) {
+    main.append($('p', 'pane-sub', 'ROUTES TAKEN — THE RECORD'));
+    if (!feedRouter) main.append($('p', 'note', 'The router feed has not answered yet.'));
+    else {
+      if (feedRouter.asks.length) {
+        main.append(rowsEl(feedRouter.asks.slice(0, 8).map((a) => [
+          `Ask ${timeOf(a.submittedAt)}`,
+          [a.diagnostics.lane ? `lane ${a.diagnostics.lane}` : null, a.diagnostics.by ? `by ${a.diagnostics.by}` : null, a.diagnostics.model, a.state, a.diagnostics.turnMs !== null && a.diagnostics.turnMs !== undefined ? `turn ${Math.round(a.diagnostics.turnMs)} ms` : null].filter(Boolean).join(' · ') || 'no diagnostics recorded',
+        ])));
+      } else main.append($('p', 'note', 'No asks routed by this server yet this session.'));
+      main.append($('p', 'pane-sub', 'TOOL ACTIVATIONS — FROM THE LEDGER'));
+      if (!feedRouter.actionsPresent) main.append($('p', 'note', 'The daemon\u2019s ledger is not present on this machine yet, so no activations can be read from it — an absent source, not an empty history.'));
+      else if (!feedRouter.actions.length) main.append($('p', 'note', 'The ledger holds no ACTION records yet.'));
+      else main.append(rowsEl(feedRouter.actions.slice(0, 12).map((a) => [`${timeOf(a.at)}`, a.action])));
+      main.append($('p', 'pane-sub', 'TURN TIMING — WHERE THE TIME WENT'));
+      if (!feedRouter.timing.length) main.append($('p', 'note', 'No per-turn timing records in this runtime\u2019s log yet.'));
+      else main.append(rowsEl(feedRouter.timing.slice(0, 8).map((t) => [
+        `${timeOf(t.at)}`,
+        [t.totalMs !== null && t.totalMs !== undefined ? `${(t.totalMs / 1000).toFixed(1)} s` : 'UNMEASURED', t.route ? `route ${t.route}` : null, t.slowestStage ? `slowest ${t.slowestStage} ${Math.round(t.slowestMs)} ms` : null].filter(Boolean).join(' · '),
+      ])));
+    }
+    if (feedModels) {
+      main.append($('p', 'pane-sub', 'MODELS ON OFFER'));
+      const seats = Array.isArray(feedModels.seats) ? feedModels.seats : [];
+      main.append(rowsEl([
+        ['Browser seats', seats.length ? seats.map((s) => `${s.label || s.id || 'seat'} — ${s.state || 'unknown'}`).join(' · ') : 'none registered'],
+        ['Engine model', feedModels.engineError ? `REFUSED — ${feedModels.engineError.code}` : feedModels.engine && feedModels.engine.model ? feedModels.engine.model.name : 'NOT PROVISIONED — no GGUF in the seat\u2019s engine-artifacts yet'],
+        ['Engine weights', feedModels.engineError ? null : feedModels.engine && feedModels.engine.weights ? `${feedModels.engine.weights.name} · pinned ${String(feedModels.engine.weights.sha256 || '').slice(0, 12)}…` : 'NOT PROVISIONED'],
+        ['Voice models', feedModels.voiceError ? `REFUSED — ${feedModels.voiceError.code}` : feedModels.voice && feedModels.voice.models ? Object.entries(feedModels.voice.models).map(([k, v]) => `${k} — ${v && v.state ? v.state : 'unknown'}`).join(' · ') : null],
+      ]));
+    }
+  }
+
+  function renderEvidence(main) {
+    main.append(head('Evidence Wall', 'Verdicts this machine has actually produced — newest first'));
+    if (!state.evidence.length) main.append($('p', 'note', 'No verdicts on file in the light state dir yet. When the 10-minute proof runs or a verdict is recorded, its card lands here with its source named. Nothing is backfilled and nothing is invented.'));
+    else for (const card of state.evidence) main.append(cardEl(card));
+    main.append($('p', 'pane-sub', 'TURN RECORDS — THE DAEMON\u2019S OWN HISTORY'));
+    if (!feedConvs) main.append($('p', 'note', 'The conversations feed has not answered yet.'));
+    else if (!feedConvs.present) main.append($('p', 'note', feedConvs.note || 'The daemon\u2019s conversation store is not present on this machine yet — no turns to show, and none invented.'));
+    else if (!feedConvs.conversations.length) main.append($('p', 'note', 'The daemon\u2019s conversation store is present and empty: no governed turn has completed on this machine yet.'));
+    else for (const conv of feedConvs.conversations.slice(0, 3)) {
+      main.append($('p', 'pane-sub', `CONVERSATION ${String(conv.id).slice(0, 24)} · ${conv.turns} TURN${conv.turns === 1 ? '' : 'S'} · LAST ${String(conv.lastMode || '').toUpperCase()} ${timeOf(conv.lastAt)}`));
+      const turns = feedTurns[conv.id];
+      if (!turns) main.append($('p', 'note', 'Its turns have not been read yet.'));
+      else for (const t of turns.slice(-10)) {
+        main.append(recordCardEl(
+          `TURN · ${timeOf(t.at)} · ${String(t.mode || 'governed').toUpperCase()}${t.confidence !== null && t.confidence !== undefined ? ` · CONFIDENCE ${t.confidence}` : ''}${t.governanceFlags && t.governanceFlags.length ? ` · FLAGS ${t.governanceFlags.join(', ')}` : ''}`,
+          `Q ${t.userText}\n${t.response}`,
+          feedConvs.source,
+        ));
+      }
+    }
+  }
+
+  function renderLibrary(main) {
+    main.append(head('Library', 'Scripture Armor, active on this machine — and the catalog the payload carries'));
+    if (!feedLibrary) { main.append($('p', 'note', 'The library feed has not answered yet.')); return; }
+    const L = feedLibrary;
+    main.append($('p', 'pane-sub', 'SCRIPTURE ARMOR'));
+    if (L.engineError) main.append(recordCardEl('ENGINE ARTIFACT — THE ARMOR REFUSED', `${L.engineError.code} — ${L.engineError.message}`, 'the engine artifact service (light-runtime/artifact.mjs)'));
+    else if (L.engine) {
+      const s = L.engine.signer || {};
+      main.append(rowsEl([
+        ['Signer', s.label], ['Sign fingerprint', s.signFp], ['Seal fingerprint', s.sealFp],
+        ['Bundle state', L.armorBundle ? (L.armorBundle.ok === true ? `OPEN — ${L.armorBundle.detail}` : L.armorBundle.ok === false ? `REFUSED ${L.armorBundle.code || ''} — ${L.armorBundle.detail}` : L.armorBundle.detail) : null],
+        ['Sealed bundle', `${(L.engine.bundle || []).length} files, each sha256-pinned in the manifest`],
+        ['Pinned streams', `${(L.engine.pinned || []).length} — the runtimes and weights the seat verifies before running`],
+        ['Seat model', L.engine.model ? L.engine.model.name : 'NOT PROVISIONED — no GGUF in the seat\u2019s engine-artifacts yet'],
+        ['Seat weights', L.engine.weights ? `${L.engine.weights.name} · sha256 ${String(L.engine.weights.sha256 || '').slice(0, 16)}…` : 'NOT PROVISIONED'],
+        ['Artifact sha256', L.engine.artifactSha256 ? `${String(L.engine.artifactSha256).slice(0, 16)}…` : null],
+      ]));
+    }
+    if (L.voiceError) main.append(recordCardEl('VOICE ARTIFACT — THE ARMOR REFUSED', `${L.voiceError.code} — ${L.voiceError.message}`, 'the voice artifact service (light-runtime/voice-artifact.mjs)'));
+    else if (L.voice && L.voice.models) {
+      main.append($('p', 'pane-sub', 'VOICE MODELS — THE EAR AND THE MOUTH'));
+      main.append(rowsEl(Object.entries(L.voice.models).map(([k, v]) => [k, v && v.state ? String(v.state).toUpperCase() : 'UNMEASURED'])));
+    }
+    main.append($('p', 'pane-sub', 'CATALOG — THE INDEX FILES, READ AS DATA'));
+    const cat = L.catalog || {};
+    const catSrc = (name) => `the payload\u2019s catalog index — ${cat.dir || 'catalog'}/${name}`;
+    if (cat.essentials && cat.essentials.present) main.append(recordCardEl(`ESSENTIALS · ${cat.essentials.items.length} ITEMS`, cat.essentials.items.map((e) => `${e.id || ''} — ${e.role || ''}${e.note ? ` · ${e.note}` : ''}`).join('\n'), catSrc('essentials.json')));
+    else main.append($('p', 'note', 'The essentials index is not in this payload\u2019s catalog.'));
+    if (cat.extensions && cat.extensions.present) main.append(recordCardEl(`EXTENSIONS · ${cat.extensions.items.length} ITEMS`, cat.extensions.items.map((e) => `${e.name || e.id || ''}${e.maker ? ` — ${e.maker}` : ''}`).join('\n'), catSrc('extensions.json')));
+    else main.append($('p', 'note', 'The extensions index is not in this payload\u2019s catalog.'));
+    if (cat.picks && cat.picks.present) main.append(recordCardEl(`KINGMAKER PICKS · ${cat.picks.items.length} ITEMS`, cat.picks.items.map((p) => `${p.role || ''} — ${p.id || ''}`).join('\n'), catSrc('kingmaker-picks.json')));
+    else main.append($('p', 'note', 'The picks index is not in this payload\u2019s catalog.'));
+  }
+
+  const SWITCHES = [
+    ['proofRun', 'Arm the 10-minute proof', 'An intent flag only: scripts/run-10m-proof.mjs reads it. Arming starts nothing by itself.'],
+    ['reflex', 'Reflex layer', 'System One answers decision-shaped turns before a reasoning brain wakes. Off restores the pre-reflex flow exactly.'],
+    ['reflexPin', 'Reflex seat pin', 'On a single-slot profile, the decision model stays pinned beside the worker so a reflex call never pays a model switch.'],
+  ];
+  function renderGates(main) {
+    main.append(head('Gates', 'The guardrails\u2019 own record, the waiting proposals, and the owner\u2019s three switches'));
+    main.append($('p', 'pane-sub', 'GUARDRAIL DECISIONS — FROM THE LEDGER'));
+    if (!feedGates) main.append($('p', 'note', 'The gates feed has not answered yet.'));
+    else if (!feedGates.guardrail.present) main.append($('p', 'note', 'The daemon\u2019s ledger is not present on this machine yet, so no guardrail decisions can be read from it — an absent source, not a clean record.'));
+    else if (!feedGates.guardrail.decisions.length) main.append($('p', 'note', 'The ledger carries no guardrail decisions yet.'));
+    else for (const d of feedGates.guardrail.decisions.slice(0, 12)) {
+      main.append(recordCardEl(
+        `DECISION · ${timeOf(d.at)} · ${String(d.stage || '').toUpperCase()} · ${String(d.mode || '').toUpperCase()}`,
+        `${d.decision || ''}${d.reasonCodes && d.reasonCodes.length ? ` — ${d.reasonCodes.join(', ')}` : ''}`,
+        feedGates.guardrail.source,
+      ));
+    }
+    main.append($('p', 'pane-sub', 'PROPOSALS — WAITING FOR THE OWNER'));
+    const gateProposals = (feedGates && feedGates.proposals && feedGates.proposals.proposals) || proposals.proposals || [];
+    if (!gateProposals.length) main.append($('p', 'note', 'No proposals waiting.'));
+    else for (const p of gateProposals) main.append(proposalCardEl(p));
+    main.append($('p', 'pane-sub', 'THE OWNER\u2019S THREE SWITCHES — THE ONLY WRITE THIS SURFACE PERFORMS'));
+    for (const [key, name, why] of SWITCHES) {
+      const row = $('div', 'switch-row');
+      const what = $('div', 'what');
+      what.append($('div', 'name', name), $('div', 'why', why));
+      const sw = $('button', 'switch');
+      sw.setAttribute('role', 'switch');
+      sw.setAttribute('aria-checked', String(Boolean(state.control[key])));
+      sw.setAttribute('aria-label', name);
+      sw.addEventListener('click', async () => {
+        sw.disabled = true;
+        try {
+          const r = await fetch('/control', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ [key]: !state.control[key] }) });
+          const j = await r.json();
+          if (j.ok) state.control = j.control;
+        } catch { /* the next poll re-reads the truth from the file */ }
+        await load();
+      });
+      row.append(what, sw);
+      main.append(row);
+    }
+    main.append($('p', 'note', 'A switch approves nothing, sends nothing, and starts nothing itself. It records the owner\u2019s intent where the governed pieces read it.'));
+  }
+
+  function renderAudit(main) {
+    main.append(head('Audit Chain', 'The daemon\u2019s hash-chained ledger — each entry carries the hash of the one before it'));
+    if (!feedAudit) { main.append($('p', 'note', 'The audit feed has not answered yet.')); return; }
+    if (!feedAudit.present) {
+      main.append(rowsEl([['Entries', 0], ['Ledger', feedAudit.source]]));
+      main.append($('p', 'note', feedAudit.note || 'The ledger is not present on this machine yet. The chain is empty because nothing has been written to it — not because anything was hidden.'));
+      return;
+    }
+    main.append(rowsEl([
+      ['Entries', feedAudit.total], ['Shown', feedAudit.entries.length],
+      ['Chain tip', feedAudit.tipHash], ['Ledger', feedAudit.source],
+    ]));
+    for (const e of feedAudit.entries) {
+      main.append(recordCardEl(
+        `ENTRY ${e.id} · ${timeOf(e.at)} · ${String(e.recordType || '').toUpperCase()}`,
+        `${e.action ? `ACTION — ${e.action}\n` : ''}HASH ${e.hash || ''}\n← ${e.previousHash || 'GENESIS'}`,
+        feedAudit.source,
+      ));
+    }
+  }
+
+  // The ask's live stage (light-runtime/ask.mjs, fed by the engine's own turn feed): the card says
+  // what the turn is doing while it does it, never just "Running" into silence.
+  const STAGE_TEXT = {
+    queued: 'Queued', routed: 'Routed', researching: 'Researching — gathering and checking sources',
+    thinking: 'Thinking — the engine is working the question', waiting: 'Waiting — needs the owner\u2019s word',
+    answered: 'Answered', held: 'Held', failed: 'Failed',
+  };
+  function diagRows(d) {
+    if (!d) return [];
+    const ms = (v) => (v === null || v === undefined ? null : `${Math.round(v)} ms`);
+    return [
+      ['Stage', d.stage ? STAGE_TEXT[d.stage] || d.stage : null],
+      ['Seat', d.seatLabel || null], ['Lane', d.lane ? `${d.lane}${d.by ? ` · by ${d.by}` : ''}` : null],
+      ['Model', Array.isArray(d.models) ? (d.models.join(', ') || null) : (d.model || null)],
+      ['Route', ms(d.routeMs)], ['Queued', ms(d.queueMs)], ['Turn', ms(d.turnMs ?? d.totalMs)],
+      ['First token', ms(d.firstTokenMs)],
+      ['Prompt tokens', d.promptTokens], ['Generated tokens', d.generatedTokens],
+      ['Decode', d.decodeTokS ? `${d.decodeTokS} tok/s` : null],
+      ['WebGPU', d.webgpu === undefined || d.webgpu === null ? null : (d.webgpu ? 'yes' : 'no — Wasm')],
+    ].filter(([, v]) => v !== null && v !== undefined);
+  }
+  // The stage a RUNNING card may show: never a terminal word. The server clamps this too
+  // (light-runtime/ask.mjs view()), but a card rendered from any ask view — an older server,
+  // a locally recorded failure-shaped record — must not be able to print "Running — Failed"
+  // while its turn is still in flight: Failed is a settled state, not a live stage.
+  const liveStageOf = (v) => ((v.state === 'running' || v.state === 'queued')
+    && (v.stage === 'failed' || v.stage === 'answered' || v.stage === 'held') ? 'thinking' : v.stage);
+  function askCardEl(v, i) {
+    const c = $('article', 'card');
+    const seatName = v.seat === 'browser' ? 'BROWSER SEAT' : v.seat === 'native' ? 'NATIVE ENGINE · JOB INBOX' : 'UNPLACED';
+    c.append($('div', 'card-head', `ASK ${asks.length - i} · ${timeOf(v.submittedAt)} · ${seatName}${v.surface === 'voice' ? ' · VOICE' : ''} · ${String(v.state).toUpperCase()}`));
+    const q = $('div', 'card-body'); q.append($('mark', null, 'Q'), document.createTextNode(` ${v.text ?? '(spoken ask — no transcript was produced)'}`)); c.append(q);
+    const a = $('div', 'card-body');
+    if (v.state === 'done') a.textContent = (v.answer || []).join('\n') || '(the turn answered with no spoken line)';
+    else if (v.state === 'held') a.textContent = `HELD — ${(v.answer || []).join(' ')}\n${v.heldReason || ''}`;
+    else if (v.state === 'failed') a.textContent = `FAILED — ${v.error || 'unknown'}${v.errorHint ? ` — ${v.errorHint}` : ''}`;
+    else a.textContent = v.state === 'queued' ? 'Queued — waiting for a seat.' : `Running — ${STAGE_TEXT[liveStageOf(v)] || 'the turn is running'} The answer lands here when the turn ends.`;
+    c.append(a);
+    if (v.state === 'done') {
+      // The spoken readback: speech is a rendering of the answer, never the record — the
+      // text above stands whether speech is capped, stopped or fails.
+      const sp = speechByAsk[v.id];
+      const row = $('div', 'askbox');
+      const speaking = sp && (sp.state === 'speaking' || sp.state === 'loading');
+      const speakBtn = $('button', 'minibtn', speaking ? 'Stop' : 'Speak');
+      speakBtn.disabled = !voiceCtl || voice.ttsAvailable === false;
+      speakBtn.addEventListener('click', () => {
+        if (!voiceCtl) return;
+        if (speaking) voiceCtl.stopSpeech();
+        else voiceCtl.speak(v.id, (v.answer || []).join('\n'));
+      });
+      row.append(speakBtn);
+      if (sp) row.append($('span', 'speechline', `${String(sp.state).toUpperCase()} — ${sp.detail || ''}`));
+      else if (voice.ttsAvailable === false) row.append($('span', 'speechline', 'SPEECH UNAVAILABLE — the voice model is not installed on this device'));
+      c.append(row);
+    }
+    const rows = diagRows({ ...v.diagnostics, seatLabel: v.seat, stage: liveStageOf(v) });
+    if (rows.length) c.append(rowsEl(rows));
+    c.append($('div', 'card-src', `SOURCE — ${v.diagnostics && v.diagnostics.source ? v.diagnostics.source : 'the ask router (lane + seat); token counts from the meter when recorded'}`));
+    return c;
+  }
+  // A registered failure, self-contained: a screenshot of this card explains the failure by
+  // itself — the question, that it did not complete, the engine's reason in its own words,
+  // where the recorded time went, and the source it was read from.
+  const SURFACE_TEXT = { bar: 'BAR', window: 'APP WINDOW' };
+  function failureCardEl(f) {
+    const held = f.state === 'held';
+    const c = $('article', `card ${held ? 'heldcard' : 'failed'}`);
+    c.append($('div', `fail-strip${held ? ' held' : ''}`,
+      `${held ? 'HELD' : '✕ FAILED'} · ${timeOf(f.submittedAt)} · ${SURFACE_TEXT[f.surface] || 'BAR'} — ${held ? 'THE ENGINE HELD THIS TURN' : 'THE REQUEST WAS NOT COMPLETED'}`));
+    const q = $('div', 'card-body'); q.append($('mark', null, 'Q'), document.createTextNode(` ${f.text}`)); c.append(q);
+    const why = $('div', 'card-body');
+    why.textContent = held
+      ? `WHY — ${f.reason || 'the engine recorded no held line'}\n${f.heldReason || ''}`
+      : f.reasonRecorded
+        ? `WHY — ${f.reason}`
+        : 'WHY — reason not recorded. The engine logged no reason for this failure; the request was not completed and no cause is claimed here.';
+    c.append(why);
+    if (f.gloss) c.append($('div', 'card-body', f.gloss));
+    c.append(rowsEl([
+      ['Turn', f.turnMs === null || f.turnMs === undefined ? null : `${(f.turnMs / 1000).toFixed(1)} s`],
+      ['Recorded turn', f.recordMs === null || f.recordMs === undefined ? null : `${(f.recordMs / 1000).toFixed(1)} s — the engine's own timing record`],
+      ['Route', f.route],
+    ]));
+    c.append($('div', 'card-src', `SOURCE — ${f.source}`));
+    return c;
+  }
+  function renderFailures(main) {
+    if (!failures.length) return;
+    main.append($('p', 'pane-sub', 'FAILURES — TURNS THAT DID NOT COMPLETE'));
+    for (const f of failures) main.append(failureCardEl(f));
+  }
+  function proposalCardEl(p) {
+    const c = $('article', 'card');
+    c.append($('div', 'card-head', `WAITING FOR YOU · RISK ${p.riskTier ?? 'UNMEASURED'}${p.requesterKind && p.requesterKind !== 'operator_typed' ? ` · ASKED BY ${String(p.requesterKind).replace(/_/g, ' ').toUpperCase()}` : ''}`));
+    const b = $('div', 'card-body'); b.textContent = p.summary; c.append(b);
+    const result = proposalResults[p.proposalId];
+    if (result) { const r = $('div', 'card-body'); r.textContent = result; c.append(r); return c; }
+    const box = $('div', 'askbox');
+    let challengeInput = null;
+    if (p.challenge) {
+      challengeInput = $('textarea');
+      challengeInput.rows = 1;
+      challengeInput.placeholder = `This approval needs the words typed back: ${p.challenge}`;
+      box.append(challengeInput);
+    }
+    const decide = async (kind) => {
+      try {
+        const r = await fetch(`/proposals/${encodeURIComponent(p.proposalId)}/${kind}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(kind === 'approve' ? { typedChallenge: challengeInput ? challengeInput.value : undefined } : {}) });
+        const j = await r.json();
+        proposalResults[p.proposalId] = j.ok ? (j.spoken || (kind === 'approve' ? 'Approved.' : 'Cancelled. Nothing was changed.')) : `Not done: ${j.error || `HTTP ${r.status}`}${j.hint ? ` — ${j.hint}` : ''}`;
+      } catch (e) { proposalResults[p.proposalId] = `Not done: ${String(e)}`; }
+      await load();
+    };
+    const yes = $('button', null, 'Approve');
+    yes.addEventListener('click', () => decide('approve'));
+    const no = $('button', null, 'Cancel');
+    no.addEventListener('click', () => decide('cancel'));
+    box.append(yes, no);
+    c.append(box);
+    return c;
+  }
+  function renderApprovals(main) {
+    const list = proposals.proposals || [];
+    if (!list.length) return;
+    main.append(head('Waiting for you', 'Held by the engine until the owner\u2019s word — given here, in this window'));
+    for (const p of list) main.append(proposalCardEl(p));
+    if (proposals.approveAvailable === false) main.append($('p', 'note', 'Approving needs this launch\u2019s owner nonce file, which this engine launch did not leave on the device — cancel works here regardless.'));
+  }
+  // One submission path for both surfaces: the typed ask box and the voice transcript
+  // enter through here, differing only in the surface they truthfully carry ('window' for
+  // typed, 'voice' for spoken — recorded at submission, never inferred afterwards).
+  async function postAsk(text, surface) {
+    try {
+      const r = await fetch('/ask', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text, surface }) });
+      const v = await r.json();
+      if (v && v.id) { asks.unshift(v); watchAsk(v.id); return v; }
+      asks.unshift({ id: `local-${Date.now()}`, text, surface, state: 'failed', seat: null, submittedAt: new Date().toISOString(), answer: null, error: v?.error || `HTTP ${r.status}`, diagnostics: {} });
+    } catch (e) {
+      asks.unshift({ id: `local-${Date.now()}`, text, surface, state: 'failed', seat: null, submittedAt: new Date().toISOString(), answer: null, error: String(e), diagnostics: {} });
+    }
+    render();
+    return null;
+  }
+  function renderAsk(main) {
+    main.append(head('Ask', 'Ask here — the answer runs on a seat and lands on this wall with its diagnostics'));
+    renderFailures(main);
+    main.append($('p', 'seatline', ''));
+    const seatLine = main.lastChild;
+    seatLine.innerHTML = '';
+    seatLine.append(document.createTextNode('BROWSER SEAT — '), $('b', null, String(seat.state).toUpperCase()), document.createTextNode(` · ${seat.detail}`));
+    const voiceLine = $('p', 'voicebar');
+    voiceLine.append(document.createTextNode('VOICE — EAR '), $('b', null, String(voice.ear).toUpperCase()), document.createTextNode(' · SPEECH '), $('b', null, String(voice.speech).toUpperCase()), document.createTextNode(` · ${voice.detail}`));
+    main.append(voiceLine);
+    const box = $('div', 'askbox');
+    const ta = $('textarea');
+    ta.id = 'ask-text';
+    ta.placeholder = 'Ask Kingmaker… (a write-lane question can be answered by the engine in this tab; anything else goes to the governed engine)';
+    ta.rows = 2;
+    ta.value = window.__askDraft || '';
+    ta.addEventListener('input', () => { window.__askDraft = ta.value; });
+    const btn = $('button', null, 'Ask');
+    const submit = async () => {
+      const text = ta.value.trim();
+      if (!text) return;
+      btn.disabled = true;
+      const v = await postAsk(text, 'window');
+      if (v) { ta.value = ''; window.__askDraft = ''; }
+      btn.disabled = false;
+      render();
+    };
+    btn.addEventListener('click', submit);
+    ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submit(); });
+    const mic = $('button', null, voice.ear === 'listening' ? 'Stop · send' : 'Speak ask');
+    mic.disabled = !voiceCtl || voice.ear === 'loading' || voice.ear === 'transcribing';
+    mic.addEventListener('click', async () => {
+      if (!voiceCtl) return;
+      mic.disabled = true;
+      if (voice.ear === 'listening') await voiceCtl.stopListening();
+      else await voiceCtl.startListening();
+      render();
+    });
+    box.append(ta, btn, mic);
+    main.append(box);
+    renderApprovals(main);
+    if (!asks.length) main.append($('p', 'note', 'No asks yet this session. Propose-only, exactly like the bar: a decision word or a /command is refused, and anything an ask sets in motion waits for the owner\u2019s word — in the Waiting section above, or at the bar.'));
+    asks.forEach((v, i) => main.append(askCardEl(v, i)));
+  }
+  async function watchAsk(id) {
+    for (let n = 0; n < 200; n++) {
+      await new Promise((r) => setTimeout(r, 1500));
+      try {
+        const v = await (await fetch(`/ask/${id}`, { cache: 'no-store' })).json();
+        const i = asks.findIndex((a) => a.id === id);
+        if (i >= 0) asks[i] = v;
+        if (pane === 'Ask') render();
+        if (v.state === 'done' || v.state === 'failed' || v.state === 'held') { await load(); return; }
+      } catch { /* a lost poll is not a failed ask */ }
+    }
+  }
+  // When a session module's import fails, the exception says only that fetching the module
+  // failed — the endpoint's own answer (its status and coded refusal) is the diagnosis, so
+  // read it before reporting: on the owner's machine that one line separates a runtime the
+  // armor refuses (Node < 24) from a stale identity store from bundle files that are not
+  // there. A healthy answer on this direct read says the failure did not repeat; a read
+  // that itself fails says so plainly. The wording lands on the seat/voice status lines.
+  async function sessionDiagnosis(url) {
+    try {
+      const r = await fetch(url, { cache: 'no-store' });
+      if (r.ok) return 'the session endpoint answers 200 — the load failure did not repeat on a direct read';
+      let code = null, msg = null;
+      try { const j = await r.json(); if (typeof j?.error === 'string') code = j.error; if (Array.isArray(j?.errors) && j.errors[0]) msg = String(j.errors[0]); } catch { /* a refusal without a JSON body still has its status */ }
+      return `session endpoint answered ${r.status}${code ? ` ${code}` : ''}${msg ? ` — ${msg}` : ''}`;
+    } catch { return 'the session endpoint could not be reached to explain the failure'; }
+  }
+
+  // Boot the in-tab engine seat: the module arrives only through the device layer's verified
+  // session handoff; its state lines are its own report, shown as such.
+  (async () => {
+    try {
+      const mod = await import('/engine/session/seat.mjs');
+      await mod.startSeat({ onStatus: (s, d) => { seat = { state: s, detail: d || '' }; if (pane === 'Ask') render(); } });
+    } catch (e) { const why = await sessionDiagnosis('/engine/session/seat.mjs'); seat = { state: 'unavailable', detail: `the seat module did not load — ${why} — asks fall back to the native engine` }; if (pane === 'Ask') render(); }
+  })();
+
+  // Boot the in-tab voice the same way: the module arrives only through the voice
+  // artifact's verified session handoff. A spoken ask's transcript enters through the
+  // same postAsk as a typed ask, carrying its true surface; a failure before any
+  // transcript exists is recorded server-side as a FAILED ask — on the wall, with its
+  // true reason, never as silence.
+  (async () => {
+    try {
+      const mod = await import('/voice/session/voice.mjs');
+      voiceCtl = mod.startVoice({
+        onStatus: (s) => { voice = { ...voice, ...s }; if (pane === 'Ask') render(); },
+        onTranscript: (text) => { postAsk(text, 'voice'); },
+        onFailure: async (f) => {
+          const local = { id: `local-${Date.now()}`, text: null, surface: 'voice', state: 'failed', seat: null, submittedAt: new Date().toISOString(), answer: null, error: `${f.stage}: ${f.error}`, diagnostics: {} };
+          try {
+            const r = await fetch('/voice/failure', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(f) });
+            const v = await r.json();
+            asks.unshift(v && v.id ? v : local);
+          } catch { asks.unshift(local); }
+          await load();
+        },
+        onSpeech: (askId, ev) => { speechByAsk[askId] = ev; if (pane === 'Ask') render(); },
+      });
+      window.__kingmakerVoice = voiceCtl;
+    } catch (e) { const why = await sessionDiagnosis('/voice/session/voice.mjs'); voice = { ...voice, ear: 'unavailable', detail: `the voice module did not load — ${why} — typed asks are unaffected` }; if (pane === 'Ask') render(); }
+  })();
+
+  const RENDER = { 'Ask': renderAsk, 'Overview': renderOverview, 'Router': renderRouter, 'Evidence Wall': renderEvidence, 'Library': renderLibrary, 'Gates': renderGates, 'Audit Chain': renderAudit };
+
+  function render() {
+    document.getElementById('status-pill').textContent = state ? state.status.pill : 'STATE UNREACHABLE';
+    document.getElementById('surface-tag').textContent = state ? state.surface : 'LIGHT RUNTIME';
+    for (const b of rail.children) b.classList.toggle('active', b.dataset.pane === pane);
+    const main = document.getElementById('main');
+    // The wall re-renders on a timer; without this, a rebuild mid-typing steals the
+    // ask box's focus and the owner's keystrokes land nowhere. Preserve focus + caret
+    // on the ask textarea across renders (its draft text is already preserved).
+    const ae = document.activeElement;
+    const keepFocus = ae && ae.id === 'ask-text' ? { s: ae.selectionStart, e: ae.selectionEnd } : null;
+    main.replaceChildren();
+    if (!state) { main.append($('p', 'note', 'The light runtime\u2019s state could not be read. This window invents nothing in its place.')); return; }
+    RENDER[pane](main);
+    if (keepFocus) {
+      const ta = document.getElementById('ask-text');
+      if (ta) { ta.focus(); try { ta.setSelectionRange(keepFocus.s, keepFocus.e); } catch { /* caret restore is best-effort */ } }
+    }
+  }
+
+  async function load() {
+    try { state = await (await fetch('/state', { cache: 'no-store' })).json(); }
+    catch { state = null; }
+    try {
+      const j = await (await fetch('/asks', { cache: 'no-store' })).json();
+      if (j && Array.isArray(j.asks)) {
+        const local = asks.filter((a) => String(a.id).startsWith('local-'));
+        asks = [...local, ...j.asks];
+      }
+    } catch { /* asks are this session's view; a lost read invents nothing */ }
+    try {
+      const j = await (await fetch('/failures', { cache: 'no-store' })).json();
+      if (j && Array.isArray(j.failures)) failures = j.failures;
+    } catch { /* a lost failures read keeps the last true list */ }
+    try {
+      const j = await (await fetch('/proposals', { cache: 'no-store' })).json();
+      if (j && Array.isArray(j.proposals)) proposals = j;
+    } catch { /* a lost proposals read keeps the last true list */ }
+    // The daemon feeds: each kept whole per endpoint; a lost or refused read keeps the
+    // last true value, never a blank dressed as data.
+    const grab = async (path, keep) => {
+      try {
+        const j = await (await fetch(path, { cache: 'no-store' })).json();
+        if (j && j.ok !== false) keep(j);
+      } catch { /* a lost feed read keeps the last true value */ }
+    };
+    await grab('/api/activity', (j) => { feedActivity = j; });
+    await grab('/api/router', (j) => { feedRouter = j; });
+    await grab('/api/gates', (j) => { feedGates = j; });
+    await grab('/api/audit', (j) => { feedAudit = j; });
+    await grab('/api/library', (j) => { feedLibrary = j; });
+    await grab('/api/health', (j) => { feedHealth = j; });
+    await grab('/api/models', (j) => { feedModels = j; });
+    await grab('/api/conversations', (j) => { feedConvs = j; });
+    if (feedConvs && feedConvs.present) {
+      for (const conv of feedConvs.conversations.slice(0, 3)) {
+        await grab(`/api/conversations/${encodeURIComponent(conv.id)}/turns`, (j) => { if (Array.isArray(j.turns)) feedTurns[conv.id] = j.turns; });
+      }
+    }
+    render();
+  }
+  load();
+  setInterval(load, 5000);
+</script>
+</body>
+</html>
