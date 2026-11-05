@@ -1,0 +1,41 @@
+# Scripture Armor vault daemon — USER systemd unit template (the
+# labeled fallback twin of linux/scripture-vaultd.service).
+# Rendered by linux/install-daemon.sh --mode user (placeholders
+# substituted with the owner's real paths) and installed to
+# ~/.config/systemd/user/scripture-vaultd.service. By hand:
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now scripture-vaultd
+#   loginctl enable-linger <owner>   (start at boot, before login —
+#     run as root; without linger this unit starts at login and
+#     logout can take the daemon down. It is a fallback posture,
+#     NOT the default: prefer the system unit.)
+#
+# Twin discipline follows solomon-user.service: the same
+# health-gated start and restart discipline as the system unit;
+# the hardening block is the system unit's alone (Solomon's user
+# twin likewise carries none). No User= line — a user unit runs as
+# the owner by construction, and vaultd is owner-bound by design.
+
+[Unit]
+Description=Scripture Armor vault daemon (vaultd, user)
+Documentation=file:__REPO_DIR__/README.md
+After=network-online.target
+
+[Service]
+Type=exec
+ExecStart=__NODE_BIN__ __REPO_DIR__/vaultd.mjs serve --identity-dir __IDENTITY_DIR__ --socket __IDENTITY_DIR__/vaultd.sock
+ExecStartPost=/bin/sh -c 'for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do __NODE_BIN__ __REPO_DIR__/vaultd.mjs status --identity-dir __IDENTITY_DIR__ >/dev/null 2>&1 && exit 0; sleep 1; done; exit 1'
+TimeoutStartSec=60
+WorkingDirectory=__REPO_DIR__
+Environment=HOME=__OWNER_HOME__
+Environment=PATH=__PATH_VALUE__
+Restart=always
+RestartSec=5
+RestartPreventExitStatus=78
+KillMode=mixed
+TimeoutStopSec=30
+StandardOutput=append:__LOG_PATH__
+StandardError=append:__LOG_PATH__
+
+[Install]
+WantedBy=default.target
