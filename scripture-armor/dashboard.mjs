@@ -72,7 +72,7 @@ const device = options.deviceProtection === true ? createDeviceProtection({
     const bytes=fs.readFileSync(target);
     try {
       const result=await reviewUploadedFile(bytes,path.basename(target),{
-        readRoots:reviewToolRoots(bytes,path.basename(target)),protectedRoots:[identityDir,identityDir+'.installation']});
+        readRoots:reviewToolRoots(bytes,path.basename(target)),protectedRoots:[identityDir,identityDir+'.installation'],retentionIdentityDir:identityDir});
       return {finding:result.activeContent||result.format==='Sensitive key material'||result.findings.some(f=>f.severity!=='info')||
         Boolean(result.rea&&result.rea.verdict!=='clean')||Boolean(result.binary&&!['pass','not-applicable'].includes(result.binary.verdict)),limited:result.status==='limited'};
     }finally{bytes.fill(0);}
@@ -81,7 +81,7 @@ const device = options.deviceProtection === true ? createDeviceProtection({
 const repositoryReview=createRepositoryReview({identityDir,...(options.repositoryFetchBytes?{fetchBytes:options.repositoryFetchBytes}:{}),
   resources:async()=>!analysisBusy&&await(options.deviceResources||deviceResources)(identityDir),
   isLicensed:async()=>{await resumeDeviceChecks();return account.state().authenticated&&Date.now()<deviceLeaseUntil&&status().activated;},
-  analyze:(bytes,name)=>exclusiveAnalysis(()=>reviewUploadedFile(bytes,name,{readRoots:reviewToolRoots(bytes,name),protectedRoots:[identityDir,identityDir+'.installation']})),
+  analyze:(bytes,name)=>exclusiveAnalysis(()=>reviewUploadedFile(bytes,name,{readRoots:reviewToolRoots(bytes,name),protectedRoots:[identityDir,identityDir+'.installation'],retentionIdentityDir:identityDir})),
 });
 function reviewToolRoots(bytes,name) {
   if(classifyBuffer(bytes.subarray(0,16384),name)!=='binary'||!fs.existsSync(path.join(HERE,'BUNDLE.json')))return [];
@@ -169,7 +169,7 @@ async function reviewLinkResponse(input,res) {
     try {
       const result=await exclusiveAnalysis(async()=>{
         intake=await retrieveReviewLink(input.url);
-        return reviewUploadedFile(intake.bytes,intake.name,{readRoots:reviewToolRoots(intake.bytes,intake.name),protectedRoots:[identityDir,identityDir+'.installation']});
+        return reviewUploadedFile(intake.bytes,intake.name,{readRoots:reviewToolRoots(intake.bytes,intake.name),protectedRoots:[identityDir,identityDir+'.installation'],retentionIdentityDir:identityDir});
       });
       if(intake.source.partial){
         result.status='limited';result.limitations.push(intake.source.scope);
@@ -195,7 +195,7 @@ async function api(req, res, url) {
       if(Object.keys(input).length!==1||typeof input.text!=='string'||!input.text.trim()||input.text.length>32768)return json(res,400,{ok:false,error:'Select up to 32 KiB of useful text.'});
       if(!await(options.deviceResources||deviceResources)(identityDir))return json(res,503,{ok:false,error:'Retained-text review is waiting for memory and disk headroom. Try again shortly.'});
       await device?.stop();const bytes=Buffer.from(input.text,'utf8');
-      try{const review=await exclusiveAnalysis(()=>reviewUploadedFile(bytes,'retained-notes.txt',{protectedRoots:[identityDir,identityDir+'.installation']}));
+      try{const review=await exclusiveAnalysis(()=>reviewUploadedFile(bytes,'retained-notes.txt',{protectedRoots:[identityDir,identityDir+'.installation'],retentionIdentityDir:identityDir}));
         if(review.disposition==='ejected'||review.status==='limited'||review.activeContent)return json(res,422,{ok:false,error:'Selected text still contains risk patterns or could not be fully inspected. Edit it before saving. The original has not been removed.'});
         return json(res,200,{ok:true,retainedText:input.text});
       }finally{bytes.fill(0);device?.start('resume');}
@@ -217,7 +217,7 @@ async function api(req, res, url) {
       const review=await exclusiveAnalysis(async()=>{
         if(options.nativeReviewRoot){const root=fs.realpathSync(options.nativeReviewRoot),file=fs.realpathSync(input.path);if(!file.startsWith(root+path.sep))throw Error('Native fixture review is restricted to its disposable file scope.');}
         source=reviewSource(input.path,{identityDir});
-        return reviewUploadedFile(source.bytes,path.basename(source.target.path),{readRoots:reviewToolRoots(source.bytes,path.basename(source.target.path)),protectedRoots:[identityDir,identityDir+'.installation']});
+        return reviewUploadedFile(source.bytes,path.basename(source.target.path),{readRoots:reviewToolRoots(source.bytes,path.basename(source.target.path)),protectedRoots:[identityDir,identityDir+'.installation'],retentionIdentityDir:identityDir});
       });
       const sourceEjectionId=originalEjection.register(source,review);
       feed('native-file-review',`Native file review: ${review.disposition}, danger ${review.risk.level}. Original removal requires confirmation.`);
@@ -306,7 +306,7 @@ async function api(req, res, url) {
       if(!await (options.deviceResources||deviceResources)(identityDir))return json(res,503,{ok:false,error:'Review paused to preserve memory and disk headroom.'});
       await device?.stop();
       const result=await exclusiveAnalysis(async()=>{
-        return reviewUploadedFile(upload,name,{readRoots:reviewToolRoots(upload,name),protectedRoots:[identityDir,identityDir+'.installation']});
+        return reviewUploadedFile(upload,name,{readRoots:reviewToolRoots(upload,name),protectedRoots:[identityDir,identityDir+'.installation'],retentionIdentityDir:identityDir});
       });
       feed('file-review',`Sandbox review of ${name}: ${result.disposition}, danger ${result.risk.level}. Uploaded content was not executed.`);
       return json(res,200,{ok:true,review:result});

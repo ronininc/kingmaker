@@ -5,6 +5,7 @@ import crypto from 'node:crypto';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {classifyBuffer} from './scan.mjs';
+import {emitFileReview} from './shield-ledger.mjs';
 const HERE=path.dirname(fileURLToPath(import.meta.url));
 const q=value=>JSON.stringify(value);
 const liveReviews=new Map();
@@ -36,14 +37,14 @@ export function macReviewPolicy({node,codeRoot,root,readRoots=[],readFiles=[],pr
 (allow file-write* (subpath ${q(path.join(root,'scratch'))}) (literal "/dev/null"))
 (allow process-exec ${executables.map(p=>`(literal ${q(p)})`).join(' ')} ${binary?readRoots.map(p=>`(subpath ${q(p)})`).join(' '):''})`;
 }
-export async function reviewUploadedFile(bytes,name,{readRoots=[],protectedRoots=[]}={}) {
+export async function reviewUploadedFile(bytes,name,{readRoots=[],protectedRoots=[],retentionIdentityDir=null}={}) {
   if(!Buffer.isBuffer(bytes)||!bytes.length||bytes.length>16*1024*1024||typeof name!=='string'||name.length>256||/[\0\r\n]/.test(name))throw Error('A single nonempty file up to 16 MiB is required.');
   // Linux lane (owner ruling 2026-11-05: the lane ships in the product):
   // the namespace sandbox in sandbox-review-linux.mjs, behind this same
   // interface and the same guards. It refuses on its own when no lane is
   // available, so the fail-closed throw below still governs every platform
   // without a lane — review never runs unsandboxed.
-  if(process.platform==='linux'){const {reviewUploadedFile:linuxReview}=await import('./sandbox-review-linux.mjs');return linuxReview(bytes,name,{readRoots,protectedRoots});}
+  if(process.platform==='linux'){const {reviewUploadedFile:linuxReview}=await import('./sandbox-review-linux.mjs');return linuxReview(bytes,name,{readRoots,protectedRoots,retentionIdentityDir});}
   if(process.platform!=='darwin'||!fs.existsSync('/usr/bin/sandbox-exec')||process.getuid?.()===0)throw Error('An unprivileged OS review sandbox is unavailable; review was not run.');
   const node=fs.realpathSync(process.execPath),root=fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'armor-review-')));
   fs.chmodSync(root,0o700);const input=path.join(root,'upload'),scratch=path.join(root,'scratch');
@@ -77,7 +78,12 @@ export async function reviewUploadedFile(bytes,name,{readRoots=[],protectedRoots
       child.stdout.on('data',chunk=>{stdout+=chunk;if(stdout.length>1024*1024){kill();finish(Error('Review output limit exceeded.'));}});
       child.stderr.on('data',chunk=>{if(stderr.length<16384)stderr+=chunk;});
       child.on('close',code=>{if(code!==0)return finish(Error('OS sandbox review failed; no clean verdict was issued.'));
-        try{const result=JSON.parse(stdout);if(result.schema!=='scripture-armor.file-review/1'||result.contentSha256!==crypto.createHash('sha256').update(bytes).digest('hex')||result.commandAuthority!==false||result.targetExecuted!==false)throw Error();finish(null,{...result,sandbox:'macos-seatbelt',isolation:{reviewId,policySha256,network:false,vault:false,ownerKeysCopied:false,workspaceDestroyedOnReturn:true,nextReview:'fresh-workspace',originalFileRemoved:false}});}
+        try{const result=JSON.parse(stdout);if(result.schema!=='scripture-armor.file-review/1'||result.contentSha256!==crypto.createHash('sha256').update(bytes).digest('hex')||result.commandAuthority!==false||result.targetExecuted!==false)throw Error();
+        // Shield-Builder B1 retention: emit the file-review record to
+        // the findings ledger before the finally destroys the workspace.
+        // Collection failure never fails a review.
+        if(retentionIdentityDir){try{emitFileReview(retentionIdentityDir,result,result.contentSha256);}catch{}}
+        finish(null,{...result,sandbox:'macos-seatbelt',isolation:{reviewId,policySha256,network:false,vault:false,ownerKeysCopied:false,workspaceDestroyedOnReturn:true,nextReview:'fresh-workspace',originalFileRemoved:false}});}
         catch{finish(Error('Review returned an invalid result.'));}
       });
       try{os.setPriority(child.pid,19);}catch{kill();finish(Error('Low-priority review could not start.'));}

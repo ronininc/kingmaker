@@ -44,6 +44,7 @@ import os from 'node:os';
 import crypto from 'node:crypto';
 import {spawn} from 'node:child_process';
 import {fileURLToPath, pathToFileURL} from 'node:url';
+import {emitFileReview} from './shield-ledger.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const INNER = path.join(HERE, 'linux-review-inner.sh');
@@ -127,7 +128,7 @@ export function runSandboxedCommand({root, codeRoot, readRoots = [], command, en
   });
 }
 
-export async function reviewUploadedFile(bytes, name, {readRoots = [], protectedRoots = [], codeRoot = DEFAULT_CODE_ROOT, timeoutMs = 25000} = {}) {
+export async function reviewUploadedFile(bytes, name, {readRoots = [], protectedRoots = [], codeRoot = DEFAULT_CODE_ROOT, timeoutMs = 25000, retentionIdentityDir = null} = {}) {
   if (!Buffer.isBuffer(bytes) || !bytes.length || bytes.length > 16 * 1024 * 1024 || typeof name !== 'string' || name.length > 256 || /[\0\r\n]/.test(name)) throw Error('A single nonempty file up to 16 MiB is required.');
   if (process.platform !== 'linux' || !fs.existsSync('/usr/bin/unshare') || !fs.existsSync('/usr/bin/setpriv') || !fs.existsSync('/usr/bin/prlimit')) throw Error('An unprivileged OS review sandbox is unavailable; review was not run.');
   const node = fs.realpathSync(process.execPath);
@@ -174,6 +175,13 @@ export async function reviewUploadedFile(bytes, name, {readRoots = [], protected
       result = JSON.parse(stdout);
       if (result.schema !== 'scripture-armor.file-review/1' || result.contentSha256 !== crypto.createHash('sha256').update(bytes).digest('hex') || result.commandAuthority !== false || result.targetExecuted !== false) throw Error();
     } catch { throw Error('Review returned an invalid result.'); }
+    // Shield-Builder B1 retention: the file-review record is emitted to
+    // the findings ledger BEFORE the finally below destroys the
+    // workspace — testimony leaves before the door closes; the original
+    // is never touched. Collection failure never fails a review.
+    if (retentionIdentityDir) {
+      try { emitFileReview(retentionIdentityDir, result, result.contentSha256); } catch {}
+    }
     return {...result, sandbox: 'linux-namespace', isolation: {reviewId, planSha256, network: false, vault: false, ownerKeysCopied: false, workspaceDestroyedOnReturn: true, nextReview: 'fresh-workspace', originalFileRemoved: false}};
   } finally { fs.rmSync(root, {recursive: true, force: true}); }
 }

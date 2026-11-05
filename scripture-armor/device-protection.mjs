@@ -7,6 +7,7 @@ import crypto from 'node:crypto';
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {classifyBuffer} from './scan.mjs';
+import {collectDeviceFindings} from './shield-collect.mjs';
 import scanRoots from './device-scan-roots.json' with {type:'json'};
 const executeFile=promisify(execFile);
 const SKIP=new Set(['.git','node_modules','.ssh','.aws','.gnupg','.codex','.scripture-armor','.kingmaker','Caches','Cache','migration-backups']);
@@ -42,6 +43,19 @@ export function createDeviceProtection({identityDir,roots=deviceScanRoots(),anal
   let state={state:'not_started',trigger:null,checked:0,findings:0,skipped:0,repaired:0,blocked:0,
     scope:[...roots],wholeDeviceCoverageVerified:false,commandAuthority:false};
   const publish=(type,message)=>{try{onEvent(type,message);}catch{}};
+  // Shield-Builder B1 retention: this lane's findings and counters live
+  // only in this process's memory today. Flush them to the findings
+  // ledger at scan completion and on stop — the transitions that can
+  // precede process exit (SPEC §3.1). Collection failure never breaks
+  // the lane.
+  function flushFindingsToLedger() {
+    try {
+      collectDeviceFindings(identityDir, {
+        findings: [...findingFiles.values()].map((f) => ({path: f.path, name: f.name})),
+        counters: {checked: state.checked, findings: state.findings, skipped: state.skipped, repaired: state.repaired, blocked: state.blocked},
+      }, 'device-protection');
+    } catch {}
+  }
   function baseline() {
     // The only automatic repair is the privacy mode of this app-owned audit
     // directory. No key store, system setting, executable, or user file changes.
@@ -93,7 +107,7 @@ export function createDeviceProtection({identityDir,roots=deviceScanRoots(),anal
       if(!await resources(protectedRoot)){state.state='paused_for_resources';return;}
       state.state='scanning';
       const file=retryQueue.length?retryQueue.shift():await nextFile();
-      if(file===null){state.state='completed_scoped_scan';stopped=true;publish('device-scan','Automatic scoped device inspection completed. Unreadable and deferred items remain listed.');return;}
+      if(file===null){state.state='completed_scoped_scan';stopped=true;flushFindingsToLedger();publish('device-scan','Automatic scoped device inspection completed. Unreadable and deferred items remain listed.');return;}
       if(!file)return;
       const fd=fs.openSync(file,fs.constants.O_RDONLY|(fs.constants.O_NOFOLLOW||0)|fs.constants.O_NONBLOCK);
       let temporary;
@@ -141,6 +155,6 @@ export function createDeviceProtection({identityDir,roots=deviceScanRoots(),anal
       state.state=isLicensed()?'queued':'waiting_for_login';schedule();
     },
     tick,
-    async stop(){stopped=true;if(timer)clearTimeout(timer);timer=null;if(running)await new Promise(resolve=>drain.push(resolve));if(iterator&&!running){await iterator.dir.close();iterator=null;}state.state='stopped';},
+    async stop(){stopped=true;if(timer)clearTimeout(timer);timer=null;if(running)await new Promise(resolve=>drain.push(resolve));if(iterator&&!running){await iterator.dir.close();iterator=null;}flushFindingsToLedger();state.state='stopped';},
   });
 }

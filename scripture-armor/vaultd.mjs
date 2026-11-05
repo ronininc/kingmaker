@@ -44,6 +44,7 @@
 
 import net from 'node:net';
 import { assertProductIdentityDir } from './product-paths.mjs';
+import { openAttemptsFeed } from './shield-attempts.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import { spawn } from 'node:child_process';
@@ -150,6 +151,7 @@ async function clientMain(cmd, flags, pos) {
     return;
   }
   if (cmd === 'status') await orpc({ cmd: 'status' });
+  else if (cmd === 'attempts') await orpc({ cmd: 'attempts' });
   else if (cmd === 'pending') await orpc({ cmd: 'pending' });
   else if (cmd === 'recovery') {
     await orpc({ cmd: 'recovery' });
@@ -263,6 +265,14 @@ function serve(flags) {
     process.exit(78);
   }
   fs.mkdirSync(outDir, { recursive: true, mode: 0o700 });
+  // Shield-Builder B2 — the attempts feed (scripture-armor.attempts/1):
+  // daemon refusals persist as testimony in <identityDir>/attempts.json
+  // (folded, capped, durable). Recording never throws into a refusal
+  // path and the feed is never a trust input. Owner read: {"cmd":"attempts"}.
+  const attemptsFeed = openAttemptsFeed(dir, {
+    cap: flags['attempts-cap'] ? Number(flags['attempts-cap']) : 500,
+    windowMs: flags['attempts-window-ms'] ? Number(flags['attempts-window-ms']) : 600000,
+  });
   const logFile = path.join(dir, 'vaultd.log');
   const startedAt = Date.now();
   const pending = new Map();
@@ -873,6 +883,12 @@ function serve(flags) {
       surface: { daemon_label: id.label, seal_fp: id.sealFp, socket: socketPath },
       ...expected,
     });
+    // B2: every beacon refusal is also attempts-feed testimony — the
+    // beacon chokepoint is where the daemon's refusal classes surface.
+    attemptsFeed.recordAttempt({
+      canary: frame?.canary ?? null, reason_class,
+      source: { kind: 'local', channel: 'socket', socket: socketPath },
+    });
     send(conn, {
       ok: false, error: `beacon: ${reason_class}`, beacon: true, reason_class,
       canary: frame?.canary ?? null, sha256: frame?.sha256 ?? null,
@@ -892,6 +908,10 @@ function serve(flags) {
       if (rev) {
         refused.push({ canary: e.canary ?? null, error: `register-revoked: sender revoked at ${rev.at}` });
         log({ event: 'register', result: 'refused: register-revoked', via, canary: e.canary ?? null, sender_sign_fp: e.sender_sign_fp, revoked_at: rev.at });
+        attemptsFeed.recordAttempt({
+          canary: e.canary ?? null, reason_class: 'register-revoked',
+          source: { kind: 'local', channel: via ?? 'register', socket: socketPath },
+        });
         continue;
       }
       accepted.push(e);
@@ -3346,6 +3366,8 @@ function serve(flags) {
               send(conn, { ok: false, error: `mesh-sync: ${e.message}` });
             });
           }
+        } else if (req.cmd === 'attempts') {
+          send(conn, attemptsFeed.attemptsFeed(req));
         } else if (req.cmd === 'pending') {
           send(conn, {
             ok: true,

@@ -24,6 +24,7 @@ import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {fetchPublicBytes, publicReviewURL} from './review-intake.mjs';
 import {fetchPublicBytesToFile, streamInspectFile, STREAM_CHUNK_BYTES} from './repository-stream.mjs';
+import {collectRepoFileRecord} from './shield-collect.mjs';
 
 export const BUFFERED_BLOB_LIMIT = 16 * 1024 * 1024; // review-intake.mjs fetchPublicBytes hard cap; blobs above this take the streamed lane
 const TERMINAL = ['completed', 'completed_with_gaps', 'cancelled'];
@@ -120,6 +121,13 @@ export function createRepositoryReview({identityDir, fetchBytes = fetchPublicByt
         p.scanned++;
         if (review.kind === 'source') { p.codeFiles++; if (streamed) p.codeLines += review.codeLines || 0; else { for (const b of bytes) if (b === 10) p.codeLines++; if (bytes.length && bytes.at(-1) !== 10) p.codeLines++; } }
         if (review.status === 'limited') { p.deferred++; }
+        // Shield-Builder B1 retention: the findings ledger keeps the
+        // UNFILTERED per-file record — the severity != 'info' filter
+        // below governs only the shipped corpus files, whose shape does
+        // not change. The info band (incl. all LB enrichment) is
+        // retained for the ledger only (SPEC §3.1). Collection failure
+        // never fails a review job.
+        try { collectRepoFileRecord(identityDir, {type: 'file', path: file.path, sha256: review.contentSha256, kind: review.kind, status: review.status, streamed, findings: review.findings || [], limitations: review.limitations || []}, p.id); } catch {}
         const findings = (review.findings || []).filter((f) => f.severity !== 'info'); p.findings += findings.length;
         const item = {type: 'file', path: file.path, sha256: review.contentSha256, kind: review.kind, status: review.status, streamed, findings, limitations: review.limitations || []}; record(item);
         for (const f of findings) { p.recentFindings.push({...f, file: file.path}); if (p.recentFindings.length > 30) p.recentFindings.shift(); }

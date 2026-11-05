@@ -29,6 +29,7 @@ test('independent frozen opener requires an explicit absolute identity before re
 test('two synthetic product installs mint different keys and refuse adopting each other without modifying either store',()=>{
  const root=temp(),home=path.join(root,'home'),standalone=path.join(root,'standalone');fs.mkdirSync(home);fs.mkdirSync(standalone);
  for(const file of ['armor.mjs','scan.mjs','product-paths.mjs','package.json'])fs.copyFileSync(path.join(ROOT,file),path.join(standalone,file));
+ fs.cpSync(path.join(ROOT,'shield-packs'),path.join(standalone,'shield-packs'),{recursive:true}); // scan.mjs loads its detector rule pack from shield-packs/ at runtime (Shield-Builder B4)
  fs.writeFileSync(path.join(standalone,'product.json'),JSON.stringify({schema:'scripture-armor.product/1',product:'standalone'}));
  const env={...process.env,HOME:home},run=(script,args)=>execFileSync(process.execPath,[script,...args],{env,stdio:'pipe',timeout:10000});
  run(path.join(ROOT,'armor.mjs'),['identity','--label','synthetic-bundled']);run(path.join(standalone,'armor.mjs'),['identity','--label','synthetic-standalone']);

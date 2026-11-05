@@ -60,7 +60,21 @@
     "repository-stream.mjs",
     "rotation-runtime.mjs",
     "format-inspect.mjs",
-    "littlebrother-integration.mjs"
+    "littlebrother-integration.mjs",
+    "shield-ledger.mjs",
+    "shield-collect.mjs",
+    "shield-attempts.mjs",
+    "shield-aggregator.mjs",
+    "shield-rulepack.mjs",
+    "shield-registry.mjs",
+    "shield-rea.mjs",
+    "shield-eval.mjs",
+    "shield-generator.mjs",
+    "shield-gate.mjs",
+    "shield-loop.mjs",
+    "shield-review-harness.mjs",
+    "shield-extract-pack.mjs",
+    "shield-packs"
   ],
   "name": "scripture-armor",
   "scripts": {
