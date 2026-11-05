@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the Scripture Armor streaming churn scan daily
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+Unit=scripture-armor-churn.service
+
+[Install]
+WantedBy=timers.target

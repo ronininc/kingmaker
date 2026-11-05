@@ -1,0 +1,7 @@
+[Unit]
+Description=Scripture Armor streaming build — daily churn scan of held portions
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/env node __ARMOR_DIR__/churn-scan.mjs --store __PORTION_STORE__ --max-bytes 2147483648
