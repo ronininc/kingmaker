@@ -55,7 +55,8 @@
     "review-controls.mjs",
     "review-ejection.mjs",
     "sandbox-review.mjs",
-    "protection-feed.mjs"
+    "protection-feed.mjs",
+    "repository-review.mjs"
   ],
   "name": "scripture-armor",
   "scripts": {
