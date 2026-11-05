@@ -76,8 +76,15 @@ export function createArmorAccountSession({ fetchImpl = globalThis.fetch, timeou
         const response = await fetchImpl(action === 'health' ? HEALTH_URL : action.endsWith('-installation') ? INSTALLATIONS_URL + action.split('-')[0] : `${BASE}${action}`, { method: action === 'me' ? 'GET' : 'POST', redirect: 'manual', signal: controller.signal,
           headers: { origin: ORIGIN, accept: 'application/json', ...(action === 'me' ? {} : { 'content-type': 'application/json' }), ...(requestCookie ? { cookie: requestCookie } : {}) },
           ...(action === 'me' ? {} : { body: encodedBody }) });
-        if (response.status === 401 || (response.status === 403 && !action.endsWith('-installation'))) clear();
-        const body = await readJson(response);
+        // An installation /check revocation is authentication revocation, not a
+        // billing/capacity refusal: read the body first, and only for that exact
+        // body clear the session (see verifyEntitlement's doctrine comment).
+        // Every other installation 403/503 keeps the saved login.
+        const body = await readJson(response).catch((error) => {
+          if (response.status === 401 || (response.status === 403 && !action.endsWith('-installation'))) clear();
+          throw error;
+        });
+        if (response.status === 401 || (response.status === 403 && (!action.endsWith('-installation') || (action === 'check-installation' && body?.error === 'revoked')))) clear();
         if (response.status >= 300 && response.status < 400) throw new Error('Account redirects are refused. Access remains locked.');
         if (action === 'reserve-installation' && response.status === 409) throw Object.assign(new Error('Installation limit reached. Book an enterprise appointment for additional capacity.'), { status: 409 });
         if (![200, 202, ...(action === 'reserve-installation' ? [201] : [])].includes(response.status)) throw new Error(remoteAccountError(response.status, body));
