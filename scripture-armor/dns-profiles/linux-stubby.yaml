@@ -1,0 +1,32 @@
+# Scripture Armor — Loop DNS via stubby (getdns) — Linux/BSD alternative
+#
+# WHAT THIS DOES: stubby listens locally (127.0.0.1:53) and forwards every
+# lookup, over DNS over TLS, to a resolver running inside your own closed
+# loop. Point the OS resolver at 127.0.0.1 and all local lookups ride
+# encrypted to your machine.
+# WHAT THIS DOES NOT DO: wrap all traffic. This is the DNS layer — the
+# queries. Full-traffic wrap is the VPN posture, separate by design.
+#
+# OPERATOR PLACEHOLDERS — REPLACE BEFORE USE:
+#   192.0.2.53                TEST-NET-1 (RFC 5737) documentation address
+#   dns.example-loop.invalid  ".invalid" can never resolve — fake on purpose
+# Replace both with your loop resolver's address + TLS hostname.
+#
+# Install (Debian/Ubuntu): sudo apt install stubby, then merge this file
+# into /etc/stubby/stubby.yml and: sudo systemctl restart stubby.
+# Point /etc/resolv.conf (or your network manager) at nameserver 127.0.0.1.
+
+resolution_type: GETDNS_RESOLUTION_STUB
+dns_transport_list:
+  - GETDNS_TRANSPORT_TLS
+tls_authentication: GETDNS_AUTHENTICATION_REQUIRED
+tls_query_padding_blocksize: 128
+edns_client_subnet_private: 1
+idle_timeout: 10000
+listen_addresses:
+  - 127.0.0.1@53
+round_robin_upstreams: 0
+upstream_recursive_servers:
+  # OPERATOR PLACEHOLDER: your loop resolver (address + TLS auth name).
+  - address_data: 192.0.2.53
+    tls_auth_name: "dns.example-loop.invalid"

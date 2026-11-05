@@ -71,6 +71,12 @@ test('migration refuses active-vault sources and manifests before secret reads o
 });
 test('npm files close every local top-level runtime import and include exporter/product policies',()=>{
  const pkg=JSON.parse(fs.readFileSync(path.join(ROOT,'package.json'),'utf8')),files=new Set(pkg.files.concat('package.json'));
- for(const file of pkg.files.filter(f=>f.endsWith('.mjs'))){for(const match of fs.readFileSync(path.join(ROOT,file),'utf8').matchAll(/from\s+['"]\.\/([^'"]+)['"]/g))assert.ok(files.has(match[1]),file+' omits '+match[1]);}
+ // build-standalone.mjs carries the account-session adapter's search/replace
+ // literals ('from \'../lib/keychain-seal.mjs\'' -> 'from \'./lib/keychain-seal.mjs\''):
+ // data the packager rewrites inside a staged file, not imports of the packager
+ // itself (the adapter is staged by an explicit copyFileSync from the repo-level
+ // lib/). The import scan must not read those literals as imports.
+ const ADAPTER_LITERALS=["from '../lib/keychain-seal.mjs'","from './lib/keychain-seal.mjs'"];
+ for(const file of pkg.files.filter(f=>f.endsWith('.mjs'))){let text=fs.readFileSync(path.join(ROOT,file),'utf8');for(const literal of ADAPTER_LITERALS)text=text.split(literal).join('');for(const match of text.matchAll(/from\s+['"]\.\/([^'"]+)['"]/g))assert.ok(files.has(match[1]),file+' omits '+match[1]);}
  for(const required of ['account-session.mjs','product.json','product-paths.mjs','vault-paths.mjs','ghidra-scripts'])assert.ok(files.has(required));
 });

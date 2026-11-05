@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Scripture Armor — Loop DNS profile (iOS + macOS)
+
+  WHAT THIS DOES, IN PLAIN LANGUAGE:
+  This profile points this device's DNS lookups (the "which address is that
+  name?" questions every app makes) at a DNS resolver that YOU operate,
+  inside your own closed loop, and it encrypts those lookups on the way
+  there (DNS over HTTPS). Nothing else about the device changes.
+
+  WHAT THIS DOES NOT DO:
+  It does NOT wrap all of the device's traffic. It wraps the DNS layer —
+  the queries. Wrapping the full traffic is a separate posture (VPN On
+  Demand; see the commented section at the bottom of this file and the
+  DNS section of the README).
+
+  OPERATOR PLACEHOLDERS — REPLACE BEFORE USE:
+  Every address below is a deliberately fake placeholder:
+    dns.example-loop.invalid   (the ".invalid" TLD can never resolve —
+                                it exists so this template can never
+                                accidentally point at a real server)
+    192.0.2.53                 (TEST-NET-1, RFC 5737 documentation range)
+  Replace them with the hostname and bootstrap address of the resolver
+  running on YOUR loop's node, and give the profile fresh UUIDs
+  (run: uuidgen) so your fleet's profiles are uniquely yours.
+-->
+<plist version="1.0">
+<dict>
+	<key>PayloadDisplayName</key>
+	<string>Scripture Armor — Loop DNS</string>
+	<key>PayloadDescription</key>
+	<string>Sends this device's DNS lookups, encrypted (DNS over HTTPS), to a resolver operated inside your own closed loop, instead of whatever resolver the network provides. Wraps the DNS layer only — not all traffic.</string>
+	<key>PayloadIdentifier</key>
+	<string>com.scripturearmor.dns</string>
+	<key>PayloadOrganization</key>
+	<string>Scripture Armor (operator-supplied template)</string>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>00000000-0000-4000-8000-0000000000A1</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadDisplayName</key>
+			<string>Loop DNS (encrypted)</string>
+			<key>PayloadDescription</key>
+			<string>DNS Settings: DNS over HTTPS to the operator's loop resolver. Replace the placeholder server before installing.</string>
+			<key>PayloadIdentifier</key>
+			<string>com.scripturearmor.dns.settings</string>
+			<key>PayloadType</key>
+			<string>com.apple.dnsSettings.managed</string>
+			<key>PayloadUUID</key>
+			<string>00000000-0000-4000-8000-0000000000A2</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>DNSSettings</key>
+			<dict>
+				<!-- DoH (HTTPS). For DNS over TLS instead, set DNSProtocol to
+				     TLS, remove ServerURL, and list the resolver in
+				     ServerAddresses; the device will speak DoT to it. -->
+				<key>DNSProtocol</key>
+				<string>HTTPS</string>
+				<!-- OPERATOR PLACEHOLDER: your loop resolver's DoH endpoint. -->
+				<key>ServerURL</key>
+				<string>https://dns.example-loop.invalid/dns-query</string>
+				<!-- OPERATOR PLACEHOLDER: bootstrap addresses for the resolver
+				     above (documentation range — replace with real ones). -->
+				<key>ServerAddresses</key>
+				<array>
+					<string>192.0.2.53</string>
+				</array>
+				<!-- The user may turn these DNS settings off unless you set
+				     this true. Left false in the template on purpose:
+				     enrollment is the operator's and the owner's act. -->
+				<key>ProhibitDisableDNSSettings</key>
+				<false/>
+			</dict>
+		</dict>
+	</array>
+</dict>
+</plist>
+<!--
+  OPTIONAL — FULL-TRAFFIC POSTURE (not active in this template).
+
+  The DNS payload above wraps lookups only. If you want the device's
+  traffic itself to travel inside your loop whenever it is off your own
+  network, that is the VPN On Demand posture, a separate payload
+  (PayloadType "com.apple.vpn.managed") added to PayloadContent, shaped
+  like this (keys abbreviated — build it with your MDM/configurator tool):
+
+    PayloadType:        com.apple.vpn.managed
+    VPNSubType:         your VPN provider's subtype (e.g. WireGuard/Tailscale-class)
+    OnDemandEnabled:    1
+    OnDemandRules:      Connect on untrusted networks (SSID not in your
+                        trusted list / interface is cellular), Disconnect
+                        on your own trusted networks.
+
+  Keep the two postures straight: DNS profile = the queries ride inside
+  the loop, encrypted. VPN On Demand = the traffic rides inside the loop.
+  Scripture Armor's DNS section in the README says the same thing in full.
+-->
