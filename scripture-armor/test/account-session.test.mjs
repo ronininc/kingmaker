@@ -41,14 +41,18 @@ test('password + email OTP establish private cookie, then fresh me + entitlement
   await account.logout(); assert.equal(account.state().authenticated, false);
   assert.equal(f.seen.at(-1).options.headers.cookie, COOKIE);
 });
-test('resend requires password and original purpose; expired session and entitlement denial lock', async () => {
+test('resend requires password and original purpose; expired session locks, entitlement denial locks the licensed action not the verified login', async () => {
   const f = fixture(), account = createArmorAccountSession({ installationProvider, fetchImpl: f.fetchImpl, now: () => NOW });
   await account.register({ name: 'Fixture Member', email: EMAIL, password: PASSWORD });
   await account.resend({ password: PASSWORD }); assert.deepEqual(f.seen.at(-1).body, { email: EMAIL, password: PASSWORD, purpose: 'register' });
   await account.verify({ code: OTP }); f.expire(); await assert.rejects(account.verifyEntitlement(), /expired|failed/); assert.equal(account.state().authenticated, false);
   const g = fixture(), other = createArmorAccountSession({ installationProvider, fetchImpl: g.fetchImpl, now: () => NOW });
   await other.login({ email: EMAIL, password: PASSWORD }); await other.verify({ code: OTP }); g.denyEntitlement();
-  await assert.rejects(other.verifyEntitlement(), /current paid/); assert.equal(other.state().authenticated, false);
+  // Doctrine (account-session-persistence.test.mjs + verifyEntitlement's own
+  // comment): a membership denial refuses the licensed action but is not
+  // authentication revocation — the verified login survives; only an expired
+  // or server-revoked session (asserted above) clears it.
+  await assert.rejects(other.verifyEntitlement(), /current paid/); assert.equal(other.state().authenticated, true);
 });
 test('redirects, oversized bodies and unresponsive remote transport stay bounded and locked', async () => {
   for (const fetchImpl of [async () => new Response('', { status: 302, headers: { location: 'https://elsewhere.invalid' } }), async () => response({ ok: true, pad: 'x'.repeat(33000) }), async () => new Promise(() => {})]) {
@@ -104,7 +108,9 @@ test('real session transport + activation flow cannot create identity or migrate
   const g = fixture(), denied = createArmorAccountSession({ installationProvider, fetchImpl: g.fetchImpl, now: () => NOW });
   await denied.login({ email: EMAIL, password: PASSWORD }); await denied.verify({ code: OTP }); g.denyEntitlement();
   await assert.rejects(activateArmor({ input: { acceptTerms: true, confirmMigration: true }, verifyEntitlement: () => denied.verifyEntitlement(), ensureIdentity: () => { throw new Error('must never execute'); } }));
-  assert.equal(denied.state().authenticated, false);
+  // Same doctrine as above: activation is refused (ensureIdentity never ran),
+  // but the denial alone does not revoke the verified login.
+  assert.equal(denied.state().authenticated, true);
 });
 
 test('entitlement verification defaults to requiring a trusted MFA cookie; legacy body credentials cannot opt out', async () => {
