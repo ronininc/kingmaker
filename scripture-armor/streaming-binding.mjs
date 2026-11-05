@@ -20,7 +20,7 @@ import { fileURLToPath } from 'node:url';
 
 export const STREAMING_SCHEMA = 'scripture-armor.streaming/1';
 export const AWARENESS = 'invocation-aware-only';
-export const WALL_NO_PULLER = 'WALL-STREAMING-LAYER-ABSENT: no portion-precise Brain Library puller (lib/brain-puller.mjs: fetchRange/pullPortion/downloadPartResumable) ships in this tree; the proven puller exists only in an unmerged Kingmaker build copy. Clearing act: merge the proven puller into this tree, then this binding resolves it unchanged.';
+export const WALL_NO_PULLER = 'WALL-STREAMING-LAYER-ABSENT: no portion-precise Brain Library puller (lib/brain-puller.mjs: fetchRange/pullPortion/downloadPartResumable) is present in this installation; the binding binds only to a puller inside this product\'s own tree and never improvises a substitute.';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 
@@ -41,23 +41,84 @@ export function resolveStreamingBinding(opts = {}) {
   return { schema: STREAMING_SCHEMA, awareness: AWARENESS, available: true, pullerPath: found, candidates };
 }
 
+// The portion store's manifest schema (churn-scan.mjs's STORE_SCHEMA — the
+// churn scan is the store's manager; the binding is its writer at pull time).
+export const PORTION_STORE_SCHEMA = 'scripture-armor.portion-store/1';
+
+const portionIdOf = ({ slug, part, start, length }) => `${slug}__${part}__${start}__${length}`.replace(/[^A-Za-z0-9._-]+/g, '_');
+
+/**
+ * Persist pulled portions in the portion store: bytes under files/, one
+ * manifest entry per portion in portions.json, each entry carrying the
+ * library linkage (model slug, part name, range, and the catalog part hash
+ * at pull time) the daily churn scan verifies and refreshes against.
+ */
+function persistPortions(storeDir, entries) {
+  const filesDir = path.join(storeDir, 'files');
+  fs.mkdirSync(filesDir, { recursive: true });
+  const manifestPath = path.join(storeDir, 'portions.json');
+  let manifest = { schema: PORTION_STORE_SCHEMA, portions: [] };
+  if (fs.existsSync(manifestPath)) {
+    manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    if (manifest.schema !== PORTION_STORE_SCHEMA || !Array.isArray(manifest.portions)) throw new Error('invalid portion store manifest: ' + manifestPath);
+  }
+  const nowIso = new Date().toISOString();
+  for (const { bytes, ...entry } of entries) {
+    const file = `${entry.id}.bin`;
+    fs.writeFileSync(path.join(filesDir, file), bytes);
+    const record = { ...entry, file, pulledAt: nowIso, lastUsedAt: nowIso };
+    const i = manifest.portions.findIndex((p) => p.id === entry.id);
+    if (i >= 0) manifest.portions[i] = { ...manifest.portions[i], ...record, pulledAt: manifest.portions[i].pulledAt ?? nowIso };
+    else manifest.portions.push(record);
+  }
+  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  return { storeDir, manifestPath, held: manifest.portions.length };
+}
+
 /**
  * The loaded-skill entry point: the ONLY way streamed capability is reached.
  * A caller names a function and the portions it needs; the binding resolves
- * the puller and pulls exactly those portions, which persist in the portion
- * store for the daily churn scan to manage. Between invocations this module
- * does nothing and knows nothing.
+ * the puller and pulls exactly those portions through it, which persist in
+ * the portion store for the daily churn scan to manage. Any puller error
+ * aborts the invocation before anything persists — the binding fails closed.
+ * Between invocations this module does nothing and knows nothing.
+ *
+ * portions: [{ model: <slug|catalog model>, part: <index|name>, start,
+ *              length | startFraction/lengthFraction, expectedSha256? }]
+ * Returns { schema, awareness, pulled: [summaries], store } — the summaries
+ * carry each portion's sha256 and the puller's verification grade; raw bytes
+ * live in the store, not in the result.
  */
 export async function invokeStreamed({ portions, storeDir, ...rest } = {}) {
   const binding = resolveStreamingBinding(rest);
   if (!binding.available) throw Object.assign(new Error(binding.wall), { code: 'STREAMING_LAYER_ABSENT' });
   const puller = await import(binding.pullerPath);
-  if (typeof puller.pullPortion !== 'function') {
-    throw Object.assign(new Error('WALL-STREAMING-LAYER-ABSENT: resolved puller has no pullPortion export'), { code: 'STREAMING_LAYER_ABSENT' });
+  if (typeof puller.pullPortion !== 'function' || typeof puller.resolveBrain !== 'function') {
+    throw Object.assign(new Error('WALL-STREAMING-LAYER-ABSENT: resolved puller lacks pullPortion/resolveBrain exports'), { code: 'STREAMING_LAYER_ABSENT' });
   }
-  const pulled = [];
+  const entries = [];
   for (const portion of portions ?? []) {
-    pulled.push(await puller.pullPortion(portion.model, portion, { ...rest, storeDir }));
+    const model = typeof portion.model === 'string' ? await puller.resolveBrain(portion.model, rest) : portion.model;
+    const parts = model?.weights?.parts ?? [];
+    const partEntry = typeof portion.part === 'number' ? parts[portion.part] : parts.find((p) => p.name === portion.part) ?? parts[portion.part ?? 0];
+    if (!partEntry) throw new Error(`invokeStreamed: no part "${portion.part}" in ${model?.slug ?? 'model'}'s weights`);
+    const pulled = await puller.pullPortion(model, portion, rest);
+    entries.push({
+      id: portionIdOf(pulled),
+      slug: pulled.slug,
+      part: pulled.part,
+      start: pulled.start,
+      length: pulled.length,
+      sha256: pulled.sha256,
+      size: pulled.bytes.length,
+      bytesMoved: pulled.bytesMoved,
+      verification: pulled.verification,
+      partSha256: partEntry.sha256,
+      release: model.weights.release,
+      bytes: pulled.bytes,
+    });
   }
-  return { schema: STREAMING_SCHEMA, awareness: AWARENESS, pulled };
+  const store = storeDir ? persistPortions(storeDir, entries) : null;
+  const pulled = entries.map(({ bytes, ...summary }) => summary);
+  return { schema: STREAMING_SCHEMA, awareness: AWARENESS, pulled, store };
 }
