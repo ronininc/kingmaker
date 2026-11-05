@@ -1,6 +1,7 @@
 // Content inspection only. No uploaded script, macro, command or entity runs.
 import zlib from 'node:zlib';
 import {classifyBuffer} from './scan.mjs';
+import {agnosticAugment} from './format-inspect.mjs'; // ITEM 9 port (UNAPPLIED work copy): named coverage for formats this reader did not inspect
 const MAX=16*1024*1024,EXPANDED=4*1024*1024;
 const utf8=b=>{try{return new TextDecoder('utf-8',{fatal:true}).decode(b).replace(/^\uFEFF/,'');}catch{return null;}};
 const privateMaterial=text=>/"(?:seal_priv|sign_priv|kem_priv|mldsa_priv)"\s*:|-----BEGIN (?:[A-Z ]+ )?PRIVATE KEY-----/.test(text);
@@ -37,7 +38,12 @@ export function inspectAgnostic(bytes,name='uploaded-file') {
   if(header.startsWith('%PDF-')) {
     result.format='PDF';result.limitations.push('PDF structure recognized; full document and embedded-object analysis is not available in this reader.');
     const text=bytes.toString('latin1');result.activeContent=/\/JavaScript\b|\/JS\b|\/OpenAction\b|\/Launch\b/.test(text);
-    if(/\/Encrypt\b/.test(text))result.limitations.push('Encrypted PDF content cannot be inspected.');return result;
+    if(/\/Encrypt\b/.test(text)){result.limitations.push('Encrypted PDF content cannot be inspected.');return result;}
+    // ITEM 9 port: structure/text-layer detail (page objects, action
+    // flags, inflated-stream coverage) from the format lane.
+    const aug=agnosticAugment(bytes,name);
+    if(aug){result.limitations.push(...aug.limitations);if(aug.activeContent)result.activeContent=true;}
+    return result;
   }
   if(header.startsWith('PK\x03\x04')||header.startsWith('PK\x05\x06')) {
     result.format='ZIP archive';
@@ -61,10 +67,20 @@ export function inspectAgnostic(bytes,name='uploaded-file') {
   }
   if(kind==='binary'){result.kind='binary';result.format=header.startsWith('\x7fELF')?'ELF executable':header.startsWith('MZ')?'PE executable':'Native binary';return result;}
   if(header.startsWith('\x89PNG')||header.startsWith('\xff\xd8\xff')||header.startsWith('GIF8')||header.startsWith('RIFF')){
+    // ITEM 9 port: named format + metadata-level inspection (chunks/
+    // markers/boxes, trailing-data check) instead of signature-only.
+    const aug=agnosticAugment(bytes,name);
+    if(aug){result.format=aug.format;result.limitations.push(...aug.limitations);return result;}
     result.format='Image/media';result.limitations.push('Media signature recognized; image/media payload review requires an additional parser.');return result;
   }
   const text=utf8(bytes);
-  if(text===null||text.includes('\0')){result.limitations.push('Opaque or unsupported binary data; not classified as clean.');return result;}
+  if(text===null||text.includes('\0')){
+    // ITEM 9 port: name the format and the reason before falling back
+    // to the generic opaque line (TAR/GZIP listings, RAR/7z/OLE named
+    // unsupported, WASM/unknown-binary header indicators).
+    const aug=agnosticAugment(bytes,name);
+    if(aug){result.format=aug.format;result.limitations.push(...aug.limitations);if(aug.activeContent)result.activeContent=true;return result;}
+    result.limitations.push('Opaque or unsupported binary data; not classified as clean.');return result;}
   if(privateMaterial(text)){
     result.format='Sensitive key material';result.limitations.push('Private key material is not accepted for ordinary file review.');return result;
   }

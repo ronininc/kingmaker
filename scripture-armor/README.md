@@ -857,10 +857,13 @@ to the cell suite).
 
 ## License
 
-**Apache License 2.0 — see `LICENSE`.** Scripture Armor is free and
-open source, for everyone: use it, copy it, modify it, and distribute
-it under the terms of the Apache License, Version 2.0. The armor is
-given away; what you wrap in it stays yours.
+**Proprietary — see `LICENSE`.** Scripture Armor is private,
+commercial software: not free, and not open source. Access is
+application-gated — membership is arranged in direct conversation
+with Ronin Inc ($99 per month), and there is no self-serve
+checkout. Membership covers improvements: if a membership lapses,
+the version you already hold keeps working in full; only future
+upgrades stop. What you wrap in the armor stays yours.
 
 ## Origin
 

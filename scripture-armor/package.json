@@ -56,7 +56,11 @@
     "review-ejection.mjs",
     "sandbox-review.mjs",
     "protection-feed.mjs",
-    "repository-review.mjs"
+    "repository-review.mjs",
+    "repository-stream.mjs",
+    "rotation-runtime.mjs",
+    "format-inspect.mjs",
+    "littlebrother-integration.mjs"
   ],
   "name": "scripture-armor",
   "scripts": {

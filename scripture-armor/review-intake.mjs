@@ -35,7 +35,7 @@ export async function fetchPublicBytes(input,{resolve=dns.lookup,request=https.r
         servername:net.isIP(host)?undefined:host,headers:{accept:'text/html,text/plain,application/json,application/octet-stream','accept-encoding':'identity','user-agent':'Scripture-Armor-Review/1'},
         lookup:(_host,options,done)=>options?.all?done(null,[pinned]):done(null,pinned.address,pinned.family)},res=>{
         if([301,302,303,307,308].includes(res.statusCode)){finished=true;clearTimeout(deadline);res.destroy();if(!res.headers.location){reject(Error('Redirect location missing.'));return;}resolveResponse({redirect:res.headers.location});return;}
-        if(res.statusCode<200||res.statusCode>=300){res.destroy();return fail(Error('The public link could not be retrieved. Authentication is not forwarded.'));}
+        if(res.statusCode<200||res.statusCode>=300){res.destroy();const statusError=Error('The public link could not be retrieved (HTTP '+res.statusCode+'). Authentication is not forwarded.');statusError.statusCode=res.statusCode;const retryAfter=Number(res.headers['retry-after']);if(Number.isFinite(retryAfter)&&retryAfter>=0)statusError.retryAfterSeconds=retryAfter;if(res.statusCode===403||res.statusCode===429)statusError.quota=true;return fail(statusError);}
         if(res.headers['content-encoding']&&res.headers['content-encoding']!=='identity'){res.destroy();return fail(Error('Compressed network responses are not accepted by this bounded intake.'));}
         res.on('data',chunk=>{
           if(finished)return;
