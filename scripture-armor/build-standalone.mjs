@@ -13,7 +13,7 @@ const SOURCE_COMPONENTS = [
   'refit-net.mjs', 'package.json', 'README.md', 'FORMAT.md', 'LICENSE',
   'product-paths.mjs', 'product.json', 'vault-paths.mjs', 'prerequisite-readiness.mjs',
   'installation-metadata.mjs', 'protection-status.mjs', 'analysis-runtime.mjs',
-  'protection-feed.mjs', 'agnostic-review.mjs', 'review-worker.mjs', 'review-presentation.mjs', 'review-intake.mjs', 'repository-review.mjs', 'review-controls.mjs', 'review-ejection.mjs', 'sandbox-review.mjs', 'device-protection.mjs', 'device-scan-roots.json', 'key-transition.mjs', 'retired-key-recovery.mjs', 'rotation-candidate.mjs',
+  'protection-feed.mjs', 'agnostic-review.mjs', 'format-inspect.mjs', 'review-worker.mjs', 'review-presentation.mjs', 'review-intake.mjs', 'repository-review.mjs', 'repository-stream.mjs', 'review-controls.mjs', 'review-ejection.mjs', 'sandbox-review.mjs', 'device-protection.mjs', 'device-scan-roots.json', 'key-transition.mjs', 'retired-key-recovery.mjs', 'rotation-candidate.mjs',
   'dns-profiles', 'ghidra-scripts', 'mac', 'linux', 'windows', 'ui',
 ];
 export function buildStandalone(args = process.argv.slice(2)) {
