@@ -6,12 +6,14 @@
 //
 //   node scripts/soak-bar.mjs [--rounds N] [--only name,name] [--json out.json]
 //
-// It never prints the bar link key. Exit 0 when every hard case passed in every round.
+// It never prints the bar link key. Exit 0 requires every hard case AND run-scoped local-work evidence.
+// --work-config config.json is required. The standalone soak-work.mjs avoids driving the owner's bar.
 import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { RUNTIME_BINARY } from '../lib/paths.mjs';
+import { runWorkSoak, validateConfig, hardwareIdentity } from '../lib/soak-work.mjs';
 
 const STATE = process.env.SOL_GHOST_HOME || join(homedir(), 'Library/Application Support/sol-ghost');
 const BAR_LOG = join(STATE, 'logs/bar.log');
@@ -123,6 +125,13 @@ async function step(c, from = null) {
 }
 
 async function main() {
+  // A bar answer alone never proves local inference. Require the bounded work phase as part of this run.
+  const workConfigPath = arg('--work-config', null);
+  if (!workConfigPath) throw new Error('WORK_EVIDENCE_CONFIG_REQUIRED: see docs/SOAK-WORK.md');
+  const workConfig = validateConfig(JSON.parse(readFileSync(workConfigPath, 'utf8')));
+  if (workConfig.exclusive !== true) throw new Error('EXCLUSIVE_ENDPOINT_REQUIRED');
+  if (!Number.isInteger(ROUNDS) || ROUNDS < 1 || ROUNDS > 100) throw new Error('INVALID_ROUND_COUNT');
+  if (ONLY && [...ONLY].some((name) => !CASES.some((c) => c.name === name))) throw new Error('UNKNOWN_CASE');
   if (!existsSync(KEY_FILE)) { console.error(`No bar link key at ${KEY_FILE}: is Kingmaker installed and started once?`); process.exit(2); }
   if ((await health()) !== 200) { console.error('Kingmaker is not answering on its health route. Start it first.'); process.exit(2); }
   // Its own chat, never the owner's current one ("/new" starts a fresh chat in the bar; the owner's chats are untouched).
@@ -135,7 +144,7 @@ async function main() {
     const round = { round: r, cases: [] };
     for (const c of CASES.filter((x) => (!ONLY || ONLY.has(x.name)) && !(x.once && r > 1))) {
       const heat = await coolDown(console.log);
-      if (heat.hot) { console.log('  still hot after 10 minutes: stopping the soak here'); r = ROUNDS; break; }
+      if (heat.hot || heat.line === 'unknown') { hardFails++; report.abort = heat.hot ? 'THERMAL_ABORT' : 'THERMAL_EVIDENCE_MISSING'; console.log(`  FAIL ${report.abort}`); break; }
       const first = await step(c);
       const { offset: _o, ...firstShown } = first;
       let res = { name: c.name, soft: Boolean(c.soft), ...firstShown };
@@ -151,12 +160,19 @@ async function main() {
     console.log(`  round ${r}: health ${h}, memory ${mem.map((m) => `${m.what.split(' ')[0]} ${m.mb} MB`).join(', ')}; heat ${heat.line}; models loaded: ${models.join(' · ') || 'none'}`);
     if (h !== 200) { hardFails++; console.log('  FAIL health'); }
     report.rounds.push(round);
+    if (report.abort) break;
   }
   clearInterval(sampler); sampleStack();
   report.stack = { ...peaks, swapGrowthMb: Math.round(peaks.swapMb - startSwap) };
   console.log(`\n  whole stack: free memory fell to ${peaks.level}%, swap peaked at ${Math.round(peaks.swapMb)} MB (${report.stack.swapGrowthMb >= 0 ? '+' : ''}${report.stack.swapGrowthMb} MB during the soak), Kingmaker's processes peaked at ${peaks.kingmakerMb} MB, Ollama's at ${peaks.ollamaMb} MB (${peaks.samples} samples)`);
   report.crashes = crashes(started);
   if (report.crashes.length) { hardFails++; console.log(`  FAIL crash reports: ${report.crashes.join(', ')}`); }
+  const expectedCases = CASES.filter((c) => !ONLY || ONLY.has(c.name)).reduce((n, c) => n + (c.once ? 1 : ROUNDS), 0);
+  if (!expectedCases || report.rounds.reduce((n, r) => n + r.cases.length, 0) !== expectedCases) { hardFails++; report.incomplete = true; }
+  if (!report.abort) {
+    report.work = await runWorkSoak(workConfig, { log: console.log, identity: arg('--hardware-json', null) ? hardwareIdentity(JSON.parse(readFileSync(arg('--hardware-json', null), 'utf8'))) : null, baseline: arg('--baseline', null) ? JSON.parse(readFileSync(arg('--baseline', null), 'utf8')) : null });
+    if (!report.work.result.ok) { hardFails++; console.log('  FAIL local work evidence:', report.work.result.failures.map((f) => f.code).join(', ')); }
+  } else { hardFails++; report.work = { error: 'WORK_PHASE_NOT_RUN' }; }
   const out = arg('--json', null);
   if (out) writeFileSync(out, JSON.stringify(report, null, 2));
   console.log(hardFails ? `\n${hardFails} hard failure(s).` : '\nAll hard cases passed in every round.');

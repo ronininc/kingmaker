@@ -1,258 +1,451 @@
+🤫 source-available: open to everyone, not for commercial use 🤫
+
+# Kingmaker 4.4.4 — unreleased
+
+This checkout prepares the next immutable release. The rebuilt engine and staged resources have local proof; the signed installer, publication and fresh installation acceptance are still pending. Existing public 4.4.3 assets have not been replaced.
+
+Kingmaker is Ronin's governed local AI control surface for **macOS, Linux, and Windows**. It runs as the native Kingmaker app on macOS and through the governed `kingmaker` owner console on every packaged platform. Its engine governs every action; platform adapters use direct CLI/API control where available, while the Hands of Horus provide the macOS accessibility fallback. It is source-available under the [PolyForm Noncommercial License 1.0.0](LICENSE).
+
+- **`Kingmaker.app` carries the complete runtime closure.** A valid 4.4.3 package contains the engine plus `kingmaker-runtime`, `voice-runtime`, `guardrails-runtime`, `guardrails-config`, `agent-runtime`, `knowledge-runtime`, managed Playwright browsers, the Chrome connector, `app.asar`, and the signed Kingmaker payload. The release gate rejects a missing, empty, unsafe or placeholder component.
+- **The native shell may show a window; the engine remains a separate Node process.** `desktop/headless-server.mjs` is the engine entry point. The default app mode presents the bar shown by the Dock/menu-bar UI; `km.windowMode bar` is the menu-bar-only mode. These are two supported presentation modes, not two different engines.
+- **A source checkout does not contain the compiled engine.** Development commands borrow a reviewed installed/staged runtime through `KINGMAKER_RUNTIME_APP`; packaged builds carry their own verified engine and resources.
+- **macOS is the reviewed native GUI target.** The 4.4.3 build pipeline also produces rollback-safe Linux x64 and Windows x64 install units from the same deep-verified payload. Their portable paths were exercised in prior Windows/Linux VMs on the 8 GB Mac through Muse; the retained checkout does not contain those guest receipts, so the refreshed exact archives remain installer candidates until their hashes are re-run on native hosts. NVIDIA is an inference backend on Windows/Linux, not a separate Kingmaker edition.
+
+## 4.4.3 release status
+
+The public platform release is 4.4.3; this checkout is the unreleased 4.4.4 candidate. Published Windows x64/Linux x64 archives are installer candidates, not verified native feature parity. The exact public [platform release](https://github.com/ronininc/kingmaker/releases/tag/v4.4.3-platform-installers.1) does not include a complete Kingmaker Mac Installer+manifest+signature unit. Current installed resources lack the shared embedding model; rebuilt production closure and fresh customer installation acceptance remain required. Source tests do not establish a completed release. See [platform evidence](docs/PLATFORM-SUPPORT.md).
+
+Updates are authenticated separately from per-install identity and paid entitlement:
+
+1. the signed release manifest binds the public app/archive bytes;
+2. the Launcher/install certificate binds an installation to its current release using its opaque installation hash and proof of possession;
+3. Scripture Armor is a separate paid product with its own UI, daemon and installers. Free Kingmaker carries only the shared compatibility modules and their Kingmaker product-policy dependencies its governed transport imports; installing Kingmaker does not install or entitle the standalone scanning-protection product.
+
+Kingmaker checks its configured HTTPS update host on launch and wake (not on a background timer). `kingmaker update --setup` stores the update URL and the installation's existing update key through stdin; `kingmaker update --check` never manufactures a key or trusts an unsigned replacement.
+
+## Install and update
+
+The supported customer path is Ronin Launcher selecting the platform-specific, signed Kingmaker release. The standalone **Kingmaker Installer** DMG remains the macOS recovery/fresh-install path. Neither path may install the current local staging build: both must receive the final signed 4.4.3 manifest, its exact assets and the governed release envelope.
+
+On macOS, the standalone installer has one wake-word field and one **Download & Install** button. After installation, Kingmaker opens in its normal app mode; it is not restricted to a menu-bar-only UI.
+
+What the button does, in order (one progress bar for all of it):
+
+1. **Checks this Mac:** macOS 14 or newer (15 for clicking and typing in other apps), Apple silicon, the wake word, and room on the disk (it says how much it needs before it starts, and stops there if it won't fit).
+2. **Downloads the exact platform artifact** named by the signed `kingmaker.release/1` manifest. On macOS, large app archives may be split into parts of at most 1.9 GB. Every physical part, the joined archive, app bundle identity, payload closure and code signature must agree with the authenticated manifest. A cut-off part can resume.
+3. **Apple's Command Line Tools and Homebrew**, only if they are missing (Homebrew's official package, pinned by sha256). macOS asks for your password once, in its own dialog.
+4. **Ollama** (its official build, pinned by sha256) if it is missing, then **the abliterated models** Kingmaker runs (`lib/profile.mjs`), with the coder sized to the Mac: the 1.5b under 16 GB of memory, the 7b from 16 GB. Each model must come down with exactly the digest the release pinned from Ollama's registry; if one changed upstream since the release was built, the install stops and says so.
+5. **Hands of Horus** (Peekaboo), **sox** (the microphone) and Python for SearXNG, through Homebrew, then **SearXNG** (private web search) with the engine's own installer, run by Kingmaker's own runtime.
+6. **The knowledge library:** every confirmed corpus in the engine's bootstrap (about 17 GB), into a staging folder. A library that is already complete in Kingmaker's data folder is reused, not downloaded again.
+7. **Moves Kingmaker into place:** the app (into `/Applications`, or `~/Applications` when `/Applications` isn't writable), the cemented wake word and the knowledge library. This step is journaled: if anything in it fails, everything it moved is moved back. An older copy is moved to the Trash (not deleted), and a running Kingmaker is asked to quit first.
+8. **Opens Kingmaker** and the installer quits.
+
+**Nothing is ever half-installed.** Kingmaker's own pieces (the app, its config, its library) exist only in staging until step 7, so a failure anywhere before leaves none of them in place, and a failure during step 7 puts everything back. The shared tools it installs on the way (Ollama and its models, Homebrew and its formulas, SearXNG) are each installed whole by their own installers and are kept, together with the verified downloads, so pressing the button again continues instead of starting over. The installer never installs third-party MCP servers or CLI tools: only Kingmaker's own parts and what they need to run.
+
+**Gatekeeper:** an ad hoc local build is for private engineering validation only. A public macOS release must complete the configured production signing flow and the final post-signing physical gate. Developer ID/notarization are separate Apple distribution requirements; neither an ad hoc signature nor a manifest hash substitutes for them.
+
+## The wake word is cemented
+
+You pick it on the install screen (default **Kingmaker**; 1 to 3 words, letters only). Then it's cemented. Want a different one? Delete Kingmaker and install it again. That's the whole settings page, lol.
+
+- It is written once to `~/Library/Application Support/sol-ghost/install.json`, read-only, and to `wake-word.txt` beside it, which is how the engine learns its own name ("the wake word is the name"). Nothing in Kingmaker offers to change either, and `SOL_GHOST_WAKE_PHRASES` is ignored once a word is cemented.
+- Reinstalling over an installed Kingmaker keeps its word (the field is locked to it; that's an update). Move Kingmaker.app to the Trash first and the installer lets you pick again.
+- Mishearings are generated from the word itself, not hardcoded: spacing never matters ("king maker" is "Kingmaker"), a plural is fine, and a name of 6+ letters may be off by one slip after folding the usual spellings (c/k, ph/f, a dropped "-er"). Short names must match exactly.
+- `kingmaker doctor` and the start banner say which word it is and whether it is cemented.
+
+## Its own data
+
+Kingmaker keeps its own data folder: `~/Library/Application Support/sol-ghost/runtime` (vault, memory, connectors, `.env`). It never writes the data folder of a windowed desktop app on the same engine, so the two can never write one data folder at once. The runtime takes a lock on whichever folder it runs (`runtime.lock`), and a second runtime on that folder is refused.
+
+- Sharing the desktop app's data is an explicit opt-in: `KINGMAKER_DESKTOP_USERDATA="$HOME/Library/Application Support/solomon-desktop"`. It is still refused while the window runs on that folder.
+- The desktop app (from its next build) refuses to start on a folder a headless engine holds. If Kingmaker is serving port 3001, the window reports it instead of killing it as an orphan.
+- Machine-level tool installs (managed Playwright browsers, the DimOS venv, the local SearXNG service, Ollama's models) are shared. They are tools, not governed data.
+
+## Measured on an 8 GB M3 (2026-10-07)
+
+| | Desktop app | Kingmaker |
+|---|---|---|
+| UI processes | GPU helper 236 MB + renderer 181 MB (+ main) | none |
+| Runtime at idle | server 434 MB (live data, after use) | launcher 16 MB + server 129 MB (fresh data folder) |
+| Ronin Atlas boot prewarm | ~670 MB, held ~20 min | skipped; Ronin Atlas starts on first use (in the standalone app; the desktop app needs a rebuild) |
+| Boot to ready | — | 22 s cold, ~5 s warm |
+
+The host's real squeeze is the agent tooling, not the engine. The Claude desktop VM, Claude Code sessions (each starting its own `ghost mcp`) and Codex filled 8 GB with the engine off (measured 2026-10-05). Kingmaker removes the desktop app's visual load. It cannot remove theirs.
+
+Proven live, with no window:
+- "press Seven in Calculator" → the engine's grammar planner (no model) → a YELLOW proposal → the event stream pushes it to the console → `y` approves it by id → the tool runs.
+- `n` cancels: "Cancelled. Nothing was changed."
+- What you say while it is awake is your word: "press Seven in Calculator" spoken becomes the same YELLOW proposal as typed, and a spoken "cancel" cancels it (installed build 5253f40e, 2026-10-07).
+
+## The app
+
+When Kingmaker opens, it runs as a normal app window: a Dock icon and a Cmd-Tab entry, with the bar as its window (click the Dock icon or the menu-bar logo to bring it up). There is also always a tiny Ronin Inc logo in the menu bar (the crest's shield and eye, as a template image, so it matches your menu bar). To run it the old way instead — no window, no Dock icon, just the menu-bar logo — set `defaults write com.ronininc.solghost km.windowMode bar` (and `km.windowMode window` to switch back):
+
+| The logo | State |
+|---|---|
+| plain | asleep, microphone off ("Hey Siri, wake Kingmaker" wakes it) |
+| glows | awake: talk to it |
+| an RGB outline turns around it | listening to you |
+| glows amber | working on your command |
+| pulses | speaking to you (talk over it to stop it) |
+| slow amber pulse | waiting for your word |
+| red | not listening; the app quits with the engine |
+
+It is all Core Animation: asleep, nothing is animating at all, so the UI costs no CPU. Click the logo to wake it (the same as "Hey Siri, wake Kingmaker": it says "I'm here." and takes your next words as a command; a click only ever wakes it, it never approves anything). Right-click, control-click or option-click the logo for its menu: one status line and **Quit Kingmaker**. `KINGMAKER_EDGE_GLOW=1` adds the old screen-edge RGB ring on top (four click-through windows per screen); by default there are no windows. macOS's own orange microphone dot shows on top of all of it. `scripts/build-app.sh --install` builds a thin dev copy into `~/Applications` (it borrows the installed Kingmaker.app's runtime). Quitting the app stops the engine, and so does force-quitting or a crash: the daemon's stdin closes and it shuts down (tested: 0 processes left after 2 s).
+
+Approvals in the app are your word, never a menu click: say yes while Kingmaker is awake (or, with `kingmaker voice verified`, "yes, go ahead" in your enrolled voice), or type `y` at a `kingmaker start` terminal.
+
+## Run it
+
+```bash
+./install.sh            # developers: checks the engine runtime, Ollama, the hands, sox; links kingmaker into ~/.local/bin
+kingmaker doctor        # every piece, with the fix for anything missing
+kingmaker start         # this terminal is the owner console; voice starts asleep
+```
+
+Kingmaker and the desktop app both serve `127.0.0.1:3001`, so run one at a time. Their data never mixes either way (see "Its own data").
+
+| Command | What it does |
+|---|---|
+| `kingmaker start [--no-voice] [--quiet] [--port N]` | Runs Kingmaker's engine headless. Type to it here; `y` approves the waiting action, `n` cancels it. |
+| `kingmaker voice [owner\|verified\|propose]` | Shows or sets what your spoken word can do (default `owner`). Set at a terminal; takes effect at the next start, for the app too. |
+| `kingmaker enroll` | Enrolls your voice for the `verified` mode, typed at a terminal: read 5 short sentences aloud. |
+| `kingmaker enroll --forget` | Deletes your voiceprint and its Keychain key. |
+| `kingmaker say "<text>"` | One turn from any other shell, in the bar's lanes: a question the local writer can answer is answered there, and lookups and actions go to the engine (`--engine` sends anything there). It can only propose. Sources are listed under the answer (`--open` opens them). |
+| `kingmaker brain local\|claude\|chatgpt\|grok` | Chooses the answering brain. The three cloud lanes use the owner's signed-in CLI and expose only Kingmaker's MCP tools; restart Kingmaker after changing it. |
+| `kingmaker background status\|enable\|disable` | Headless Host Mode: registers or removes the installed `Kingmaker.app` as a macOS Login Item and keeps the plugged-in Mac awake while the lid stays open. The built-in display may sleep. |
+| `kingmaker update --setup` | Reads the canonical HTTPS update-host URL and this installation's existing update key from stdin, then writes the private `update.json` configuration with mode 0600. It does not mint or rotate a key. |
+| `kingmaker update --check` | Authenticates `latest.json` against the signed release manifest and reports an available update without applying it. |
+| `kingmaker update --auto` | Performs the quiet authenticated launch/wake check. In 4.4.3 it reports that an update is ready; it does not silently apply it. |
+| `kingmaker update` | Applies an authenticated newer release through the journaled installer. It refuses unsigned manifests, mismatched parts, an unrecognized release identity, rollback, or changed installed provenance. |
+| ChatGPT/Codex interaction lease | When ChatGPT or Codex owns the foreground governed conversation, Kingmaker closes its microphone and suppresses wake acknowledgements, answers, and proactive announcements. It records a bounded private event for its own brain instead of speaking into the other transcript. Switching to another app releases the lease and the cemented wake path works normally. |
+| `:key <provider>` at the console (or say "connect my GitHub key") | An API key into Kingmaker's vault: the provider's key page opens in Chrome, the steps are printed and spoken, you paste the key at a hidden prompt, and "Saved your GitHub key to the vault" comes only once the engine confirms. Connecting it and its live test wait for your `y`. Providers come from the engine's key-handoff catalog. |
+| `kingmaker key <provider>` | The same from a shell, against a headless engine that minted its own owner secret (the Linux service: `--runtime-home <dir>`). While Kingmaker runs, its console holds the secret, so it points you there. |
+| `kingmaker mcp` | MCP control surface over stdio, for Claude, Codex or an IDE. It can only propose. Its ArtCraft tools (`artcraft_status`, `artcraft_request`) go through the engine the same way. |
+| `kingmaker craft [status]` | The seven ArtCraft apps: found (version, commit, sha256, pinned) or missing, each with its fix line. Also the engine's own view of them. `kingmaker doctor` lists them too. |
+| `kingmaker craft install [app…]` | Builds them from source (all seven if none is named), one at a time. See "ArtCraft apps". |
+| `kingmaker craft <app> [what…] [--input F] [--says T]` | Asks the engine to run one, e.g. `kingmaker craft photocraft --input beach.jpg --says "Summer sale"`. The input is copied into the ArtCraft inbox first. A job that makes a file is read back and runs only on the owner's word: from this shell it is proposed. At the console, `:craft <app> …` does the same as the owner. |
+| `kingmaker scan [--find] [--force]` | The device scan, now (it also runs in the background on every start when the last one is over a week old): every app and how Kingmaker can drive it (its own CLI, an MCP server already configured on this Mac, Kingmaker's engine, AppleScript, its links, the Hands of Horus as the fallback), the CLIs on PATH, Homebrew/npm/uv/cargo tools, the web apps in your Chrome session (hosts only), and the API keys already on this Mac (names, provider and file only; never a value). One file: `<runtime home>/device-capabilities.json` (0600). `--find` is your consent to look online (the MCP registry and GitHub, only app names leave) for open-source tools for the apps with no CLI or MCP; they become proposals, ranked licence first (AGPL and non-commercial flagged), never installed. |
+| `kingmaker tools` / `:tools` / "what can you drive" | The capability summary and the proposals. |
+| "install <tool>" / "acquire <tool>" (said or typed at the console) | Outside code is never run as-is. Read back first; on your yes the proposal goes to the engine's acquisition loop as a capability gap: it is studied in quarantine and rebuilt as Kingmaker's own CLI or MCP tool, and nothing from it runs until you approve what comes out. |
+| "put my keys in the vault" / `:key import` | The keys the scan found, read back by name and provider; on your yes they go to Kingmaker's vault in one receipted call (`/api/key-handoff/console/import`), and the lanes that read an env var (Tavily, Groq, Gemini, NIM, …) can use them. |
+| "get me a Groq key" / "set up my keys" / `:key setup` | For the free APIs the engine uses (its free-tier catalog) with no key yet: read back, then on your yes the key page opens in your Chrome and a hidden Kingmaker paste box for that provider opens with it. You sign up and copy the key (Kingmaker never signs up, accepts terms, types a password or passes a check); paste and Save is your act: shape-checked, sealed, receipted, then a read-only check says whether it works. A provider already in the vault is never asked for again: the vault is outside every app bundle (`~/.solomon-secure`), so a rebuild or reinstall keeps it. "Save the Groq key" reads your clipboard once instead, on your spoken yes. |
+| `kingmaker markets install\|status` / `kingmaker markets <TICKER>` | TradingAgents (TauricResearch, Apache-2.0) as a research-only ability: a desk of AI analysts on your local models rates one ticker Buy to Sell, with its reports. It never trades; not financial advice. See `core/skills/trading-agents/SKILL.md`. |
+| `kingmaker settings` | Says where Kingmaker's settings are: the menu bar's gear, or `/connectors` (connectors, keys, and what it may reach on this Mac). |
+| `kingmaker status` / `stop` | Up or down, what's waiting, RAM across the process tree. |
+
+### Grok brain
+
+Install xAI's official Grok Build CLI, run `grok login` once, then choose it with `kingmaker brain grok`. Kingmaker invokes `grok -p` in bounded headless turns, resumes the same Grok session, and gives it only Kingmaker's MCP surface; Grok's shell, file, subagent and web tools remain disabled. `XAI_API_KEY` and `GROK_API_KEY` are deliberately removed from this lane, so it uses the cached CLI login instead of silently starting metered API usage. Set `SOL_GHOST_GROK_MODEL` only when you want to pin a model. Prompts and answers in this lane leave the Mac for xAI; Mac and CRM actions still pass through the engine's normal proposal and owner-approval boundary.
+
+### Background operation and sleep
+
+`kingmaker background enable` uses Apple's `SMAppService` Login Item API for the installed app; it installs no copied LaunchAgent or privileged helper, remains visible in System Settings ▸ General ▸ Login Items, and is reversible with `kingmaker background disable`. While the service is enabled, Kingmaker holds `caffeinate -s -w <pid>` for its full lifetime. That prevents **system** sleep while the Mac is connected to AC power, allows the built-in display to sleep, and automatically releases if Kingmaker exits.
+
+The supported default is: **power connected, MacBook lid open, built-in display asleep/off**. A local process cannot execute while macOS is in true system sleep, and software does not override normal closed-lid sleep. A dock, external monitor, dummy-display adapter, or wake-on-LAN may be used as an optional recovery arrangement, but none is required or claimed by Headless Host Mode.
+
+
+## Built-in skills
+
+Kingmaker ships with 100+ skills in `core/skills/`: Ronin's own (websites, local-business operations, voice, releases),
+the engine's project skills (Godot, Blender, ComfyUI, Docker, research, cameras, video and more), and the best public ones,
+each under its own licence ([THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)). Two are the core of how Kingmaker meets
+outside code:
+
+- **`rea`**: REA reads any program, repo, MCP server, CLI or skill before Kingmaker uses it and says what it would do
+  unprompted. Clean code runs as itself, code with bad parts runs sandboxed, and code that fetches-and-runs or hides
+  what it runs is never connected.
+- **`cli-anything`**: a ready-made CLI for 175+ apps from the Kingmaker CLI Hub, or a new CLI-Anything harness for an
+  app that has none, so Kingmaker drives it exactly instead of clicking.
+
+Name a skill in the bar (`/name`) to use it. Every skill, built in or added by you, goes through REA first.
+
+## Paid add-ons
+
+Kingmaker is complete on its own. Ronin sells add-ons through Ronin Launcher. The launcher hands one to
+`kingmaker addons install <folder>` (the licence on stdin); Kingmaker checks it again itself: the manifest's signature by
+Ronin's release key, every file's size and SHA-256, the Kingmaker version it needs, and, for a paid one, a licence
+signed by Ronin for this Mac and not revoked. It then places the add-on in its own data folder, outside the app, and
+loads it at the next start. An add-on never reaches into Kingmaker's files; it gets only what Kingmaker hands it.
+`kingmaker addons list` shows what is installed; `kingmaker addons remove <id>` takes one out.
+
+<!-- BEGIN command-list (generated from lib/command-list.mjs; edit it there) -->
+## Command list
+
+Every preset shortcut key, every bar and console command, and the words that turn a tool on. The bar shows the same list as its command library: click the small controller icon in its bottom row (🎮, beside Voice) for a glassy panel with every category side by side and a search bar on top (type what you want to do, e.g. *poster*, *approve*, *keys*). Choosing an entry puts it in the box, ready to finish and send.
+
+### Shortcut keys
+
+| Keys | What it does |
+|---|---|
+| ⌥Space | Open the bar from anywhere (Customize → Shortcut: ⌃Space, ⇧⌘K or none) |
+| Hold fn | Talk to Kingmaker while it's held; let go and it's one command (Customize → Hold to talk) |
+| ↵ | Send |
+| ⌘↵ | Queue it for after the current answer |
+| ⌥-click the mic | Talk to Kingmaker (a plain click dictates into the box) |
+| Tab | Take the suggested next command, or the highlighted pick |
+| ↑ ↓ | Move through the picks under the box |
+| Esc | Close the picks; again to hide the bar |
+| ⌘M | Minimize the bar (⌘W too); Kingmaker keeps running |
+| ⌘V | Paste: copied files, images, video and audio attach to the message |
+| ⌘Z | Undo (⇧⌘Z redo) |
+| ⌘X ⌘C ⌘A | Cut, copy, select all |
+| ↵ / Esc on a card | Answer the card in the bar (↵ takes its highlighted button) when you're in the bar and not typing |
+| ⌘S | Save in Customize → How should Kingmaker behave? |
+
+### In the bar
+
+| Say or type | What it does |
+|---|---|
+| `/off` | A real off: no listening, no wake word, until /on |
+| `/on` | Turn it back on |
+| `/mute` | No voice: answers here as text |
+| `/unmute` | Speak again |
+| `/folder` | Choose the folder Kingmaker works in |
+| `/clear` | A new conversation (/new too) |
+| `/connectors` | Connectors & keys (/keys, /settings, /connections) |
+| `/behave` | How Kingmaker should behave, and its guardrails (/instructions, /guardrails) |
+| `/<program> …` | Drive that program with the rest of the words (type / for the list) |
+| `@name` | Attach a file from this Mac |
+
+### Typed commands (console, or the bar)
+
+| Say or type | What it does |
+|---|---|
+| `:key <provider>` | Put an API key in the vault (console only) |
+| `:key import · :key setup` | The keys the scan found · free keys still missing (console only) |
+| `:craft <app> …` | Run an ArtCraft app (console only) |
+| `:tools · :scan` | What it can drive · rescan this Mac (console only) |
+| `:pending · y · n` | What's waiting · approve it · cancel it (console only) |
+| `:help · :quit` | The console's help · stop Kingmaker (console only) |
+
+### Say or type to turn a tool on
+
+| Say or type | What it does |
+|---|---|
+| `open youtube · open Photos · open gmail` | Open an app or site |
+| `how many files on my desktop` | Count files |
+| `whatsapp Ana saying on my way` | WhatsApp someone from Contacts: it opens ready, you press Send |
+| `make a poster for …` | Draw a picture on this Mac (about 90 s); it shows in the chat |
+| `make an ad about …` | Make an ad video on this Mac |
+| `write … · draft … · research …` | Written work or research, by the local writer |
+| `build …` | Build a tool, tracker, dashboard or small site: the engine reads the plan back and builds it on your yes |
+| `research …` | Research a question on the open internet, governed (online mode + consent); answers grounded or says it is not |
+| `merchant clover dry-run …` | Dry-run a Clover menu change (proposes the diff, changes nothing); applying is the owner's word at the console |
+| `fabricate …` | Plan a part with the engine (CAD): planning only, it proposes a plan and never runs a machine |
+| `twin list · twin show …` | Project Twins: list, show, back-burner, export; reviewing a task is your word at the console |
+| `connect my CRM` | Dock the CRM (the key goes through the hidden field into the vault) |
+| `connect my GitHub key` | Any provider's key into the vault |
+| `scan my Mac` | Rescan what it can drive (read-only) |
+| `what can you drive` | Its tools and the proposals |
+| `find tools for my apps` | Your OK to look online for open-source tools |
+| `install <tool>` | Acquire a tool: studied in quarantine, rebuilt, and only run on your yes |
+| `put my keys in the vault` | The keys the scan found, into the vault on your yes |
+| `set up my keys · get me a Groq key` | The free API keys it still needs |
+| `learning on · learning off` | Learn your preferences from what you say |
+| `keep that · drop that` | Keep or drop what it just offered to learn |
+| `what have you learned about me` | What it has learned about you |
+| `forget what you learned about …` | Forget it |
+| `where did you learn …` | Where a preference came from |
+| `sharing on · sharing off` | Community learning (kept preferences only) |
+| `new conversation` | A fresh Claude/ChatGPT conversation; what it learned stays |
+| `stop approving` | Kill switch: everything that approves without asking stops, at once |
+<!-- END command-list -->
+
+## Who can do what (same rules as the desktop app)
+
+At launch Kingmaker mints the same two per-launch secrets the desktop shell mints: the control nonce and the voice-attestation key. Their presence switches the engine's principal enforcement on. They live only in Kingmaker's memory and the server's environment. They are never written to disk or logged.
+
+| Where it comes from | The engine sees | Can |
+|---|---|---|
+| Typed at the `kingmaker start` terminal | `operator_typed` (nonce) | Ask, run your direct commands, approve proposals |
+| Your voice while Kingmaker is awake (default, `owner`) | your word (sent with this console's nonce, `operator_typed`) | Everything typing here can: run commands, say yes, say "confirm <words>" for RED |
+| With `kingmaker voice verified`: your enrolled voice, verified on this utterance | `owner_voice` (solvox2 attestation) | Ask, run your direct commands, approve what you asked for with "yes, go ahead" |
+| With `verified`: any other voice, Kingmaker's own echo, you talking over Kingmaker, a replayed token, or no voiceprint | `unverified_voice` | Ask and get answers. An action gets "I can only do that for my owner's verified voice." |
+| `kingmaker say`, `kingmaker mcp`, the browser, any program | `local_process` | Ask and propose; never approve; never reach the owner-only routes |
+
+The engine's owner-only routes (the vault, CLI-Anything, reverse engineering, capability acquisition, feature watch, key handoff) admit only this console when there is no window: whoever installed Kingmaker and holds its console is the owner. Opening a route is not an approval: money, outbound messages, connector writes and every proposal still wait for your word.
+
+The MCP server has **no approve tool**. An agent can never confirm its own proposal.
+
+## Voice
+
+The examples say "Kingmaker"; yours says whatever word you cemented at install.
+
+- **Asleep by default, microphone off.** While asleep, nothing is captured at all. "Hey Siri, wake Kingmaker" (a Shortcut `kingmaker siri` adds; it opens `kingmaker://wake`) or `kingmaker wake` wakes it.
+- **Addressing it by name:** "Kingmaker, …" wakes it and the name comes off the command, so "Kingmaker, open my Chrome" works in one breath (with `SOL_GHOST_LISTEN_ASLEEP=1` the name alone wakes it from sleep too).
+- **Decision log:** `logs/voice.log` records each decision (woke, slept, ignored N characters, barge-in, the command sent). Anything heard while asleep is never written, only its length.
+- **Awake:** talk normally with no wake word, until "Kingmaker, go to sleep" (or "that's all") or 2 minutes of quiet. "Shut down" turns it off.
+- **Waking is the gate, not the words.** The wake phrase itself is never sent to the engine, so "Kingmaker, wake up" on its own never runs or approves anything. "Kingmaker, yes go ahead" in one breath sends only "yes go ahead".
+- **What your voice can do** (`kingmaker voice`; `SOL_GHOST_VOICE_AUTHORITY` wins over it):
+  - `owner` (default): what Kingmaker hears while AWAKE is your word, sent with this console's nonce. Waking it is the only gate: anything audible while it is awake (a person, the TV) has that authority, and RED still needs its two challenge words.
+  - `verified` (opt-in): only your enrolled voice is your word. See "Verified voice" below.
+  - `propose`: speech only proposes (a local program's authority), and approvals are typed.
+
+## Verified voice (opt-in)
+
+For when "anyone audible while it is awake" is too loose. `kingmaker enroll` (once, typed at a terminal, with Kingmaker quit) runs the engine's own guided enrollment (`desktop/owner-voice/*`, used as shipped): you read 5 prompted sentences, each is checked (too short, wrong sentence, Kingmaker's own voice, a second voice), and the averaged voiceprint is sealed. Then `kingmaker voice verified` turns it on. In that mode every voice turn carries a solvox2 attestation that the engine's server re-checks before it counts as you:
+
+- **Per utterance:** the same audio that whisper transcribes is embedded by the bundled CAM++ model, compared with your print (threshold 0.62), and the token is minted for the exact text sent. The server re-checks the key, MAC, age (15 s), the transcript hash, the minimum speech (700 ms), and that the token has never been used.
+- **Never you:** another voice (`owner_mismatch`), Kingmaker's own voice (`self_echo`, against its `say` voice learned at each start), speech captured while Kingmaker was talking, a re-sent token (`replayed`), or no enrolled print.
+- **Say "yes, go ahead", not just "yes".** A bare "yes" is usually under the 700 ms the server requires, and Kingmaker then answers "I couldn't verify it was your voice". `cancel` always works, from anyone.
+- **What a spoken yes can approve:** what you (or the console) asked for. A proposal from `kingmaker say`, MCP or another program is never voice-approvable, by the engine's rule; approve those with `y` at the console.
+- **Sealed, not stored:** the print is AES-256-GCM sealed with a random key in your login Keychain (item "Sol Ghost Owner Voice"), under `~/Library/Application Support/sol-ghost/owner-voice/`. No audio is ever written: whisper reads the WAV on stdin, the speaker model gets PCM on stdin, and buffers are zero-filled after each utterance. `--forget` zero-fills the file and deletes the Keychain key, so any old backup of the file can't be opened.
+- **Honest limit:** the key's trusted reader is `/usr/bin/security`, so a program running as you could ask for it, the same reach it has over the rest of your account. Narrowing that to Kingmaker's own code signature needs a Developer-ID-signed helper with a Keychain access group.
+- **Speech:** replies come from Apple's own `say` voice, headless with nothing resident.
+- **Barge-in:** talk over it and it stops (detection is about 300 ms). It never fires in the first 700 ms of a reply. The echo level is learned only once `say` is actually audible, because `say` starts silent and learning from that silence used to cut its own voice off. `SOL_GHOST_BARGE=0` turns it off.
+- **Listening:** mic via `sox` (or ffmpeg), endpointing in-process, then the app's bundled whisper.cpp per utterance. Nothing stays resident between utterances.
+- **Overrides:** `SOL_GHOST_SAY_VOICE` changes the voice. `SOL_GHOST_WAKE_PHRASES` changes the wake phrases only on a legacy install; once a word is cemented it is ignored.
+
+## Chrome connector
+
+Kingmaker sets up its Chrome connector with the engine's own setup code (`desktop/chrome-connector-setup.mjs` + `chrome-extension-update.mjs`, imported from the bundle):
+
+- **Talks to the server, not a window.** The extension's native host calls the engine's server on `127.0.0.1:3001`, so keep Kingmaker on port 3001.
+- **Setup:** `kingmaker chrome` (or `./install.sh --yes`) writes the native-messaging host and a Chrome connector folder on your Desktop.
+- **One step only you can do:** in Chrome, open `chrome://extensions`, turn on Developer mode, choose Load unpacked, and pick that folder. Chrome doesn't let a program add an unpacked extension.
+- **Updates:** every start keeps the loaded copy current, as the desktop app does.
+
+## Ronin Atlas (formerly God's Eye)
+
+Ronin Atlas stays installed and is driven in the browser. Only its boot warm-up is skipped (`SOLOMON_GODS_EYE_PREWARM=0`), because on 8 GB it holds about 670 MB for about 20 minutes at every boot. It starts on first use instead. `SOL_GHOST_GODS_EYE=0` turns Ronin Atlas off entirely (the variable keeps its old name).
+
+## Evidence, as Mac windows
+
+When a turn produces something (an image, a video, a page), Kingmaker opens it with your Mac's own apps: Preview, QuickTime or your browser. Only the engine's own output is ever opened, meaning files in its `generated-media` / `evidence-screenshots` / `artifacts` folders, or pages on its own loopback port. Links that merely appear in an answer are never opened. `SOL_GHOST_OPEN_EVIDENCE=0` turns this off.
+
+## What drives what
+
+1. **Apps macOS can see through accessibility** (most Mac apps, Finder, Notes, Mail, Calculator): the Hands of Horus, through the engine's mac provider and its governed device actions (voice "open Notes and click New Note", a WhatsApp send). Reading is free. Every committing step stops for a yes, and one yes presses exactly one thing. They act on an app in place, without bringing it forward, and never click or type in a web browser. When they are not installed, ghost-os does this, as before.
+
+## The hands
+
+The Hands of Horus are an MIT-licensed macOS automation tool (credited in the code where it is invoked), driven over its MCP server. Install with `brew install openclaw/tap/peekaboo`, then allow its Bridge under System Settings ▸ Privacy & Security ▸ Accessibility and Screen Recording. When the `peekaboo` binary is found (`/opt/homebrew/bin`, `/usr/local/bin`, then `PATH`; or `SOL_GHOST_PEEKABOO_BIN`), Kingmaker hands the engine `SOLOMON_MAC_HANDS=peekaboo` and `SOLOMON_PEEKABOO_MCP_CMD`, and the start banner says `Hands: Hands of Horus <version> live (<N> tools, …)`. `kingmaker doctor` reads their own permission report. Your own `SOLOMON_*` environment wins: `SOLOMON_MAC_HANDS=ghost` goes back to ghost-os. Kingmaker never uses their built-in AI agent, image analysis or browser tools.
+2. **Scriptable programs** (Blender, Godot, FreeCAD, ffmpeg, ComfyUI, anything added with CLI-Anything or a self-built skill): Kingmaker's engine drives them through their CLI or Python API. This is more deterministic than clicking. Blender draws its own UI, so the accessibility tree sees almost nothing inside it.
+3. **Pixel-only surfaces** (a 3D viewport, a game, canvas web apps): these need ghost-os vision grounding (ShowUI-2B, about 3 GB). That's off on 8 GB and turns on with more RAM.
+
+## ArtCraft apps
+
+The engine's ArtCraft adapter drives seven open-source creative apps from `storytold/*`, each MIT OR Apache-2.0: PhotoCraft, VectorCraft, FilmCraft, LightCraft, EffectCraft, PrintCraft (its repo is now `storytold/pdfcraft`; the CLI is still `printcraft-cli`) and DesignCraft. It runs their CLIs in a sandbox with no network, verifies every output by its bytes and signs a receipt.
+
+- **Where they go.** `<runtime home>/data/artcraft/bin`, Kingmaker's own data root. The adapter looks there itself, so a Kingmaker that is already running finds a new install. Every start also hands the engine `SOLOMON_ARTCRAFT_BIN_DIR` and, for each app Kingmaker built, `SOLOMON_<APP>_CLI_SHA256`. With that pin, a binary that changed since the install is refused, never run. Your own `SOLOMON_*` environment wins.
+- **Building.** There are no published binaries. `kingmaker craft install` fetches each repo at the commit the engine's evaluation verified. Then it runs `cargo build --release --locked -p <app>-cli` and copies the binary in. The commit, version and sha256 go into `sol-ghost-craft.json` beside it, and the clone and target folder are removed (`--keep-build` keeps them). Builds run one at a time, at `nice 15`, with 2 jobs on 8 GB, and paced like every other Kingmaker background job. A build waits while another cargo build or critical memory pressure is going. It never gives up because the Mac is busy. It stops only when the disk has less than 4 GB free.
+- **Using them.** Only through the engine: by voice ("PhotoCraft, make a carousel image from beach.jpg"), at the console (`:craft`), with `kingmaker craft`, or over MCP. The apps' own `<app>-cli mcp` servers are never started or re-exported. With no flags, VectorCraft's attaches to an unauthenticated `127.0.0.1:7979`. VectorCraft `screenshot` and DesignCraft `render_page` claim to be read-only but write a file when given a path. What a request does is judged from its words and by the engine, never from a tool's hint. FilmCraft and EffectCraft renders wait for the engine's heavy slot, never beside a model load.
+- **LightCraft in this build.** HEIC and AVIF do not decode, and its folder import skips Nikon `.nrw`. `kingmaker craft lightcraft --input <folder>` counts those files and says so.
+
+## Known gaps (4.4.3, honest)
+
+- **The signed 4.4.3 macOS update is live; Apple public-web distribution is still separate.** The private release uses the pinned Kingmaker Release identity and signed manifest. Developer ID/notarization remain prerequisites for a frictionless public website download.
+- **Linux and Windows install units are VM-tested installer candidates, not native GUI parity.** Prior portable paths were exercised in Windows/Linux VMs on the 8 GB Mac through Muse. The refreshed 4.4.3 archives add `UNIT.json` and rollback-safe `install.sh`/`install.ps1`, but native UI, voice and platform credential adapters remain separate acceptance items.
+- **System software it doesn't bundle** comes with the installer: Ollama and the models, the Hands of Horus, sox, SearXNG (Kingmaker starts an installed `ollama serve` when none is running). ghost-os stays an optional fallback for the hands. Blender, Godot and Chrome are found where they're installed.
+- **The desktop app's first-run installer and knowledge-library offer are pop-ups in its window,** so they don't run headless. The runtime still reports what's missing.
+- **The ledger calls spoken turns typed.** The engine records them as `operator_typed` because Kingmaker sends them with the console's nonce. An honest "spoken at the Kingmaker console" principal needs an engine change.
+- **Mic capture is not live-tested here.** The first `kingmaker start` in Terminal triggers macOS's microphone prompt for Terminal.
+- **The verified mode is proven on synthetic voices, not yet on your own.** The end-to-end proof (`npm run proof:owner-voice`) uses `say` voices as stand-ins for people; your first live run is `kingmaker enroll`.
+- **The engine's own Kokoro voice** isn't wired yet; `say` is the 0-MB default. Kokoro can be added when RAM allows.
+- **The wake detector** runs whisper on every speech segment while asleep. The bundled KWS spotter would make sleep near-zero CPU.
+
+(yes the title is deliberate, share this by word of mouth not social media please.)
+
+## Licence
+
+Free for personal and noncommercial use under the [PolyForm Noncommercial License 1.0.0](LICENSE). Kingmaker is source-available, not open source: any commercial use, by any company, needs a written licence from Ronin Inc. Contact **ronininc@mail.grokbot.com**. See [COMMERCIAL-LICENSE.md](COMMERCIAL-LICENSE.md); contributions are covered by [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Fine print
+
+Kingmaker shares what it learns by default, and it's your choice: the first time it has something to share, a permissions box asks, and "Keep it on this Mac" turns it off (so does "sharing off", any time). The line between your data and ours is absolute: everything you say, type, see or store stays on your device and stays yours. Only sanitized learning about how Kingmaker works is sent: skill procedures and scorecards, per-device evaluation and model-trial results, counts of public task words, and counts of preference kinds. Every packet is logged locally, exactly as sent, in `fleet/contributed.jsonl`. The collective's signed improvements go only to installs that share. Full terms: [TERMS.md](TERMS.md). The community-learning implementation lives in `lib/sharing.mjs` and its associated tests; this recovered tree does not contain the former standalone design document.
+
+
+---
+
+# Appendix — historical Kingmaker management-layer doctrine
+
+_Historical design record consolidated from `ronininc/kingmaker-os` on 2026-10-23. It is preserved for provenance and is **not** the current 4.4.3 product description, deployment status, network contract or release checklist. Where it conflicts with the implementation documented above, the 4.4.3 source and signed contracts govern._
+
 # Kingmaker
 
-### Become digitally sovereign for free today.
-
-**Your Mac, working — not just talking. A console for local AI: type, speak, or drive it from your tools. Your data never leaves.**
-
-Kingmaker is a Mac agent with a menu-bar console ("the bar"): a chat UI with a sidebar, a model picker, an Artifacts tab, and a Skills tab — plus voice control, a CLI, an MCP surface your other tools can drive, and an iPhone bridge. Say the wake word or type; it proposes the action, you approve, and the Hands of Horus drive your real Mac apps. Every step is governed, every action is on the audit chain, and your data stays in `~/Library/Application Support/sol-ghost/runtime`.
-
-Source-available under [PolyForm Noncommercial 1.0.0](LICENSE). Free for personal use.
-
----
-
-## Quick answers
-
-**What is Kingmaker?**
-Kingmaker is a Mac agent built by Ronin Inc: a menu-bar console, voice control, CLI, and MCP surface for running AI on your own Mac. It routes work to interchangeable AI brains (local or cloud), governs every step with approval gates, and keeps your data on your machine.
-
-**Is Kingmaker open source?**
-Kingmaker is source-available under the PolyForm Noncommercial 1.0.0 license, free for personal use. The public repository is [github.com/ronininc/kingmaker](https://github.com/ronininc/kingmaker). It is not closed-source and is not distributed only through private channels.
-
-**Where do I download Kingmaker?**
-From [ronininc.org/kingmaker](https://ronininc.org/kingmaker) or the [GitHub releases page](https://github.com/ronininc/kingmaker/releases). Every release ships a signed installer; the release manifest is signature-verified before install.
-
-**Who makes Kingmaker?**
-Ronin Inc, founded by Robbie G. Kingmaker is the uncensored local engine; Solomon is the governed business product built on the same core.
-
----
-
-## The system
-
-Five surfaces, one engine:
-
-- **The bar** — the menu-bar console. Chat UI with a sidebar of conversations, a model picker, an Artifacts tab (everything Kingmaker made), a Skills tab (mint new skills), file drops, a global hotkey, and a first-run tour. The Ronin crest in the menu bar glows when awake, pulses while speaking, and rings while listening.
-- **Voice** — wake word, spoken commands, voiceprint enrollment, a voice-turn ledger. Approvals are never a click: they are your word. "Hey Siri, wake Kingmaker" works too.
-- **CLI** — `kingmaker` / `sol-ghost`: full terminal control, iPhone bridge controls, model management, enrollment.
-- **MCP** — any MCP client (Claude, Codex, an IDE) can drive your Mac *through* Kingmaker: ask, plan, propose — the engine governs, the Mac executes.
-- **iPhone bridge** — your one iPhone, driven from your Mac, local only: see the screen, tap, type, call, iMessage. Trusting a contact or changing policy takes your Touch ID at the CLI. Outbound goes to people you know; strangers are prohibited.
-
-## Install
-
-**You need:** Apple silicon Mac, macOS 14+, **≈ 29 GB free** (the 18.5 GB knowledge library is a required step; Kingmaker keeps 20 GB free and pauses heavy jobs below that). Intel Macs, Windows, and Linux do not install.
-
-1. **Download:** [Kingmaker Installer DMG](https://ronininc.org/download/kingmaker) (or from the [latest release](https://github.com/ronininc/kingmaker/releases))
-2. **Open the DMG**, double-click the installer
-3. **Pick your wake word**, click **Download & Install**
-4. **Allow** Microphone, Accessibility, and Screen Recording when asked
-5. **Say:** *"[wake word], open Notes"* → approve with "yes"
-
-That's it. No terminal. No config files. One button.
-
-> **First launch:** The installer isn't notarized yet. When macOS blocks it, go to **System Settings → Privacy & Security → Open Anyway**. One time only.
-
-## What it does
-
-- **Talk & do** — voice or text in, proposed action out, your word approves it. Hands of Horus click, type, and drive real Mac apps.
-- **Make** — office files (Word, Excel, PowerPoint, PDF) rendered locally with bundled open libraries; artifacts and reels through seven creative CLIs. The local model never writes file bytes: it answers with a JSON spec, the engine renders it.
-- **Know** — 106 skills in `core/skills`, and Kingmaker absorbs what it connects to: new connectors become *candidate* skills (minting never grants permission). REA reverse-engineers every connector's code before use and quarantines anything that phones home, grabs credentials, or raises privileges unprompted. The R&D floor (`kingmaker rd`) is the separate analysis engine for a shipped artifact: five modules over the free, licence-checked part of the REA toolkit. It does not download that toolkit and it does not replace the connector check. See `docs/RD-FLOOR.md`.
-- **Trade** — a desk of LLM analysts (market, social, news, fundamentals) debates a ticker, bull vs bear, risk team argues, portfolio manager rates it. Research aid, not an autopilot.
-- **Phone home (to you)** — Kingmaker calls *your* number with updates through your own Twilio account. It never calls anyone else.
-- **Think fast, think governed** — every command gets a lane first: instant rules, then a lightweight local router (1.7B, ~155 ms), then the heavy governed brain only when needed.
-
----
-
-## Skills — the capability surface
-
-Skills are not optional extras. They are how Kingmaker's core functions happen: the files hold the methods, the router picks the skill, the brain executes. 174 ship in this repo — 106 top-level packs in `core/skills`, nested sub-skills, and 5 vendored.
-
-
-**Core and everything else** (50)
-
-`agent-self-scheduling`, `axis-projection`, `create-skill-gen`, `custom-tool-builder`, `dagster-expert`, `data-visualization`, `fastmcp`, `ffmpeg-skill`, `founder-metric-reel`, `get-available-resources`, `gh-fix-ci`, `graphite`, `gsap-core`, `gsap-scrolltrigger`, `gsap-timeline`, `humanizer`, `immersive-evidence-workspace`, `internal-comms`, `kingmaker-flagship-driver`, `kingmaker-native-internet`, `kingmaker-proof-authoring`, `kingmaker-proof-runner`, `kingmaker-repo-hygiene`, `kingmaker-voice-runtime`, `kingmaker-voice-verification`, `marketing-ideas`, `mcp-server-builder`, `movie-gen`, `native-capability-extraction`, `observability-and-instrumentation`, `offers`, `open-harness`, `parametric-cad-verify`, `playwright-cli`, `pricing`, `rea`, `referrals`, `scheduler`, `security-and-hardening`, `security-audit`, `skill-creator`, `skill-kokoro-tts-tool`, `skill-matchmaker`, `social`, `spanish-regional-localization`, `theme-factory`, `verify-claims`, `voice-operations-command`, `wholesale-real-estate`, `workflows`
-
-**Driving real tools (CLI bridges)** (7)
-
-`cli-anything`, `cli-anything-blender`, `cli-anything-comfyui`, `cli-anything-freecad`, `cli-anything-godot`, `cli-anything-hermes`, `cli-hub-meta-skill`
-
-**Making: 3D, image, video, art** (31)
-
-`aaa-modeling`, `algorithmic-art`, `blender-3d-asset-generation`, `comfyui`, `godot-prompter`, `godot-prompter/skills/2d-essentials`, `godot-prompter/skills/3d-essentials`, `godot-prompter/skills/animation-system`, `godot-prompter/skills/audio-system`, `godot-prompter/skills/camera-system`, `godot-prompter/skills/component-system`, `godot-prompter/skills/dependency-injection`, `godot-prompter/skills/event-bus`, `godot-prompter/skills/gdscript-patterns`, `godot-prompter/skills/godot-debugging`, `godot-prompter/skills/godot-mentor`, `godot-prompter/skills/godot-optimization`, `godot-prompter/skills/godot-project-setup`, `godot-prompter/skills/godot-testing`, `godot-prompter/skills/godot-ui`, `godot-prompter/skills/input-handling`, `godot-prompter/skills/math-essentials`, `godot-prompter/skills/physics-system`, `godot-prompter/skills/resource-pattern`, `godot-prompter/skills/save-load`, `godot-prompter/skills/scene-organization`, `godot-prompter/skills/state-machine`, `godot-prompter/skills/using-godot-prompter`, `site-media-fetch`, `social-media-gen`, `web-artifacts-builder`
-
-**Building and code** (27)
-
-`app-remake-belt`, `claude-code-skillforge`, `claude-code-skillforge/examples/auditing-seo`, `claude-code-skillforge/examples/formatting-commits`, `clone`, `clone/references/cli-anything`, `clone/references/graphify`, `clone/references/reverse-engineer-anything`, `codex-handoff`, `coding-gen`, `debugging-and-error-recovery`, `gcode`, `kingmaker-engine-verifier`, `penetration-testing`, `universal-modder`, `universal-modder/skills/asset-pipeline`, `universal-modder/skills/fal-assets`, `universal-modder/skills/game-automation`, `universal-modder/skills/game-recon`, `universal-modder/skills/game-research-websearch`, `universal-modder/skills/mashup-mods`, `universal-modder/skills/mod-any-game`, `universal-modder/skills/publish-mod`, `universal-modder/skills/reverse-engineering`, `universal-modder/skills/share-field-notes`, `universal-modder/skills/showcase-video`, `webapp-testing`
-
-**Business, leads, and clients** (8)
-
-`big-box-store`, `business-name-fit`, `business-profile-recon`, `clover-operations-command`, `contract-and-proposal-writer`, `emails`, `lead-magnets`, `service-business-website`
-
-**Web and search** (9)
-
-`ai-search-ranking`, `cloudflare-ordering-worker`, `customer-research`, `deep-research`, `kingmaker-cloudflare-release`, `local-seo-manager`, `paper-search-pro`, `research`, `website-build-standard`
-
-**Documents and writing** (4)
-
-`copy-editing`, `copywriting`, `office`, `wake-word-detection`
-
-**Research and knowledge** (31)
-
-`deepcamera`, `deepcamera/skills/analysis/cloud-provider-regression`, `deepcamera/skills/analysis/home-security-benchmark`, `deepcamera/skills/analysis/homesafe-bench`, `deepcamera/skills/analysis/smarthome-bench`, `deepcamera/skills/annotation/dataset-annotation`, `deepcamera/skills/annotation/dataset-management`, `deepcamera/skills/automation/ha-trigger`, `deepcamera/skills/automation/mqtt`, `deepcamera/skills/automation/webhook`, `deepcamera/skills/camera-providers/eufy`, `deepcamera/skills/camera-providers/reolink`, `deepcamera/skills/camera-providers/tapo`, `deepcamera/skills/channels/line`, `deepcamera/skills/channels/matrix`, `deepcamera/skills/channels/signal`, `deepcamera/skills/detection/yolo-detection-2026`, `deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos`, `deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl`, `deepcamera/skills/detection/yolo-detection-2026-openvino`, `deepcamera/skills/integrations/homeassistant-bridge`, `deepcamera/skills/segmentation/sam2-segmentation`, `deepcamera/skills/streaming/go2rtc-cameras`, `deepcamera/skills/training/model-training`, `deepcamera/skills/transformation/depth-estimation`, `docker-build-strategies`, `docker-compose-patterns`, `docker-destructive-guardrails`, `docker-project-foundations`, `kingmaker-doc-author`, `kingmaker-readme-sync`
-
-**Trading and finance** (2)
-
-`algo-trading`, `trading-agents`
-
-**Vendored (kingmaker-cli-hub)** (5)
-
-`cli_hub/_matrix_data/3d-cad`, `cli_hub/_matrix_data/game-development`, `cli_hub/_matrix_data/image-design`, `cli_hub/_matrix_data/knowledge-research`, `cli_hub/_matrix_data/video-creation`
-
----
-
-## By the numbers
-
-| | |
-|---|---|
-| Modules in `lib/` | 146 files |
-| Skills | 174 (169 in `core/skills`, 5 vendored) |
-| Test files | 105 |
-| MCP tools | 17 (8 core + 9 iPhone bridge) |
-| Brains | Local, Claude, Grok, ChatGPT |
-
-## The vision
-
-*Status key: **LIVE** = shipped and working. **BUILT** = in the codebase, not yet wired into the running app. **PLANNED** = designed, not yet built. If it isn't marked LIVE, it isn't done.*
-
-### The mission
-
-"Service, function, power. To the people."
-
-SaaS is dead — service is the value, software is the wrapper. Kingmaker puts production-grade AI in the hands of sovereign individuals: you choose what runs, what it does, what it's capable of. No corporation, government, or cloud provider can revoke it. A node in every house.
-
-### The router doctrine — LIVE
-
-Kingmaker is a **router**, not a model. The 140+ modules in `lib/` hold the methods; interchangeable AI brains (local, Claude, Grok, ChatGPT) execute. Brains never self-coordinate — every multi-step job fans out from the router and reports back up. Swap the brain, keep the governance. The routing, the skill tree, and the combined skills are the product: they push any model to its ceiling under personal compute.
-
-### Doing more with less — LIVE
-
-Reading (prefill) is parallel and cheap. Writing (decode) is sequential and dear. So the system reads enormously — skills, model library, governed toolbelt — and writes minimally. Capability lives *around* the model, not inside it. The metric is **outcomes-per-token**, not benchmark scores. A smaller brain with many hands beats a big brain with none.
-
-### Governance stack — LIVE
-
-Ten modules in `lib/`. Nothing executes outside them:
-
-- **decision-router** — local reflex layer; simple decisions resolve without a cloud round-trip.
-- **audit-chain** — every action hash-chained, tamper-evident. The ledger is the product.
-- **model-pin-registry** — only pinned model hashes load. Unpinned weights refused.
-- **governance-spine** — `custom` or `kingmaker-x-heretic` mode, per-session founder tap. Remakes of external tools inherit the user's guardrails or default to standard governance. Never ungoverned, never guessed.
-- **ingestion-guard / egress-guard** — all input treated as untrusted at the boundary; egress allowlisted.
-- **abliterate-model** — official base weights → local uncensoring → hash-pinned. Reproducible, auditable.
-- **compute-governor** — resident/stream/refused load decisions graded on the *active set*, not weight bytes.
-- **model-condense** — FP8 dense backbone, MXFP4 experts, sparse activation, small KV cache. Same model + device always yields the same plan.
-- **runtime-degrade** — full capability first, degrade only on resource exhaustion.
-- **bar-guard** — your words come first, before any framing, before any brain. Kill-switch phrases and duress handling built in.
-
-Plus **keychain-seal** (Scripture Armor — the sealed vault both systems stand on; see *Kingmaker vs Solomon* below), **kill-switch**, **duress**, **universal-file-handler**.
-
-### THE CAGE — LIVE
-
-New capabilities enter through a 7-stage ingestion pipeline, ported from the private `kingmaker-os` runtime. Stages 1–3 (discovery, triage, scan) run autonomously. **Stage 4 is a hard gate: nothing enters the brain library without the founder's signed tap** — `decidedBy` is the literal `'robbie'`. Stage 5 re-validates the approval and recomputes the packet hash before ingesting anything; a tampered packet throws and nothing ingests. Stage 7 (fleet learning) is opt-in; customer data is hardcoded out.
-
-### Titan — LIVE
-
-Gated self-iteration. When the system hits something it can't reason through, it says so first — then works every avenue in the background and saves the learned pathway. Whatever puts it down, it adapts to until it gets up immune.
-
-### The bridge — BUILT
-
-Rotating key agreement between the user's devices. Two keys born at setup, mutual docking auth, then liveness proven with rotating call signs — **296 per cycle, 6 digits each, rotating every 24 hours**, derived from a shared seed. *"Seeded deterministic rotation, synchronized with nothing but math."* Long-term keys are never seen after setup; only call signs travel. Pure functions, no I/O, no network, no server. **Status: in the v4.0 codebase, not yet wired into the running launcher.**
-
-### Compute — LIVE, next target in the pipeline
-
-Live today: the governor, condense, degrade, and fast-route modules. Measured on an 8GB M3: 145MB idle, 22s cold boot, 5s warm.
-
-Next target: **Edge0-35B-A3B** — a 35B sparse MoE (40 layers, 256 experts, 4 active per token) streaming in **under 3 GiB of active RAM** at 14.9–17.7 tok/s, Apache-2.0 licensed. Edge0's models are already in the Hugging Bay catalog; the 35B is through pipeline Stages 1–2. **Status: triaged FLAG — no published hash, first-time publisher, needs human eyes before it goes near the library.**
-
-Honest limit, measured: **there is no memory tier above 16 GB today** — on 24–64 GB machines the extra memory sits unused. That changes when the streaming tier lands.
-
-### Models — LIVE
-
-Hugging Bay is Kingmaker's model source: every file recorded with its SHA-256 and license, no account needed. A download is your ask (CLI or the bar), lands in the models folder, and is kept only when size and SHA-256 match the record — anything else is deleted. `kingmaker models hb search | info | pull`.
-
-### K-Bucks — BUILT, economy PLANNED
-
-Proof-of-impact currency, not speculation. `UBI_GRANT_AMOUNT = 1000` KMB per verified installer identity — one identity, one grant, idempotent. The grant module does **not** mint; it emits signed grant instructions onto the audit chain, and the ledger replays them. *"The number is not a store of value — it is a ledger the machine reads to decide what an identity may access. People who do more get more."* Sybil defense is the identity layer itself. **Status: ledger and grant modules live; the trading economy is not announced until there's something to trade.**
-
-### The heretic set — LIVE, one module untested
-
-The sharp edges, under the same audit chain and approval gates as everything else:
-
-- **`kingmaker-x-heretic` spine mode** — loads only pinned abliterated models; requires the founder's tap per session. No tap, no run.
-- **darkweb-search** — Tor-only, fail-closed, read-only, text-only. CSAM auto-abort is a hard rule with no override path — not tap, not session, nothing. Abort in <1s, log without content, notify the founder. **Status: in the codebase, UNTESTED live — no Tor traffic has run through it.**
-- **abliterate-model** — the local uncensoring pipeline (governed, founder tap, provenance hash-checked); output must be hash-pinned before the heretic spine will load it. **Status: UNTESTED live — needs a GPU box and official base weights.**
-- **heretic-llm** — the uncensoring engine abliterate-model drives. External Python tool, AGPL-3.0: it runs via subprocess ONLY, never imported, never linked, never shipped in this repo.
-
-They exist because the governed path needs a complete picture to govern against.
-
-### OSINT — private side
-
-Kingmaker's OSINT toolkit (LittleBrother) is a **private-side module** — it is not in this repository. Solomon gets only the public-source boundary (public IP and username lookups; no person/phone non-public lookups, no pretexting).
-
-### Trust — LIVE
-
-Releases ship as 8 signed archive parts + installer DMG via GitHub Releases. The manifest is signed with an **offline RSA-4096** key; the installer verifies the signature against a pinned public key (`lib/kingmaker-release-public.pem`) before touching a byte. Tampered manifest = refused, loudly. Key rotation is deliberate: rotate, re-pin, re-sign, ship an installer carrying the new pin. The launcher checks the update host (Cloudflare Worker + R2, in `update-host/`) for new releases.
-
-### The fleet — LIVE protocol, collective early
-
-Every Kingmaker learns on its own Mac (on by default). **Sharing** what it learned with the community is a separate switch, decided in a permissions box: share-and-get-improvements is the default, nothing leaves until the box has been shown, "keep it on this Mac" stops sharing at once, "forget what I shared" asks the collective to erase your contributions. The fleet host (`fleet-host/`, Cloudflare Worker) receives closed packets, stores them, and hands each install back its signed bundle — it never executes anything it receives. **Status: protocol and host code live; the collective is young.**
-
-### Kingmaker vs Solomon
-
-Kingmaker is the uncensored engine underneath — source-available, more abilities, cannot be owned or licensed, only caged by its device. Solomon is the governed business product built on the same core: it synthesizes knowledge for production only, passes legal restrictions, and ships to clients whose lawyers review the config — the review is the product.
-
-**The armor under both.** Kingmaker and Solomon both stand on Scripture Armor — Ronin Inc's sealed vault for keys, data, and software. Nothing sealed by Armor opens without its owner's approval, on the owner's own machine; possession of a sealed file is not possession of what's inside it. Armor is private, commercial, and application-gated, and it is the one bridge between the two systems: ronininc.org/scripture-armor.
-
-### The fleet vision — PLANNED
-
-The endgame is a network of independent sovereign nodes — citizens and companies running their own infrastructure, compounding knowledge through opt-in fleet learning while personal data never leaves the machine. One distribution method: high-density compute staged on sovereign vessels in international waters — ocean-water cooling, no grid dependence, no single jurisdiction. Kingmaker **mitigates** (individual sovereignty bounds the damage); Solomon **prevents** (owned infrastructure has no failure mode for the reset to trigger).
-
-### The acceptance loop — LIVE as the bar
-
-"It launches" is not the bar. The bar is the full loop, proven end-to-end: **read → replicate → ask → improve**. Point Kingmaker at a target, it replicates it byte-for-byte, asks improvement questions, and delivers the finished product. Every release is held to the loop before it ships.
-
----
-
-## Hardware outcomes
-
-Measured 2026-10-09 (MacBook Air M3, 8 GB). Full numbers in `catalog/`.
-
-| Machine | Outcome |
-|---|---|
-| **8 GB Apple-silicon Mac** | **Works.** Cloud brains are quick (thinking happens in the cloud). Local brain: simple answers in 2–4 s; multi-step reasoning gets shaky, model reloads cost 1–5 s between jobs. |
-| **16 GB Apple-silicon Mac** | **Good** (estimate). The local brain becomes the 8B model — much smarter, chat stays smooth. |
-| **24–64 GB Apple-silicon Mac** | **Good, same as 16 GB** (estimate). No tier above 16 GB today — extra memory sits unused until the streaming tier lands. |
-
-## The details
-
-**System requirements:** [docs/SYSTEM-REQUIREMENTS.md](docs/SYSTEM-REQUIREMENTS.md)
-
-**What Kingmaker absorbed:** [docs/ABSORBED.md](docs/ABSORBED.md) — open projects studied to improve the architecture. Nothing absorbed ships as-is; GPL projects give ideas only, never code.
-
-**Wake word:** Picked at install, then cemented. 1-3 words. Want a different one? Reinstall.
-
-**Data:** `~/Library/Application Support/sol-ghost/runtime` (vault, memory, connectors). Never touches another app's data.
-
-**Voice:** Say yes to approve. Say "cancel" to stop. Verified voice (opt-in) for hands-free approval.
-
-**Repo map:**
-
-| Repo | Visibility | Contents |
-|---|---|---|
-| `ronininc/kingmaker` | Public | This repo: app, engine, releases, installer |
-| `ronininc/kingmaker-os` | Private | TypeScript governance runtime (source of truth the app ports from) |
-| `ronininc/kingmaker-private` | Private | Mac app |
-| `ronininc/kingmaker-brain-library` | Private | Model packs per Mac class. Kingmaker reads it with a GitHub token: `KINGMAKER_LIBRARY_TOKEN`, the Keychain item `kingmaker-library`, or `gh auth login` (see docs/MAC-PROFILES.md) |
-
----
-
-## License
-
-PolyForm Noncommercial 1.0.0 — free for personal use. [Commercial licenses](COMMERCIAL-LICENSE.md) available. See [TERMS.md](TERMS.md) and [PRIVACY.md](PRIVACY.md).
+Kingmaker is the sovereign management layer for **Solomon** — the internal Ronin
+executive/administrative and capability-evolution exoskeleton that **manages, builds,
+alters, and monitors** a running Solomon instance.
+
+Kingmaker is a **separate project, built after Solomon is done.** It was extracted from
+the Solomon (TSS) repo on 2026-07-19; none of the files here had any Solomon importer —
+Solomon does not depend on Kingmaker and does not run this code.
+
+## The diode (anti-zero-day) security model
+
+**Kingmaker is the SOLE, non-public access point to Solomon.** Solomon is not publicly
+reachable at all; the only way to reach it is through the Kingmaker gateway. Kingmaker is a
+closed-loop, one-way diode:
+
+```
+(the world) ──▶ Kingmaker ──(one-way, Kingmaker-initiated)──▶ Solomon
+Solomon ──✗──▶ Kingmaker      (NEVER — Solomon holds no address, credential, or path back)
+```
+
+There is **no backdoor** into Solomon. All access flows through Kingmaker → Solomon.
+Kingmaker *initiates* every connection (to manage/build/alter/monitor); Solomon is passive —
+it only *responds* to reads/inputs Kingmaker initiates, over connectors that live on the
+Solomon side (the receiving end). Solomon never opens an outbound connection to Kingmaker,
+never pushes, and never learns where Kingmaker is. Monitoring works by Kingmaker PULLING
+Solomon's exposed read surfaces (e.g. the self-hardening immune ledger), not by Solomon
+reporting out.
+
+**Anti-zero-day property:** a fully compromised Solomon cannot pivot into Kingmaker — there
+is no route, address, or credential to follow — so Kingmaker's elevated management authority
+can never become an inbound attack surface. The channel only flows one direction.
+
+**Deployment:** Kingmaker is self-hosted on Ronin's own server in a **black site** (private,
+not public, network-isolated). It is a SECONDARY program that begins only after Solomon is
+complete.
+
+Kingmaker uses this one-way channel to:
+- **manage** Solomon (governed lifecycle, queue, founder review),
+- **build** Solomon (capability evolution, the Vault),
+- **alter** Solomon (governed changes pushed in through the connector),
+- **monitor** Solomon's internals for users attempting harm (zero-day / breach detection).
+
+## Contents
+
+- `contracts/` — the governed lifecycle spine (pure types + pure functions, no I/O):
+  - `kingmaker-queue.ts` — the queue lane/status state machine
+    (Request → Review → Risk Class → Founder Table → Build Queue → Validation → Vault →
+    Release → Hall of Fame / Public Telemetry).
+  - `runtime-sovereignty.ts` — Green/Yellow/Red risk classification + device/runtime tiers.
+  - `lifecycle-stage.ts` / `lifecycle-transitions.ts` / `lifecycle-snapshot.ts` — the
+    stage vocabulary + "nothing teleports" transition guards + per-request stage state.
+  - `capability-manifest.ts`, `intent-manifest.ts`, `objective-registry.ts` — the
+    capability/intent/objective contract layers.
+  - `vault-registry.ts` — governed capability accumulation (customer data never enters the
+    Vault; contributor watermarks; no price penalty for contributions).
+  - `federation-report.ts` — the SANITIZED Solomon→Kingmaker report schema + the SANDBOX that
+    refuses any incoming report carrying a payload/source key, malformed JSON, or an un-sanitized
+    shape. Abilities are metadata only — there is nothing to execute, so sandboxing = strict
+    schema validation + anomaly quarantine.
+  - `open-dev-hall-of-fame.ts` — contributor Hall of Fame, public idea pot, weekly draw,
+    and ronininc.org public expansion telemetry.
+- `runtime/` — `kingmaker-engine.ts`, `open-dev-engine.ts` (engine implementations over the
+  contracts), and `solomon-federation-collector.ts` — the **first Solomon connector**: the PULL
+  side of the S→K diode. It reads Solomon's exposed sanitized outbox, sandboxes every line, STAGES
+  graduated abilities under review (a governed step later promotes them into the Vault — never
+  auto-canon), records BLOCKED-skill threat intel, and QUARANTINES anything hostile. Kingmaker thus
+  accumulates the abilities acquired across every Solomon installation, staying as powerful as their
+  sum, with no path for a compromised node to push code or data upward.
+- `docs/` — the Kingmaker ↔ Solomon split + ownership architecture.
+
+## Status
+
+Contract + engine layer, plus the **first one-way Solomon connector**: `solomon-federation-collector`
+(the S→K federation transport) is built and tested (`npm test`) — it pulls + sandboxes + stages
+Solomon's sanitized ability reports. The full runtime service, persistence, routes, UI, and the
+remaining connectors (management/build/alter) are **not built yet** — Kingmaker begins in earnest
+once Solomon is complete, when its core becomes a clone of a mature full-capacity Solomon + build
+permissions (Solomon PLUS).
+
+The Solomon side of this transport already exists in TSS: Solomon's governed acquisition loop writes
+sanitized abilities/blocks to a durable local outbox (`data/capability-acquisition/kingmaker-outbox.jsonl`),
+opening no outbound connection and holding no Kingmaker address. Point the collector at that file (the
+exposed read surface) to pull it up.
+
+
+Platform requirements, exact release/source provenance and scoped performance evidence: [Platform support](docs/PLATFORM-SUPPORT.md).

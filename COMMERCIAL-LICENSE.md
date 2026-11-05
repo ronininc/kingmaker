@@ -9,7 +9,7 @@ Everything else is commercial use, and LICENSE does not cover it. That includes 
 
 A commercial licence is a written agreement with Ronin Inc., negotiated directly. There is no self-serve price.
 
-**Contact: ronininc2026@gmail.com**
+**Contact: ronininc@mail.grokbot.com**
 
 - Use outside these terms ends your licence unless, after a first written notice, you come into compliance within 32 days (see "Violations" in LICENSE).
 - Third-party components bundled with Kingmaker keep their own licences; their notices ship with them.

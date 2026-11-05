@@ -2,9 +2,9 @@
 // and eye, app/Resources/MenuBarLogo.png, a template image), which says what Kingmaker is doing (operator
 // 2026-10-08: "a tiny Ronin Inc logo that glows when awake, pulses while speaking to the user, and shows an RGB
 // outline while listening; no windows"). It starts its engine headless (lib/cli.mjs start --agent) on the runtime this
-// bundle carries (Contents/MacOS/KingmakerEngine, from the engine build; an older name in an app built before 0.3.0), reads its "@@ghost {json}" state
-// lines, and stops it on quit. A thin dev build (scripts/build-app.sh) carries no runtime and borrows the installed
-// Kingmaker.app's (KINGMAKER_RUNTIME_APP). Approvals are never a click: they are your word.
+// bundle carries (Contents/MacOS/KingmakerEngine, from the engine build), reads its "@@ghost {json}" state lines,
+// and stops it on quit. It never borrows an engine from another app or an environment-selected path.
+// Approvals are never a click: they are your word.
 //
 // The logo, by state (all drawn by Core Animation in the render server; asleep there is no animation at all):
 //   starting   dimmed while the engine boots
@@ -2454,7 +2454,7 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
       for (name, id) in KingmakerBar.automationTargets where KingmakerBar.automationAllowed(id, ask: false) != true {
         guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: id) else { continue }
         pending = true
-        let ask = { DispatchQueue.global().async { if KingmakerBar.automationAllowed(id, ask: true) == false { DispatchQueue.main.async { [weak self] in self?.append(who: "", "Automation for \(name) is off: System Settings → Privacy & Security → Automation → Kingmaker → \(name).") } }; refresh() } }
+        let ask = { [weak self] in DispatchQueue.global().async { [weak self] in if KingmakerBar.automationAllowed(id, ask: true) == false { DispatchQueue.main.async { [weak self] in self?.append(who: "", "Automation for \(name) is off: System Settings → Privacy & Security → Automation → Kingmaker → \(name).") } }; refresh() } }
         if NSRunningApplication.runningApplications(withBundleIdentifier: id).isEmpty {
           let cfg = NSWorkspace.OpenConfiguration(); cfg.activates = false; cfg.hides = true
           NSWorkspace.shared.openApplication(at: url, configuration: cfg) { _, _ in DispatchQueue.global().asyncAfter(deadline: .now() + 1.5) { ask() } }
@@ -3754,6 +3754,30 @@ final class TranscriptPanel {
   }
 }
 
+// BEGIN NATIVE_RUNTIME_PROFILE
+struct NativeRuntimeProfile {
+  let state: String
+  let runtimeHome: String
+  let port: Int
+}
+enum NativeRuntimeProfileError: Error {
+  case incomplete, invalidPath, invalidPort
+}
+func nativeRuntimeProfile(_ environment: [String: String]) throws -> NativeRuntimeProfile? {
+  let names = ["SOL_GHOST_HOME", "SOL_GHOST_RUNTIME_HOME", "SOL_GHOST_PORT"]
+  if !names.contains(where: { environment[$0] != nil }) { return nil }
+  guard let state = environment[names[0]], let runtime = environment[names[1]], let rawPort = environment[names[2]],
+        !state.isEmpty, !runtime.isEmpty, !rawPort.isEmpty else { throw NativeRuntimeProfileError.incomplete }
+  let paths = [state, runtime]
+  guard paths.allSatisfy({ $0.hasPrefix("/") && !$0.contains(where: { $0.isNewline || $0.asciiValue == 0 }) }) else { throw NativeRuntimeProfileError.invalidPath }
+  let statePath = URL(fileURLWithPath: state, isDirectory: true).standardizedFileURL.path
+  let runtimePath = URL(fileURLWithPath: runtime, isDirectory: true).standardizedFileURL.path
+  guard statePath != "/", runtimePath != "/", statePath != runtimePath else { throw NativeRuntimeProfileError.invalidPath }
+  guard let port = Int(rawPort), (1024...65535).contains(port), String(port) == rawPort else { throw NativeRuntimeProfileError.invalidPort }
+  return NativeRuntimeProfile(state: statePath, runtimeHome: runtimePath, port: port)
+}
+// END NATIVE_RUNTIME_PROFILE
+
 final class GhostApp: NSObject, NSApplicationDelegate {
   private struct ActiveProfile: Decodable {
     let schema: Int
@@ -3815,20 +3839,19 @@ final class GhostApp: NSObject, NSApplicationDelegate {
 
   private var headlessHostMode: Bool { SMAppService.mainApp.status == .enabled }
 
-  private let runtimeApp = ProcessInfo.processInfo.environment["KINGMAKER_RUNTIME_APP"] ?? "/Applications/Kingmaker.app"
-  /// The Node runtime to run the CLI with: this bundle's own (no Solomon.app needed), else the installed app's.
+  /// The Node runtime to run the CLI with. Production bundles are self-contained: never execute a binary selected
+  /// from an environment variable or a second app, because path + executable mode do not establish its signer.
   private var runtimeBinary: (path: String, bundled: Bool) {
-    // The engine's names inside the app (0.3.0 on), then the older ones (an app built before 0.3.0).
     let fm = FileManager.default
-    let firstExecutable = { (app: String) -> String? in
-      ["KingmakerEngine", "Solomon"].map { "\(app)/Contents/MacOS/\($0)" }.first { fm.isExecutableFile(atPath: $0) }
-    }
     let ownApp = Bundle.main.bundleURL.path
-    let hasRuntime = ["kingmaker-runtime", "solomon-runtime"].contains { fm.fileExists(atPath: "\(ownApp)/Contents/Resources/\($0)") }
-    if let own = firstExecutable(ownApp), hasRuntime { return (own, true) }
-    return (firstExecutable(runtimeApp) ?? "\(runtimeApp)/Contents/MacOS/KingmakerEngine", false)
+    let hasRuntime = fm.fileExists(atPath: "\(ownApp)/Contents/Resources/sol-ghost/lib/kingmaker.mjs")
+    let own = "\(ownApp)/Contents/MacOS/KingmakerEngine"
+    return (hasRuntime && fm.isExecutableFile(atPath: own) ? own : "", true)
   }
   private lazy var activeProfile: ActiveProfile? = {
+    if let explicit = try? nativeRuntimeProfile(ProcessInfo.processInfo.environment) {
+      return ActiveProfile(schema: 1, profile: "explicit", state: explicit.state, runtime_home: explicit.runtimeHome, port: explicit.port)
+    }
     let home = URL(fileURLWithPath: NSHomeDirectory(), isDirectory: true)
     let support = home.appendingPathComponent("Library/Application Support", isDirectory: true).standardizedFileURL
     let pointer = support.appendingPathComponent("Kingmaker/active-profile.json")
@@ -3846,6 +3869,14 @@ final class GhostApp: NSObject, NSApplicationDelegate {
   }
 
   func applicationDidFinishLaunching(_ notification: Notification) {
+    do { _ = try nativeRuntimeProfile(ProcessInfo.processInfo.environment) } catch {
+      let alert = NSAlert()
+      alert.messageText = "Kingmaker runtime profile is invalid"
+      alert.informativeText = "Set SOL_GHOST_HOME and SOL_GHOST_RUNTIME_HOME to separate absolute directories and SOL_GHOST_PORT to a port from 1024 to 65535. Kingmaker has not opened the saved profile."
+      alert.runModal()
+      NSApp.terminate(nil)
+      return
+    }
     buildEditMenu()
     watchFnKey()
     buildMenuBar()
@@ -4053,9 +4084,9 @@ final class GhostApp: NSObject, NSApplicationDelegate {
 
   private func launch() {
     appliedPrefs = false // a fresh engine gets the owner's off/mute again
-    let (binary, bundled) = runtimeBinary
+    let (binary, _) = runtimeBinary
     guard FileManager.default.isExecutableFile(atPath: binary), let resources = Bundle.main.resourceURL else {
-      lastLine = bundled ? "This Kingmaker.app is missing its runtime. Reinstall it (Kingmaker Installer), or rebuild it (the engine build)." : "No engine runtime: this build carries none and there is none at \(runtimeApp)."
+      lastLine = "This Kingmaker.app is missing its signed, bundled runtime. Reinstall it with Kingmaker Installer."
       log(lastLine)
       transition(to: "down"); render(); return
     }

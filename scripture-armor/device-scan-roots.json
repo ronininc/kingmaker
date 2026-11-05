@@ -1,0 +1,5 @@
+{
+  "darwin": ["/Applications", "/Library/LaunchAgents", "/Library/LaunchDaemons", "/usr/local/bin", "/opt/homebrew/bin", "~/Applications", "~/Downloads", "~/Desktop", "~/Documents", "~/Library/LaunchAgents"],
+  "linux": ["/usr/bin", "/usr/local/bin", "/opt", "~/.local/bin", "~/.config/autostart", "~/Downloads", "~/Documents"],
+  "win32": ["~/Downloads", "~/Documents"]
+}

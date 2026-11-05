@@ -13,13 +13,12 @@
 // Load them at phone size (iPhone 13 mini 375×812 … 17 Pro Max 440×956).
 import { createServer } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { PREVIEW_PAGES } from '../lib/phone-companion.mjs';
+import { PHONE_ICON } from '../lib/phone-icon.mjs';
 
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : d; };
 const PORT = Number(arg('--port', 3199));
-const ICON = join(dirname(fileURLToPath(import.meta.url)), '..', 'assets', 'ronin-inc-crest.png');
+const ICON = PHONE_ICON;
 const now = () => new Date().toISOString();
 const SAMPLE = [
   { who: 'You', text: 'how many files are on my desktop' },

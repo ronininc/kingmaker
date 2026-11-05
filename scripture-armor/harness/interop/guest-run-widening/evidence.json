@@ -1,0 +1,18 @@
+{
+  "peer_sign_fp": "e4cd2649b48a1eb7d46c97ddc7351fdddc6a2fe317de3617ce7eca5b8bcf14b4",
+  "peer_seal_fp": "c4321165b417a85dadc642683fda9f5b4a89d8c9349229f19e0d829bbae3292e",
+  "packages_opened": 2,
+  "packages_refused": 2,
+  "senders_seen": [
+    "596a4ed57ff431700d0578fdb25eb9e2e6c40f099b6f24a2e9be4088141eaae1"
+  ],
+  "last_payload_sha256": "be0e1b0c487266a33704c14c4c8add07fe4916ec4de502df75e22ad7b3cc5794",
+  "last_envelope_sha256": "344b0ecb9580b6fcacc8e9bad05829618c6d7ffaef530188ad6491f61c77bf90",
+  "refusals": [
+    "armor-native: package canary already served — replay refused (092596ee-da9b-412d-8062-b6b7e1c52d81)",
+    "armor-native: package expired 2026-10-25T16:11:17.101Z — refused"
+  ],
+  "unexpected_sender_beacons": 0,
+  "expired_beacons": 1,
+  "replay_beacons": 1
+}

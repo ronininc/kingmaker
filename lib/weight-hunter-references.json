@@ -1,0 +1,167 @@
+{
+  "schema": "kingmaker.weight-hunter-references/1",
+  "discovery": "https://github.com/orgs/lmarena/repositories",
+  "retrieval": "Pinned documentation cached locally; upstream code remains in quarantine. No model downloads or runtime execution.",
+  "entries": [
+    {
+      "id": "withmartian--routerbench",
+      "repository": "withmartian/routerbench",
+      "commit": "cc67d1008bd8f3cf1e8040cc3ba4034d31b93c0c",
+      "category": "routing",
+      "purpose": "Compare router quality versus cost on held-out task traces.",
+      "limitation": "Selected evaluation code loads pandas pickle data. Never load untrusted pickle. Martian, optional MongoDB and remote execution paths require separate review.",
+      "tree": "450539ba18fbc4205532ae55628c2b89e4db3ac5",
+      "license": "MIT",
+      "licenseNoticeSha256": "5a73d9410eb4f288d95245e5ec15ba55b2a5a080226d98869b52ba72379938bf",
+      "riskReportSha256": "36022adacc646190a781e49c0f64e4110bc7165030156988afd22930ee6a47c9",
+      "evidenceEligible": true,
+      "documentation": {
+        "url": "https://github.com/withmartian/routerbench/blob/cc67d1008bd8f3cf1e8040cc3ba4034d31b93c0c/README.md",
+        "sha256": "592561dd58ee3d0e0b3e6b1ec7831bc8c980870f8ca1b71fff90a5c69b8787f2",
+        "bytes": 3141
+      },
+      "executionAllowed": false,
+      "trust": "untrusted-reference"
+    },
+    {
+      "id": "yuchenlin--llm-blender",
+      "repository": "yuchenlin/LLM-Blender",
+      "commit": "33204d2712944b6b17996f7c079e74cd963ccc7c",
+      "category": "ensemble",
+      "purpose": "Rank candidate answers and fuse their useful content; not weight merging.",
+      "limitation": "Selected loader downloads model snapshots. PairRM and GenFuser checkpoints have separate terms and memory costs; no model was loaded or measured.",
+      "tree": "1b953dae3d5ce01abe636d23b55e6932723a0ab8",
+      "license": "Apache-2.0",
+      "licenseNoticeSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "riskReportSha256": "dee87108275abf46af71fa2366756db1d98542b8bbd1daba8b332d90afc8f802",
+      "evidenceEligible": true,
+      "documentation": {
+        "url": "https://github.com/yuchenlin/LLM-Blender/blob/33204d2712944b6b17996f7c079e74cd963ccc7c/README.md",
+        "sha256": "871a001b31fd15aa7fb8e7166d58c095fa04fdd81acdbc73dd03414662e55369",
+        "bytes": 17512
+      },
+      "executionAllowed": false,
+      "trust": "untrusted-reference"
+    },
+    {
+      "id": "malcolmchetwyn--star-step-by-step",
+      "repository": "malcolmchetwyn/STaR-Step-by-Step",
+      "commit": "21d97d0f65e48053f24857b020d7e4aebfac1be6",
+      "category": "reasoning-concept",
+      "purpose": "Conceptual curriculum and step-verification reference only.",
+      "limitation": "EXCLUDE from acceptance scoring: app.py assigns random correctness labels and ProcessRewardModel is a placeholder. Top-level model loading must not execute during intake.",
+      "tree": "fe07a7d8eb27416e0804123c36ee923d409151d2",
+      "license": "Apache-2.0",
+      "licenseNoticeSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "riskReportSha256": "373c7a3320ba85162e2d53706c20248ee2a435de855a36ecab87148586e3219c",
+      "evidenceEligible": false,
+      "documentation": {
+        "url": "https://github.com/malcolmchetwyn/STaR-Step-by-Step/blob/21d97d0f65e48053f24857b020d7e4aebfac1be6/README.md",
+        "sha256": "efde79d3adaa09ebfe1662d79160df148b6c565af89e37e79c9260f41851cd20",
+        "bytes": 946
+      },
+      "executionAllowed": false,
+      "trust": "untrusted-reference"
+    },
+    {
+      "id": "princeton-nlp--intercode",
+      "repository": "princeton-nlp/intercode",
+      "commit": "c3e46d827cfc9d4c704ec078f7abf9f41e3191d8",
+      "category": "coding",
+      "purpose": "Evaluate interactive Bash and SQL problem-solving in an isolated test environment.",
+      "limitation": "Selected base environment delegates action execution. Docker setup, images and concrete executor implementations remain unreviewed. No host shell or CTF workload execution is authorized.",
+      "tree": "2e85c05a8f23ffea6028314caa7a986ab2c26c0b",
+      "license": "MIT",
+      "licenseNoticeSha256": "837bf0fc3fe75298e6bcca9dbb66028b449bc456e16621d7a0f65292fa037274",
+      "riskReportSha256": "ccb0fc8d8f07a4562e1759490cdf16259a16b336a9fe5f701c63b4dbd61b3319",
+      "evidenceEligible": true,
+      "documentation": {
+        "url": "https://github.com/princeton-nlp/intercode/blob/c3e46d827cfc9d4c704ec078f7abf9f41e3191d8/README.md",
+        "sha256": "02aed83e81e6d26b2da36bf086c08e499192e41cc7778caa70e0325d6943ae41",
+        "bytes": 6397
+      },
+      "executionAllowed": false,
+      "trust": "untrusted-reference"
+    },
+    {
+      "id": "lm-sys--routellm",
+      "repository": "lm-sys/RouteLLM",
+      "commit": "0b64fdafe049e596a3f5657c219329f24af24198",
+      "category": "routing",
+      "purpose": "Calibrate strong/weak model selection against task quality and budget.",
+      "limitation": "Selected controller sends completions through LiteLLM. README says mf/sw_ranking use OpenAI embeddings even with other model pairs. No silent external calls or cost claims for Kingmaker.",
+      "tree": "0857ed1a6e2eccd809b9786d65837988fdba594d",
+      "license": "Apache-2.0",
+      "licenseNoticeSha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1",
+      "riskReportSha256": "e633c87294ae83cec4160629ddf40842a2b3f92875f2a9d061cc73ee135805b9",
+      "evidenceEligible": true,
+      "documentation": {
+        "url": "https://github.com/lm-sys/RouteLLM/blob/0b64fdafe049e596a3f5657c219329f24af24198/README.md",
+        "sha256": "380ebee5361b8a191d92091639bc2be08e258dd2b4404f804a680f343fa16f0c",
+        "bytes": 14103
+      },
+      "executionAllowed": false,
+      "trust": "untrusted-reference"
+    },
+    {
+      "id": "lmarena--arena-hard-auto",
+      "repository": "lmarena/arena-hard-auto",
+      "commit": "196f6b826783b3da7310e361a805fa36f0be83f3",
+      "category": "evaluation",
+      "purpose": "Compare difficult-prompt candidate outputs with calibrated pairwise judges.",
+      "limitation": "Selected judgment code invokes provider completions. Judge bias, style/position effects, data overlap, API cost and private prompt egress require controls. Scores are evidence, not adoption approval.",
+      "tree": "e1e4121aa6ffee7755e8109543190de08b7b28f1",
+      "license": "Apache-2.0",
+      "licenseNoticeSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "riskReportSha256": "6f74ed6e83c9e85a44955641cf08b37ec17b343bdfecf3487c4a193e9bd0059a",
+      "evidenceEligible": true,
+      "documentation": {
+        "url": "https://github.com/lmarena/arena-hard-auto/blob/196f6b826783b3da7310e361a805fa36f0be83f3/README.md",
+        "sha256": "f0563c344399179df0fb7abbb2503762b0446584ace78039f1f792058e0ab0dc",
+        "bytes": 21360
+      },
+      "executionAllowed": false,
+      "trust": "untrusted-reference"
+    },
+    {
+      "id": "lm-sys--vicuna-blog-eval",
+      "repository": "lm-sys/vicuna-blog-eval",
+      "commit": "29e5d378309de4efe28a87fc0d1f1002df4a448c",
+      "category": "historical",
+      "purpose": "Historical evaluation design and failure modes.",
+      "limitation": "EXCLUDE from current adoption scoring: README deprecates this repository and warns about easy questions and position bias. FastChat is an upstream pointer, not an automatically approved substitute.",
+      "tree": "988ba3a833b37c64595f82f1f40b36ef31db5a5f",
+      "license": "Apache-2.0",
+      "licenseNoticeSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "riskReportSha256": "d0475ed628aa6ee38da7457804ebe0723d0ad4a1ff0b9b354b6c1b911d718c32",
+      "evidenceEligible": false,
+      "documentation": {
+        "url": "https://github.com/lm-sys/vicuna-blog-eval/blob/29e5d378309de4efe28a87fc0d1f1002df4a448c/README.md",
+        "sha256": "70cc920ffc02ee961f676e7770ed2122e31d0f074395f44e794856f74d77f641",
+        "bytes": 1794
+      },
+      "executionAllowed": false,
+      "trust": "untrusted-reference"
+    },
+    {
+      "id": "lmarena--arena-rank",
+      "repository": "lmarena/arena-rank",
+      "commit": "7ea56771d8c3acea463fea12edafcbd1d808bc96",
+      "category": "ranking",
+      "purpose": "Estimate pairwise preference ratings with uncertainty intervals.",
+      "limitation": "Selected Bradley-Terry code supports parallel bootstrap work. Keep one worker and bounded samples. Public ratings do not establish task fitness or local memory fit; JAX/dependencies unreviewed.",
+      "tree": "220a1144bb2c6db74f23b47d5c9cbd7f69330829",
+      "license": "Apache-2.0",
+      "licenseNoticeSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "riskReportSha256": "2800bf19b189829b56721f2222fc589f961db3d76a337f994d935ed83f72ef1f",
+      "evidenceEligible": true,
+      "documentation": {
+        "url": "https://github.com/lmarena/arena-rank/blob/7ea56771d8c3acea463fea12edafcbd1d808bc96/README.md",
+        "sha256": "bfb8bbd76817f9fac16a5f9fab7866e34a760d787721b5e564766a119339a53d",
+        "bytes": 4039
+      },
+      "executionAllowed": false,
+      "trust": "untrusted-reference"
+    }
+  ]
+}

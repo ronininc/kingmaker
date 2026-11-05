@@ -8,6 +8,7 @@
 //   node scripts/phone-companion.mjs unpair <id|all>          unpair one phone, or every one (on the Mac)
 import { writeFileSync } from 'node:fs';
 import { COMPANION_PORT, createCompanion, deviceStore } from '../lib/phone-companion.mjs';
+import { PHONE_ICON } from '../lib/phone-icon.mjs';
 
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : d; };
 
@@ -30,7 +31,7 @@ if (cmd === 'devices' || cmd === 'unpair') {
 }
 
 const companion = createCompanion({
-  port: Number(arg('--port', COMPANION_PORT)), host: arg('--host', null), icon: arg('--icon', undefined),
+  port: Number(arg('--port', COMPANION_PORT)), host: arg('--host', null), icon: arg('--icon', process.env.KINGMAKER_PHONE_ICON || PHONE_ICON),
   log: (event, d) => {
     console.log(`${event} ${JSON.stringify(d)}`);
     // By hand, this terminal is the Mac's screen: show the next link and code after each pairing.

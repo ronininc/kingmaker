@@ -7,6 +7,19 @@
 //   node scripts/release-parts.mjs [--app <Kingmaker.app>] [--out <dir>] [--tag v0.2.0]
 //                                  [--part-size <bytes>] [--level 1-9] [--dry-run] [--offline] [--pins <file>]
 //                                  [--skip-codesign] [--notarize] [--sign-key <private.pem>] --launcher <ronin-launcher-pin.json>
+//                                  [--platforms <platforms.json>] [--tree-repo <owner/name>] [--tree-commit <sha>]
+//
+//   --platforms  pins for the NON-mac platforms (lib/release-platforms.mjs): { "linux": {...}, "windows": {...} },
+//                each a ready entry (artifacts + signature reference) or a placeholder. The artifacts themselves
+//                are built on their own hosts — off-Mac Apple-side builds use xtool (xtool-org/xtool, MIT) — and
+//                only their pins are carried here. A "macos" key is REFUSED: the macOS set is the parts built
+//                below, never a second list. The artifact files ride beside the release as <out>/<platform>/<name>.
+//   --tree-repo / --tree-commit (or env KINGMAKER_TREE_REPO / KINGMAKER_TREE_COMMIT)
+//                the source tree this release is built from. Recorded in the manifest as ISSUANCE provenance
+//                together with the installer sources' tree (this tree) and the launcher pin's recorded source
+//                (pin fields sourceRepo/sourceCommit). The staged gate refuses issuance when any of them is
+//                missing or from another tree — the 2026-10-21 lesson: the shipped 0.3.1 launcher ran the old
+//                installer, whose trust pin belonged to the old release line, and nothing could even say so.
 //
 //   --app        default: $KINGMAKER_ENGINE_SRC/desktop/dist-ghost/Kingmaker.app (KINGMAKER_ENGINE_SRC: the engine's source
 //                checkout; without it, --app is required)
@@ -25,14 +38,19 @@
 
 import { createHash } from 'node:crypto';
 import { spawn, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { createReadStream, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 // Ronin's signing check needs its private tooling; without it (the public repo) every app counts as unverified.
 const { verifyKingmakerSignature } = await import('./kingmaker-mac-signing.mjs').catch(() => ({ verifyKingmakerSignature: () => ({ ok: false, adhoc: false }) }));
-import { buildManifest, cleanTempParts, DEFAULT_REPO, MANIFEST_FILE, MAX_PART_BYTES, sha256sums, splitStream, verifyParts } from '../lib/release-manifest.mjs';
+import { buildManifest, cleanTempParts, DEFAULT_REPO, issuanceProblems, MANIFEST_FILE, MAX_PART_BYTES, sha256sums, splitStream, verifyParts } from '../lib/release-manifest.mjs';
+import { verifyStagedRelease } from './release-gate.mjs';
 import { signManifestBytes, verifyManifestBytes, pubkeyFingerprint } from '../lib/release-signing.mjs';
 import { RELEASE_PUBLIC_KEY_PEM } from '../lib/release-pubkey.mjs';
+import { REQUIRED_RUNTIMES, validateEngineRuntimeClosure } from './runtime-closure.mjs';
+import { validateProductionCapabilityClosure } from './capability-closure.mjs';
+import { ARMOR_RELEASE_ASSETS, verifyPhysicalReleaseAssets } from '../lib/release-assets.mjs';
 import { PACKS } from '../lib/mac-profiles.mjs';
 import { ABLITERATED_CODERS, ABLITERATED_LARGE_BRAIN, ABLITERATED_MODELS, BRAIN_ROLES, LARGE_BRAIN_MIN_GB, LARGE_CODER_MIN_GB } from '../lib/profile.mjs';
 
@@ -168,7 +186,16 @@ export function engineSourceMaps(root) {
 }
 
 /** What the app is: bundle id, version, engine build, signing authority, unpacked size. Throws when it is not Kingmaker. */
-export const REQUIRED_RUNTIMES = Object.freeze(['kingmaker-runtime', 'voice-runtime', 'guardrails-runtime', 'guardrails-config', 'agent-runtime', 'knowledge-runtime', 'playwright-browsers', 'chrome-connector', 'sol-ghost', 'app.asar']);
+export { REQUIRED_RUNTIMES } from './runtime-closure.mjs';
+
+/** [4.3] The oldest bundled Node a release may carry: 24.22.1 has the Node2Shell fix (CVE-2026-111497,
+ *  the Brotli out-of-bounds write). The engine build holds the same floor (GHOST_MIN_BUNDLED_NODE). */
+export const MIN_BUNDLED_NODE = '24.22.1';
+function nodeVersionGte(version, floor) {
+  const a = String(version).split('.').map((n) => Number(n) || 0), b = floor.split('.').map((n) => Number(n) || 0);
+  for (let i = 0; i < 3; i += 1) { if (a[i] !== b[i]) return a[i] > b[i]; }
+  return true;
+}
 
 export function inspectApp(app, { skipCodesign = false, allowAdhoc = false } = {}) {
   if (basename(app) !== 'Kingmaker.app') throw new Error(`${app} is not named Kingmaker.app`);
@@ -180,14 +207,17 @@ export function inspectApp(app, { skipCodesign = false, allowAdhoc = false } = {
   // run its agent or knowledge base; a release refuses it.
   const missing = REQUIRED_RUNTIMES.filter((r) => !existsSync(join(app, 'Contents', 'Resources', r)));
   if (missing.length) throw new Error(`${app}: missing ${missing.join(', ')}; stage them (desktop/build/<runtime>) and rebuild`);
-  // Kingmaker's names inside its own bundle, no web interface, and no source maps of the engine's own code (the engine
-  // build). An app with the older names, or with any of these left in, is not released.
+  // Kingmaker's names inside its own bundle, the staged frontend dist the headless shell boots against, and
+  // no source maps of the engine's own code (the engine build). An app with the older names, a missing dist,
+  // or any of these left in, is not released.
   const resources = join(app, 'Contents', 'Resources'), runtimeDir = join(resources, 'kingmaker-runtime');
+  validateEngineRuntimeClosure(resources);
+  validateProductionCapabilityClosure(resources);
   const leftovers = [
     ...(existsSync(join(resources, 'solomon-runtime')) ? ['Contents/Resources/solomon-runtime (the runtime folder is kingmaker-runtime)'] : []),
     ...(existsSync(join(app, 'Contents', 'MacOS', 'Solomon')) ? ['Contents/MacOS/Solomon (the engine binary is KingmakerEngine)'] : []),
     ...(existsSync(join(app, 'Contents', 'MacOS', 'KingmakerEngine')) ? [] : ['no Contents/MacOS/KingmakerEngine']),
-    ...(existsSync(join(runtimeDir, 'app')) ? ['kingmaker-runtime/app (web files Kingmaker never serves)'] : []),
+    ...(existsSync(join(runtimeDir, 'app', 'dist', 'index.html')) ? [] : ['no kingmaker-runtime/app/dist/index.html (the frontend dist the headless shell serves at boot — the engine build stages it; 0.4.2 stripped it and the bundle could not boot)']),
     ...engineSourceMaps(runtimeDir).slice(0, 3).map((m) => `${m} (a source map)`),
   ];
   if (leftovers.length) throw new Error(`${app}: rebuild it with the current engine build: ${leftovers.join('; ')}`);
@@ -199,9 +229,17 @@ export function inspectApp(app, { skipCodesign = false, allowAdhoc = false } = {
   // The one payload file's list: without it an installed Kingmaker refuses to start (lib/payload.mjs), so a build that
   // copied Kingmaker's parts instead of unpacking kingmaker-payload.tar is refused here, not on the owner's Macs.
   if (!existsSync(join(engine, 'payload.json'))) throw new Error(`${app}: its engine has no payload.json; build it from the one payload file (node scripts/build-payload.mjs, then unpack kingmaker-payload.tar into Contents/Resources)`);
+  let bundledNode = null;
   if (process.platform === 'darwin') {
     const started = spawnSync(join(engine, 'bin', 'kingmaker'), ['version'], { encoding: 'utf8', timeout: 120_000, env: { ...process.env, ELECTRON_RUN_AS_NODE: '' } });
     if (started.status !== 0) throw new Error(`${app}: its engine does not start (kingmaker version exited ${started.status}): ${String(started.stderr || started.stdout).trim().split('\n').slice(-3).join(' | ')}`);
+    // [4.3] The bundled "Node" is the engine binary itself run as Node (ELECTRON_RUN_AS_NODE=1): ask IT for
+    // its version. A package.json pin cannot prove what the staged binary embeds, and a Node older than
+    // 24.22.1 carries Node2Shell (CVE-2026-111497) — such a build is not released.
+    const nodeProbe = spawnSync(join(app, 'Contents', 'MacOS', 'KingmakerEngine'), ['-e', 'process.stdout.write(process.versions.node)'], { encoding: 'utf8', timeout: 60_000, env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' } });
+    bundledNode = String(nodeProbe.stdout ?? '').trim();
+    if (nodeProbe.status !== 0 || !/^\d+\.\d+\.\d+$/.test(bundledNode)) throw new Error(`${app}: could not read the bundled Node version from its engine binary: ${String(nodeProbe.stderr ?? '').trim().split('\n').slice(-2).join(' | ') || 'no output'}`);
+    if (!nodeVersionGte(bundledNode, MIN_BUNDLED_NODE)) throw new Error(`${app}: its bundled Node is ${bundledNode}, vulnerable to Node2Shell (CVE-2026-111497); rebuild with an Electron whose Node is >= ${MIN_BUNDLED_NODE} (Electron 46+, pinned in the engine build's package.json)`);
   }
   let signing = 'unchecked';
   if (!skipCodesign) {
@@ -220,7 +258,7 @@ export function inspectApp(app, { skipCodesign = false, allowAdhoc = false } = {
     }
   }
   const du = spawnSync('du', ['-sk', app], { encoding: 'utf8' });
-  return { bundleId: info.CFBundleIdentifier, version: info.CFBundleShortVersionString ?? PKG.version, solomonBuild: info.KingmakerEngineBuild ?? info.SolomonRuntimeBuild ?? null, signing, unpackedBytes: Number(String(du.stdout).split('\t')[0]) * 1024 || null };
+  return { bundleId: info.CFBundleIdentifier, version: info.CFBundleShortVersionString ?? PKG.version, solomonBuild: info.KingmakerEngineBuild ?? info.SolomonRuntimeBuild ?? null, signing, bundledNode, unpackedBytes: Number(String(du.stdout).split('\t')[0]) * 1024 || null };
 }
 
 /** The confirmed corpora the installer fetches, read from the app's own copy of the bootstrap script. */
@@ -318,21 +356,65 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
     print(`· Ronin Launcher ${launcher.version}: ${launcher.archive} ${(launcher.size / 1e6).toFixed(1)} MB, sha256 ${launcher.sha256.slice(0, 12)}…`);
   } catch (error) { print(`✗ The Ronin Launcher pin doesn't check out: ${error.message}`); return 1; }
 
-  // The archive, streamed straight into the parts.
+  // The archive, streamed straight into the parts. With --deterministic the archive is first written by
+  // lib/deterministic-archive.mjs (sorted entries, epoch mtimes, zeroed owners, gzip -n) so the same app
+  // always produces the same archive sha256; the temp file lives in the system temp and is removed after.
   const archive = `Kingmaker-${facts.version}.tar.gz`;
   if (!dryRun) { mkdirSync(outDir, { recursive: true }); cleanTempParts(outDir); }
-  const tar = spawn('tar', ['-c', '-z', '--xattrs', '--options', `gzip:compression-level=${level}`, '-f', '-', '-C', dirname(app), basename(app)], { env: { ...env, COPYFILE_DISABLE: '1' }, stdio: ['ignore', 'pipe', 'pipe'] });
+  let archiveSource;
+  let tarExit = Promise.resolve(0);
   let tarErr = '';
-  tar.stderr.on('data', (d) => { tarErr += d; });
-  const tarExit = new Promise((r) => tar.once('exit', (code) => r(code)));
+  let detTmp = null;
+  let killArchive = () => {};
+  if (argv.includes('--deterministic')) {
+    const { createDeterministicArchive } = await import('../lib/deterministic-archive.mjs');
+    detTmp = join(tmpdir(), `kingmaker-deterministic-${process.pid}.tar.gz`);
+    const det = await createDeterministicArchive({ dir: app, outFile: detTmp, level });
+    print(`· deterministic archive (${det.flavor} tar, normalized): sha256 ${det.sha256}`);
+    archiveSource = createReadStream(detTmp);
+  } else {
+    const tar = spawn('tar', ['-c', '-z', '--xattrs', '--options', `gzip:compression-level=${level}`, '-f', '-', '-C', dirname(app), basename(app)], { env: { ...env, COPYFILE_DISABLE: '1' }, stdio: ['ignore', 'pipe', 'pipe'] });
+    tar.stderr.on('data', (d) => { tarErr += d; });
+    tarExit = new Promise((r) => tar.once('exit', (code) => r(code)));
+    killArchive = () => tar.kill('SIGTERM');
+    archiveSource = tar.stdout;
+  }
   let split;
-  try { split = await splitStream(tar.stdout, { partSize, outDir: dryRun ? null : outDir, archive }); } catch (error) {
-    tar.kill('SIGTERM');
+  try { split = await splitStream(archiveSource, { partSize, outDir: dryRun ? null : outDir, archive }); } catch (error) {
+    killArchive();
+    if (detTmp) rmSync(detTmp, { force: true });
     if (!dryRun) cleanTempParts(outDir);
     print(`✗ Splitting the archive failed: ${error.message}`);
     return 1;
   }
   if ((await tarExit) !== 0) { print(`✗ tar failed: ${tarErr.trim().slice(-300)}`); return 1; }
+  if (detTmp) rmSync(detTmp, { force: true });
+  // The non-mac platform pins (lib/release-platforms.mjs): declared platforms beyond the macOS parts built
+  // here. Only pins are carried — the artifacts are built on their own hosts (xtool for off-Mac Apple-side
+  // builds) and placed at <out>/<platform>/<name> by whoever built them.
+  let platforms = null;
+  if (arg(argv, '--platforms')) {
+    try { platforms = JSON.parse(readFileSync(arg(argv, '--platforms'), 'utf8')); } catch (error) { print(`✗ Could not read the platform pins: ${error.message}`); return 1; }
+    if (platforms.macos !== undefined) { print('✗ The platform pins name a "macos" entry: refused. The macOS artifact set is the parts built here — a second list of the shipped payload is how 0.4.2 happened.'); return 1; }
+    for (const [name, entry] of Object.entries(platforms)) print(`· platform ${name}: ${entry?.status ?? '?'}`);
+  }
+
+  // ISSUANCE PROVENANCE (the 2026-10-21 acceptance lesson): the tree this release is built from, the tree
+  // the installer sources in it come from (this tree — installer/engine.sh is hashed below from it), and the
+  // tree the launcher artifact was built from (recorded on its pin). Checked BEFORE anything is written:
+  // a release whose artifacts come from another tree is not issuable, and this is where that is decided —
+  // not by an owner whose installer refuses a signature at acceptance time.
+  const treeRepo = arg(argv, '--tree-repo', env.KINGMAKER_TREE_REPO || 'ronininc/kingmaker-private');
+  const treeCommit = arg(argv, '--tree-commit', env.KINGMAKER_TREE_COMMIT || null);
+  const issuance = {
+    tree: { repo: treeRepo, commit: treeCommit, version: facts.version },
+    installer: { repo: treeRepo, commit: treeCommit, version: facts.version },
+    launcher: { repo: launcher.sourceRepo ?? launcher.source?.repo ?? null, commit: launcher.sourceCommit ?? launcher.source?.commit ?? null, version: launcher.version },
+  };
+  const issProblems = issuanceProblems({ version: facts.version, issuance });
+  if (issProblems.length) { for (const p of issProblems) print(`✗ Not issuable: ${p}`); print('✗ Record the build provenance (tree --tree-commit; launcher pin sourceRepo/sourceCommit from a launcher built from this tree) and rebuild. Nothing was written.'); return 1; }
+  print(`· issuance: tree ${treeRepo}@${String(treeCommit).slice(0, 12)}; installer + launcher built from the same tree`);
+
   // Pin the install/update engine's sha256 in the (signed) manifest, so the installed app can authenticate the engine
   // it downloads before running it. This is the SAME engine.sh publish-update.sh ships; it verifies the match.
   const engineSha256 = createHash('sha256').update(readFileSync(join(ROOT, 'installer', 'engine.sh'))).digest('hex');
@@ -340,6 +422,7 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
     version: facts.version, tag, repo: arg(argv, '--repo', DEFAULT_REPO),
     app: facts, archive: { name: archive, size: split.size, sha256: split.sha256 }, parts: split.parts, partSize,
     ollama, homebrew, tailscale, models, brew: BREW_TOOLS, knowledge, searxng, packs: manifestPacks(), launcher, engineSha256,
+    platforms, issuance,
   });
   for (const p of split.parts) print(`· ${p.name}  ${(p.size / 1e9).toFixed(3)} GB  sha256 ${p.sha256}`);
   print(`· whole archive ${archive}: ${(split.size / 1e9).toFixed(3)} GB, sha256 ${split.sha256}`);
@@ -376,12 +459,27 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
   }
 
   writeFileSync(join(outDir, 'SHA256SUMS'), sha256sums([...split.parts, { name: launcher.archive, sha256: launcher.sha256 }, { name: MANIFEST_FILE, sha256: createHash('sha256').update(manifestText).digest('hex') }]));
-  const check = await verifyParts(manifest, outDir);
+  const check = await verifyParts(manifest, outDir, { forRelease: true });
   if (!check.ok) { print(`✗ The parts just written do not verify: ${check.problems.join('; ')}`); return 1; }
   print(`✓ ${split.parts.length} part(s) + ${MANIFEST_FILE} + SHA256SUMS in ${outDir}, re-read and verified.`);
+  // THE STAGED GATE (finish plan Phase 2): extract the parts just written and test the app inside them —
+  // tree-identical to the inspected app above, and passing the installer's own signature test. v0.4.2 shipped
+  // an archive whose app failed that test because every check ran on the build tree. A release that fails the
+  // gate does not get a publish command.
+  const gate = await verifyStagedRelease({ manifest, partsDir: outDir, sourceApp: app, stageDir: join(outDir, '.gate-stage'), signature: argv.includes('--skip-codesign') ? 'skip' : 'require', requireIssuance: true });
+  if (!gate.ok) { print(`✗ The staged release fails the gate: ${gate.problems.join('; ')}`); return 1; }
+  // Free Kingmaker is authenticated by the signed release manifest and its
+  // Launcher-pinned hashes. Armor assets are optional here; when present the
+  // physical gate verifies the complete set and refuses a partial envelope.
+  const assets = await verifyPhysicalReleaseAssets({ manifestPath: join(outDir, MANIFEST_FILE), assetsDir: outDir, requireInstallerDmg: false });
+  if (!assets.ok) { print(`✗ The publication assets fail the gate: ${assets.problems.join('; ')}`); return 1; }
+  print('✓ staged gate: the archived app is identical to the inspected app, passes the installer signature test, and its installer + launcher were built from this release\'s tree (issuance)');
   print('Not published. To publish (the operator\'s call):');
   const sigAsset = keyPath ? ` ${JSON.stringify(join(outDir, sigName))}` : '';
-  print(`  gh release create ${tag} --repo ${manifest.repo} --draft --title "Kingmaker ${facts.version}" ${split.parts.map((p) => JSON.stringify(join(outDir, p.name))).join(' ')} ${JSON.stringify(join(outDir, launcher.archive))} ${JSON.stringify(join(outDir, MANIFEST_FILE))}${sigAsset} ${JSON.stringify(join(outDir, 'SHA256SUMS'))} "<Kingmaker Installer DMG>"`);
+  const armorAssetArgs = ARMOR_RELEASE_ASSETS.filter((n) => existsSync(join(outDir, n))).map((n) => JSON.stringify(join(outDir, n))).join(' ');
+  const nonMacAssetArgs = platformObjects({ version: manifest.version, platforms: manifest.platforms, dir: outDir })
+    .map((object) => JSON.stringify(object.file)).join(' ');
+  print(`  gh release create ${tag} --repo ${manifest.repo} --draft --title "Kingmaker ${facts.version}" ${split.parts.map((p) => JSON.stringify(join(outDir, p.name))).join(' ')}${nonMacAssetArgs ? ` ${nonMacAssetArgs}` : ''} ${JSON.stringify(join(outDir, launcher.archive))} ${JSON.stringify(join(outDir, MANIFEST_FILE))}${sigAsset}${armorAssetArgs ? ` ${armorAssetArgs}` : ''} ${JSON.stringify(join(outDir, 'SHA256SUMS'))} "<Kingmaker-Installer-${tag}.dmg>"`);
   print(`Then build the installer around this manifest: scripts/build-installer.sh --manifest ${join(outDir, MANIFEST_FILE)}`);
   return 0;
 }

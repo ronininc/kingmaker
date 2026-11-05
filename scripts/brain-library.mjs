@@ -41,6 +41,10 @@ The local models [Kingmaker](https://github.com/ronininc/Kingmaker) suggests for
 benchmarks behind each pick, and the weights. Abliterated and uncensored builds are preferred wherever one measured
 well. Machine-readable: [\`library.json\`](library.json) (schema: [\`schema/library.schema.json\`](schema/library.schema.json)).
 
+The Brain Library is paid proprietary software available only to authorized customers under an active paid entitlement
+or separate written agreement. See [LICENSE](LICENSE). Third-party models, weights, and applications retain their own
+licenses as listed in [NOTICE.md](NOTICE.md).
+
 **Picks come from measurements, not claims.** Every Mac that runs \`kingmaker models bench\` adds its results to
 [\`bench/\`](bench/). A class is **measured** once its own results are in, and an **estimate** until then. So the more
 Macs that test, the more of this table is measured. A 30-day churn scan finds new builds, and a benchmark decides
@@ -61,6 +65,8 @@ whether one replaces a pick.
   }
   md += `\n## For bigger Macs (options, not measured here)\n\nListed for when a bigger Mac arrives. Never picked automatically, not benchmarked here, and the weights are linked upstream, not republished. These do not run in Ollama.\n\n| Model | Licence | For | Files | Runtime |\n|---|---|---|---|---|\n`;
   for (const o of lib.bigOptions ?? []) md += `| [${o.tag}](${o.links[0]})${o.links[1] ? ` · [GGUF](${o.links[1]})` : ''}<br><small>${o.params}${o.context ? `, ${o.context} context` : ''}. ${o.note}</small> | ${o.license} | ${o.forRamGb.join(' / ')} GB Macs | ${o.files.map((f) => `${f.quant} ${f.gb} GB`).join(', ')} | ${o.runtime} |\n`;
+  md += `\n## Applications\n\nReviewed optional applications are version-pinned and published as immutable Brain Library release assets. Kingmaker verifies the asset SHA-256, installs it outside the signed base app, and gives it an isolated runtime.\n\n| Application | Version | Licence | Source | Install and use |\n|---|---|---|---|---|\n`;
+  for (const app of lib.applications ?? []) md += `| ${app.name}<br><small>${app.summary}</small> | ${app.version} | ${app.license} | [commit ${app.sourceCommit.slice(0, 8)}](${app.source}/commit/${app.sourceCommit}) | \`kingmaker models library pull ${app.id}\`<br>\`kingmaker models library use ${app.id}\` |\n`;
   md += `\n## Install a pick with Kingmaker\n\n\`\`\`\nkingmaker models library pull <tag>      # downloads the parts, checks every SHA-256, loads it into Ollama\nkingmaker models setup --pack <class>    # a whole pack\nkingmaker models bench                   # measure this Mac; then: kingmaker models library submit\n\`\`\`\n\nSubmissions are scanned, then reviewed by the owner: see [CONTRIBUTING.md](CONTRIBUTING.md).\n\nEach model keeps its own licence: see [NOTICE.md](NOTICE.md). A model without a licence on its card is listed and\nmeasured here, but its weights are not republished.\n`;
   return md;
 }
@@ -68,7 +74,7 @@ whether one replaces a pick.
 function notice(lib) {
   let md = '# Notices\n\nThe weights published in this repo\'s releases keep their own licences:\n\n';
   for (const m of lib.models.filter((x) => x.redistributable)) md += `- \`${m.tag}\`: ${m.license}. From ${m.from}${m.base ? `, based on ${m.base}` : ''}. Changes: abliteration or quantization by the builders named, not by Ronin Inc.\n`;
-  md += '\nApache-2.0: https://www.apache.org/licenses/LICENSE-2.0. The library\'s own files (library.json, the schema, the bench results) are published by Ronin Inc for anyone to use.\n';
+  md += '\nApache-2.0: https://www.apache.org/licenses/LICENSE-2.0.\n\nThe Brain Library\'s own catalog, schema, benchmarks, documentation, and library tooling are Copyright (c) 2026 Ronin Inc., all rights reserved, and require a paid entitlement or separate written agreement under [LICENSE](LICENSE). Third-party models, weights, and applications retain their own licenses; inclusion does not relicense them.\n';
   return md;
 }
 
@@ -150,7 +156,7 @@ if (cmd === 'build') {
   writeFileSync(join(dir, 'README.md'), readme(lib));
   writeFileSync(join(dir, 'NOTICE.md'), notice(lib));
   writeGuard(dir);
-  console.log(`✓ ${dir}: ${lib.devices.length} Mac configurations, ${lib.classes.length} classes (${lib.classes.filter((c) => c.status === 'measured').length} measured), ${lib.models.length} models (${lib.models.filter((m) => m.status === 'pick').length} picks), ${lib.bench.length} bench files.`);
+  console.log(`✓ ${dir}: ${lib.devices.length} Mac configurations, ${lib.classes.length} classes (${lib.classes.filter((c) => c.status === 'measured').length} measured), ${lib.models.length} models (${lib.models.filter((m) => m.status === 'pick').length} picks), ${(lib.applications ?? []).length} applications, ${lib.bench.length} bench files.`);
   void CHIP_BANDWIDTH;
 } else if (cmd === 'weights') {
   const lib = readJson(join(dir, 'library.json'), null);
