@@ -1,0 +1,227 @@
+{
+  "basis": "Empirical touched-set from a full REA exporter run (analyzeHeadless + ScriptureScan.java decompile) against /bin/bash (ELF x86-64, 2583 functions) on the complete Ghidra 12.2 home: strace openat trace (927 unique files opened under the home) + atime-delta run + the headless analyzer list. A path is denied only when the run never opened it, or opened it solely for module/classpath enumeration while none of its analyzers ran. Route B job 2026-11-05 (armor-route-b-2026-11-05).",
+  "deny": [
+    {
+      "bytes": 117755892,
+      "path": "docs",
+      "reason": "GUI/help documentation tree; zero opens in the traced REA run."
+    },
+    {
+      "bytes": 104376725,
+      "path": "Extensions",
+      "reason": "Extension zips (incl. Jython.zip and SymbolicSummaryZ3.zip, whose bundled natives no codesign pass can reach) are never opened by headless REA; the directory itself is only enumerated."
+    },
+    {
+      "bytes": 85276374,
+      "path": "Ghidra/Debug",
+      "reason": "Debugger modules; jars are opened only for classpath enumeration and no Debug analyzer appears in the headless analysis that ran."
+    },
+    {
+      "bytes": 36917254,
+      "path": "Ghidra/Features/BSim",
+      "reason": "BSim similarity server/client; its analyzer is not in the default headless analysis set and did not run; jars opened only for classpath enumeration."
+    },
+    {
+      "bytes": 25541562,
+      "path": "Ghidra/Features/GhidraServer",
+      "reason": "Ghidra server; never used by local headless analysis; jar opened only for classpath enumeration. Its bundled archive (yajsw) carries natives no codesign pass can reach."
+    },
+    {
+      "bytes": 12139686,
+      "path": "Ghidra/Features/PyGhidra",
+      "reason": "Python bridge (Jython/jpype wheel archives, unreachable by codesign); ScriptureScan is a Java script and REA never loads PyGhidra; jar opened only for classpath enumeration."
+    },
+    {
+      "bytes": 7864820,
+      "path": "Ghidra/Features/Decompiler/src",
+      "reason": "Decompiler C++ sources; the runtime uses the prebuilt natives under os/ only. (The Mac native build compiles from the SOURCE Ghidra home before staging; the prune touches only the staged copy.)"
+    },
+    {
+      "bytes": 3705441,
+      "path": "Ghidra/Features/VersionTracking",
+      "reason": "GUI version-tracking tool; did not run headless."
+    },
+    {
+      "bytes": 3275763,
+      "path": "Ghidra/Features/GraphServices",
+      "reason": "GUI graph rendering services; no GraphServices analyzer ran headless; jar opened only for classpath enumeration."
+    },
+    {
+      "bytes": 944175,
+      "path": "GPL/DemanglerGnu/src",
+      "reason": "GNU demangler C sources; the runtime executes the built natives under GPL/DemanglerGnu/os/ only. (Built in the source home on the Mac before staging.)"
+    },
+    {
+      "bytes": 880676,
+      "path": "Ghidra/Features/FunctionGraph",
+      "reason": "GUI function graph."
+    },
+    {
+      "bytes": 673198,
+      "path": "Ghidra/Features/Sarif",
+      "reason": "Sarif export format support; ScriptureScan writes its own JSON and never uses it."
+    },
+    {
+      "bytes": 599594,
+      "path": "GPL/Icons",
+      "reason": "GUI icon set."
+    },
+    {
+      "bytes": 381847,
+      "path": "Ghidra/Features/ProgramDiff",
+      "reason": "GUI program diff tool."
+    },
+    {
+      "bytes": 359552,
+      "path": "Ghidra/Features/ByteViewer",
+      "reason": "GUI byte viewer."
+    },
+    {
+      "bytes": 278971,
+      "path": "Ghidra/Features/SystemEmulation",
+      "reason": "GUI emulator tooling; the pcode emulation core lives in Ghidra/Framework/Emulation, which is retained."
+    },
+    {
+      "bytes": 258006,
+      "path": "Ghidra/Features/CodeCompare",
+      "reason": "GUI code comparison."
+    },
+    {
+      "bytes": 227437,
+      "path": "Ghidra/Features/DataGraph",
+      "reason": "GUI data graph."
+    },
+    {
+      "bytes": 199600,
+      "path": "server",
+      "reason": "GhidraServer launch scripts for the pruned GhidraServer module."
+    },
+    {
+      "bytes": 169084,
+      "path": "Ghidra/Features/GraphFunctionCalls",
+      "reason": "GUI graph of function calls."
+    },
+    {
+      "bytes": 161221,
+      "path": "Ghidra/Features/ProgramGraph",
+      "reason": "GUI program graph."
+    },
+    {
+      "bytes": 118047,
+      "path": "GPL/DMG/src",
+      "reason": "DMG library sources; the runtime uses GPL/DMG/data (retained)."
+    },
+    {
+      "bytes": 108439,
+      "path": "Ghidra/Features/WildcardAssembler",
+      "reason": "Assembler used by GUI patching workflows; not part of import analysis."
+    },
+    {
+      "bytes": 85641,
+      "path": "Ghidra/Features/BSimFeatureVisualizer",
+      "reason": "GUI visualizer for the pruned BSim module."
+    },
+    {
+      "bytes": 83072,
+      "path": "Ghidra/Features/VersionTrackingBSim",
+      "reason": "GUI version-tracking companion for the pruned BSim module."
+    },
+    {
+      "bytes": 60683,
+      "path": "Ghidra/Features/FunctionGraphDecompilerExtension",
+      "reason": "GUI function-graph decompiler extension."
+    },
+    {
+      "bytes": 60745,
+      "path": "Ghidra/Features/GhidraGo",
+      "reason": "GUI GhidraGo service."
+    },
+    {
+      "bytes": 31942,
+      "path": "docker",
+      "reason": "Container build files for the Ghidra server image; never opened."
+    },
+    {
+      "bytes": 17485,
+      "path": "Ghidra/Features/SourceCodeLookup",
+      "reason": "GUI source-code lookup."
+    },
+    {
+      "bytes": 10107,
+      "path": "Ghidra/Features/DebugUtils",
+      "reason": "GUI debug utilities."
+    },
+    {
+      "bytes": 1471,
+      "path": "ghidraRun",
+      "reason": "GUI launcher script; headless REA uses support/analyzeHeadless (retained)."
+    },
+    {
+      "bytes": 1531,
+      "path": "ghidraRun.bat",
+      "reason": "GUI launcher script (Windows); headless REA uses support/analyzeHeadless.bat (retained)."
+    },
+    {
+      "bytes": 38504,
+      "path": "GettingStarted.html",
+      "reason": "GUI documentation landing page; never opened."
+    },
+    {
+      "bytes": 26142,
+      "path": "GettingStarted.md",
+      "reason": "GUI documentation landing page; never opened."
+    },
+    {
+      "bytes": 907663,
+      "path": "Ghidra/Framework/Gui/lib/flatlaf-3.5.4.jar",
+      "reason": "Carries two macOS dylibs inside the jar (libflatlaf-macos-arm64.dylib, libflatlaf-macos-x86_64.dylib) \u2014 named in the 2026-11-05 notarization INVALID log's archive pile; no codesign pass can reach inside a jar. FlatLaf is the GUI look-and-feel; headless REA never loads it (the jar file is opened only for classpath enumeration). Found by the Route B residual archive scan of the pruned payload."
+    },
+    {
+      "bytes": 1878533,
+      "path": "Ghidra/Framework/Pty/lib/jna-5.14.0.jar",
+      "reason": "Carries two Darwin jnidispatch natives inside the jar (darwin-aarch64, darwin-x86-64) \u2014 the 'jna jars' of the 2026-11-05 INVALID log's archive pile. JNA backs the Pty terminal module, which headless import analysis never executes. (jna-platform-5.14.0.jar carries no native entries and is retained.) Found by the Route B residual archive scan."
+    }
+  ],
+  "denyIfPresent": [
+    {
+      "path": "Ghidra/Features/Decompiler/build",
+      "reason": "gradle buildNatives output. The sheet copies build/os into os/ before the Armor build; the os/ copy is the runtime payload. A second, duplicate copy of the locally built natives must not ride in the bundle (tonight's INVALID log flagged the natives in both places). Absent on a home where natives were not built \u2014 skipped, not an error."
+    },
+    {
+      "path": "GPL/DemanglerGnu/build",
+      "reason": "gradle buildNatives output; same rule as the Decompiler build directory \u2014 os/ is the payload, build/ is a duplicate."
+    },
+    {
+      "path": "Ghidra/Features/FileFormats/build",
+      "reason": "gradle buildNatives output; the lzfse native's runtime copy lives under Ghidra/Features/FileFormats/os/ after the sheet's build/os copy \u2014 build/ is a duplicate of a native named in the 2026-11-05 notarization INVALID log."
+    }
+  ],
+  "ghidraVersion": "12.2",
+  "retainedAgainstIntuition": [
+    {
+      "basis": "ALL processor modules retained (28,682,724 B total). Ghidra enumerates every processor's language metadata at startup; only the target language's compiled .sla actually loads (x86-64.sla in the traced run). Armor analyzes arbitrary files across architectures and formats; dropping processors would silently narrow coverage for 3% of the home.",
+      "path": "Ghidra/Processors"
+    },
+    {
+      "basis": "RETAINED BY EVIDENCE: the Function ID analyzer opened all ten Visual Studio .fidbf databases (204,171,136 B) during the traced run. They are data, not Mach-O, so they never blocked notarization. Cutting them would change PE analysis (library-function identification) \u2014 a product decision, not a prune-by-evidence.",
+      "path": "Ghidra/Features/FunctionID/data"
+    },
+    {
+      "basis": "RETAINED: the run opened the generic C-library data-type archive and symbol/string data; PE and Mach-O targets use the win32/mac_10.9 typeinfo and symbols subtrees of the same directory. Armor analyzes arbitrary files, so the whole data tree stays.",
+      "path": "Ghidra/Features/Base/data"
+    },
+    {
+      "basis": "RETAINED: the decompile and sleigh natives the decompiler execs (decompile attempted 24 / failed 0 in the traced run). On macOS these are the locally built natives the signing stage signs individually.",
+      "path": "Ghidra/Features/Decompiler/os"
+    },
+    {
+      "basis": "RETAINED: the demangler_gnu_v2_24 / v2_41 natives the Demangler GNU analyzer (which ran in the traced analysis) executes for C++ targets.",
+      "path": "GPL/DemanglerGnu/os"
+    },
+    {
+      "basis": "RETAINED: DMG loader library data, enumerated by the run; keeps .dmg among the formats Armor can analyze.",
+      "path": "GPL/DMG/data"
+    }
+  ],
+  "schema": "scripture-armor.ghidra-prune/1"
+}

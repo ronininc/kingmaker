@@ -15,6 +15,7 @@ const SOURCE_COMPONENTS = [
   'installation-metadata.mjs', 'protection-status.mjs', 'analysis-runtime.mjs',
   'protection-feed.mjs', 'agnostic-review.mjs', 'format-inspect.mjs', 'review-worker.mjs', 'review-presentation.mjs', 'review-intake.mjs', 'repository-review.mjs', 'repository-stream.mjs', 'review-controls.mjs', 'review-ejection.mjs', 'sandbox-review.mjs', 'sandbox-review-linux.mjs', 'linux-review-inner.sh', 'device-protection.mjs', 'device-scan-roots.json', 'key-transition.mjs', 'retired-key-recovery.mjs', 'rotation-candidate.mjs',
   'dns-profiles', 'ghidra-scripts', 'mac', 'linux', 'windows', 'ui',
+  'ghidra-prune-manifest.json',
 ];
 export function buildStandalone(args = process.argv.slice(2)) {
   const opt = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : null; };
@@ -38,6 +39,12 @@ export function buildStandalone(args = process.argv.slice(2)) {
 
   stageStandaloneSources(out, { reaDir });
   copyRuntime(ghidraHome, path.join(out, 'tools', 'ghidra'), { cloneRuntimes: args.includes('--clone-runtimes') });
+  // Route B (2026-11-05): the staged Ghidra is pruned per the manifest kept
+  // as data beside this builder. The source Ghidra home is never modified —
+  // the Mac native build compiles from it before staging — and the JDK copy
+  // is unchanged (the bundled JDK is pre-signed upstream and drew no flags).
+  const prune = applyGhidraPrune(path.join(out, 'tools', 'ghidra'));
+  console.log(`ghidra prune: removed ${prune.removedFiles} files, ${prune.removedBytes} bytes (${prune.entries} manifest entries, ${prune.skippedIfPresent} build-product entries absent)`);
   copyRuntime(jdkHome, path.join(out, 'tools', 'jdk'), { cloneRuntimes: args.includes('--clone-runtimes') });
 
   const records = collectBundleRecords(out);
@@ -79,6 +86,91 @@ export function stageStandaloneSources(out, { reaDir = path.join(HERE, '..', 'li
   const needle = "from '../lib/keychain-seal.mjs'";
   if (original.split(needle).length !== 2) throw new Error('release refused: unexpected account session adapter import');
   fs.writeFileSync(store, original.replace(needle, "from './lib/keychain-seal.mjs'"));
+}
+
+export function loadGhidraPruneManifest(manifestPath = path.join(HERE, 'ghidra-prune-manifest.json')) {
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  if (manifest.schema !== 'scripture-armor.ghidra-prune/1' || !Array.isArray(manifest.deny) || !manifest.deny.length) {
+    throw new Error('release refused: invalid Ghidra prune manifest: ' + manifestPath);
+  }
+  for (const entry of manifest.deny) {
+    if (!entry || typeof entry.path !== 'string' || !entry.path || path.isAbsolute(entry.path)
+      || entry.path.split('/').some((part) => !part || part === '.' || part === '..')) {
+      throw new Error('release refused: invalid Ghidra prune manifest entry: ' + JSON.stringify(entry));
+    }
+  }
+  if (manifest.denyIfPresent !== undefined) {
+    if (!Array.isArray(manifest.denyIfPresent)) throw new Error('release refused: invalid Ghidra prune manifest denyIfPresent');
+    for (const entry of manifest.denyIfPresent) {
+      if (!entry || typeof entry.path !== 'string' || !entry.path || path.isAbsolute(entry.path)
+        || entry.path.split('/').some((part) => !part || part === '.' || part === '..')) {
+        throw new Error('release refused: invalid Ghidra prune manifest denyIfPresent entry: ' + JSON.stringify(entry));
+      }
+    }
+  }
+  return manifest;
+}
+
+// Removes the manifest's deny paths from a STAGED COPY of the Ghidra home
+// (never from a source home: callers pass the bundle-internal destination).
+// Fail-closed by this tree's convention: a Ghidra version other than the
+// manifest's basis, or a deny path that is absent (layout drift), refuses
+// the release instead of silently shipping an unpruned or wrongly pruned
+// payload. Deny paths that are bundles of locally built natives the REA
+// runtime actually loads (Decompiler/os, GPL/DemanglerGnu/os) are refused
+// as manifest errors — the prune exists to cut what REA never loads.
+export function applyGhidraPrune(stagedGhidraHome, { manifest = loadGhidraPruneManifest() } = {}) {
+  const root = fs.realpathSync(stagedGhidraHome);
+  const props = fs.readFileSync(path.join(root, 'Ghidra', 'application.properties'), 'utf8');
+  const version = /^application.version=(.+)$/m.exec(props)?.[1]?.trim();
+  if (version !== manifest.ghidraVersion) {
+    throw new Error(`release refused: Ghidra prune manifest is written for Ghidra ${manifest.ghidraVersion}, staged home is ${version || 'unknown'}`);
+  }
+  for (const entry of manifest.deny) {
+    if (/(^|\/)os$/.test(entry.path) || entry.path.includes('/os/')) {
+      throw new Error('release refused: Ghidra prune manifest may not deny a native os payload: ' + entry.path);
+    }
+  }
+  let removedFiles = 0, removedBytes = 0, skippedIfPresent = 0;
+  const removeEntry = (entry, { required }) => {
+    const target = path.join(root, entry.path);
+    if (!fs.existsSync(target)) {
+      if (required) throw new Error('release refused: Ghidra prune target absent (layout drift?): ' + entry.path);
+      skippedIfPresent += 1;
+      return;
+    }
+    const real = fs.realpathSync(target);
+    if (real !== root && !real.startsWith(root + path.sep)) throw new Error('release refused: Ghidra prune target escapes the staged home: ' + entry.path);
+    const tally = (dir) => {
+      for (const name of fs.readdirSync(dir)) {
+        const file = path.join(dir, name), st = fs.lstatSync(file);
+        if (st.isDirectory()) tally(file);
+        else if (st.isFile()) { removedFiles += 1; removedBytes += st.size; }
+      }
+    };
+    const st = fs.lstatSync(target);
+    if (st.isDirectory()) tally(target);
+    else if (st.isFile()) { removedFiles += 1; removedBytes += st.size; }
+    fs.rmSync(target, { recursive: true, force: true });
+    if (fs.existsSync(target)) throw new Error('release refused: Ghidra prune failed to remove: ' + entry.path);
+  };
+  for (const entry of manifest.deny) {
+    if (/(^|\/)os$/.test(entry.path) || entry.path.includes('/os/')) {
+      throw new Error('release refused: Ghidra prune manifest may not deny a native os payload: ' + entry.path);
+    }
+    removeEntry(entry, { required: true });
+  }
+  // denyIfPresent covers build products (gradle buildNatives output trees)
+  // that exist only on a home where natives were built locally — on the Mac
+  // release home they are duplicate native copies and are removed; on any
+  // other home their absence is normal and is not drift.
+  for (const entry of manifest.denyIfPresent || []) {
+    if (/(^|\/)os$/.test(entry.path) || entry.path.includes('/os/')) {
+      throw new Error('release refused: Ghidra prune manifest may not deny a native os payload: ' + entry.path);
+    }
+    removeEntry(entry, { required: false });
+  }
+  return { entries: manifest.deny.length, removedFiles, removedBytes, skippedIfPresent };
 }
 
 export function copyRuntime(source, destination, { cloneRuntimes = false } = {}) {
