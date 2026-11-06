@@ -9,7 +9,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SOURCE_COMPONENTS = [
   'armor.mjs', 'vaultd.mjs', 'cell.mjs', 'airlock.mjs', 'scan.mjs', 'launch.mjs',
   'terms.mjs', 'open-standalone.mjs', 'dashboard.mjs', 'dashboard-view.mjs', 'credential-vault.mjs',
-  'entitlement-client.mjs', 'account-session.mjs', 'account-session-store.mjs', 'installation-health.mjs', 'activation-flow.mjs', 'paid-activation.mjs',
+  'entitlement-client.mjs', 'account-session.mjs', 'account-session-store.mjs', 'submit-request.mjs', 'submit-transport-guard.mjs', 'installation-health.mjs', 'activation-flow.mjs', 'paid-activation.mjs',
   'refit-net.mjs', 'package.json', 'README.md', 'FORMAT.md', 'LICENSE',
   'product-paths.mjs', 'product.json', 'vault-paths.mjs', 'prerequisite-readiness.mjs',
   'installation-metadata.mjs', 'protection-status.mjs', 'analysis-runtime.mjs',
@@ -73,7 +73,7 @@ export function buildStandalone(args = process.argv.slice(2)) {
   const records = collectBundleRecords(out);
   const required = [
     'armor.mjs', 'vaultd.mjs', 'dashboard.mjs', 'credential-vault.mjs', 'scan.mjs',
-    'entitlement-client.mjs', 'account-session.mjs', 'account-session-store.mjs', 'installation-health.mjs', 'activation-flow.mjs', 'paid-activation.mjs',
+    'entitlement-client.mjs', 'account-session.mjs', 'account-session-store.mjs', 'submit-request.mjs', 'submit-transport-guard.mjs', 'installation-health.mjs', 'activation-flow.mjs', 'paid-activation.mjs',
     'rea/rea.mjs', 'rea/rea-rules.mjs', 'lib/keychain-seal.mjs', 'ghidra-scripts/ScriptureScan.java',
     'ui/scripture-armor-crest-ronin.png',
     'mac/ScriptureArmorApp.swift', 'mac/build-native-app.sh',

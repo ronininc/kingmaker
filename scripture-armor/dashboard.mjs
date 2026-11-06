@@ -23,6 +23,8 @@ import { createArmorAccountSession } from './account-session.mjs';
 import { activateArmor } from './activation-flow.mjs';
 import { hasPaidActivation, recordPaidActivation } from './paid-activation.mjs';
 import { assertProductIdentityDir, canonicalPath } from './product-paths.mjs';
+import { createArmorSubmitter, submitQueueDir, submitVaultDir } from './submit-request.mjs';
+import { createGuardedSubmitTransport, createHttpSubmitSend, createVaultLiveness, CRM_INTAKE_URL } from './submit-transport-guard.mjs';
 import { externalFile, sameExternalFile } from './vault-paths.mjs';
 import { installationMetadata } from './installation-metadata.mjs';
 
@@ -106,6 +108,22 @@ async function resumeDeviceChecks(trigger='resume') {
 const armorCheckout = Object.freeze({
   download: 'https://www.ronininc.org/armor/checkout?purpose=download',
   discordMembership: 'https://www.ronininc.org/armor/checkout?purpose=discord-membership',
+});
+
+// "Submit a request to Ronin Inc" (submit-request.mjs): filed under the
+// dashboard's signed-in account only, queued in the product store first,
+// delivered through the guarded transport. A test may inject
+// options.submitTransport; the live default is the guarded CRM transport
+// with vaultd liveness at this identity dir's socket.
+const requestSubmitter = createArmorSubmitter({
+  session: account,
+  queueDir: submitQueueDir({ identityDir }),
+  vaultDir: submitVaultDir({ identityDir }),
+  transport: options.submitTransport ?? createGuardedSubmitTransport({
+    endpoint: CRM_INTAKE_URL,
+    send: createHttpSubmitSend({ endpoint: CRM_INTAKE_URL, fetchImpl: options.fetchImpl || globalThis.fetch }),
+    vaultAlive: createVaultLiveness({ socketPath: path.join(identityDir, 'vaultd.sock') }),
+  }),
 });
 
 async function runRea(target) {
@@ -248,6 +266,17 @@ async function api(req, res, url) {
       else await resumeDeviceChecks('login');
       return json(res,200,result);
     } catch (error) { return json(res, 403, { ok: false, error: error.message }); }
+  }
+  if (req.method === 'POST' && url.pathname === '/api/request/submit') {
+    try { await account.ensureAuthenticated(); } catch { return json(res, 401, { ok: false, error: 'Sign in and verify your email code before submitting a request.' }); }
+    const input = await body(req);
+    try {
+      const result = await requestSubmitter.submit({
+        type: input.type, name: input.name, source: input.source,
+        description: input.description, license: input.license, notes: input.notes,
+      });
+      return json(res, 200, { ok: true, id: result.record.id, delivery: result.delivery, confirmation: result.confirmation });
+    } catch (error) { return json(res, 400, { ok: false, error: error.message }); }
   }
   if(req.method==='POST'&&url.pathname==='/api/review/repository-control'){
     await account.verifyEntitlement();const input=await body(req);

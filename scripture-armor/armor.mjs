@@ -34,6 +34,9 @@
 //   verify <wrapped-dir> [--identity-dir <dir>]
 //   reseal <file.scripture> [--socket <path>] [--daemon-out-dir <dir>]
 //             [--out <new-package>] [--identity-dir <dir>]
+//   request --type <brain|method|tool|other> --name <thing> --source <url|origin>
+//             --description <what it does> [--license <license>] [--notes <text>]
+//             [--attach <file>] [--identity-dir <dir>]
 //
 // v2 (Closure 1): every wrap of code-class content is scanned first
 // (scan.mjs); the verdict record is sealed as a first-class report
@@ -2529,6 +2532,39 @@ function cmdVerify(flags, pos) {
   if (failures) process.exitCode = 1;
 }
 
+// request — "Submit a request to Ronin Inc" (submit-request.mjs, spec
+// §3.2): the plain request surface's CLI form. The request is filed under
+// the signed-in account session only (identity prefilled from the saved
+// session; never a flag), queued locally first, and handed to the guarded
+// transport — PENDING OWNER GATE whatever the route answers. Armor does
+// not scan a submission: a request is order-class, and the human gate
+// governs. An --attach file lands in a disposable vault cell, unopened.
+async function cmdRequest(flags, pos) {
+  const dir = identityDir(flags);
+  const { createArmorSubmitter, submitQueueDir, submitVaultDir } = await import('./submit-request.mjs');
+  const { createGuardedSubmitTransport, createHttpSubmitSend, createVaultLiveness, CRM_INTAKE_URL } = await import('./submit-transport-guard.mjs');
+  const { createArmorAccountSession } = await import('./account-session.mjs');
+  const { createAccountSessionStore } = await import('./account-session-store.mjs');
+  const { installationMetadata } = await import('./installation-metadata.mjs');
+  const session = createArmorAccountSession({ sessionStore: createAccountSessionStore(), installationProvider: () => installationMetadata(dir) });
+  await session.resume();
+  const transport = createGuardedSubmitTransport({
+    endpoint: CRM_INTAKE_URL,
+    send: createHttpSubmitSend({ endpoint: CRM_INTAKE_URL }),
+    vaultAlive: createVaultLiveness({ socketPath: path.join(dir, 'vaultd.sock') }),
+  });
+  const submitter = createArmorSubmitter({ session, queueDir: submitQueueDir({ identityDir: dir }), vaultDir: submitVaultDir({ identityDir: dir }), transport });
+  const attachments = flags.attach ? [{ sourcePath: path.resolve(String(flags.attach)) }] : [];
+  const result = await submitter.submit({
+    type: flags.type, name: flags.name, source: flags.source,
+    description: flags.description, license: flags.license, notes: flags.notes,
+  }, { attachments });
+  console.log(result.confirmation);
+  console.log(result.delivery === 'sent-to-crm-intake'
+    ? 'Delivered to the Ronin Inc CRM intake. Its status there is PENDING OWNER GATE.'
+    : 'The intake did not answer; the request is queued on this device and will be delivered when it does. Its status is PENDING OWNER GATE.');
+}
+
 // ---------------------------------------------------------------------------
 
 function main() {
@@ -2550,8 +2586,9 @@ function main() {
     else if (cmd === 'unwrap-repo') done(cmdUnwrapRepo(flags, pos));
     else if (cmd === 'verify') cmdVerify(flags, pos);
     else if (cmd === 'reseal') done(cmdReseal(flags, pos));
+    else if (cmd === 'request') done(cmdRequest(flags, pos));
     else {
-      console.error('usage: armor.mjs <identity|trust|untrust|enroll|wrap|register|inspect|wrap-repo|unwrap-repo|verify|reseal> …');
+      console.error('usage: armor.mjs <identity|trust|untrust|enroll|wrap|register|inspect|wrap-repo|unwrap-repo|verify|reseal|request> …');
       process.exit(2);
     }
   } catch (err) {

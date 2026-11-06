@@ -32,6 +32,8 @@
     "windows",
     "ui",
     "account-session.mjs",
+    "submit-request.mjs",
+    "submit-transport-guard.mjs",
     "product-paths.mjs",
     "product.json",
     "vault-paths.mjs",
