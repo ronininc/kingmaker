@@ -27,8 +27,31 @@ import os from 'node:os';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-export const SCAN_RULES_VERSION = 'scan-rules/1';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
+
+// ---------------------------------------------------------------------------
+// Detector rule pack (Shield-Builder B4) — the scan stage's detector core
+// (source packs, content sniffs, binary sink/category tables, verdict
+// weights, composite sets, tier defaults) lives in versioned DATA at
+// shield-packs/scan-rules-pack.json, loaded here. The pack's
+// rules_version IS the scan-rules lineage: it joins every record's
+// engine.rules field, so each corpus record stays attributable to the
+// exact rule set that produced it. A missing, corrupt, or
+// version-mismatched pack is a hard failure at load — the scanner never
+// runs on silently improvised detectors (fail closed).
+// ---------------------------------------------------------------------------
+
+export const RULE_PACK_PATH = path.join(HERE, 'shield-packs', 'scan-rules-pack.json');
+export function loadRulePack(packPath = RULE_PACK_PATH) {
+  const pack = JSON.parse(fs.readFileSync(packPath, 'utf8'));
+  if (pack.format !== 'scripture-armor-rule-pack/1' || typeof pack.rules_version !== 'string') {
+    throw Error(`invalid detector rule pack: ${packPath}`);
+  }
+  return pack;
+}
+export const RULE_PACK = loadRulePack();
+export const SCAN_RULES_VERSION = RULE_PACK.rules_version;
+const packRegExp = (r) => new RegExp(r.source, r.flags ?? '');
 
 // ---------------------------------------------------------------------------
 // Policy (SPEC §0.4) — policy.json in the identity store, owner-edited,
@@ -133,21 +156,21 @@ export function tierParams(tier, policy) {
   const t = policy.scan.tiers[tier] || {};
   if (tier === 2) {
     return {
-      expiry_cap_hours: t.expiry_cap_hours ?? 24,
-      reseal_hours: t.reseal_hours ?? 24,
+      expiry_cap_hours: t.expiry_cap_hours ?? RULE_PACK.tier_defaults[2].expiry_cap_hours,
+      reseal_hours: t.reseal_hours ?? RULE_PACK.tier_defaults[2].reseal_hours,
       dual_approval: true,
       min_cell: 'hard',
       downgrade_allowed: false,
       egress: 'airlock-only',
       reverify: 'every-activation+freshness',
-      scan_max_age_hours: t.scan_max_age_hours ?? 24,
+      scan_max_age_hours: t.scan_max_age_hours ?? RULE_PACK.tier_defaults[2].scan_max_age_hours,
       beacon_anomaly: true,
     };
   }
   if (tier === 1) {
     return {
-      expiry_cap_hours: t.expiry_cap_hours ?? 168,
-      reseal_hours: t.reseal_hours ?? 720,
+      expiry_cap_hours: t.expiry_cap_hours ?? RULE_PACK.tier_defaults[1].expiry_cap_hours,
+      reseal_hours: t.reseal_hours ?? RULE_PACK.tier_defaults[1].reseal_hours,
       dual_approval: false,
       min_cell: 'hard',
       downgrade_allowed: true,
@@ -213,19 +236,8 @@ export function classifyBuffer(buf, name = '') {
 
 // Strong code signals for the content sniff (FIX 4). Deliberately
 // token-shaped: interpreter calls, shell plumbing, module systems.
-const SOURCE_SNIFFS = [
-  /\b(?:eval|exec)\s*\(/, // JS + Python string execution
-  /\bos\.(?:system|popen)\s*\(/,
-  /\bsubprocess\./,
-  /\b__import__\s*\(|\bpickle\.loads?\s*\(/,
-  /\bdef\s+[A-Za-z_]\w*\s*\(/,
-  /^\s*(?:from\s+[\w.]+\s+import\s|import\s+[\w.]+)/m,
-  /\|\s*(?:sudo\s+)?(?:sh|bash|zsh)\b/, // pipe into a shell
-  /\bchild_process\b/,
-  /\brequire\s*\(/,
-  /\bconsole\.log\s*\(|\bmodule\.exports\b/,
-  /^\s*(?:const|let|var|function|class|async\s+function)\s/m,
-];
+// B4: the sniff tables are rule-pack data (shield-packs/scan-rules-pack.json).
+const SOURCE_SNIFFS = RULE_PACK.source_sniffs.map(packRegExp);
 
 // ---------------------------------------------------------------------------
 // Canonical verdict record (SPEC §0.3) — key order fixed as listed;
@@ -290,8 +302,9 @@ function computeVerdictRisk(findings, confidence) {
   if (critRules.length) { tier = 2; drivers.push(...critRules); }
   else if (highRules.length) { tier = 1; drivers.push(...highRules); }
   else if (confidence === 'low') { tier = 1; drivers.push('static-analysis-limited'); }
-  const score = Math.min(100,
-    counts.critical * 40 + counts.high * 15 + counts.medium * 5 + counts.low * 2);
+  const W = RULE_PACK.weights;
+  const score = Math.min(W.cap,
+    counts.critical * W.critical + counts.high * W.high + counts.medium * W.medium + counts.low * W.low);
   return { counts, verdict, risk: { score, tier, drivers } };
 }
 
@@ -301,30 +314,11 @@ function computeVerdictRisk(findings, confidence) {
 // ride as behavior-* rules; provenance is never an input.
 // ---------------------------------------------------------------------------
 
-const SRC_PACKS = [
-  // --- JS / TS ---
-  { rule: 'src-eval-call', sev: 'high', langs: ['js'], re: /\beval\s*\(/, detail: 'eval() executes a string as code' },
-  { rule: 'src-dynamic-function', sev: 'high', langs: ['js'], re: /new\s+Function\s*\(/, detail: 'new Function() compiles a string into code' },
-  { rule: 'src-vm-run', sev: 'high', langs: ['js'], re: /\bvm\.runIn(NewContext|ThisContext|Context)\s*\(|runInNewContext\s*\(/, detail: 'vm.runIn* executes a string as code' },
-  { rule: 'src-child-process-exec-interp', sev: 'high', langs: ['js'], re: /\b(exec|execSync)\s*\(\s*(`[^`]*\$\{|[^)]*\+)/, detail: 'child_process exec with an interpolated/concatenated command string' },
-  { rule: 'src-child-process', sev: 'medium', langs: ['js'], re: /child_process/, detail: 'child_process import — process execution surface (inventory)' },
-  { rule: 'src-dynamic-import', sev: 'medium', langs: ['js'], re: /\bimport\s*\(\s*[^\s'"`)]/, detail: 'dynamic import() of a non-literal specifier' },
-  { rule: 'behavior-remote-activation', sev: 'medium', langs: ['js'], re: /\b(createServer|WebSocketServer)\s*\(|\.listen\s*\(/, detail: 'opens a listening socket / server — remotely activatable surface [behavior: remote-activation]' },
-  { rule: 'behavior-sensor-access', sev: 'high', langs: ['js'], re: /getUserMedia|navigator\.mediaDevices|AVCaptureDevice|kCGWindowList|\\\\.\\pipe\\|node-microphone|node-webcam/, detail: 'camera/microphone capture API [behavior: sensor-access]' },
-  // --- shell ---
-  { rule: 'src-shell-pipe-exec', sev: 'high', langs: ['sh'], re: /\b(curl|wget)\b[^|\n]*\|\s*(sudo\s+)?(sh|bash|zsh)\b/, detail: 'downloads a script and pipes it into a shell' },
-  { rule: 'src-shell-download', sev: 'high', langs: ['sh'], re: /\b(curl|wget)\b[^\n]*https?:\/\//, detail: 'fetches a remote payload over http(s) — the download half of download-and-execute' },
-  { rule: 'src-shell-eval', sev: 'high', langs: ['sh'], re: /(^|\s)eval\s+/, detail: 'shell eval of a constructed string' },
-  { rule: 'src-shell-decode-exec', sev: 'high', langs: ['sh'], re: /base64\s+(-d|--decode)[^|\n]*\|\s*(sh|bash)/, detail: 'base64-decodes into a shell — encoded payload execution' },
-  // --- python ---
-  { rule: 'src-py-eval-exec', sev: 'high', langs: ['py'], re: /\b(eval|exec)\s*\(/, detail: 'eval/exec of a string as code' },
-  { rule: 'src-py-os-system', sev: 'high', langs: ['py'], re: /\bos\.system\s*\(|\bos\.popen\s*\(/, detail: 'os.system/os.popen shell execution' },
-  { rule: 'src-py-subprocess-shell', sev: 'high', langs: ['py'], re: /subprocess\.[a-zA-Z]+\([^)]*shell\s*=\s*True/, detail: 'subprocess with shell=True' },
-  { rule: 'src-py-pickle-loads', sev: 'high', langs: ['py'], re: /\bpickle\.loads?\s*\(/, detail: 'pickle deserialization executes embedded opcodes' },
-  // --- cross-language behavior classes ---
-  { rule: 'behavior-silent-persistence', sev: 'high', langs: ['js', 'sh', 'py', 'any'], re: /crontab|systemd|\/etc\/init\.d|LaunchAgents|LaunchDaemons|CurrentVersion\\Run|RegSetValue|reg add|autostart/i, detail: 'installs a persistence mechanism (cron/systemd/launchd/registry-run) [behavior: silent-persistence]' },
-  { rule: 'behavior-removal-resistance', sev: 'medium', langs: ['js', 'sh', 'py', 'any'], re: /IsDebuggerPresent|ptrace\s*\(|anti-?debug|respawn|watchdog/i, detail: 'anti-analysis or self-respawn mechanism [behavior: removal-resistance]' },
-];
+// B4: the source detector packs are rule-pack data
+// (shield-packs/scan-rules-pack.json), extracted mechanically from the
+// tables this array used to hardcode; digest equivalence against the
+// pre-refactor scanner is proven in test/shield-b4-equivalence.test.mjs.
+const SRC_PACKS = RULE_PACK.src_packs.map((p) => ({ ...p, re: packRegExp(p.re) }));
 
 function langOf(name) {
   const ext = path.extname(name || '').toLowerCase();
@@ -403,18 +397,14 @@ export function scanSourceText(text, name, targetSha) {
   // findings from the code-execution / behavior families in one file
   // compose into a critical. The composite is itself a finding, so the
   // sealed record shows exactly why.
-  const PROMOTE = new Set([
-    'src-eval-call', 'src-dynamic-function', 'src-vm-run', 'src-child-process-exec-interp',
-    'src-shell-pipe-exec', 'src-shell-eval', 'src-shell-decode-exec', 'src-shell-download',
-    'src-py-eval-exec', 'src-py-os-system', 'src-py-subprocess-shell', 'src-py-pickle-loads',
-  ]);
+  const PROMOTE = new Set(RULE_PACK.composite.promote);
   // With every pack running on every text (FIX 4), the same token can
   // fire its rule in two language packs (eval( is both src-eval-call
   // and src-py-eval-exec). The composite counts independent CONSTRUCTS,
   // so cross-language duplicates of one construct share a family and
   // count once — a lone eval( stays a single high (warn), exactly as
   // before; eval + os.system is two constructs and composes.
-  const FAMILY = { 'src-eval-call': 'eval-exec', 'src-py-eval-exec': 'eval-exec' };
+  const FAMILY = RULE_PACK.composite.family;
   const eligible = [...new Set(findings
     .filter((f) => f.severity === 'high' && (PROMOTE.has(f.rule) || f.rule.startsWith('behavior-')))
     .map((f) => FAMILY[f.rule] || f.rule))];
@@ -438,18 +428,14 @@ export function scanSourceText(text, name, targetSha) {
 // Binary lane (SPEC §1.4) — Ghidra headless + the dumb exporter.
 // ---------------------------------------------------------------------------
 
-const EXEC_SINKS = new Set(['system', 'popen', 'execl', 'execlp', 'execle', 'execv', 'execve', 'execvp', 'execvpe', 'WinExec', 'ShellExecute', 'ShellExecuteEx', 'CreateProcess', 'CreateProcessA', 'CreateProcessW', '_spawnl', '_spawnlp', '_spawnv', '_spawnvp']);
-const UNBOUNDED_SINKS = new Set(['strcpy', 'strcat', 'gets', 'sprintf', 'vsprintf', 'stpcpy', 'wcscpy', 'wcscat']);
-// Dangerous-import categories (inventory basis). Behavior classes per
-// Addendum A.2 ride in the detail text; provenance is never consulted.
-const IMPORT_CATEGORIES = [
-  { cat: 'process-injection', sev: 'high', names: new Set(['CreateRemoteThread', 'VirtualAllocEx', 'WriteProcessMemory', 'NtCreateThreadEx', 'QueueUserAPC', 'SetWindowsHookEx', 'DLLInjection'.toLowerCase()]) },
-  { cat: 'persistence', sev: 'high', behavior: 'silent-persistence', names: new Set(['RegSetValueEx', 'RegSetValue', 'RegCreateKeyEx', 'CreateService', 'CreateServiceA', 'CreateServiceW', 'StartServiceCtrlDispatcher']) },
-  { cat: 'network-control', sev: 'high', behavior: 'remote-activation', names: new Set(['InternetOpen', 'InternetOpenA', 'InternetOpenW', 'InternetConnect', 'HttpSendRequest', 'WSAStartup', 'socket', 'connect', 'bind', 'listen', 'accept']) },
-  { cat: 'sensor-access', sev: 'high', behavior: 'sensor-access', names: new Set(['capCreateCaptureWindow', 'avicap32', 'GetDC', 'BitBlt' /* screen capture */, 'waveInOpen', 'mciSendString']) },
-  { cat: 'removal-resistance', sev: 'medium', behavior: 'removal-resistance', names: new Set(['IsDebuggerPresent', 'CheckRemoteDebuggerPresent', 'ptrace', 'NtQueryInformationProcess']) },
-];
-const INPUT_FNS = new Set(['recv', 'recvfrom', 'read', 'fread', 'fgets', 'gets', 'scanf', 'fscanf', 'sscanf', 'getenv', 'getopt', 'getopt_long', 'accept', 'InternetReadFile', 'getline', '__isoc99_scanf']);
+// B4: the binary lane's sink/category tables are rule-pack data
+// (shield-packs/scan-rules-pack.json). Dangerous-import categories are
+// inventory basis; behavior classes per Addendum A.2 ride in the pack's
+// behavior field; provenance is never consulted.
+const EXEC_SINKS = new Set(RULE_PACK.binary.exec_sinks);
+const UNBOUNDED_SINKS = new Set(RULE_PACK.binary.unbounded_sinks);
+const IMPORT_CATEGORIES = RULE_PACK.binary.import_categories.map((c) => ({ ...c, names: new Set(c.names) }));
+const INPUT_FNS = new Set(RULE_PACK.binary.input_fns);
 
 // PLATFORM SEAM (packaging requirement, 2026-10-24): engine discovery
 // tries, in order — owner policy, environment, a BUNDLED layout relative

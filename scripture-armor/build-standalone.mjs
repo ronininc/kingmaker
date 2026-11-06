@@ -16,6 +16,13 @@ const SOURCE_COMPONENTS = [
   'protection-feed.mjs', 'agnostic-review.mjs', 'format-inspect.mjs', 'review-worker.mjs', 'review-presentation.mjs', 'review-intake.mjs', 'repository-review.mjs', 'repository-stream.mjs', 'review-controls.mjs', 'review-ejection.mjs', 'sandbox-review.mjs', 'sandbox-review-linux.mjs', 'linux-review-inner.sh', 'device-protection.mjs', 'device-scan-roots.json', 'key-transition.mjs', 'retired-key-recovery.mjs', 'rotation-candidate.mjs',
   'dns-profiles', 'ghidra-scripts', 'mac', 'linux', 'windows', 'ui',
   'ghidra-prune-manifest.json',
+  // Shield-Builder layer: scan.mjs loads its detector rule pack from
+  // shield-packs/ at runtime, and vaultd + the review lanes import the
+  // retention + attempts modules — the bundle is incomplete without them.
+  'shield-ledger.mjs', 'shield-collect.mjs', 'shield-attempts.mjs', 'shield-aggregator.mjs',
+  'shield-rulepack.mjs', 'shield-registry.mjs', 'shield-rea.mjs', 'shield-eval.mjs',
+  'shield-generator.mjs', 'shield-gate.mjs', 'shield-loop.mjs', 'shield-review-harness.mjs',
+  'shield-extract-pack.mjs', 'shield-packs',
 ];
 export function buildStandalone(args = process.argv.slice(2)) {
   const opt = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : null; };
