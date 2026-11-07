@@ -1,19 +1,31 @@
 🤫 source-available: open to everyone, not for commercial use 🤫
 
-# Kingmaker 4.4.4 — unreleased
+# Kingmaker 4.4.4
 
-This checkout prepares the next immutable release. The rebuilt engine and staged resources have local proof; the signed installer, publication and fresh installation acceptance are still pending. Existing public 4.4.3 assets have not been replaced.
+4.4.4 is the current public release, published 2026-11-07. The macOS installer is Developer ID signed, Apple-notarized and stapled, the release manifest is signed, and the release is live on GitHub (see release status below). One step is still open: the owner's clean-machine production proof — delete the local copy, download from the site, install, run — has not been done yet, so no install path is customer-proven yet.
 
-Kingmaker is Ronin's governed local AI control surface for **macOS, Linux, and Windows**. It runs as the native Kingmaker app on macOS and through the governed `kingmaker` owner console on every packaged platform. Its engine governs every action; platform adapters use direct CLI/API control where available, while the Hands of Horus provide the macOS accessibility fallback. It is source-available under the [PolyForm Noncommercial License 1.0.0](LICENSE).
+Kingmaker is Ronin's governed local AI control surface. The shipped 4.4.4 release path is **macOS** (Linux and Windows units are built but not yet released — see release status). It runs as the native Kingmaker app on macOS and through the governed `kingmaker` owner console on packaged platforms. Its engine governs every action; platform adapters use direct CLI/API control where available, while the Hands of Horus provide the macOS accessibility fallback. It is source-available under the [PolyForm Noncommercial License 1.0.0](LICENSE).
 
-- **`Kingmaker.app` carries the complete runtime closure.** A valid 4.4.3 package contains the engine plus `kingmaker-runtime`, `voice-runtime`, `guardrails-runtime`, `guardrails-config`, `agent-runtime`, `knowledge-runtime`, managed Playwright browsers, the Chrome connector, `app.asar`, and the signed Kingmaker payload. The release gate rejects a missing, empty, unsafe or placeholder component.
+- **`Kingmaker.app` carries the complete runtime closure.** A valid 4.4.4 package contains the engine plus `kingmaker-runtime`, `voice-runtime`, `guardrails-runtime`, `guardrails-config`, `agent-runtime`, `knowledge-runtime`, managed Playwright browsers, the Chrome connector, `app.asar`, and the signed Kingmaker payload. The release gate rejects a missing, empty, unsafe or placeholder component.
 - **The native shell may show a window; the engine remains a separate Node process.** `desktop/headless-server.mjs` is the engine entry point. The default app mode presents the bar shown by the Dock/menu-bar UI; `km.windowMode bar` is the menu-bar-only mode. These are two supported presentation modes, not two different engines.
 - **A source checkout does not contain the compiled engine.** Development commands borrow a reviewed installed/staged runtime through `KINGMAKER_RUNTIME_APP`; packaged builds carry their own verified engine and resources.
-- **macOS is the reviewed native GUI target.** The 4.4.3 build pipeline also produces rollback-safe Linux x64 and Windows x64 install units from the same deep-verified payload. Their portable paths were exercised in prior Windows/Linux VMs on the 8 GB Mac through Muse; the retained checkout does not contain those guest receipts, so the refreshed exact archives remain installer candidates until their hashes are re-run on native hosts. NVIDIA is an inference backend on Windows/Linux, not a separate Kingmaker edition.
+- **macOS is the reviewed native GUI target and the shipped release path.** The 4.4.4 build pipeline also produces Linux x64 and Windows x64 install units from the same deep-verified payload. The 4.4.4 units were built and hash-verified on a Linux VM on 2026-11-06; they are not attached to the GitHub release and have not had native-host run proof, so they remain installer candidates, not a shipped path. NVIDIA is an inference backend on Windows/Linux, not a separate Kingmaker edition.
 
-## 4.4.3 release status
+## 4.4.4 release status
 
-The public platform release is 4.4.3; this checkout is the unreleased 4.4.4 candidate. Published Windows x64/Linux x64 archives are installer candidates, not verified native feature parity. The exact public [platform release](https://github.com/ronininc/kingmaker/releases/tag/v4.4.3-platform-installers.1) does not include a complete Kingmaker Mac Installer+manifest+signature unit. Current installed resources lack the shared embedding model; rebuilt production closure and fresh customer installation acceptance remain required. Source tests do not establish a completed release. See [platform evidence](docs/PLATFORM-SUPPORT.md).
+The public release is **4.4.4**, published 2026-11-07 as a full GitHub release ([v4.4.4](https://github.com/ronininc/kingmaker/releases/tag/v4.4.4)) — not a draft, not a pre-release. Its 8 assets: the macOS installer DMG, the release manifest and its signature, SHA256SUMS, the two archive parts and the whole archive, and the Ronin Launcher 0.3.15 DMG and ZIP. The manifest is signed with the rotated release key; the current release-key fingerprint is:
+
+`7EDC 06F8 D116 7C8A 2514 F7BA 5A06 6F7C A391 E9C9 FA78 8971 9FFD E2BD DD64 73B6`
+
+The macOS installer (`Kingmaker-Installer-v4.4.4.dmg`) is Developer ID signed, Apple-notarized (Accepted), stapled, and Gatekeeper-verified (`spctl`: accepted, source = Notarized Developer ID). ronininc.org/download/kingmaker serves the Ronin Launcher 0.3.15 DMG (7,832,010 bytes) from this release; the Launcher is the front door — one download, Start opens it — and Kingmaker is free inside it. The 4.4.4 cut's suite ran 176/176 at the release staging tree, with the G7 guarded transport and the Brain Library machinery in the build.
+
+Still open, stated plainly:
+
+- The owner's clean-machine production proof (delete the local copy, download from the site, install, run) has not been done yet.
+- The Windows x64 and Linux x64 4.4.4 units were built and hash-verified on a Linux VM on 2026-11-06, but they are not attached to this release and have not had native-host run proof; they are not verified native feature parity.
+- The Brain Library holds 41 models and its machinery is in this build, but live streaming from it has not been proven end to end live.
+
+See [platform evidence](docs/PLATFORM-SUPPORT.md).
 
 Updates are authenticated separately from per-install identity and paid entitlement:
 
@@ -25,7 +37,7 @@ Kingmaker checks its configured HTTPS update host on launch and wake (not on a b
 
 ## Install and update
 
-The supported customer path is Ronin Launcher selecting the platform-specific, signed Kingmaker release. The standalone **Kingmaker Installer** DMG remains the macOS recovery/fresh-install path. Neither path may install the current local staging build: both must receive the final signed 4.4.3 manifest, its exact assets and the governed release envelope.
+The supported customer path is the Ronin Launcher: ronininc.org/download/kingmaker serves the Launcher DMG from the signed 4.4.4 release — one download — and Kingmaker is free inside it. The standalone **Kingmaker Installer** DMG remains the macOS recovery/fresh-install path. Neither path installs a local staging build: both deliver the final signed 4.4.4 manifest, its exact assets and the governed release envelope.
 
 On macOS, the standalone installer has one wake-word field and one **Download & Install** button. After installation, Kingmaker opens in its normal app mode; it is not restricted to a menu-bar-only UI.
 
@@ -42,7 +54,7 @@ What the button does, in order (one progress bar for all of it):
 
 **Nothing is ever half-installed.** Kingmaker's own pieces (the app, its config, its library) exist only in staging until step 7, so a failure anywhere before leaves none of them in place, and a failure during step 7 puts everything back. The shared tools it installs on the way (Ollama and its models, Homebrew and its formulas, SearXNG) are each installed whole by their own installers and are kept, together with the verified downloads, so pressing the button again continues instead of starting over. The installer never installs third-party MCP servers or CLI tools: only Kingmaker's own parts and what they need to run.
 
-**Gatekeeper:** an ad hoc local build is for private engineering validation only. A public macOS release must complete the configured production signing flow and the final post-signing physical gate. Developer ID/notarization are separate Apple distribution requirements; neither an ad hoc signature nor a manifest hash substitutes for them.
+**Gatekeeper:** an ad hoc local build is for private engineering validation only. A public macOS release must complete the configured production signing flow and the final post-signing physical gate. Developer ID/notarization are separate Apple distribution requirements; neither an ad hoc signature nor a manifest hash substitutes for them. The 4.4.4 macOS installer has completed that flow: Developer ID signed, Apple-notarized (Accepted), stapled, and accepted by Gatekeeper with source = Notarized Developer ID.
 
 ## The wake word is cemented
 
@@ -70,7 +82,7 @@ Kingmaker keeps its own data folder: `~/Library/Application Support/sol-ghost/ru
 | Ronin Atlas boot prewarm | ~670 MB, held ~20 min | skipped; Ronin Atlas starts on first use (in the standalone app; the desktop app needs a rebuild) |
 | Boot to ready | — | 22 s cold, ~5 s warm |
 
-The host's real squeeze is the agent tooling, not the engine. The Claude desktop VM, Claude Code sessions (each starting its own `ghost mcp`) and Codex filled 8 GB with the engine off (measured 2026-10-05). Kingmaker removes the desktop app's visual load. It cannot remove theirs.
+The host's real squeeze is the agent tooling, not the engine. Cloud-agent desktop apps and their CLI sessions (each starting its own `ghost mcp`) filled 8 GB with the engine off (measured 2026-10-05). Kingmaker removes the desktop app's visual load. It cannot remove theirs.
 
 Proven live, with no window:
 - "press Seven in Calculator" → the engine's grammar planner (no model) → a YELLOW proposal → the event stream pushes it to the console → `y` approves it by id → the tool runs.
@@ -116,7 +128,7 @@ Kingmaker and the desktop app both serve `127.0.0.1:3001`, so run one at a time.
 | `kingmaker background status\|enable\|disable` | Headless Host Mode: registers or removes the installed `Kingmaker.app` as a macOS Login Item and keeps the plugged-in Mac awake while the lid stays open. The built-in display may sleep. |
 | `kingmaker update --setup` | Reads the canonical HTTPS update-host URL and this installation's existing update key from stdin, then writes the private `update.json` configuration with mode 0600. It does not mint or rotate a key. |
 | `kingmaker update --check` | Authenticates `latest.json` against the signed release manifest and reports an available update without applying it. |
-| `kingmaker update --auto` | Performs the quiet authenticated launch/wake check. In 4.4.3 it reports that an update is ready; it does not silently apply it. |
+| `kingmaker update --auto` | Performs the quiet authenticated launch/wake check. It reports that an update is ready; it does not silently apply it. |
 | `kingmaker update` | Applies an authenticated newer release through the journaled installer. It refuses unsigned manifests, mismatched parts, an unrecognized release identity, rollback, or changed installed provenance. |
 | ChatGPT/Codex interaction lease | When ChatGPT or Codex owns the foreground governed conversation, Kingmaker closes its microphone and suppresses wake acknowledgements, answers, and proactive announcements. It records a bounded private event for its own brain instead of speaking into the other transcript. Switching to another app releases the lease and the cemented wake path works normally. |
 | `:key <provider>` at the console (or say "connect my GitHub key") | An API key into Kingmaker's vault: the provider's key page opens in Chrome, the steps are printed and spoken, you paste the key at a hidden prompt, and "Saved your GitHub key to the vault" comes only once the engine confirms. Connecting it and its live test wait for your `y`. Providers come from the engine's key-handoff catalog. |
@@ -248,7 +260,7 @@ Every preset shortcut key, every bar and console command, and the words that tur
 | `forget what you learned about …` | Forget it |
 | `where did you learn …` | Where a preference came from |
 | `sharing on · sharing off` | Community learning (kept preferences only) |
-| `new conversation` | A fresh Claude/ChatGPT conversation; what it learned stays |
+| `new conversation` | A fresh cloud-agent conversation; what it learned stays |
 | `stop approving` | Kill switch: everything that approves without asking stops, at once |
 <!-- END command-list -->
 
@@ -333,10 +345,10 @@ The engine's ArtCraft adapter drives seven open-source creative apps from `story
 - **Using them.** Only through the engine: by voice ("PhotoCraft, make a carousel image from beach.jpg"), at the console (`:craft`), with `kingmaker craft`, or over MCP. The apps' own `<app>-cli mcp` servers are never started or re-exported. With no flags, VectorCraft's attaches to an unauthenticated `127.0.0.1:7979`. VectorCraft `screenshot` and DesignCraft `render_page` claim to be read-only but write a file when given a path. What a request does is judged from its words and by the engine, never from a tool's hint. FilmCraft and EffectCraft renders wait for the engine's heavy slot, never beside a model load.
 - **LightCraft in this build.** HEIC and AVIF do not decode, and its folder import skips Nikon `.nrw`. `kingmaker craft lightcraft --input <folder>` counts those files and says so.
 
-## Known gaps (4.4.3, honest)
+## Known gaps (4.4.4, honest)
 
-- **The signed 4.4.3 macOS update is live; Apple public-web distribution is still separate.** The private release uses the pinned Kingmaker Release identity and signed manifest. Developer ID/notarization remain prerequisites for a frictionless public website download.
-- **Linux and Windows install units are VM-tested installer candidates, not native GUI parity.** Prior portable paths were exercised in Windows/Linux VMs on the 8 GB Mac through Muse. The refreshed 4.4.3 archives add `UNIT.json` and rollback-safe `install.sh`/`install.ps1`, but native UI, voice and platform credential adapters remain separate acceptance items.
+- **Clean-machine production proof is still pending.** The signed, notarized 4.4.4 release is live and its macOS installer passes Gatekeeper, but the owner's own acceptance run — delete the local copy, download the production installer from the site, install, run — has not been done yet. Until it has, no install path is customer-proven.
+- **Linux and Windows install units are built, not released.** The 4.4.4 units were built and hash-verified on a Linux VM on 2026-11-06; they are not attached to the GitHub release and have not had native-host run proof, so they are not native GUI parity and not a shipped path. macOS is the shipped release path today.
 - **System software it doesn't bundle** comes with the installer: Ollama and the models, the Hands of Horus, sox, SearXNG (Kingmaker starts an installed `ollama serve` when none is running). ghost-os stays an optional fallback for the hands. Blender, Godot and Chrome are found where they're installed.
 - **The desktop app's first-run installer and knowledge-library offer are pop-ups in its window,** so they don't run headless. The runtime still reports what's missing.
 - **The ledger calls spoken turns typed.** The engine records them as `operator_typed` because Kingmaker sends them with the console's nonce. An honest "spoken at the Kingmaker console" principal needs an engine change.
@@ -360,7 +372,7 @@ Kingmaker shares what it learns by default, and it's your choice: the first time
 
 # Appendix — historical Kingmaker management-layer doctrine
 
-_Historical design record consolidated from `ronininc/kingmaker-os` on 2026-10-23. It is preserved for provenance and is **not** the current 4.4.3 product description, deployment status, network contract or release checklist. Where it conflicts with the implementation documented above, the 4.4.3 source and signed contracts govern._
+_Historical design record consolidated from `ronininc/kingmaker-os` on 2026-10-23. It is preserved for provenance and is **not** the current 4.4.4 product description, deployment status, network contract or release checklist. Where it conflicts with the implementation documented above, the 4.4.4 source and signed contracts govern._
 
 # Kingmaker
 
