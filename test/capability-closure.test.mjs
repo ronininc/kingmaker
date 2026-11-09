@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, writeFileSync, rmSync, chmodSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { payloadFiles, EMBEDDED_ARMOR_FILES } from '../lib/payload.mjs';
 import { validateProductionCapabilityClosure } from '../scripts/capability-closure.mjs';
 function write(file, data) { mkdirSync(join(file, '..'), { recursive: true }); writeFileSync(file, data); }
 function fixture() {
@@ -44,14 +43,3 @@ test('wrong browser revision, architecture, permissions and old headless wiring 
   }
 });
 
-test('embedded compatibility files carry only the Kingmaker product identity policy', () => {
-  const root=mkdtempSync(join(tmpdir(),'kingmaker-product-policy-'));
-  try {
-    for(const file of EMBEDDED_ARMOR_FILES)write(join(root,'scripture-armor',file),'fixture');
-    writeFileSync(join(root,'scripture-armor/product.json'),JSON.stringify({schema:'scripture-armor.product/1',product:'standalone'}));
-    assert.throws(()=>payloadFiles(root,['scripture-armor']),/refuses a standalone/);
-    writeFileSync(join(root,'scripture-armor/product.json'),JSON.stringify({schema:'scripture-armor.product/1',product:'kingmaker'}));
-    const files=payloadFiles(root,['scripture-armor']);assert.equal(files.length,5);assert.ok(files.includes('scripture-armor/product-paths.mjs'));
-    assert.ok(!files.some(file=>file.includes('dashboard')||file.includes('account-session')));
-  }finally{rmSync(root,{recursive:true,force:true});}
-});

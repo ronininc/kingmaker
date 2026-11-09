@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { ARMOR_RELEASE_ASSETS, releaseAssetProblems, verifyPhysicalReleaseAssets } from '../lib/release-assets.mjs';
 import { finalizeInstallerRelease } from '../lib/installer-finalize.mjs';
+import { PLUTIL_SKIP } from './helpers/host-tool-skips.mjs';
 
 const h = 'a'.repeat(64);
 const manifest = {
@@ -54,7 +55,7 @@ test('physical gate hashes every required asset and requires real signature and 
   assert.match((await verifyPhysicalReleaseAssets({ manifestPath: mp, assetsDir: dir, installerDmg: dmg, verifySignature: () => true, verifyArmor: async () => true })).problems.join('\n'), /not a regular non-symlink file/);
 });
 
-test('mounted CLI and installer build entrypoints fail closed on unverified release assets', () => {
+test('mounted CLI and installer build entrypoints fail closed on unverified release assets', { skip: PLUTIL_SKIP }, () => {
   const dir = mkdtempSync(join(tmpdir(), 'kingmaker-release-cli-')), mp = join(dir, 'kingmaker-manifest.json'), dmg = join(dir, 'Kingmaker-Installer-v4.4.2.dmg');
   writeFileSync(mp, JSON.stringify(manifest)); writeFileSync(dmg, 'dmg');
   const cli = spawnSync(process.execPath, ['scripts/check-release-assets.mjs', mp, dmg], { cwd: new URL('..', import.meta.url), encoding: 'utf8' });
