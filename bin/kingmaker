@@ -30,7 +30,7 @@ else
     # (version, help, markets, …); `kingmaker start` and the rest say plainly that they need Kingmaker.app.
     node_bin="$(command -v node || true)"
     if [ -n "$node_bin" ]; then exec "$node_bin" "$here/lib/kingmaker.mjs" "$@"; fi
-    echo "kingmaker: no engine to run and no Node. Install Kingmaker (Kingmaker Installer), or set KINGMAKER_RUNTIME_APP (not found at $app)." >&2
+    echo "kingmaker: no engine to run and no Node. Install Kingmaker with the Ronin Launcher, or set KINGMAKER_RUNTIME_APP (not found at $app)." >&2
     exit 78
   fi
 fi
