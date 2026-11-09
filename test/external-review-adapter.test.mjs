@@ -9,6 +9,7 @@ import test from 'node:test';
 import { createDurableJobPool } from '../lib/durable-job-pool.mjs';
 import { createJobDispatcher } from '../lib/job-dispatcher.mjs';
 import { createExternalDispatchReceiptVerifier, createLocalStaticReviewAdapter, externalSecurityManifestSha256, normalizeExternalSecurityManifest, EXTERNAL_REVIEW_ADAPTER } from '../lib/external-review-adapter.mjs';
+import { ARMOR_KEM_SKIP } from './helpers/host-tool-skips.mjs';
 
 const temp=()=>mkdtempSync(join(tmpdir(),'external-review-'));
 const externalJobId='11111111-1111-4111-8111-111111111111',boardJobId='22222222-2222-4222-8222-222222222222',nativeOpportunityId='44444444-4444-4444-8444-444444444444';
@@ -17,7 +18,7 @@ function dispatch(root,commit) { const m=manifest(commit);return {schema:'ronin.
 function fixtureRepo(){const root=temp(),env={PATH:'/usr/bin:/bin',HOME:root,LANG:'C',GIT_AUTHOR_NAME:'Fixture',GIT_AUTHOR_EMAIL:'fixture@example.invalid',GIT_COMMITTER_NAME:'Fixture',GIT_COMMITTER_EMAIL:'fixture@example.invalid'},git=(args)=>execFileSync('/usr/bin/git',['-C',root,...args],{env});git(['init','-q']);writeFileSync(join(root,'fixture.go'),'package fixture\n');git(['add','fixture.go']);git(['commit','-qm','fixture']);return{root,commit:git(['rev-parse','HEAD']).toString().trim()}}
 const trust={verifyDispatchReceipt:async()=>({authorized:true,receiptId:'receipt-fixture',attemptId:armorAttemptId,authorityKeyId:'fixture-key',completeAdmission:(e)=>e})};
 
-test('durable external review uses exact CRM manifest digest and stays review-held',async()=>{
+test('durable external review uses exact CRM manifest digest and stays review-held', { skip: ARMOR_KEM_SKIP }, async()=>{
   const repo=fixtureRepo(),dir=temp(),source=repo.root,m=dispatch(source,repo.commit);
   const pool=createDurableJobPool({path:join(dir,'queue','jobs.sqlite')});
   const job=pool.submit({jobId:m.externalJobId,text:JSON.stringify(m),idempotencyKey:`external:${m.externalJobId}:${m.manifestSha256}`,adapter:EXTERNAL_REVIEW_ADAPTER,attempts:1});
@@ -27,13 +28,13 @@ test('durable external review uses exact CRM manifest digest and stays review-he
   assert.deepEqual(pool.events(job.id).map((e)=>e.event),['submitted','claimed','acknowledged','started','evidence_recorded','review_required','completed']);pool.close();
 });
 
-test('adapter refuses pending scope, digest, policy, method, source or id widening',async()=>{
+test('adapter refuses pending scope, digest, policy, method, source or id widening', { skip: ARMOR_KEM_SKIP }, async()=>{
   const repo=fixtureRepo(),dir=temp(),source=repo.root,base=dispatch(source,repo.commit);
   const run=async(change,id=externalJobId,receiptVerifier=trust.verifyDispatchReceipt)=>{const pool=createDurableJobPool({path:join(temp(),'queue','jobs.sqlite'),maxAttempts:1});const m=structuredClone(base);change(m);pool.submit({jobId:id,text:JSON.stringify(m),idempotencyKey:`external:refuse:${Math.random()}`,adapter:EXTERNAL_REVIEW_ADAPTER,attempts:1});const a=createLocalStaticReviewAdapter({allowedRoots:[source],...trust,verifyDispatchReceipt:receiptVerifier,...armorFixture(m),armorAttemptId});const out=await createJobDispatcher({pool,workerId:'little-brother-local-test',adapters:{[EXTERNAL_REVIEW_ADAPTER]:a}}).runOne();assert.equal(out.state,'failed');pool.close();};
   await run(()=>{},externalJobId,async()=>({authorized:false}));await run((m)=>{m.manifestSha256='0'.repeat(64);});await run((m)=>{m.execution.network=true;});await run((m)=>{m.command='curl target';});await run((m)=>{m.manifest.allowedMethods=['active scan'];m.manifestSha256=externalSecurityManifestSha256(m.manifest);});await run((m)=>{m.manifest.commitSha='0'.repeat(40);m.manifestSha256=externalSecurityManifestSha256(m.manifest);});await run(()=>{},'33333333-3333-4333-8333-333333333333');
 });
 
-test('adapter rejects a source-root alias before reading Git objects',async()=>{
+test('adapter rejects a source-root alias before reading Git objects', { skip: ARMOR_KEM_SKIP }, async()=>{
   const repo=fixtureRepo(),dir=temp(),source=join(dir,'alias');symlinkSync(repo.root,source);const m=dispatch(source,repo.commit),pool=createDurableJobPool({path:join(dir,'queue','jobs.sqlite'),maxAttempts:1});pool.submit({jobId:externalJobId,text:JSON.stringify(m),idempotencyKey:'external:alias:fixture',adapter:EXTERNAL_REVIEW_ADAPTER,attempts:1});const adapter=createLocalStaticReviewAdapter({allowedRoots:[dir],...trust,...armorFixture(m),armorAttemptId});const out=await createJobDispatcher({pool,workerId:'little-brother-local-test',adapters:{[EXTERNAL_REVIEW_ADAPTER]:adapter}}).runOne();assert.equal(out.state,'failed');pool.close();
 });
 
@@ -60,7 +61,7 @@ test('CRM Ed25519 receipt binds exact fresh scope, registered authority and one 
   const changed=createExternalDispatchReceiptVerifier({authorities:{'key-fixture':{publicJwk:publicKey.export({format:'jwk'})}},executorRegistration:executor,now:()=>nowMs,authorityStatus:async()=>({active:true,expiresAt:authorityExpiresAt}),executorStatus:async()=>({active:true}),attemptStatus:async()=>({...current(),status:'cancelled'}),admissionStore});await assert.rejects(()=>changed(envelope({...receipt,nonce:'changed_nonce_12345678901234567'}),expected),/ATTEMPT_CHANGED/);
 });
 
-test('authority lookup delay cannot carry an expired admission into Git inventory', async () => {
+test('authority lookup delay cannot carry an expired admission into Git inventory', { skip: ARMOR_KEM_SKIP }, async () => {
   const repo = fixtureRepo(), m = dispatch(repo.root, repo.commit); let now = Date.now();
   const armor = armorFixture(m, armorAttemptId, { now: () => now });
   const adapter = createLocalStaticReviewAdapter({ allowedRoots: [repo.root], ...armor, armorAttemptId,

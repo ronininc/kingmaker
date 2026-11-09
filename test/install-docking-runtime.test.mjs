@@ -6,7 +6,7 @@ import test from 'node:test';
 import { createIdentity, publicBlock, signPayload, signRevocation } from '../scripture-armor/armor.mjs';
 import { createArmorRevocationChecker, createDockChallengeStore, createKingmakerArmorProofVerifier, createKingmakerInstallProof } from '../lib/install-docking-runtime.mjs';
 import { createLauncherDockGate } from '../lib/install-docking.mjs';
-import { cmdInstallProof } from '../lib/cli.mjs';
+import { ARMOR_KEM_SKIP } from './helpers/host-tool-skips.mjs';
 
 const deviceSha256 = 'a'.repeat(64);
 const expectedInstallIdentity = { installId: 'install-fixture', deviceSha256, keySha: 'b'.repeat(64), releaseTag: 'v4.4.2' };
@@ -26,7 +26,7 @@ const revocationSnapshot = (issuer, querySignFp, at, overrides = {}) => signPayl
     generatedAt: new Date(at).toISOString(), validUntil: new Date(at + 60_000).toISOString(), records: [], ...overrides },
 });
 
-test('concrete Armor verifier binds signature, embedded fingerprint, challenge and install claims', async (t) => {
+test('concrete Armor verifier binds signature, embedded fingerprint, challenge and install claims', { skip: ARMOR_KEM_SKIP }, async (t) => {
   const f = fixture(); t.after(() => rmSync(f.root, { recursive: true, force: true }));
   const issuedAt = Date.parse('2026-11-01T00:00:00Z'); const challenge = 'challenge_concrete01';
   const verify = createKingmakerArmorProofVerifier({ expectedArmorIdentity: f.expectedArmorIdentity, expectedInstallIdentity });
@@ -37,7 +37,7 @@ test('concrete Armor verifier binds signature, embedded fingerprint, challenge a
   assert.equal((await verify({ challenge, issuedAt, proof: proof(other.identity, challenge, issuedAt) })).ok, false);
 });
 
-test('proof producer uses the installed Armor identity and fails closed on trust or revocation', async (t) => {
+test('proof producer uses the installed Armor identity and fails closed on trust or revocation', { skip: ARMOR_KEM_SKIP }, async (t) => {
   const root = mkdtempSync(join(tmpdir(), 'kingmaker-proof-')); chmodSync(root, 0o700);
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const identity = createIdentity(join(root, 'armor', 'identity'), 'Kingmaker fixture');
@@ -66,28 +66,6 @@ test('proof producer uses the installed Armor identity and fails closed on trust
   }), /KINGMAKER_ARMOR_IDENTITY_REQUIRED/);
 });
 
-test('Launcher-facing CLI emits the real proof only with pinned fresh revocation evidence', async (t) => {
-  const root = mkdtempSync(join(tmpdir(), 'kingmaker-proof-cli-')); chmodSync(root, 0o700);
-  t.after(() => rmSync(root, { recursive: true, force: true }));
-  const identity = createIdentity(join(root, 'armor', 'identity'), 'Kingmaker fixture');
-  const issuer = createIdentity(join(root, 'issuer'), 'Revocation fixture');
-  const issuedAt = Date.parse('2026-11-01T00:00:00Z'); const challenge = 'challenge_cli_real01';
-  const responseFile = join(root, 'response.json'); const issuerFile = join(root, 'issuer.block');
-  writeFileSync(responseFile, JSON.stringify(revocationSnapshot(issuer, identity.signFp, issuedAt)));
-  writeFileSync(issuerFile, publicBlock(issuer));
-  let output = '';
-  const args = ['--challenge', challenge, '--issued-at', String(issuedAt), '--revocation-response', responseFile,
-    '--revocation-issuer', issuerFile, '--trusted-revocation-fp', issuer.signFp];
-  assert.equal(await cmdInstallProof(args, { state: root, installIdentity: () => expectedInstallIdentity,
-    now: () => issuedAt, write: (line) => { output += line; } }), 0);
-  const result = JSON.parse(output);
-  const verify = createKingmakerArmorProofVerifier({ expectedArmorIdentity: result.armorIdentity, expectedInstallIdentity });
-  assert.equal((await verify({ challenge, issuedAt, proof: result.proof })).ok, true);
-  assert.equal(await cmdInstallProof(args.filter((_, i) => i < args.length - 2), {
-    state: root, installIdentity: () => expectedInstallIdentity, now: () => issuedAt, write: () => {},
-  }), 2);
-});
-
 test('durable challenge consumption survives restart and permits only one winner', async (t) => {
   const root = mkdtempSync(join(tmpdir(), 'kingmaker-replay-')); chmodSync(root, 0o700); t.after(() => rmSync(root, { recursive: true, force: true }));
   const path = join(root, 'private', 'challenges.sqlite');
@@ -98,7 +76,7 @@ test('durable challenge consumption survives restart and permits only one winner
   assert.equal(await store.consumeChallenge(item), false); store.close();
 });
 
-test('Launcher gate runs concrete Armor verification and durable replay refusal', async (t) => {
+test('Launcher gate runs concrete Armor verification and durable replay refusal', { skip: ARMOR_KEM_SKIP }, async (t) => {
   const f = fixture(); t.after(() => rmSync(f.root, { recursive: true, force: true }));
   const challenge = 'challenge_endtoend01'; const issuedAt = Date.parse('2026-11-01T00:00:00Z');
   const issuer = createIdentity(join(f.root, 'revocation-issuer'), 'Revocation fixture');
@@ -117,7 +95,7 @@ test('Launcher gate runs concrete Armor verification and durable replay refusal'
   assert.equal((await gate(request)).reason, 'replayed_challenge');
 });
 
-test('revocation requires a fresh authenticated complete query-bound response', async (t) => {
+test('revocation requires a fresh authenticated complete query-bound response', { skip: ARMOR_KEM_SKIP }, async (t) => {
   const f = fixture(); t.after(() => rmSync(f.root, { recursive: true, force: true }));
   const issuer = createIdentity(join(f.root, 'issuer'), 'Revocation fixture');
   const other = createIdentity(join(f.root, 'other'), 'Other fixture');

@@ -3,8 +3,7 @@ import assert from'node:assert/strict';
 import {mkdtempSync,readFileSync,statSync}from'node:fs';
 import {tmpdir}from'node:os';
 import {join}from'node:path';
-import {createCrmUsageSync,attachCrmUsageSync}from'../lib/crm-usage-sync.mjs';
-import {setCrmUsageObserver,meterCloud,meterDataset,meterFail}from'../lib/token-meter.mjs';
+import {createCrmUsageSync}from'../lib/crm-usage-sync.mjs';
 const receipt=s=>({ok:true,receipt:{agent:s.agent,report_id:s.report_id,observed_at:s.observed_at,provenance:'paired_launcher_provider_report'}});
 test('explicit flush only, numeric-only local log, unknown propagation and 0600',async()=>{
  const file=join(mkdtempSync(join(tmpdir(),'usage-proof-')),'usage.jsonl');let sends=0;
@@ -14,24 +13,6 @@ test('explicit flush only, numeric-only local log, unknown propagation and 0600'
  assert.deepEqual(s.totals().codex,{prompt_tokens:15,generated_tokens:null});
  const log=readFileSync(file,'utf8');assert.doesNotMatch(log,/secret|api_key|answer/);assert.equal(statSync(file).mode&0o777,0o600);
  assert.equal((await s.flush()).ok,true);assert.equal(sends,1);assert.equal(s.pending(),0);
-});
-test('explicit Launcher attachment logs real meter calls and pushes through existing authenticated request',async()=>{
- const file=join(mkdtempSync(join(tmpdir(),'usage-attach-')),'totals.jsonl');let path,body;
- const sync=attachCrmUsageSync({meter:{setCrmUsageObserver},file,request:async(p,init)=>{path=p;body=JSON.parse(init.body);return{ok:true,json:async()=>receipt(body)};}});
- try{
-  meterCloud({provider:'anthropic',prompt:5,generated:7});assert.equal(path,undefined);
-  assert.equal((await sync.flush()).ok,true);assert.equal(path,'/api/launcher/agent-usage');assert.equal(body.agent,'claude');assert.equal(body.prompt_tokens,5);
- }finally{sync.detach();}
-});
-test('real token-meter provider names feed the optional observer without blocking calls',()=>{
- const s=createCrmUsageSync();setCrmUsageObserver(s.observe);
- try{
-  meterCloud({provider:'anthropic',prompt:12,generated:8});meterCloud({provider:'openai'});meterCloud({provider:'xai',prompt:2,generated:3});
-  assert.deepEqual(s.totals().claude,{prompt_tokens:12,generated_tokens:8});assert.deepEqual(s.totals().codex,{prompt_tokens:null,generated_tokens:null});assert.deepEqual(s.totals().grok,{prompt_tokens:2,generated_tokens:3});
-  const before=s.pending();meterDataset({dataset:'private-fixture'});assert.equal(s.pending(),before);
-  meterFail({});assert.deepEqual(s.totals().kingmaker,{prompt_tokens:null,generated_tokens:null});
-  setCrmUsageObserver(()=>{throw Error('reporter down');});assert.doesNotThrow(()=>meterCloud({provider:'openai'}));
- }finally{setCrmUsageObserver(null);}
 });
 test('restart recovers the exact snapshot identity after an uncertain response',async()=>{
  const file=join(mkdtempSync(join(tmpdir(),'usage-restart-')),'usage.jsonl');

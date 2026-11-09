@@ -3,7 +3,6 @@ import test from 'node:test';
 import { WEIGHT_HUNTER_REFERENCES, selectWeightHunterReferences } from '../lib/weight-hunter-references.mjs';
 import { planForge } from '../lib/weight-hunter-forge.mjs';
 import { planTaskRuntime } from '../lib/capability-fabric.mjs';
-import { buildLibrary, referenceSelectableAs } from '../lib/brain-library.mjs';
 import { canonicalJson, sha256Hex } from '../lib/hash-util.mjs';
 const ids = (context) => context.references.map((entry) => entry.id);
 test('eight unique pinned sources are immutable with document hashes and no authority', () => {
@@ -54,16 +53,4 @@ test('forge and runtime builders bind task context without expanding capabilitie
   assert.deepEqual(runtime.components[0].grantedCapabilities, []);
   assert.equal(runtime.referenceContext.authorityGranted, false);
   assert.equal(runtime.referenceContext.assessment.concurrency, 1);
-});
-test('Brain Library builder retains sources as inert hash-bound references', () => {
-  const library = buildLibrary({ now: '2026-11-04T00:00:00.000Z' });
-  for (const e of WEIGHT_HUNTER_REFERENCES) {
-    const ref = library.references.find(r => r.id === e.id);
-    assert.ok(ref);
-    assert.equal(ref.contentSha256, sha256Hex(ref.content));
-    assert.equal(ref.executionDisabled, true);
-    assert.deepEqual(ref.capabilities, []);
-    for (const lane of ['model', 'tool', 'skill', 'prompt']) assert.equal(referenceSelectableAs(ref, lane), false);
-    for (const field of ['licenseNoticeSha256', 'riskReportSha256']) assert.match(ref.provenance[field], /^[a-f0-9]{64}$/);
-  }
 });

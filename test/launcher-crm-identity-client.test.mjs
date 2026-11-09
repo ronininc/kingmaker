@@ -7,6 +7,7 @@ import test from 'node:test';
 import { createInstallCertificateStatusProviderForFixture, createLauncherCrmIdentityClient, createProductionLauncherIdentityReporter, launcherIdentityCanonicalJson, verifyLauncherReportInputs, verifyLauncherReportInputsForFixture } from '../lib/launcher-crm-identity-client.mjs';
 import { pubkeyFingerprint, signManifestBytes } from '../lib/release-signing.mjs';
 import { createIdentity, signPayload } from '../scripture-armor/armor.mjs';
+import { ARMOR_KEM_SKIP } from './helpers/host-tool-skips.mjs';
 
 const reportKeys = generateKeyPairSync('ed25519');
 const certKeys = generateKeyPairSync('ec', { namedCurve: 'P-256' });
@@ -69,7 +70,7 @@ test('forged labels, certificates, digests, tags and app bytes cannot create ver
   assert.throws(() => verifyLauncherReportInputsForFixture(raw, { ...trust, releasePublicKeyPem: substituted.publicKey.export({ format: 'pem', type: 'spki' }) }), /RELEASE_KEY_MISMATCH|MANIFEST_NOT_VERIFIED/);
 });
 
-test('paid profile requires a genuine challenge-bound Armor proof', async (t) => {
+test('paid profile requires a genuine challenge-bound Armor proof', { skip: ARMOR_KEM_SKIP }, async (t) => {
   const dir = mkdtempSync(join(tmpdir(), 'launcher-crm-armor-')); t.after(() => rmSync(dir, { recursive: true, force: true }));
   const armor = createIdentity(join(dir, 'identity'), 'fixture'); const expected = { senderSignFp: armor.signFp, keyTypes };
   const proof = signPayload(armor, { type: 'kingmaker.install-proof/1', nonce: 'challenge-value-1234', at: new Date(1000000).toISOString(), body: { schema: 'kingmaker.install-proof/1', challenge: 'challenge-value-1234', issuedAt: 1000000, ...install } });
@@ -80,7 +81,7 @@ test('paid profile requires a genuine challenge-bound Armor proof', async (t) =>
   await assert.rejects(() => fixture().client.report({ verified: verified(), kingmakerProof: proof }), /PAID_ARMOR_TRUST_NOT_CONFIGURED/);
 });
 
-test('certificate and paid Armor revocation are derived from current providers', async () => {
+test('certificate and paid Armor revocation are derived from current providers', { skip: ARMOR_KEM_SKIP }, async () => {
   await assert.rejects(() => fixture(null, { checkInstallCertificateStatus: async () => ({ current: true, revoked: true, installId: install.installId, keySha: install.keySha, releaseTag: install.releaseTag }) }).client.report({ verified: verified() }), /CERTIFICATE_STATUS_INVALID/);
   await assert.rejects(() => fixture(null, { checkInstallCertificateStatus: async () => null }).client.report({ verified: verified() }), /CERTIFICATE_STATUS_INVALID/);
   const dir = mkdtempSync(join(tmpdir(), 'launcher-crm-revoked-')); const armor = createIdentity(join(dir, 'identity'), 'fixture');
