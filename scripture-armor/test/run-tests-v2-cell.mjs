@@ -97,11 +97,11 @@ function vaultLog(storeDir) {
 // look an entry up by — the entry's digest is a keyed commitment).
 function ownerRpc(socket, obj) {
   let token = '';
-  try { token = fs.readFileSync(ownerTokenPathFor(socket), 'utf8').trim(); } catch {}
-  return rpcOnce(ownerSocketFor(socket), { ...obj, owner_token: token });
+  try { token = fs.readFileSync(ownerTokenPathFor(path.dirname(socket)), 'utf8').trim(); } catch {}
+  return rpcOnce(ownerSocketFor(path.dirname(socket)), { ...obj, owner_token: token });
 }
 function readConfirm(socket, id) {
-  try { return JSON.parse(fs.readFileSync(ownerConfirmPathFor(socket, id), 'utf8')); } catch { return null; }
+  try { return JSON.parse(fs.readFileSync(ownerConfirmPathFor(path.dirname(socket), id), 'utf8')); } catch { return null; }
 }
 function entryForPkg(storeDir, pkgPath) {
   try {

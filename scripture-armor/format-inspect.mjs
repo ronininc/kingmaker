@@ -30,6 +30,7 @@
 
 import crypto from 'node:crypto';
 import zlib from 'node:zlib';
+import { attachExplanation } from './finding-explain.mjs';
 
 export const FORMAT_RULES_VERSION = 'format-rules/1';
 export const FORMAT_INSPECT_CAP_BYTES = 64 * 1024 * 1024; // honest cap; streaming is gate 2, not claimed here
@@ -53,7 +54,8 @@ function baseRecord(cls, sha, findings, confidence, coverage) {
     format: 'scripture-armor-scan/1', target_sha256: sha, target_class: cls,
     engine: { name: 'scripture-format', version: 'scripture-format/1', rules: FORMAT_RULES_VERSION },
     started: new Date().toISOString(), duration_ms: 0, analysis_confidence: confidence,
-    findings, counts, verdict: coverage.unsupported ? 'unsupported' : verdict, risk, override: null,
+    // Explanation layer (Item 4): additive per-finding explanations.
+    findings: findings.map(attachExplanation), counts, verdict: coverage.unsupported ? 'unsupported' : verdict, risk, override: null,
     coverage,
   };
 }

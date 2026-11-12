@@ -22,6 +22,7 @@ import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { loadIdentity, createIdentity, publicBlock, defaultIdentityDir } from './armor.mjs';
 import { assertProductIdentityDir } from './product-paths.mjs';
+import { resolveEndpoint } from './daemon-transport.mjs';
 import { TERMS_TEXT, hasCurrentAcceptance, recordAcceptance } from './terms.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -65,7 +66,7 @@ function daemonAnswers(socketPath) {
 async function main() {
   const flags = parseFlags(process.argv.slice(2));
   const dir = assertProductIdentityDir(flags['identity-dir'] ? path.resolve(flags['identity-dir']) : defaultIdentityDir());
-  const socketPath = flags.socket ? path.resolve(flags.socket) : path.join(dir, 'vaultd.sock');
+  const socketPath = resolveEndpoint(flags.socket, dir);
 
   // 4.4 PHASE-0 COEXISTENCE — ITEM 1 (deliberate, marked deviation from the
   // public line): this is Kingmaker's BUNDLED launch path. It issues the

@@ -12,6 +12,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { attachExplanation } from './finding-explain.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const BASELINE_PACK = JSON.parse(fs.readFileSync(path.join(HERE, 'shield-packs', 'scan-rules-pack.json'), 'utf8'));
@@ -112,7 +113,9 @@ export function scanWithPack(text, name, targetSha, pack) {
     format: 'scripture-armor-scan/1', target_sha256: targetSha, target_class: 'source',
     engine: { name: 'scripture-lexical', version: 'scripture-lexical/1', rules: pack.rules_version },
     started, duration_ms: Date.now() - t0, analysis_confidence: 'full',
-    findings, counts, verdict, risk, override: null,
+    // Explanation layer (Item 4): attached identically to scan.mjs's
+    // scanSourceText so pack-driven and product findings stay equal.
+    findings: findings.map(attachExplanation), counts, verdict, risk, override: null,
   };
 }
 

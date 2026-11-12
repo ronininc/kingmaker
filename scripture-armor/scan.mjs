@@ -26,6 +26,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { attachExplanation } from './finding-explain.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 
@@ -260,6 +261,13 @@ export function canonicalScanRecord(rec) {
     duration_ms: rec.duration_ms,
     analysis_confidence: rec.analysis_confidence,
     findings,
+    // Whole-artifact scope (Item 3): named shortfalls ride the canonical
+    // record ONLY when non-empty, so a complete scan's canonical bytes —
+    // and therefore its digest — are unchanged from before this field
+    // existed, while any scan that hit a cap, a bound, or an unpack
+    // refusal is distinguishable from a complete scan by reading the
+    // record alone.
+    ...(Array.isArray(rec.shortfalls) && rec.shortfalls.length ? { shortfalls: rec.shortfalls } : {}),
     counts: rec.counts,
     verdict: rec.verdict,
     risk: { score: rec.risk.score, tier: rec.risk.tier, drivers: rec.risk.drivers },
@@ -420,7 +428,11 @@ export function scanSourceText(text, name, targetSha) {
     format: 'scripture-armor-scan/1', target_sha256: targetSha, target_class: 'source',
     engine: { name: 'scripture-lexical', version: 'scripture-lexical/1', rules: SCAN_RULES_VERSION },
     started, duration_ms: Date.now() - t0, analysis_confidence: 'full',
-    findings, counts, verdict, risk, override: null,
+    // Explanation layer (Item 4): each finding carries its stage-by-stage
+    // plain-language explanation, derived purely from the finding's own
+    // fields. The canonical form (canonicalScanRecord) maps findings to
+    // its fixed key set, so sealed records and digests are unchanged.
+    findings: findings.map(attachExplanation), counts, verdict, risk, override: null,
   };
 }
 
@@ -516,6 +528,27 @@ function spawnWithTimeout(cmd, args, { timeoutMs, env, cwd }) {
   });
 }
 
+// Exporter observation caps (Item 3, wall (a)). Defaults are the values
+// the exporter shipped with; policy scan.exporter_caps overrides per key
+// and the SCRIPTURE_SCAN_MAX_* environment variables override policy.
+// Whatever values are in force, the exporter COUNTS past every cap and
+// the scan record names each cap that truncated the observation set.
+export const EXPORTER_CAP_DEFAULTS = { strings: 2000, paths: 64, sites: 512, decompile: 24 };
+const EXPORTER_CAP_ENV = { strings: 'SCRIPTURE_SCAN_MAX_STRINGS', paths: 'SCRIPTURE_SCAN_MAX_PATHS', sites: 'SCRIPTURE_SCAN_MAX_SITES', decompile: 'SCRIPTURE_SCAN_MAX_DECOMPILE' };
+export function exporterCaps(policy) {
+  const fromPolicy = (policy && policy.scan && policy.scan.exporter_caps) || {};
+  const caps = {};
+  for (const key of Object.keys(EXPORTER_CAP_DEFAULTS)) {
+    let v = EXPORTER_CAP_DEFAULTS[key];
+    const pv = Number(fromPolicy[key]);
+    if (Number.isSafeInteger(pv) && pv > 0 && pv <= 1000000) v = pv;
+    const ev = Number(process.env[EXPORTER_CAP_ENV[key]]);
+    if (Number.isSafeInteger(ev) && ev > 0 && ev <= 1000000) v = ev;
+    caps[key] = v;
+  }
+  return caps;
+}
+
 // Runs the exporter over a staged COPY of the target (the original is
 // never handed to the JVM). Workdir lives under <store>/scan-work/<uuid>/
 // (0700) and is wiped on every exit path — pass, fail, and timeout.
@@ -541,11 +574,13 @@ export async function runGhidraExporter(targetAbs, { policy, storeDir }) {
     const scriptDir = path.join(HERE, 'ghidra-scripts');
     const env = { ...process.env };
     if (jdk) env.JAVA_HOME = jdk;
+    const caps = exporterCaps(policy);
     const res = await spawnWithTimeout(gh.headless, [
       path.join(work, 'proj'), 'ScanProj',
       '-import', staged,
       '-scriptPath', scriptDir,
       '-postScript', 'ScriptureScan.java', obsPath,
+      `cap.strings=${caps.strings}`, `cap.paths=${caps.paths}`, `cap.sites=${caps.sites}`, `cap.decompile=${caps.decompile}`,
       '-deleteProject',
       '-analysisTimeoutPerFile', String(timeoutS),
     ], { timeoutMs: timeoutS * 1000, env, cwd: work });
@@ -569,15 +604,20 @@ export async function runGhidraExporter(targetAbs, { policy, storeDir }) {
       error.code = 'GHIDRA_INVALID_OBSERVATIONS';
       throw error;
     }
-    return { obs, engineVersion: ghidraVersion(gh.home), ghidraHome: gh.home };
+    return { obs, engineVersion: ghidraVersion(gh.home), ghidraHome: gh.home, caps };
   } finally {
     try { fs.rmSync(work, { recursive: true, force: true }); } catch {}
   }
 }
 
 // Normalize raw exporter observations into findings under scan-rules/1.
-export function normalizeBinaryFindings(obs, targetSha, storeDir) {
+// Also returns `shortfalls`: the named scope gaps (Item 3) — every
+// exporter cap that truncated the observation set, stated with its cap,
+// its total, and how much was omitted, so the sealed record itself
+// discloses that the scan was capped.
+export function normalizeBinaryFindings(obs, targetSha, storeDir, caps = null) {
   const findings = [];
+  const shortfalls = [];
   const push = (f) => findings.push(f);
   // exact-sample-hash: owner-curated list only; ships empty; no bundled intel.
   try {
@@ -696,12 +736,32 @@ export function normalizeBinaryFindings(obs, targetSha, storeDir) {
   }
   const coverage = obs.coverage;
   const coverageKeys = ['paths_total', 'paths_omitted', 'sites_total', 'sites_omitted', 'decompile_eligible', 'decompile_omitted'];
+  // Strings counters joined coverage with Item 3 (the exporter counts
+  // past the strings cap now). They are validated when present; an
+  // exporter too old to emit them leaves string coverage UNCOUNTED,
+  // which is itself a named shortfall — never a silent truncation.
+  const stringsCounted = !!coverage && Number.isSafeInteger(coverage.strings_total) && coverage.strings_total >= 0
+    && Number.isSafeInteger(coverage.strings_omitted) && coverage.strings_omitted >= 0
+    && coverage.strings_total === (obs.strings || []).length + coverage.strings_omitted;
   if (!coverage || coverageKeys.some(k => !Number.isSafeInteger(coverage[k]) || coverage[k] < 0)
       || coverage.paths_total !== (obs.call_paths || []).length + coverage.paths_omitted
-      || coverage.sites_total !== (obs.call_sites || []).length + coverage.sites_omitted) {
+      || coverage.sites_total !== (obs.call_sites || []).length + coverage.sites_omitted
+      || (coverage.strings_total !== undefined && !stringsCounted)) {
     reasons.push('missing or malformed observation coverage counters');
   } else if (coverage.paths_omitted || coverage.sites_omitted || coverage.decompile_omitted) {
     reasons.push(`observation caps omitted ${coverage.paths_omitted} paths, ${coverage.sites_omitted} sites, ${coverage.decompile_omitted} decompilations`);
+  }
+  if (coverage && coverageKeys.every(k => Number.isSafeInteger(coverage[k]) && coverage[k] >= 0)) {
+    const capRows = [
+      ['paths', 'call paths', coverage.paths_total, coverage.paths_omitted],
+      ['sites', 'sink call sites', coverage.sites_total, coverage.sites_omitted],
+      ['decompile', 'decompiled sink callers', coverage.decompile_eligible, coverage.decompile_omitted],
+    ];
+    if (stringsCounted) capRows.push(['strings', 'defined strings', coverage.strings_total, coverage.strings_omitted]);
+    else shortfalls.push({ kind: 'exporter-cap', what: 'defined strings', cap: caps?.strings ?? EXPORTER_CAP_DEFAULTS.strings, disposition: 'uncounted-by-exporter', detail: 'the exporter did not count strings past the emission cap; how much string content went unobserved is unknown' });
+    for (const [key, what, total, omitted] of capRows) {
+      if (omitted > 0) shortfalls.push({ kind: 'exporter-cap', what, cap: caps?.[key] ?? (total - omitted), total, omitted });
+    }
   }
   if ((obs.call_paths || []).some(p => typeof p.arg_literal !== 'boolean' || p.argument_evidence !== 'unique-call-text')) reasons.push('per-call argument evidence is unknown or unsupported');
   const dec = obs.decompile || {};
@@ -717,7 +777,10 @@ export function normalizeBinaryFindings(obs, targetSha, storeDir) {
       location: '(whole file)', detail: `static analysis is limited: ${reasons.join('; ')} — verdict capped at warn; an opaque binary cannot earn pass from a blind scan`,
     });
   }
-  return { findings, confidence };
+  // Explanation layer (Item 4) over the Item 3 return: see scanSourceText
+  // — additive field, stripped again by the canonical form, so digests
+  // are unchanged; shortfalls (Item 3) ride alongside.
+  return { findings: findings.map(attachExplanation), confidence, shortfalls };
 }
 
 // UPX v10+ non-DOS pack-header layout/checksum, reviewed against pinned upstream
@@ -752,25 +815,114 @@ function packedMachOEvidence(file) {
   } finally { fs.closeSync(fd); }
 }
 
+// UPX tooling (Item 3, wall (b)). Discovery order mirrors findGhidra's
+// seam discipline: an explicit policy pin is authoritative, then the
+// environment, then PATH. Absent tooling is an honest state, not an
+// error: the caller names it as a shortfall in the record.
+export function findUpx(policy) {
+  const candidates = [];
+  if (policy?.scan?.upx_path) candidates.push(policy.scan.upx_path);
+  if (process.env.SCRIPTURE_UPX_PATH) candidates.push(process.env.SCRIPTURE_UPX_PATH);
+  const exe = process.platform === 'win32' ? 'upx.exe' : 'upx';
+  for (const dir of (process.env.PATH || '').split(path.delimiter)) if (dir) candidates.push(path.join(dir, exe));
+  for (const c of candidates) {
+    try { if (fs.existsSync(c) && fs.statSync(c).isFile()) return c; } catch {}
+  }
+  return null;
+}
+
+// Decompress a UPX-packed COPY inside the scan workdir. `upx -d` is a
+// decompressor, not an executor: the target is never run. The original
+// file is never handed to upx (a copy is), and the workdir is wiped by
+// the caller's finally on every path.
+async function tryUnpackWithUpx(targetAbs, upxBin, { policy, storeDir }) {
+  const workRoot = path.join(storeDir, 'scan-work');
+  fs.mkdirSync(workRoot, { recursive: true, mode: 0o700 });
+  const work = path.join(workRoot, `upx-${crypto.randomUUID()}`);
+  fs.mkdirSync(work, { recursive: true, mode: 0o700 });
+  const cleanup = () => { try { fs.rmSync(work, { recursive: true, force: true }); } catch {} };
+  try {
+    const copy = path.join(work, 'packed.bin');
+    const out = path.join(work, 'unpacked.bin');
+    fs.copyFileSync(targetAbs, copy);
+    const timeoutMs = Math.min(policy?.scan?.timeout_s ?? 600, 300) * 1000;
+    const res = await spawnWithTimeout(upxBin, ['-d', '-o', out, copy], { timeoutMs, env: { ...process.env }, cwd: work });
+    if (res.code !== 0 || !fs.existsSync(out) || fs.statSync(out).size === 0) {
+      const tail = (res.err || res.out || '').trim().split('\n').filter(Boolean).slice(-2).join(' ');
+      return { error: `upx -d exited ${res.code}${tail ? `: ${tail.slice(0, 300)}` : ''}`, cleanup };
+    }
+    return { path: out, cleanup };
+  } catch (e) {
+    return { error: String(e.message || e), cleanup };
+  }
+}
+
 export async function scanBinaryFile(targetAbs, { policy, storeDir, targetSha }) {
   const started = new Date().toISOString();
   const t0 = Date.now();
-  const { obs, engineVersion } = await runGhidraExporter(targetAbs, { policy, storeDir });
-  const normalized = normalizeBinaryFindings(obs, targetSha, storeDir);
-  const findings = normalized.findings;
-  const packed = packedMachOEvidence(targetAbs);
+  const first = await runGhidraExporter(targetAbs, { policy, storeDir });
+  const engineVersion = first.engineVersion;
+  let normalized = normalizeBinaryFindings(first.obs, targetSha, storeDir, first.caps);
+  let findings = normalized.findings;
+  let shortfalls = normalized.shortfalls || [];
   let confidence = normalized.confidence;
+  const packedHeader = packedMachOEvidence(targetAbs);
+  const upxSection = (first.obs.sections || []).find((s) => /^UPX\d/i.test(s.name || ''));
+  const packed = packedHeader
+    ? { how: `checksum-valid UPX v${packedHeader.version} Mach-O format ${packedHeader.format} pack header @ ${packedHeader.offset} (${packedHeader.compressedBytes}/${packedHeader.unpackedBytes} compressed/unpacked bytes)` }
+    : upxSection ? { how: `UPX packer section name ${upxSection.name}` } : null;
   if (packed) {
-    confidence = 'low';
-    findings.push({ rule: 'static-analysis-limited', severity: 'info', basis: 'pattern', location: `UPX pack header @ ${packed.offset}`,
-      detail: `checksum-valid UPX v${packed.version} Mach-O format ${packed.format} pack header (${packed.compressedBytes}/${packed.unpackedBytes} compressed/unpacked bytes); packed content is not unpacked or analyzed here — cannot earn pass from loader-stub analysis` });
+    // Wall (b): packed content is unpacked and the UNPACKED bytes are
+    // scanned through the normal lane; the verdict follows the unpacked
+    // evidence (harm test unchanged). If unpacking cannot happen, the
+    // record names the refusal as a shortfall and confidence stays low —
+    // the loader stub never earns a pass for the program inside.
+    const upxBin = findUpx(policy);
+    let unpacked = null;
+    if (upxBin) unpacked = await tryUnpackWithUpx(targetAbs, upxBin, { policy, storeDir });
+    if (unpacked && unpacked.path) {
+      try {
+        const second = await runGhidraExporter(unpacked.path, { policy, storeDir });
+        const n2 = normalizeBinaryFindings(second.obs, targetSha, storeDir, second.caps);
+        findings = n2.findings;
+        shortfalls = [...shortfalls, ...(n2.shortfalls || [])];
+        confidence = n2.confidence;
+        findings.push(attachExplanation({ rule: 'packed-content-unpacked', severity: 'info', basis: 'inventory', location: '(whole file)',
+          detail: `UPX-packed target (${packed.how}); an unpacked copy was produced inside the scan workdir and scanned through the binary lane — the findings, confidence and verdict of this record describe the UNPACKED content; the packed loader stub was not treated as the program` }));
+      } catch (e) {
+        if (!unpacked.error) unpacked.error = `unpacked scan failed: ${e.message}`;
+      } finally {
+        unpacked.cleanup();
+      }
+    }
+    if (!(unpacked && unpacked.path && findings.some((f) => f.rule === 'packed-content-unpacked'))) {
+      if (unpacked && !unpacked.path && unpacked.cleanup) unpacked.cleanup();
+      confidence = 'low';
+      shortfalls.push({ kind: 'packed-content', packer: 'UPX', disposition: 'detected-not-unpacked',
+        reason: !upxBin
+          ? 'no upx tool is available to this build (set scan.upx_path in policy.json or SCRIPTURE_UPX_PATH, or install upx) — packed content was detected but not unpacked'
+          : `the unpack attempt failed (${unpacked.error || 'unknown error'}) — packed content was detected but not unpacked` });
+      if (packedHeader) {
+        findings.push(attachExplanation({ rule: 'static-analysis-limited', severity: 'info', basis: 'pattern', location: `UPX pack header @ ${packedHeader.offset}`,
+          detail: `checksum-valid UPX v${packedHeader.version} Mach-O format ${packedHeader.format} pack header (${packedHeader.compressedBytes}/${packedHeader.unpackedBytes} compressed/unpacked bytes); packed content is not unpacked or analyzed here — cannot earn pass from loader-stub analysis` }));
+      }
+    }
+  } else {
+    // Non-UPX packing signal: a high-entropy executable region with no
+    // UPX evidence. Today this only lowered confidence; now the record
+    // also names it as detected-not-unpacked with the packer unknown.
+    const hotExec = (first.obs.sections || []).find((s) => s.exec && typeof s.entropy === 'number' && s.entropy >= 7.2);
+    if (hotExec) {
+      shortfalls.push({ kind: 'packed-content', packer: 'unknown', disposition: 'detected-not-unpacked',
+        reason: `high-entropy executable region ${hotExec.name} (entropy ${hotExec.entropy.toFixed(2)}) suggests packed or encrypted content; the packer is not identified and the content was not unpacked` });
+    }
   }
   const { counts, verdict, risk } = computeVerdictRisk(findings, confidence);
   return {
     format: 'scripture-armor-scan/1', target_sha256: targetSha, target_class: 'binary',
     engine: { name: 'ghidra-headless', version: engineVersion, rules: SCAN_RULES_VERSION },
     started, duration_ms: Date.now() - t0, analysis_confidence: confidence,
-    findings, counts, verdict, risk, override: null,
+    findings, shortfalls, counts, verdict, risk, override: null,
   };
 }
 

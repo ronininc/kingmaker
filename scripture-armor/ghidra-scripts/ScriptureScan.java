@@ -51,10 +51,15 @@ public class ScriptureScan extends GhidraScript {
     private static final Set<String> INPUT_FNS = new HashSet<>(Set.of(
         "recv", "recvfrom", "read", "fread", "fgets", "scanf", "fscanf", "sscanf",
         "getenv", "getopt", "getopt_long", "accept", "InternetReadFile", "getline", "__isoc99_scanf"));
-    private static final int MAX_PATHS = 64;
-    private static final int MAX_SITES = 512;
-    private static final int MAX_STRINGS = 2000;
-    private static final int MAX_DECOMPILE = 24;
+    // Observation caps. Defaults are the shipped values; scan.mjs may
+    // override per run with extra script args of the form cap.<name>=<int>
+    // (paths|sites|strings|decompile). Every cap, when hit, is accounted
+    // in the coverage object (totals + omitted counts) — a capped export
+    // is never indistinguishable from a complete one.
+    private static int MAX_PATHS = 64;
+    private static int MAX_SITES = 512;
+    private static int MAX_STRINGS = 2000;
+    private static int MAX_DECOMPILE = 24;
 
     private static String esc(String s) {
         if (s == null) return "";
@@ -103,6 +108,23 @@ public class ScriptureScan extends GhidraScript {
             return;
         }
         String outPath = args[0];
+        for (int i = 1; i < args.length; i++) {
+            String a = args[i];
+            if (!a.startsWith("cap.")) continue;
+            int eq = a.indexOf('=');
+            if (eq < 0) continue;
+            try {
+                int v = Integer.parseInt(a.substring(eq + 1).trim());
+                if (v <= 0 || v > 1000000) continue;
+                switch (a.substring(4, eq)) {
+                    case "paths": MAX_PATHS = v; break;
+                    case "sites": MAX_SITES = v; break;
+                    case "strings": MAX_STRINGS = v; break;
+                    case "decompile": MAX_DECOMPILE = v; break;
+                    default: break;
+                }
+            } catch (NumberFormatException ignored) { }
+        }
         FunctionManager fm = currentProgram.getFunctionManager();
         SymbolTable st = currentProgram.getSymbolTable();
         ReferenceManager rm = currentProgram.getReferenceManager();
@@ -287,11 +309,13 @@ public class ScriptureScan extends GhidraScript {
                 + "\",\"excerpt\":\"" + esc(excerpt) + "\"}}");
         }
 
-        // ---- strings ----
+        // ---- strings (total counted even past the emission cap, so the
+        // cap discloses itself in coverage instead of truncating silently) ----
         StringBuilder stringsJson = new StringBuilder();
         int sCount = 0;
+        int sTotal = 0;
         Iterator<Data> di = currentProgram.getListing().getDefinedData(true);
-        while (di.hasNext() && sCount < MAX_STRINGS) {
+        while (di.hasNext()) {
             Data d = di.next();
             if (!(d.getValue() instanceof String)) continue;
             try {
@@ -299,9 +323,12 @@ public class ScriptureScan extends GhidraScript {
                 if (sdi == null) continue;
                 String v = sdi.getStringValue();
                 if (v == null || v.isEmpty()) continue;
-                if (sCount++ > 0) stringsJson.append(",");
-                stringsJson.append("{\"value\":\"").append(esc(v.length() > 300 ? v.substring(0, 300) : v))
-                    .append("\",\"addr\":\"").append(esc(d.getAddress().toString())).append("\"}");
+                sTotal++;
+                if (sCount < MAX_STRINGS) {
+                    if (sCount++ > 0) stringsJson.append(",");
+                    stringsJson.append("{\"value\":\"").append(esc(v.length() > 300 ? v.substring(0, 300) : v))
+                        .append("\",\"addr\":\"").append(esc(d.getAddress().toString())).append("\"}");
+                }
             } catch (Exception ignored) { }
         }
 
@@ -359,6 +386,7 @@ public class ScriptureScan extends GhidraScript {
         out.append(",\"coverage\":{\"paths_total\":").append(livePaths.size())
             .append(",\"paths_omitted\":").append(Math.max(0, livePaths.size() - enrichedPaths.size()))
             .append(",\"sites_total\":").append(sitesTotal).append(",\"sites_omitted\":").append(Math.max(0, sitesTotal - siteJson.size()))
+            .append(",\"strings_total\":").append(sTotal).append(",\"strings_omitted\":").append(Math.max(0, sTotal - sCount))
             .append(",\"decompile_eligible\":").append(eligibleFunctions.size()).append(",\"decompile_omitted\":").append(Math.max(0, eligibleFunctions.size() - decAttempted)).append("}");
         out.append(",\"decompile\":{\"attempted\":").append(decAttempted)
             .append(",\"failed\":").append(decFailed).append(",\"errors\":[");

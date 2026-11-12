@@ -77,8 +77,8 @@ function rpcOnce(socket, obj, timeoutMs = 5000) {
 }
 function ownerRpc(socket, obj, timeoutMs = 8000) {
   let token = '';
-  try { token = fs.readFileSync(ownerTokenPathFor(socket), 'utf8').trim(); } catch {}
-  return rpcOnce(ownerSocketFor(socket), { ...obj, owner_token: token }, timeoutMs);
+  try { token = fs.readFileSync(ownerTokenPathFor(path.dirname(socket)), 'utf8').trim(); } catch {}
+  return rpcOnce(ownerSocketFor(path.dirname(socket)), { ...obj, owner_token: token }, timeoutMs);
 }
 // Present a package and collect every daemon message (no approvals).
 function present(socket, pkgPath, outName = null) {

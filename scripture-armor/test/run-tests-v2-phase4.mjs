@@ -125,11 +125,11 @@ function rpcOnce(socket, obj, timeoutMs = 20000) {
 // FIX 1 client discipline: owner acts ride the owner socket + token.
 function ownerRpc(socket, obj, timeoutMs = 20000) {
   let token = '';
-  try { token = fs.readFileSync(ownerTokenPathFor(socket), 'utf8').trim(); } catch {}
-  return rpcOnce(ownerSocketFor(socket), { ...obj, owner_token: token }, timeoutMs);
+  try { token = fs.readFileSync(ownerTokenPathFor(path.dirname(socket)), 'utf8').trim(); } catch {}
+  return rpcOnce(ownerSocketFor(path.dirname(socket)), { ...obj, owner_token: token }, timeoutMs);
 }
 function readConfirm(socket, id) {
-  try { return JSON.parse(fs.readFileSync(ownerConfirmPathFor(socket, id), 'utf8')); } catch { return null; }
+  try { return JSON.parse(fs.readFileSync(ownerConfirmPathFor(path.dirname(socket), id), 'utf8')); } catch { return null; }
 }
 // Streaming unwrap: .pending resolves at the pend, .final with all msgs.
 function present(socket, pkgPath, outName) {
@@ -291,9 +291,9 @@ async function main() {
     const own = await ownerRpc(dB.socket, { cmd: 'status' });
     check('owner status carries the full view', own.ok === true && own.seal_fp === idB.sealFp);
     // (f) The owner socket itself demands the token.
-    const noTok = await rpcOnce(ownerSocketFor(dB.socket), { cmd: 'approve', id: pend.id });
+    const noTok = await rpcOnce(ownerSocketFor(path.dirname(dB.socket)), { cmd: 'approve', id: pend.id });
     check('owner socket without the token refused', noTok.ok === false && /owner-auth-required/.test(noTok.error || ''));
-    const badTok = await rpcOnce(ownerSocketFor(dB.socket), { cmd: 'approve', id: pend.id, owner_token: 'deadbeef' });
+    const badTok = await rpcOnce(ownerSocketFor(path.dirname(dB.socket)), { cmd: 'approve', id: pend.id, owner_token: 'deadbeef' });
     check('owner socket with a wrong token refused', badTok.ok === false && /owner-auth-required/.test(badTok.error || ''));
     // (g) The owner's own approval still completes the loop.
     const appr = await ownerRpc(dB.socket, { cmd: 'approve', id: pend.id });
@@ -341,7 +341,7 @@ async function main() {
       a1.ok === true && a1.approved_stage === 1 && !('confirm_code' in a1)
       && !!conf && /^[0-9]{6}$/.test(conf.code) && !JSON.stringify(a1).includes(conf.code),
       JSON.stringify(a1).slice(0, 220));
-    const confMode = fs.statSync(ownerConfirmPathFor(dB.socket, pend.id)).mode & 0o777;
+    const confMode = fs.statSync(ownerConfirmPathFor(path.dirname(dB.socket), pend.id)).mode & 0o777;
     check('the code sits in a 0600 owner-channel state file', confMode === 0o600, `mode=${confMode.toString(8)}`);
     const bad = await ownerRpc(dB.socket, { cmd: 'approve', id: pend.id, confirm: conf.code === '000000' ? '111111' : '000000' });
     check('wrong code refused (dual-confirm-mismatch)', bad.ok === false && /dual-confirm-mismatch/.test(bad.error || ''));
@@ -362,8 +362,8 @@ async function main() {
   {
     const od = path.join(B, 'owner');
     check('owner directory is 0700', (fs.statSync(od).mode & 0o777) === 0o700);
-    check('owner socket is 0600', (fs.statSync(ownerSocketFor(dB.socket)).mode & 0o777) === 0o600);
-    check('owner token file is 0600', (fs.statSync(ownerTokenPathFor(dB.socket)).mode & 0o777) === 0o600);
+    check('owner socket is 0600', (fs.statSync(ownerSocketFor(path.dirname(dB.socket))).mode & 0o777) === 0o600);
+    check('owner token file is 0600', (fs.statSync(ownerTokenPathFor(path.dirname(dB.socket))).mode & 0o777) === 0o600);
     check('requester socket is 0600', (fs.statSync(dB.socket).mode & 0o777) === 0o600);
     const sharedSock = path.join(os.tmpdir(), `p4-shared-${process.pid}.sock`);
     const r = spawnSync(NODE, [VAULTD, 'serve', '--identity-dir', B, '--socket', sharedSock],

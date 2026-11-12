@@ -34,6 +34,9 @@
 //   verify <wrapped-dir> [--identity-dir <dir>]
 //   reseal <file.scripture> [--socket <path>] [--daemon-out-dir <dir>]
 //             [--out <new-package>] [--identity-dir <dir>]
+//   request --type <brain|method|tool|other> --name <thing> --source <url|origin>
+//             --description <what it does> [--license <license>] [--notes <text>]
+//             [--attach <file>] [--identity-dir <dir>]
 //
 // v2 (Closure 1): every wrap of code-class content is scanned first
 // (scan.mjs); the verdict record is sealed as a first-class report
@@ -49,6 +52,7 @@ import path from 'node:path';
 import os from 'node:os';
 import net from 'node:net';
 import { productPaths, assertProductIdentityDir, canonicalPath } from './product-paths.mjs';
+import { transportFor, daemonSocketFor, resolveEndpoint } from './daemon-transport.mjs';
 import { fileURLToPath } from 'node:url';
 import {
   loadPolicy, tierParams, classifyBuffer, scanFile, canonicalScanRecord, scanDigestOf,
@@ -813,45 +817,51 @@ function daemonRpc(socketPath, obj, timeoutMs = 2000) {
 }
 
 // ---------------------------------------------------------------------------
-// Owner channel (Phase 4, FIX 1) — the daemon serves TWO Unix sockets.
-// The requester socket (present/pending-public/status-public/terms and
+// Owner channel (Phase 4, FIX 1) — the daemon serves TWO endpoints.
+// The requester endpoint (present/pending-public/status-public/terms and
 // SIGNED registration) stays where it always was. Every owner act —
 // approve, unsigned register, revoke, revoke-grant, clear-anomaly,
 // supersede, accept-terms, mesh-sync, estate view — lives on a second
-// socket in a 0700 `owner/` directory beside the requester socket, the
-// socket itself mode 0600, and every owner request must additionally
-// carry the per-daemon owner token the daemon writes (0600) beside it
-// at serve time. The paths derive from the requester socket path by
-// ONE rule, shared by the daemon, this CLI, and the test batteries.
+// endpoint, and every owner request must additionally carry the
+// per-daemon owner token the daemon writes (0600) at serve time. The
+// layout comes from daemon-transport.mjs — ONE rule, shared by the
+// daemon, this CLI, and the test batteries: on POSIX both endpoints
+// are socket files (the owner socket in the identity store's 0700
+// `owner/` directory, mode 0600, the historical layout byte-for-byte);
+// on win32 both endpoints are named pipes. The owner FILES (token,
+// confirmations) anchor on the identity dir on every platform — they
+// are real files and never derive from the transport name, because a
+// pipe name is not a path. These functions therefore take the identity
+// dir, not a socket path.
 // ---------------------------------------------------------------------------
 
-export function ownerDirFor(socketPath) {
-  return path.join(path.dirname(socketPath), 'owner');
+export function ownerDirFor(identityDir) {
+  return transportFor(identityDir).ownerDir;
 }
-export function ownerSocketFor(socketPath) {
-  return path.join(ownerDirFor(socketPath), `${path.basename(socketPath)}.owner`);
+export function ownerSocketFor(identityDir) {
+  return transportFor(identityDir).ownerSocket;
 }
-export function ownerTokenPathFor(socketPath) {
-  return path.join(ownerDirFor(socketPath), `${path.basename(socketPath)}.owner.token`);
+export function ownerTokenPathFor(identityDir) {
+  return transportFor(identityDir).ownerTokenPath;
 }
-export function ownerConfirmPathFor(socketPath, id) {
-  return path.join(ownerDirFor(socketPath), `${path.basename(socketPath)}.confirm-${id}.json`);
+export function ownerConfirmPathFor(identityDir, id) {
+  return transportFor(identityDir).ownerConfirmPath(id);
 }
-export function readOwnerConfirm(socketPath, id) {
-  try { return JSON.parse(fs.readFileSync(ownerConfirmPathFor(socketPath, id), 'utf8')); }
+export function readOwnerConfirm(identityDir, id) {
+  try { return JSON.parse(fs.readFileSync(ownerConfirmPathFor(identityDir, id), 'utf8')); }
   catch { return null; }
 }
 
 // One owner-channel RPC from a client that holds the identity store
-// (this CLI, the batteries): reads the token the daemon left beside
-// the owner socket and presents it with the request.
-export function ownerRpc(socketPath, obj, timeoutMs = 5000) {
+// (this CLI, the batteries): reads the token the daemon left in the
+// identity store's owner/ directory and presents it with the request.
+export function ownerRpc(identityDir, obj, timeoutMs = 5000) {
   let token = null;
-  try { token = fs.readFileSync(ownerTokenPathFor(socketPath), 'utf8').trim(); } catch {}
+  try { token = fs.readFileSync(ownerTokenPathFor(identityDir), 'utf8').trim(); } catch {}
   if (!token) {
     return Promise.reject(new Error('owner channel unavailable: no owner token beside the daemon socket (is the daemon running?)'));
   }
-  return daemonRpc(ownerSocketFor(socketPath), { ...obj, owner_token: token }, timeoutMs);
+  return daemonRpc(ownerSocketFor(identityDir), { ...obj, owner_token: token }, timeoutMs);
 }
 
 // Signed local registration (FIX 1): a registration arriving on the
@@ -1174,9 +1184,9 @@ function reportRegistration(what, res) {
 }
 
 function registrationSocket(flags, dir) {
-  if (flags['register-socket']) return path.resolve(flags['register-socket']);
-  if (flags.socket) return path.resolve(flags.socket);
-  return path.join(dir, 'vaultd.sock');
+  if (flags['register-socket']) return resolveEndpoint(flags['register-socket'], dir);
+  if (flags.socket) return resolveEndpoint(flags.socket, dir);
+  return daemonSocketFor(dir);
 }
 
 // Which transport carries registrations for THIS wrap's recipient
@@ -2100,12 +2110,12 @@ async function cmdUnwrapRepo(flags, pos) {
   const wrappedAbs = path.resolve(wrappedArg);
   const intoAbs = path.resolve(flags.into);
   const dir = identityDir(flags);
-  const socketPath = flags.socket ? path.resolve(flags.socket) : path.join(dir, 'vaultd.sock');
+  const socketPath = resolveEndpoint(flags.socket, dir);
   const daemonOut = flags['daemon-out-dir'] ? path.resolve(flags['daemon-out-dir']) : path.join(dir, 'out');
 
   // Full status (with fingerprints) is an owner-channel read (FIX 1);
   // unwrap-repo is the owner's own tool, run from the identity store.
-  const status = await ownerRpc(socketPath, { cmd: 'status' }).catch((e) => {
+  const status = await ownerRpc(dir, { cmd: 'status' }).catch((e) => {
     throw new Error(`cannot reach vaultd at ${socketPath} (${e.message}) — start it: node vaultd.mjs serve`);
   });
   if (!status.ok) throw new Error(`vaultd status not ok: ${JSON.stringify(status)}`);
@@ -2310,10 +2320,9 @@ async function cmdReseal(flags, pos) {
   const pkgAbs = path.resolve(pkg);
   const { frame: oldFrame } = parseScriptureFile(fs.readFileSync(pkgAbs, 'utf8'));
   const socketPath = registrationSocket(flags, dir);
-  const socketDir = path.dirname(socketPath);
-  const daemonOut = flags['daemon-out-dir'] ? path.resolve(flags['daemon-out-dir']) : path.join(socketDir, 'out');
+  const daemonOut = flags['daemon-out-dir'] ? path.resolve(flags['daemon-out-dir']) : path.join(dir, 'out');
 
-  const status = await ownerRpc(socketPath, { cmd: 'status' }).catch((e) => {
+  const status = await ownerRpc(dir, { cmd: 'status' }).catch((e) => {
     throw new Error(`cannot reach vaultd at ${socketPath} (${e.message})`);
   });
   if (!status.ok) throw new Error(`vaultd status not ok: ${JSON.stringify(status)}`);
@@ -2401,7 +2410,7 @@ async function cmdReseal(flags, pos) {
   extras[frame.canary] = { tierParams: prep.params };
   const res = await registerIssuances(dir, socketPath, frames, extras);
   reportRegistration('reseal', res);
-  const sup = await ownerRpc(socketPath, { cmd: 'supersede', old_canary: oldFrame.canary, new_canary: frame.canary, reseal_token: last.reseal_token || null });
+  const sup = await ownerRpc(dir, { cmd: 'supersede', old_canary: oldFrame.canary, new_canary: frame.canary, reseal_token: last.reseal_token || null });
   if (!sup.ok) throw new Error(`daemon refused the supersede marking: ${sup.error || JSON.stringify(sup)}`);
   try { fs.unlinkSync(staged); } catch {} // the staged plaintext has been re-sealed; it does not linger
   console.log(outPath);
@@ -2529,6 +2538,39 @@ function cmdVerify(flags, pos) {
   if (failures) process.exitCode = 1;
 }
 
+// request — "Submit a request to Ronin Inc" (submit-request.mjs, spec
+// §3.2): the plain request surface's CLI form. The request is filed under
+// the signed-in account session only (identity prefilled from the saved
+// session; never a flag), queued locally first, and handed to the guarded
+// transport — PENDING OWNER GATE whatever the route answers. Armor does
+// not scan a submission: a request is order-class, and the human gate
+// governs. An --attach file lands in a disposable vault cell, unopened.
+async function cmdRequest(flags, pos) {
+  const dir = identityDir(flags);
+  const { createArmorSubmitter, submitQueueDir, submitVaultDir } = await import('./submit-request.mjs');
+  const { createGuardedSubmitTransport, createHttpSubmitSend, createVaultLiveness, CRM_INTAKE_URL } = await import('./submit-transport-guard.mjs');
+  const { createArmorAccountSession } = await import('./account-session.mjs');
+  const { createAccountSessionStore } = await import('./account-session-store.mjs');
+  const { installationMetadata } = await import('./installation-metadata.mjs');
+  const session = createArmorAccountSession({ sessionStore: createAccountSessionStore(), installationProvider: () => installationMetadata(dir) });
+  await session.resume();
+  const transport = createGuardedSubmitTransport({
+    endpoint: CRM_INTAKE_URL,
+    send: createHttpSubmitSend({ endpoint: CRM_INTAKE_URL }),
+    vaultAlive: createVaultLiveness({ socketPath: daemonSocketFor(dir) }),
+  });
+  const submitter = createArmorSubmitter({ session, queueDir: submitQueueDir({ identityDir: dir }), vaultDir: submitVaultDir({ identityDir: dir }), transport });
+  const attachments = flags.attach ? [{ sourcePath: path.resolve(String(flags.attach)) }] : [];
+  const result = await submitter.submit({
+    type: flags.type, name: flags.name, source: flags.source,
+    description: flags.description, license: flags.license, notes: flags.notes,
+  }, { attachments });
+  console.log(result.confirmation);
+  console.log(result.delivery === 'sent-to-crm-intake'
+    ? 'Delivered to the Ronin Inc CRM intake. Its status there is PENDING OWNER GATE.'
+    : 'The intake did not answer; the request is queued on this device and will be delivered when it does. Its status is PENDING OWNER GATE.');
+}
+
 // ---------------------------------------------------------------------------
 
 function main() {
@@ -2550,8 +2592,9 @@ function main() {
     else if (cmd === 'unwrap-repo') done(cmdUnwrapRepo(flags, pos));
     else if (cmd === 'verify') cmdVerify(flags, pos);
     else if (cmd === 'reseal') done(cmdReseal(flags, pos));
+    else if (cmd === 'request') done(cmdRequest(flags, pos));
     else {
-      console.error('usage: armor.mjs <identity|trust|untrust|enroll|wrap|register|inspect|wrap-repo|unwrap-repo|verify|reseal> …');
+      console.error('usage: armor.mjs <identity|trust|untrust|enroll|wrap|register|inspect|wrap-repo|unwrap-repo|verify|reseal|request> …');
       process.exit(2);
     }
   } catch (err) {

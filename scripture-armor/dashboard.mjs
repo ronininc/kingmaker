@@ -23,6 +23,10 @@ import { createArmorAccountSession } from './account-session.mjs';
 import { activateArmor } from './activation-flow.mjs';
 import { hasPaidActivation, recordPaidActivation } from './paid-activation.mjs';
 import { assertProductIdentityDir, canonicalPath } from './product-paths.mjs';
+import { createHostLittleBrother, enrichFindings } from './lb-host.mjs';
+import { createArmorSubmitter, submitQueueDir, submitVaultDir } from './submit-request.mjs';
+import { createGuardedSubmitTransport, createHttpSubmitSend, createVaultLiveness, CRM_INTAKE_URL } from './submit-transport-guard.mjs';
+import { daemonSocketFor } from './daemon-transport.mjs';
 import { externalFile, sameExternalFile } from './vault-paths.mjs';
 import { installationMetadata } from './installation-metadata.mjs';
 
@@ -57,6 +61,31 @@ const migrationManifest = options.migrationManifest || null;
 
 const token = crypto.randomBytes(24).toString('base64url');
 const feedFile = path.join(identityDir, 'dashboard-feed.jsonl');
+// Little Brother enrichment (INTEGRATION-NOTE-item-09-10.md Part A):
+// the bridge is built once per dashboard through the host wiring in
+// lb-host.mjs, lazily, on the first review that could carry endpoint
+// indicators. Unconfigured, the bridge is inert and every review
+// behaves exactly as it did before this wiring. A configured module
+// that fails to load (including LB refusing a corrupted persisted
+// audit chain at open) degrades to "no enrichment" and says so in the
+// protection feed — a review never fails because enrichment did.
+let lbPromise = null;
+const littleBrother = () => {
+  if (!lbPromise) lbPromise = createHostLittleBrother({ identityDir }).catch((error) => {
+    try { feed('littlebrother-unavailable', `Little Brother enrichment unavailable: ${error.message}. Reviews continue without enrichment.`); } catch {}
+    return null;
+  });
+  return lbPromise;
+};
+// Attach-point helper: enrichment findings are appended to the
+// presentation layer only — a separate `enrichment` block on the
+// review response. The review's own findings, disposition, and digest
+// are never touched.
+async function enrichReviewResult(result) {
+  const enrichment = await enrichFindings(await littleBrother(), result?.findings);
+  if (enrichment) result.enrichment = { wired: true, findings: enrichment.findings, audit: enrichment.audit };
+  return result;
+}
 const quarantineDir = path.join(identityDir, 'quarantine');
 let analysisBusy = false, deviceLeaseUntil = 0, deviceRenewing = null, wasAuthenticated = false;
 async function exclusiveAnalysis(operation) {
@@ -73,6 +102,14 @@ const device = options.deviceProtection === true ? createDeviceProtection({
     try {
       const result=await reviewUploadedFile(bytes,path.basename(target),{
         readRoots:reviewToolRoots(bytes,path.basename(target)),protectedRoots:[identityDir,identityDir+'.installation'],retentionIdentityDir:identityDir});
+      // Attach point — device-protection's analyze(copy) callback
+      // boundary (INTEGRATION-NOTE Part A): endpoint indicators from
+      // this analysis are enriched through the bridge and presented on
+      // the protection feed. The {finding, limited} verdict returned
+      // below is computed from the original analysis alone; enrichment
+      // changes nothing about coverage or verdict claims.
+      const enrichment=await enrichFindings(await littleBrother(), result.findings);
+      if(enrichment) for(const f of enrichment.findings) feed('littlebrother-enrichment', `${f.location}: ${f.detail}`);
       return {finding:result.activeContent||result.format==='Sensitive key material'||result.findings.some(f=>f.severity!=='info')||
         Boolean(result.rea&&result.rea.verdict!=='clean')||Boolean(result.binary&&!['pass','not-applicable'].includes(result.binary.verdict)),limited:result.status==='limited'};
     }finally{bytes.fill(0);}
@@ -106,6 +143,22 @@ async function resumeDeviceChecks(trigger='resume') {
 const armorCheckout = Object.freeze({
   download: 'https://www.ronininc.org/armor/checkout?purpose=download',
   discordMembership: 'https://www.ronininc.org/armor/checkout?purpose=discord-membership',
+});
+
+// "Submit a request to Ronin Inc" (submit-request.mjs): filed under the
+// dashboard's signed-in account only, queued in the product store first,
+// delivered through the guarded transport. A test may inject
+// options.submitTransport; the live default is the guarded CRM transport
+// with vaultd liveness at this identity dir's socket.
+const requestSubmitter = createArmorSubmitter({
+  session: account,
+  queueDir: submitQueueDir({ identityDir }),
+  vaultDir: submitVaultDir({ identityDir }),
+  transport: options.submitTransport ?? createGuardedSubmitTransport({
+    endpoint: CRM_INTAKE_URL,
+    send: createHttpSubmitSend({ endpoint: CRM_INTAKE_URL, fetchImpl: options.fetchImpl || globalThis.fetch }),
+    vaultAlive: createVaultLiveness({ socketPath: daemonSocketFor(identityDir) }),
+  }),
 });
 
 async function runRea(target) {
@@ -176,6 +229,7 @@ async function reviewLinkResponse(input,res) {
         if(result.risk.level==='low')result.risk.level='unknown';
         result.announcement='Partial webpage review only. The first 16 MiB was inspected; the remainder was not retrieved. No complete-page safety verdict is issued. '+result.announcement;
       }
+      await enrichReviewResult(result);
       feed('link-review',`Public ${intake.source.kind} review: ${result.disposition}, danger ${result.risk.level}. No linked content was executed.`);
       return json(res,200,{ok:true,review:result,source:intake.source});
     }finally{intake?.bytes.fill(0);device?.start('resume');}
@@ -220,6 +274,7 @@ async function api(req, res, url) {
         return reviewUploadedFile(source.bytes,path.basename(source.target.path),{readRoots:reviewToolRoots(source.bytes,path.basename(source.target.path)),protectedRoots:[identityDir,identityDir+'.installation'],retentionIdentityDir:identityDir});
       });
       const sourceEjectionId=originalEjection.register(source,review);
+      await enrichReviewResult(review);
       feed('native-file-review',`Native file review: ${review.disposition}, danger ${review.risk.level}. Original removal requires confirmation.`);
       return json(res,200,{ok:true,review,sourceEjectionId,nativeSourcePath:source.target.path});
     }finally{source?.bytes.fill(0);device?.start('resume');}
@@ -248,6 +303,17 @@ async function api(req, res, url) {
       else await resumeDeviceChecks('login');
       return json(res,200,result);
     } catch (error) { return json(res, 403, { ok: false, error: error.message }); }
+  }
+  if (req.method === 'POST' && url.pathname === '/api/request/submit') {
+    try { await account.ensureAuthenticated(); } catch { return json(res, 401, { ok: false, error: 'Sign in and verify your email code before submitting a request.' }); }
+    const input = await body(req);
+    try {
+      const result = await requestSubmitter.submit({
+        type: input.type, name: input.name, source: input.source,
+        description: input.description, license: input.license, notes: input.notes,
+      });
+      return json(res, 200, { ok: true, id: result.record.id, delivery: result.delivery, confirmation: result.confirmation });
+    } catch (error) { return json(res, 400, { ok: false, error: error.message }); }
   }
   if(req.method==='POST'&&url.pathname==='/api/review/repository-control'){
     await account.verifyEntitlement();const input=await body(req);
@@ -308,6 +374,7 @@ async function api(req, res, url) {
       const result=await exclusiveAnalysis(async()=>{
         return reviewUploadedFile(upload,name,{readRoots:reviewToolRoots(upload,name),protectedRoots:[identityDir,identityDir+'.installation'],retentionIdentityDir:identityDir});
       });
+      await enrichReviewResult(result);
       feed('file-review',`Sandbox review of ${name}: ${result.disposition}, danger ${result.risk.level}. Uploaded content was not executed.`);
       return json(res,200,{ok:true,review:result});
     }finally{upload.fill(0);for(const chunk of chunks)chunk.fill(0);device?.start('resume');}

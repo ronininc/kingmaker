@@ -127,9 +127,9 @@ export function createRepositoryReview({identityDir, fetchBytes = fetchPublicByt
         // not change. The info band (incl. all LB enrichment) is
         // retained for the ledger only (SPEC §3.1). Collection failure
         // never fails a review job.
-        try { collectRepoFileRecord(identityDir, {type: 'file', path: file.path, sha256: review.contentSha256, kind: review.kind, status: review.status, streamed, findings: review.findings || [], limitations: review.limitations || []}, p.id); } catch {}
+        try { collectRepoFileRecord(identityDir, {type: 'file', path: file.path, sha256: review.contentSha256, kind: review.kind, status: review.status, streamed, findings: review.findings || [], limitations: review.limitations || [], shortfalls: review.shortfalls || [], coverage: review.coverage || null}, p.id); } catch {}
         const findings = (review.findings || []).filter((f) => f.severity !== 'info'); p.findings += findings.length;
-        const item = {type: 'file', path: file.path, sha256: review.contentSha256, kind: review.kind, status: review.status, streamed, findings, limitations: review.limitations || []}; record(item);
+        const item = {type: 'file', path: file.path, sha256: review.contentSha256, kind: review.kind, status: review.status, streamed, findings, limitations: review.limitations || [], shortfalls: review.shortfalls || [], coverage: review.coverage || null}; record(item);
         for (const f of findings) { p.recentFindings.push({...f, file: file.path}); if (p.recentFindings.length > 30) p.recentFindings.shift(); }
       } catch (error) {
         if (isQuotaError(error)) { advance = false; throw error; } // handled by the outer catch: pause, cursor NOT advanced

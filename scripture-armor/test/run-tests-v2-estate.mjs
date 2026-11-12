@@ -135,8 +135,8 @@ function rpcOnce(socket, obj, timeoutMs = 20000) {
 // estate-status) ride the owner socket with the daemon's token.
 function ownerRpc(socket, obj, timeoutMs = 20000) {
   let token = '';
-  try { token = fs.readFileSync(ownerTokenPathFor(socket), 'utf8').trim(); } catch {}
-  return rpcOnce(ownerSocketFor(socket), { ...obj, owner_token: token }, timeoutMs);
+  try { token = fs.readFileSync(ownerTokenPathFor(path.dirname(socket)), 'utf8').trim(); } catch {}
+  return rpcOnce(ownerSocketFor(path.dirname(socket)), { ...obj, owner_token: token }, timeoutMs);
 }
 // Streaming unwrap: pends, the test approves on a second connection,
 // resolves with every message the presenting connection received.

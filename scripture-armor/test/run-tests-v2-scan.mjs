@@ -134,11 +134,11 @@ function present(socket, pkgPath, outName, purpose = null) {
 // read from the owner channel state (it is never in a socket response).
 function ownerRpc(socket, obj) {
   let token = '';
-  try { token = fs.readFileSync(ownerTokenPathFor(socket), 'utf8').trim(); } catch {}
-  return rpcOnce(ownerSocketFor(socket), { ...obj, owner_token: token });
+  try { token = fs.readFileSync(ownerTokenPathFor(path.dirname(socket)), 'utf8').trim(); } catch {}
+  return rpcOnce(ownerSocketFor(path.dirname(socket)), { ...obj, owner_token: token });
 }
 function readConfirm(socket, id) {
-  try { return JSON.parse(fs.readFileSync(ownerConfirmPathFor(socket, id), 'utf8')); } catch { return null; }
+  try { return JSON.parse(fs.readFileSync(ownerConfirmPathFor(path.dirname(socket), id), 'utf8')); } catch { return null; }
 }
 async function approveFlow(socket, pendingMsg, { dual = false } = {}) {
   const a1 = await ownerRpc(socket, { cmd: 'approve', id: pendingMsg.id });

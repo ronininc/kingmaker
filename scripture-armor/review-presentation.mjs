@@ -1,4 +1,5 @@
 // Locally authored explanation policy; upstream prose never becomes policy or authority.
+import {explainFinding,explainDownload,statedFunctionOf} from './finding-explain.mjs';
 const DESCRIPTIONS = {
   'src-shell-pipe-exec':'Contains a command that pipes downloaded content into a shell; review its source before running it.',
   'src-shell-download':'Contains commands that download external content; this alone does not establish malicious intent.',
@@ -43,5 +44,12 @@ export function explainReview(result,parsed,bytes) {
     let text=parsed.texts.map(item=>item.text).join('\n\n').replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>|<style\b[^>]*>[\s\S]*?<\/style\s*>/gi,' [active content omitted] ').replace(/<[^>]{0,8192}>/g,' ').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f\u202a-\u202e\u2066-\u2069]/g,'[control]');
     retention={text:text.slice(0,32768),notice:'Would you like to retain useful text before removing the original? Edit this draft to keep only what you need. It will be scanned again and saved only as plain text; it is not a repaired executable or a guarantee of safety.'};
   }
-  return {retention,disposition,risk:{level,reasons,basis:'bounded-static-analysis'},announcement,preview};
+  // Explanation layer (Item 4): the per-finding stage-by-stage
+  // explanations (what / where / trigger / effect, from each finding's
+  // own evidence) and the download-moment delta — what the file says
+  // it does vs. what the findings show beyond that. Additive fields:
+  // announcement/reasons/disposition above are unchanged.
+  const explanations=findings.slice(0,8).map(f=>f.explanation||explainFinding(f));
+  const downloadDelta=explainDownload({format:parsed.format,stated:statedFunctionOf({format:parsed.format,texts:parsed.texts||[]}),findings:result.findings||[]});
+  return {retention,disposition,risk:{level,reasons,basis:'bounded-static-analysis'},announcement,preview,explanations,downloadDelta};
 }

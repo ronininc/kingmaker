@@ -143,8 +143,8 @@ function dockOpenStream(socket, profile) {
 // Phase 4 (FIX 1): approvals are owner acts (owner socket + token).
 function ownerRpc(socket, obj) {
   let token = '';
-  try { token = fs.readFileSync(ownerTokenPathFor(socket), 'utf8').trim(); } catch {}
-  return rpcOnce(ownerSocketFor(socket), { ...obj, owner_token: token });
+  try { token = fs.readFileSync(ownerTokenPathFor(path.dirname(socket)), 'utf8').trim(); } catch {}
+  return rpcOnce(ownerSocketFor(path.dirname(socket)), { ...obj, owner_token: token });
 }
 async function openSession(socket, profile) {
   const s = dockOpenStream(socket, profile);

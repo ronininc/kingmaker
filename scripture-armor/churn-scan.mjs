@@ -142,8 +142,9 @@ export function runChurnScan({ storeDir, libraryDir = null, sourceDir = null, st
 /**
  * The LIVE churn pass: the same Amendment-1 behaviors as runChurnScan, but
  * the verify/refresh legs consult the real Brain Library through this tree's
- * own streaming puller (../lib/brain-puller.mjs + the access layer in
- * ../lib/brain-library.mjs) instead of a fixture library directory. Portions
+ * own streaming puller (bundle: streaming/brain-puller.mjs + the access
+ * layer in streaming/brain-library.mjs; checkout: ../lib/brain-puller.mjs
+ * + ../lib/brain-library.mjs) instead of a fixture library directory. Portions
  * carrying library linkage (slug, part, range, catalog part hash at pull
  * time — written by streaming-binding.mjs's invokeStreamed) are:
  *   1. VERIFIED against the library: the same byte range is range-fetched
@@ -163,11 +164,20 @@ export function runChurnScan({ storeDir, libraryDir = null, sourceDir = null, st
  */
 export async function runChurnScanLive({ storeDir, staleDays = DEFAULT_STALE_DAYS, maxBytes = DEFAULT_MAX_BYTES, now = new Date(), log = (line) => console.log(line), verifiedPartPaths = {} } = {}) {
   const here = path.dirname(fileURLToPath(import.meta.url));
-  const pullerPath = path.join(here, '..', 'lib', 'brain-puller.mjs');
-  const accessPath = path.join(here, '..', 'lib', 'brain-library.mjs');
-  if (!fs.existsSync(pullerPath) || !fs.existsSync(accessPath)) {
-    throw Object.assign(new Error('WALL-STREAMING-LAYER-ABSENT: the live churn pass needs this tree\'s Brain Library puller (lib/brain-puller.mjs) and access layer (lib/brain-library.mjs); neither is present in this installation'), { code: 'STREAMING_LAYER_ABSENT' });
+  // Bundle-resident first (Item 5, 2026-11-06): in a staged small bundle
+  // this file sits at the bundle root and the puller chain lives flat
+  // under streaming/; in a source checkout this file sits in
+  // scripture-armor/ and the chain lives in ../lib/. First existing pair
+  // wins; neither present fails closed with the wall, as before.
+  const candidatePairs = [
+    [path.join(here, 'streaming', 'brain-puller.mjs'), path.join(here, 'streaming', 'brain-library.mjs')],
+    [path.join(here, '..', 'lib', 'brain-puller.mjs'), path.join(here, '..', 'lib', 'brain-library.mjs')],
+  ];
+  const foundPair = candidatePairs.find(([p, a]) => fs.existsSync(p) && fs.existsSync(a));
+  if (!foundPair) {
+    throw Object.assign(new Error('WALL-STREAMING-LAYER-ABSENT: the live churn pass needs the Brain Library puller and access layer (bundle: streaming/brain-puller.mjs + streaming/brain-library.mjs; checkout: lib/brain-puller.mjs + lib/brain-library.mjs); neither pair is present in this installation'), { code: 'STREAMING_LAYER_ABSENT' });
   }
+  const [pullerPath, accessPath] = foundPair;
   const puller = await import(pullerPath);
   const access = await import(accessPath);
   const { manifestPath, manifest } = readStore(storeDir);

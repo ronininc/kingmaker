@@ -87,7 +87,7 @@ export function createArmorAccountSession({ fetchImpl = globalThis.fetch, timeou
         if (response.status === 401 || (response.status === 403 && (!action.endsWith('-installation') || (action === 'check-installation' && body?.error === 'revoked')))) clear();
         if (response.status >= 300 && response.status < 400) throw new Error('Account redirects are refused. Access remains locked.');
         if (action === 'reserve-installation' && response.status === 409) throw Object.assign(new Error('Installation limit reached. Book an enterprise appointment for additional capacity.'), { status: 409 });
-        if (![200, 202, ...(action === 'reserve-installation' ? [201] : [])].includes(response.status)) throw new Error(remoteAccountError(response.status, body));
+        if (![200, 202, ...(['reserve-installation', 'resume-installation'].includes(action) ? [201] : [])].includes(response.status)) throw new Error(remoteAccountError(response.status, body));
         if (!action.endsWith('-installation') && body?.ok !== true) throw new Error('Account verification failed. Access remains locked.');
         return { status: response.status, body, receivedCookie: sessionCookie(response.headers), receivedAnyCookie: Boolean(response.headers.get('set-cookie')) };
       })(), timeout]);
@@ -147,7 +147,7 @@ export function createArmorAccountSession({ fetchImpl = globalThis.fetch, timeou
     const installationId = metadata?.installationId, installationEvidenceRef = metadata?.installationEvidenceRef;
     if (!/^[a-f0-9]{64}$/.test(installationId || '') || !/^local-metadata-sha256:[a-f0-9]{64}$/.test(installationEvidenceRef || '')) throw new Error('Trusted local installation metadata is required.');
     const result = await request(action + '-installation', { installationId, installationEvidenceRef });
-    if (result.status !== 200 && !(action === 'reserve' && result.status === 201)) throw new Error('Installation capacity could not be confirmed. Access remains locked.');
+    if (result.status !== 200 && !(['reserve', 'resume'].includes(action) && result.status === 201)) throw new Error('Installation capacity could not be confirmed. Access remains locked.');
     if (result.body?.installationId !== installationId || result.body?.quotaReservationOnly !== true || result.body?.deviceAdmissionGranted !== false
       || (action === 'check' && (result.body?.ok !== true || result.body?.active !== true || result.body?.installationId !== installationId))
       || (['reserve', 'resume'].includes(action) && result.body?.reserved !== true)

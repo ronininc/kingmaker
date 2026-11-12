@@ -44,6 +44,7 @@
 
 import net from 'node:net';
 import { assertProductIdentityDir } from './product-paths.mjs';
+import { resolveEndpoint, isPipeEndpoint } from './daemon-transport.mjs';
 import { openAttemptsFeed } from './shield-attempts.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -111,15 +112,15 @@ function rpc(socketPath, obj, { stream = false } = {}) {
 
 async function clientMain(cmd, flags, pos) {
   const dir = assertProductIdentityDir(flags['identity-dir'] ? path.resolve(flags['identity-dir']) : defaultIdentityDir());
-  const socketPath = flags.socket ? path.resolve(flags.socket) : path.join(dir, 'vaultd.sock');
+  const socketPath = resolveEndpoint(flags.socket, dir);
   // Owner acts ride the OWNER channel (FIX 1): this CLI reads the
-  // per-daemon owner token from beside the owner socket and presents
-  // it there. The requester socket refuses every one of these.
+  // per-daemon owner token from the identity store's owner/ directory
+  // and presents it there. The requester socket refuses every one of these.
   const orpc = (obj, opts) => {
     let token = null;
-    try { token = fs.readFileSync(ownerTokenPathFor(socketPath), 'utf8').trim(); } catch {}
+    try { token = fs.readFileSync(ownerTokenPathFor(dir), 'utf8').trim(); } catch {}
     if (!token) throw new Error(`owner channel unavailable: no owner token beside ${socketPath} — is the daemon running?`);
-    return rpc(ownerSocketFor(socketPath), { ...obj, owner_token: token }, opts);
+    return rpc(ownerSocketFor(dir), { ...obj, owner_token: token }, opts);
   };
   if (cmd === 'log-verify') {
     // M.26 owner act: verify the live log's hash chain + HMAC seals.
@@ -163,7 +164,7 @@ async function clientMain(cmd, flags, pos) {
       // The code never travels a socket: the owner's own CLI reads it
       // from the owner channel state and shows it on the owner's
       // terminal; the owner enters it for stage 2.
-      const rec = readOwnerConfirm(socketPath, stage1.id);
+      const rec = readOwnerConfirm(dir, stage1.id);
       if (rec?.code) {
         console.log(`dual approval: stage 1 recorded. One-time confirmation code (from the owner channel): ${rec.code}`);
         console.log(`  stage 2: vaultd.mjs approve --id ${stage1.id} --confirm ${rec.code}`);
@@ -234,7 +235,8 @@ async function clientMain(cmd, flags, pos) {
 
 function serve(flags) {
   const dir = assertProductIdentityDir(flags['identity-dir'] ? path.resolve(flags['identity-dir']) : defaultIdentityDir());
-  const socketPath = flags.socket ? path.resolve(flags.socket) : path.join(dir, 'vaultd.sock');
+  const socketPath = resolveEndpoint(flags.socket, dir);
+  const pipe = isPipeEndpoint(socketPath);
   const outDir = flags['out-dir'] ? path.resolve(flags['out-dir']) : path.join(dir, 'out');
   const windowMs = flags['approval-window-ms'] ? Number(flags['approval-window-ms']) : 120000;
 
@@ -242,7 +244,30 @@ function serve(flags) {
   // the 0700 identity store. A socket path whose parent directory is
   // group/world-accessible exposes the requester API to every local
   // user who can guess the path — the daemon refuses to serve there.
-  {
+  // That check is POSIX-shaped because the thing it guards is a POSIX
+  // socket FILE. On win32 the endpoint is a named pipe (daemon-
+  // transport.mjs): there is no socket directory to stat, and the
+  // mode model has no Windows meaning — libuv synthesizes mode bits
+  // that never read as 0700, so the POSIX check would refuse every
+  // Windows serve by construction. The gate therefore takes its
+  // win32 form: the identity store must live under the owner's own
+  // profile, whose ACL is per-user by construction, and the pipe's
+  // privacy is its default DACL (the creating user, SYSTEM,
+  // administrators). A store outside the profile cannot be verified
+  // private on win32, so the daemon refuses — the same
+  // configuration-class refusal (exit 78), never a restart loop.
+  if (pipe) {
+    fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+    const home = path.resolve(os.homedir());
+    if (!(dir === home || dir.startsWith(home + path.sep))) {
+      console.error(`error: refusing to serve: the identity store ${dir} is not under the owner profile ${home}.`);
+      console.error('  On Windows the daemon endpoint is a named pipe; its privacy rests on the profile ACL,');
+      console.error('  and a store outside the profile cannot be verified private. Serve from the');
+      console.error('  identity store under the owner profile (the default).');
+      // Exit 78 (EX_CONFIG): see the POSIX refusal below.
+      process.exit(78);
+    }
+  } else {
     const socketDir = path.dirname(socketPath);
     fs.mkdirSync(socketDir, { recursive: true, mode: 0o700 });
     const mode = fs.statSync(socketDir).mode & 0o777;
@@ -1221,7 +1246,7 @@ function serve(flags) {
     if (entry.timer) clearTimeout(entry.timer);
     entry.timer = setTimeout(() => {
       pending.delete(entry.id);
-      try { fs.unlinkSync(ownerConfirmPathFor(socketPath, entry.id)); } catch {}
+      try { fs.unlinkSync(ownerConfirmPathFor(dir, entry.id)); } catch {}
       // The window closed unapproved: release the claim. A release is not
       // a consumption — the package may pend again on a later presentation.
       if (entry.claimCanary) releaseClaim(entry.claimCanary, entry.id);
@@ -1566,12 +1591,12 @@ function serve(flags) {
       // enters it out-of-band for stage 2. The approving connection
       // learns only that a code exists and where the OWNER finds it.
       try {
-        fs.writeFileSync(ownerConfirmPathFor(socketPath, entry.id), JSON.stringify({
+        fs.writeFileSync(ownerConfirmPathFor(dir, entry.id), JSON.stringify({
           id: entry.id, canary: entry.frame.canary, kind: entry.kind || 'unwrap',
           code: entry.confirmCode, notices: entry.notices,
           created: new Date().toISOString(),
         }, null, 2), { mode: 0o600 });
-        try { fs.chmodSync(ownerConfirmPathFor(socketPath, entry.id), 0o600); } catch {}
+        try { fs.chmodSync(ownerConfirmPathFor(dir, entry.id), 0o600); } catch {}
       } catch (e) {
         log({ event: 'approve', result: `confirm-state-write-failed: ${e.message}`, id: entry.id });
       }
@@ -1594,7 +1619,7 @@ function serve(flags) {
     }
     pending.delete(entry.id);
     clearTimeout(entry.timer);
-    try { fs.unlinkSync(ownerConfirmPathFor(socketPath, entry.id)); } catch {}
+    try { fs.unlinkSync(ownerConfirmPathFor(dir, entry.id)); } catch {}
     log({ event: 'approve', result: 'approved', canary: entry.frame?.canary ?? null, digest: frameDigest(entry.frame), kind: entry.kind || 'unwrap' });
     send(conn, { ok: true, approved: entry.id, canary: entry.frame?.canary ?? null });
     if (entry.kind === 'activation') {
@@ -3225,20 +3250,21 @@ function serve(flags) {
   const MAX_FRAME_BYTES = 1024 * 1024; // one request line; packages travel by path, not by socket
 
   // OWNER CHANNEL (Phase 4, FIX 1) — set up before any server listens.
-  // Owner acts are served ONLY here: a second socket in a 0700 owner/
-  // directory beside the requester socket, the socket itself 0600, and
-  // every owner request must carry the per-daemon token written (0600)
-  // beside it at serve time. A process that can merely reach the
+  // Owner acts are served ONLY here: a second endpoint in the identity
+  // store's 0700 owner/ directory (a socket file on POSIX, a named
+  // pipe on win32 — daemon-transport.mjs), and every owner request
+  // must carry the per-daemon token written (0600) in that directory
+  // at serve time. A process that can merely reach the
   // requester socket can present packages and read public status —
   // it cannot approve, register unsigned, revoke, clear, supersede,
   // or accept terms. The token rotates every serve.
-  const ownerDir = ownerDirFor(socketPath);
+  const ownerDir = ownerDirFor(dir);
   fs.mkdirSync(ownerDir, { recursive: true, mode: 0o700 });
   try { fs.chmodSync(ownerDir, 0o700); } catch {}
-  const ownerSocketPath = ownerSocketFor(socketPath);
+  const ownerSocketPath = ownerSocketFor(dir);
   const ownerToken = crypto.randomBytes(24).toString('hex');
-  fs.writeFileSync(ownerTokenPathFor(socketPath), `${ownerToken}\n`, { mode: 0o600 });
-  try { fs.chmodSync(ownerTokenPathFor(socketPath), 0o600); } catch {}
+  fs.writeFileSync(ownerTokenPathFor(dir), `${ownerToken}\n`, { mode: 0o600 });
+  try { fs.chmodSync(ownerTokenPathFor(dir), 0o600); } catch {}
   const OWNER_CMDS = new Set(['approve', 'revoke', 'revoke-grant', 'clear-anomaly', 'supersede', 'accept-terms', 'mesh-sync', 'estate-status']);
   function ownerGate(conn, req, channel) {
     if (channel !== 'owner') {
@@ -3457,17 +3483,24 @@ function serve(flags) {
 
   const server = net.createServer((conn) => { if (admitSocket(conn, 'requester')) attachHandlers(conn, 'requester'); });
   const ownerServer = net.createServer((conn) => { if (admitSocket(conn, 'owner')) attachHandlers(conn, 'owner'); });
-  try { fs.unlinkSync(socketPath); } catch {}
-  try { fs.unlinkSync(ownerSocketPath); } catch {}
+  // Endpoint files exist only on POSIX: a named pipe is not a file —
+  // there is nothing to unlink before listen and nothing to chmod
+  // after (pipe security is the DACL in force at creation). Stale
+  // POSIX socket files, by contrast, must be cleared or listen fails,
+  // and the socket files are tightened to 0600 once bound.
+  if (!pipe) {
+    try { fs.unlinkSync(socketPath); } catch {}
+    try { fs.unlinkSync(ownerSocketPath); } catch {}
+  }
   server.listen(socketPath, () => {
-    try { fs.chmodSync(socketPath, 0o600); } catch {}
+    if (!pipe) { try { fs.chmodSync(socketPath, 0o600); } catch {} }
     log({ event: 'daemon', result: 'started', seal_fp: id.sealFp, socket: socketPath });
     console.log(`vaultd listening on ${socketPath}`);
     console.log(`identity: ${id.label}  seal fp ${id.sealFp}`);
     console.log(`out dir: ${outDir}  approval window: ${Math.round(windowMs / 1000)}s`);
   });
   ownerServer.listen(ownerSocketPath, () => {
-    try { fs.chmodSync(ownerSocketPath, 0o600); } catch {}
+    if (!pipe) { try { fs.chmodSync(ownerSocketPath, 0o600); } catch {} }
     log({ event: 'daemon', result: 'owner-channel-started', socket: ownerSocketPath });
     console.log(`vaultd owner channel on ${ownerSocketPath} (owner acts only; per-daemon token required)`);
   });
@@ -3523,9 +3556,11 @@ function serve(flags) {
     for (const dock of docks.values()) { try { dock.proc.kill('SIGTERM'); } catch {} }
     try { meshServer?.close(); } catch {}
     try { ownerServer?.close(); } catch {}
-    try { fs.unlinkSync(socketPath); } catch {}
-    try { fs.unlinkSync(ownerSocketPath); } catch {}
-    try { fs.unlinkSync(ownerTokenPathFor(socketPath)); } catch {}
+    if (!pipe) {
+      try { fs.unlinkSync(socketPath); } catch {}
+      try { fs.unlinkSync(ownerSocketPath); } catch {}
+    }
+    try { fs.unlinkSync(ownerTokenPathFor(dir)); } catch {}
     process.exit(0);
   };
   process.on('SIGTERM', shutdown);

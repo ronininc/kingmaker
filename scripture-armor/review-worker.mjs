@@ -14,7 +14,7 @@ try {
   const bytes=fs.readFileSync(input);const parsed=inspectAgnostic(bytes,name),findings=[];
   for(const item of parsed.texts){
     const report=scanSourceText(item.text,item.name,crypto.createHash('sha256').update(item.text).digest('hex'));
-    for(const f of report.findings)if(findings.length<100)findings.push({rule:f.rule,severity:f.severity,title:f.rule.replace(/[-_]+/g,' '),basis:f.basis,location:f.location,detail:f.detail,excerpt:f.excerpt});
+    for(const f of report.findings)if(findings.length<100)findings.push({rule:f.rule,severity:f.severity,title:f.rule.replace(/[-_]+/g,' '),basis:f.basis,location:f.location,detail:f.detail,excerpt:f.excerpt,...(f.explanation?{explanation:f.explanation}:{})});
   }
   let rea=null;
   const here=path.dirname(fileURLToPath(import.meta.url));
@@ -29,6 +29,7 @@ try {
   const limited=parsed.limitations.length>0;
   const result={schema:'scripture-armor.file-review/1',contentSha256:crypto.createHash('sha256').update(bytes).digest('hex'),format:parsed.format,kind:parsed.kind,
     status:limited?'limited':'reviewed_static',limitations:parsed.limitations,findings,
+    ...(parsed.shortfalls&&parsed.shortfalls.length?{shortfalls:parsed.shortfalls}:{}),
     activeContent:parsed.activeContent,entries:parsed.entries??null,
     rea,binary:binary?{verdict:binary.verdict,confidence:binary.confidence??null}:null,
     commandAuthority:false,targetExecuted:false,priority:os.getPriority()};

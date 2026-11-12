@@ -21,13 +21,13 @@
 # reviewed on a Linux machine; no Windows host was available to
 # execute it. Two things are therefore labeled, not implied:
 #   1. This installer itself has not yet had a live Windows run.
-#   2. vaultd's control channel is a Unix-domain socket path;
-#      vaultd.mjs carries no Windows named-pipe path today, so the
-#      daemon's socket behavior on Windows is unverified. The
-#      installer's identity step (plain Node file I/O) is
-#      cross-platform; the daemon's first live Windows run is the
-#      open item, and the installer prints this note again at the
-#      daemon step so it is never silent.
+#   2. vaultd's Windows transport is a named pipe, computed by the
+#      daemon's transport helper (daemon-transport.mjs) from the
+#      identity dir — the mapping is unit-proven with the platform
+#      injected, but the daemon has not yet bound a pipe on a live
+#      Windows host. That first live run (WINDOWS-PROOF) is the open
+#      item, and the installer prints this note again at the daemon
+#      step so it is never silent.
 #
 # Run in an ELEVATED PowerShell for the default boot task:
 #   powershell -ExecutionPolicy Bypass -File .\windows\install-armor.ps1
@@ -117,6 +117,24 @@ $productPaths = (& $nodeExe (Join-Path $repo 'product-paths.mjs') --home $ownerH
 if ($LASTEXITCODE -ne 0) { throw "Invalid product identity policy" }
 $identityDir = $productPaths.identityDir
 
+# --- build variant device match ----------------------------------------
+# Builds are versioned per Windows version (windows/builds.json): the
+# site serves the latest build, and this installer device-matches — it
+# asks the shared selector which variant fits THIS machine and prints
+# the answer. A mismatch never blocks the install; it is printed so it
+# is never silent.
+$osBuild = [Environment]::OSVersion.Version.Build
+$selector = Join-Path $repo 'windows\select-build.mjs'
+$buildsManifest = Join-Path $repo 'windows\builds.json'
+if ((Test-Path $selector) -and (Test-Path $buildsManifest)) {
+  $pick = (& $nodeExe $selector --os-build $osBuild --json | ConvertFrom-Json)
+  if ($pick.pick) {
+    Write-Host "device match: Windows build $osBuild -> build variant $($pick.pick.variant) ($($pick.pick.matched))"
+  } else {
+    Write-Host "device match: NO build variant claims Windows build $osBuild - see windows\builds.json" -ForegroundColor Yellow
+  }
+}
+
 # --- identity --------------------------------------------------------------
 Push-Location $repo
 try {
@@ -136,8 +154,13 @@ Write-Host ''
 $taskBoot = if ($productPaths.product -eq 'kingmaker') { 'KingmakerScriptureArmorVaultd' } else { 'ScriptureArmorVaultd' }
 $taskLogon = $taskBoot + 'Logon'
 $vaultdPath = Join-Path $repo 'vaultd.mjs'
-$socketPath = Join-Path $identityDir 'vaultd.sock'
-$taskArgs = "`"$vaultdPath`" serve --identity-dir `"$identityDir`" --socket `"$socketPath`""
+# NO --socket is persisted in the task. The daemon's endpoint is decided
+# by its one transport helper (daemon-transport.mjs) from the identity
+# dir — on Windows a named pipe derived from the identity dir. An earlier
+# version of this installer baked a filesystem socket path into the task
+# arguments; a filesystem path is not a legal Windows IPC endpoint, and
+# an explicit --socket would override the helper's default forever.
+$taskArgs = "`"$vaultdPath`" serve --identity-dir `"$identityDir`""
 
 function Register-VaultdTask([string]$name, [string]$triggerKind) {
   $action = New-ScheduledTaskAction -Execute $nodeExe -Argument $taskArgs -WorkingDirectory $repo
@@ -187,7 +210,7 @@ if ($mode -eq 'boot') {
   Register-VaultdTask $taskBoot 'boot'
   Start-ScheduledTask -TaskName $taskBoot
   Write-Host '  [done] task started; vaultd now starts at boot, before login, and Task Scheduler restarts it on failure.'
-  Write-Host '  [note] vaultd on Windows is UNVERIFIED on a live host - see the header of this script (socket transport).'
+  Write-Host '  [note] vaultd on Windows is UNVERIFIED on a live host - see the header of this script (named-pipe transport).'
 
   if ($DesignatedHost) {
     # Best-effort read of the current AC standby timeout (seconds) for the revert note.
@@ -229,7 +252,7 @@ elseif ($mode -eq 'logon') {
   Register-VaultdTask $taskLogon 'logon'
   Start-ScheduledTask -TaskName $taskLogon
   Write-Host '  [done] task started for this session.'
-  Write-Host '  [note] vaultd on Windows is UNVERIFIED on a live host - see the header of this script (socket transport).'
+  Write-Host '  [note] vaultd on Windows is UNVERIFIED on a live host - see the header of this script (named-pipe transport).'
   Write-Host '  [unchanged] power policy: logon mode cannot change system sleep.'
   Write-Host "Fallback install complete. Remove later: Unregister-ScheduledTask -TaskName $taskLogon -Confirm:`$false"
 }

@@ -7,11 +7,11 @@ import { verifyPrerequisites } from './prerequisite-readiness.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SOURCE_COMPONENTS = [
-  'armor.mjs', 'vaultd.mjs', 'cell.mjs', 'airlock.mjs', 'scan.mjs', 'launch.mjs',
+  'armor.mjs', 'vaultd.mjs', 'cell.mjs', 'airlock.mjs', 'scan.mjs', 'finding-explain.mjs', 'launch.mjs',
   'terms.mjs', 'open-standalone.mjs', 'dashboard.mjs', 'dashboard-view.mjs', 'credential-vault.mjs',
-  'entitlement-client.mjs', 'account-session.mjs', 'account-session-store.mjs', 'installation-health.mjs', 'activation-flow.mjs', 'paid-activation.mjs',
+  'entitlement-client.mjs', 'account-session.mjs', 'account-session-store.mjs', 'submit-request.mjs', 'submit-transport-guard.mjs', 'installation-health.mjs', 'activation-flow.mjs', 'paid-activation.mjs',
   'refit-net.mjs', 'package.json', 'README.md', 'FORMAT.md', 'LICENSE',
-  'product-paths.mjs', 'product.json', 'vault-paths.mjs', 'prerequisite-readiness.mjs',
+  'product-paths.mjs', 'product.json', 'vault-paths.mjs', 'prerequisite-readiness.mjs', 'daemon-transport.mjs',
   'installation-metadata.mjs', 'protection-status.mjs', 'analysis-runtime.mjs',
   'protection-feed.mjs', 'agnostic-review.mjs', 'format-inspect.mjs', 'review-worker.mjs', 'review-presentation.mjs', 'review-intake.mjs', 'repository-review.mjs', 'repository-stream.mjs', 'review-controls.mjs', 'review-ejection.mjs', 'sandbox-review.mjs', 'sandbox-review-linux.mjs', 'linux-review-inner.sh', 'device-protection.mjs', 'device-scan-roots.json', 'key-transition.mjs', 'retired-key-recovery.mjs', 'rotation-candidate.mjs',
   'dns-profiles', 'ghidra-scripts', 'mac', 'linux', 'windows', 'ui',
@@ -23,6 +23,10 @@ const SOURCE_COMPONENTS = [
   'shield-rulepack.mjs', 'shield-registry.mjs', 'shield-rea.mjs', 'shield-eval.mjs',
   'shield-generator.mjs', 'shield-gate.mjs', 'shield-loop.mjs', 'shield-review-harness.mjs',
   'shield-extract-pack.mjs', 'shield-packs',
+  // Little Brother bridge + its host wiring: dashboard.mjs imports
+  // lb-host.mjs, which imports littlebrother-integration.mjs — the
+  // bundle is incomplete (dashboard would fail to load) without both.
+  'littlebrother-integration.mjs', 'lb-host.mjs',
 ];
 // Build flavors of the SAME product (owner, 2026-11-05): 'full' is the
 // unchanged default — full local runtimes embedded, exactly as this build
@@ -34,6 +38,27 @@ const SOURCE_COMPONENTS = [
 export const BUILD_FLAVORS = Object.freeze(['full', 'small']);
 const SMALL_STREAMING_FILES = ['streaming-binding.mjs', 'churn-scan.mjs', 'streaming-choice.md'];
 const SMALL_STREAMING_UNITS = ['streaming-churn.service', 'streaming-churn.timer'];
+// WALL-BUNDLE-RESIDENT-PULLER clearing (Item 5, 2026-11-06): the small
+// bundle must carry the Brain Library puller INSIDE the bundle, under
+// streaming/, so a staged bundle streams without a source checkout on the
+// resolution path. This is the puller's full transitive import closure
+// from lib/brain-puller.mjs, traced first-hand at 56dc9f0:
+//   brain-puller -> brain-library
+//   brain-library -> mac-profiles, model-bench, weight-hunter-references
+//   model-bench -> fast-route, local-turn, tool-call
+//   fast-route/local-turn/tool-call -> token-meter (+ mac-profiles)
+//   weight-hunter-references -> weight-hunter-references.json, hash-util
+// No other relative imports exist in the closure (all other imports are
+// node: builtins); there are no dynamic relative imports in the chain.
+// The files are staged FLAT under streaming/ so every relative import in
+// the chain resolves inside streaming/ unchanged (brain-puller at
+// streaming/brain-puller.mjs is streaming-binding.mjs's first candidate).
+// Small flavor only: the full flavor's staged set is untouched.
+export const SMALL_STREAMING_LIB_FILES = Object.freeze([
+  'brain-puller.mjs', 'brain-library.mjs', 'mac-profiles.mjs', 'model-bench.mjs',
+  'fast-route.mjs', 'local-turn.mjs', 'tool-call.mjs', 'token-meter.mjs',
+  'hash-util.mjs', 'weight-hunter-references.mjs', 'weight-hunter-references.json',
+]);
 
 export function buildStandalone(args = process.argv.slice(2)) {
   const opt = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : null; };
@@ -72,17 +97,17 @@ export function buildStandalone(args = process.argv.slice(2)) {
 
   const records = collectBundleRecords(out);
   const required = [
-    'armor.mjs', 'vaultd.mjs', 'dashboard.mjs', 'credential-vault.mjs', 'scan.mjs',
-    'entitlement-client.mjs', 'account-session.mjs', 'account-session-store.mjs', 'installation-health.mjs', 'activation-flow.mjs', 'paid-activation.mjs',
+    'armor.mjs', 'vaultd.mjs', 'dashboard.mjs', 'credential-vault.mjs', 'scan.mjs', 'daemon-transport.mjs',
+    'entitlement-client.mjs', 'account-session.mjs', 'account-session-store.mjs', 'submit-request.mjs', 'submit-transport-guard.mjs', 'installation-health.mjs', 'activation-flow.mjs', 'paid-activation.mjs',
     'rea/rea.mjs', 'rea/rea-rules.mjs', 'lib/keychain-seal.mjs', 'ghidra-scripts/ScriptureScan.java',
     'ui/scripture-armor-crest-ronin.png',
     'mac/ScriptureArmorApp.swift', 'mac/build-native-app.sh',
   ];
-  if (flavor === 'small') required.push('streaming-binding.mjs', 'churn-scan.mjs', 'streaming-choice.md', 'streaming/config.json');
+  if (flavor === 'small') required.push('streaming-binding.mjs', 'churn-scan.mjs', 'streaming-choice.md', 'streaming/config.json', ...SMALL_STREAMING_LIB_FILES.map((f) => `streaming/${f}`));
   for (const rel of required) if (!records.some((r) => r.path === rel && r.size > 0)) throw new Error(`release refused: empty or missing component: ${rel}`);
   if (flavor === 'full' && !records.some((r) => /(^|\/)support\/analyzeHeadless(\.bat)?$/.test(r.path) && r.size > 0)) throw new Error('release refused: packaged Ghidra analyzeHeadless missing');
   if (flavor === 'full' && !records.some((r) => /(^|\/)tools\/jdk\/bin\/java(\.exe)?$/.test(r.path) && r.size > 0)) throw new Error('release refused: packaged JDK java missing');
-  const manifest = { schema: 'scripture-armor.standalone-bundle/1', version: '1.2.1', product: 'standalone', ...(flavor === 'small' ? { flavor, streaming: { schema: 'scripture-armor.streaming/1', awareness: 'invocation-aware-only', embeddedRuntimes: [] } } : { prerequisites: readiness }), files: records.sort((a, b) => a.path.localeCompare(b.path)) };
+  const manifest = { schema: 'scripture-armor.standalone-bundle/1', version: '1.2.2', product: 'standalone', ...(flavor === 'small' ? { flavor, streaming: { schema: 'scripture-armor.streaming/1', awareness: 'invocation-aware-only', embeddedRuntimes: [] } } : { prerequisites: readiness }), files: records.sort((a, b) => a.path.localeCompare(b.path)) };
   fs.writeFileSync(path.join(out, 'BUNDLE.json'), `${JSON.stringify(manifest, null, 2)}\n`);
   console.log(`built ${out}: ${records.length} verified files`);
 
@@ -112,6 +137,16 @@ export function stageStandaloneSources(out, { reaDir = path.join(HERE, '..', 'li
     }
     fs.mkdirSync(path.join(out, 'streaming'));
     for (const file of SMALL_STREAMING_UNITS) fs.copyFileSync(path.join(HERE, file), path.join(out, 'streaming', file.replace('streaming-', 'scripture-armor-')), fs.constants.COPYFILE_EXCL);
+    // Bundle-resident puller chain (see SMALL_STREAMING_LIB_FILES): copied
+    // from the lib directory (reaDir, the same source the REA components
+    // come from) flat into streaming/, byte-identical to the checkout's
+    // lib/ copies, so the bundle form and the checkout form run the same
+    // puller code and the binding's bundle-resident candidate resolves.
+    for (const file of SMALL_STREAMING_LIB_FILES) {
+      const source = path.join(reaDir, file);
+      if (!fs.existsSync(source)) throw new Error(`release refused: streaming puller chain component missing: ${file}`);
+      fs.copyFileSync(source, path.join(out, 'streaming', file), fs.constants.COPYFILE_EXCL);
+    }
     // The per-device choice lives here at install/config time: 'streaming'
     // (this build's binding active) or 'full' (a full build replaces this
     // one). Recorded in the open; changing it never happens silently.
@@ -122,7 +157,7 @@ export function stageStandaloneSources(out, { reaDir = path.join(HERE, '..', 'li
       note: 'This build is invocation-aware only: streamed capability is inert until a function call invokes it, and nothing here watches between calls. Omni-awareness is the full build.',
       portionStore: 'portions',
       churn: { schedule: 'daily', command: 'node churn-scan.mjs --store <portion-store>', staleDays: 30, maxBytes: 2147483648 },
-      binding: { puller: 'lib/brain-puller.mjs (Brain Library streaming layer)', status: 'resolved at invocation time; fails closed when absent' },
+      binding: { puller: 'streaming/brain-puller.mjs (bundle-resident Brain Library streaming layer; checkout fallback ../lib/brain-puller.mjs)', status: 'resolved at invocation time; fails closed when absent' },
     }, null, 2)}\n`);
   }
   fs.mkdirSync(path.join(out, 'rea'));

@@ -15,7 +15,7 @@ function transport(reserve){const seen=[];return{seen,fetch:async(url,options)=>
  if(url.endsWith('/login'))return json({ok:true,emailCodeRequired:true,email:EMAIL,purpose:'login',challengeId:'synthetic-challenge',expiresAt:NOW+300},202);
  if(url.endsWith('/verify'))return json({ok:true,mfaVerified:true,member:{email:EMAIL}},200,{'set-cookie':COOKIE+';HttpOnly;Secure;SameSite=Strict;Path=/'});
  if(url.endsWith('/me'))return json({ok:true,mfaVerified:true,member:{email:EMAIL,mfa_verified_at:NOW}});
- if(url.endsWith('/reserve')){assert.equal(options.headers.cookie,COOKIE);const result=await reserve(url,options);if(!result.ok)return result;return json({installationId:JSON.parse(options.body).installationId,...await result.json()},result.status);}
+ if(url.endsWith('/reserve')||url.endsWith('/resume')){assert.equal(options.headers.cookie,COOKIE);const result=await reserve(url,options);if(!result.ok)return result;return json({installationId:JSON.parse(options.body).installationId,...await result.json()},result.status);}
  throw new Error('Unexpected test transport route');
 }};}
 const signIn=async account=>{await account.login({email:EMAIL,password:'synthetic-password'});await account.verify({code:'12345678'});};
@@ -32,6 +32,13 @@ test('private MFA cookie reserves only the fixed billing endpoint; no body crede
   const call=f.seen.at(-1);assert.equal(call.url,'https://www.ronininc.org/api/armor/license/installations/reserve');assert.deepEqual(call.body,metadata);assert.equal(call.options.headers.origin,'https://www.ronininc.org');
  }
  const f=transport(()=>json({reserved:true,quotaReservationOnly:true,deviceAdmissionGranted:true})),account=createArmorAccountSession({fetchImpl:f.fetch,installationProvider:()=>installationMetadata(path.join(temp(),'vault'))});await signIn(account);await assert.rejects(account.reserveInstallation(installationMetadata(path.join(temp(),'vault'))),/capacity/);
+});
+test('resume accepts the production 201 success instead of reporting the installation locked',async()=>{
+ for(const status of [200,201]){
+  const f=transport(()=>json({reserved:true,quotaReservationOnly:true,deviceAdmissionGranted:false},status)),metadata=installationMetadata(path.join(temp(),'vault')),account=createArmorAccountSession({fetchImpl:f.fetch,installationProvider:()=>metadata});await signIn(account);
+  const result=await account.resumeInstallation();assert.equal(result.reserved,true);assert.equal(result.installationId,metadata.installationId);assert.equal(result.quotaReservationOnly,true);assert.equal(result.deviceAdmissionGranted,false);
+  const call=f.seen.at(-1);assert.equal(call.url,'https://www.ronininc.org/api/armor/license/installations/resume');assert.deepEqual(call.body,metadata);assert.equal(call.options.headers.origin,'https://www.ronininc.org');
+ }
 });
 test('quota errors and unresponsive reservation transport remain bounded and do not grant capacity',async()=>{
  const metadata=installationMetadata(path.join(temp(),'vault'));

@@ -14,6 +14,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { evaluateText } from './shield-eval.mjs';
 import { emitFileReview } from './shield-ledger.mjs';
+import { explainFinding } from './finding-explain.mjs';
 
 export const sha256hex = (buf) => crypto.createHash('sha256').update(buf).digest('hex');
 
@@ -35,13 +36,19 @@ export function reviewArtifact(bytes, name, config, opts = {}) {
     for (const f of ev.scan.findings) {
       if (findings.length >= 100) break;
       findings.push({ rule: f.rule, severity: f.severity, title: f.rule.replace(/[-_]+/g, ' '),
-        basis: f.basis, location: f.location, detail: f.detail, ...(f.excerpt != null ? { excerpt: f.excerpt } : {}) });
+        basis: f.basis, location: f.location, detail: f.detail, ...(f.excerpt != null ? { excerpt: f.excerpt } : {}),
+        ...(f.explanation ? { explanation: f.explanation } : {}) });
     }
     for (const f of [...ev.reaFindings, ...ev.genFindings]) {
       if (findings.length >= 100) break;
-      findings.push({ rule: f.rule, severity: f.severity === 'reject' ? 'high' : 'medium',
+      const mapped = { rule: f.rule, severity: f.severity === 'reject' ? 'high' : 'medium',
         title: f.rule.replace(/[-_]+/g, ' '), basis: 'rea', location: `${name}:${f.line}`,
-        detail: f.why || '', excerpt: f.code, generated_rule: !!f.generated });
+        detail: f.why || '', excerpt: f.code, generated_rule: !!f.generated };
+      // Explanation layer (Item 4): REA/gen findings are explained from
+      // their own evidence (why = detail, code = excerpt, fix carried so
+      // the sandbox consequence is stated from the finding itself).
+      mapped.explanation = explainFinding({ ...mapped, fix: f.fix, generated: !!f.generated });
+      findings.push(mapped);
     }
     const record = {
       schema: 'scripture-armor.file-review/1', contentSha256: targetSha,
