@@ -1,0 +1,6 @@
+{
+  "schema": "ronin.addon/1",
+  "id": "meeting-notes",
+  "note": "Packaged by scripts/build-floor-addon.mjs (its manifest is the source of truth for the release); this file only lets an owner's checkout load it from source.",
+  "entry": "lib/floor-participant.mjs"
+}
