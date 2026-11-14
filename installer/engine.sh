@@ -174,6 +174,7 @@ cleanup() {
   # The background step and its children (curl inside a pull, git/curl under the knowledge bootstrap).
   [ -n "$BG_PID" ] && { pkill -TERM -P "$BG_PID" 2>/dev/null; kill "$BG_PID" 2>/dev/null; }
   [ -n "$AUTH_HEADER" ] && rm -f "$AUTH_HEADER"
+  [ -n "${GH_HDR:-}" ] && rm -f "$GH_HDR"
   rm -rf "$STAGE/unpack" "$STAGE/ollama" "$STAGE/launcher" "$STAGE/old" "$STAGE/whole.fifo" "$DSTAGE/config"
   [ "$LOCKED" = 1 ] && rm -rf "$STAGE/lock"
   rmdir "$STAGE" 2>/dev/null
@@ -368,7 +369,9 @@ fail_at preflight
 # A Mac that already has update.json keeps its key.
 ENROLL_FILE="$HERE/enroll.json"
 # A Mac that already has update.json (a reinstall) downloads with its own key; otherwise it enrolls first. Either
-# way, with no --source/--base-url the release comes from the update host, not GitHub (no sign-in needed).
+# way, with no --source/--base-url the release comes from the update host, not GitHub (no sign-in needed). If the
+# update host cannot serve a file, that file falls back to the GitHub release (see github_fetch below); the key
+# itself is never changed by the engine.
 if [ -z "${KINGMAKER_UPDATE_KEY:-}" ] && [ -s "$DATA/update.json" ] && [ -z "$PREFIX" ]; then
   KINGMAKER_UPDATE_URL="$(plutil -extract url raw -o - "$DATA/update.json" 2>/dev/null || true)"; KINGMAKER_UPDATE_KEY="$(plutil -extract key raw -o - "$DATA/update.json" 2>/dev/null || true)"
 fi
@@ -431,22 +434,66 @@ asset_id() { # asset_id <name> → the release asset's API id
   return 1
 }
 
+# ── the GitHub fallback ──────────────────────────────────────────────────────────────────────────────────────────
+# The update host is the primary source when this Mac has an update key; GitHub is the fallback for any file the
+# update host cannot serve (a stale update key, a release the host does not carry yet). Resolved lazily: the
+# token, its 0600 header file and the release's asset list are only fetched when a fallback actually happens.
+GH_HDR=""; GH_RESOLVED=0; GH_TOKEN_VAL=""
+resolve_github() {
+  [ "$GH_RESOLVED" = 1 ] && return 0
+  GH_RESOLVED=1
+  GH_TOKEN_VAL="${KINGMAKER_GITHUB_TOKEN:-${GH_TOKEN:-${GITHUB_TOKEN:-}}}"
+  [ -z "$GH_TOKEN_VAL" ] && command -v gh >/dev/null 2>&1 && GH_TOKEN_VAL="$(gh auth token 2>/dev/null || true)"
+  if [ -n "$GH_TOKEN_VAL" ]; then
+    GH_HDR="$CACHE/.gh-auth-header"
+    ( umask 077; printf 'Authorization: Bearer %s\n' "$GH_TOKEN_VAL" > "$GH_HDR" )
+    if [ ! -s "$CACHE/release.json" ]; then
+      curl -fsSL --max-time 60 -H @"$GH_HDR" -H "Accept: application/vnd.github+json" "$GITHUB_API/repos/$REPO/releases/tags/$TAG" -o "$CACHE/release.json" 2>>"$LOG" \
+        || { echo "GitHub fallback: could not read release $TAG of $REPO through the API; the public download URL remains." >> "$LOG"; rm -f "$CACHE/release.json"; }
+    fi
+  fi
+  return 0
+}
+# github_fetch <dest> <sha256> <size> <asset name> <bytes already counted> <bytes in this phase>: fetch one file
+# from the GitHub release — through the API with the token when one resolves, else the public download URL.
+github_fetch() {
+  local dest="$1" sha="$2" size="$3" name="$4" before="$5" total="$6" src auth=0 id saved_hdr rc
+  resolve_github
+  if [ -n "$GH_TOKEN_VAL" ] && [ -s "$CACHE/release.json" ] && id="$(asset_id "$name")"; then
+    src="$GITHUB_API/repos/$REPO/releases/assets/$id"; auth=1
+  else
+    src="https://github.com/$REPO/releases/download/$TAG/$name"
+  fi
+  saved_hdr="$AUTH_HEADER"
+  [ "$auth" = 1 ] && AUTH_HEADER="$GH_HDR"
+  fetch "$dest" "$sha" "$size" "$src" "$auth" "$before" "$total"; rc=$?
+  AUTH_HEADER="$saved_hdr"
+  return "$rc"
+}
+
 # fetch <dest> <sha256> <size> <url|file> <auth 0|1> <bytes already counted> <bytes in this phase>
 # Resumable and verified: a cut-off transfer is resumed from where it stopped (curl -C -, a Range request), up to 4
 # times; a complete file whose sha256 is wrong is thrown away and fetched again once. The file lands at <dest> only
 # when its size and sha256 match; a half-done <dest>.partial is kept for the next press of the button.
+# A failed fetch also reports WHY, so callers can name the real cause instead of blaming the sha256 for a download
+# that never arrived: FETCH_KIND is sha|http|conn|short|range, FETCH_HTTP the last HTTP status curl saw (""
+# for a local source), FETCH_CAUSE a plain-language cause that names the source.
+FETCH_KIND=""; FETCH_HTTP=""; FETCH_CAUSE=""
+host_of() { case "$1" in *://*) local h="${1#*://}"; printf '%s' "${h%%/*}" ;; /*) printf 'the local source folder' ;; *) printf '%s' "$1" ;; esac }
 fetch() {
   local dest="$1" sha="$2" size="$3" src="$4" auth="$5" before="$6" total="$7" part rc have bad=0 short=0
+  FETCH_KIND=""; FETCH_HTTP=""; FETCH_CAUSE=""
   if [ -f "$dest" ] && [ "$(cat "$dest.ok" 2>/dev/null)" = "$sha" ] && [ "$(fsize "$dest")" = "$size" ]; then return 0; fi
   rm -f "$dest" "$dest.ok"
   part="$dest.partial"
   while [ "$bad" -lt 2 ] && [ "$short" -lt 4 ]; do
     have="$(fsize "$part")"; [ "$have" -gt "$size" ] && { rm -f "$part"; have=0; }
     if [ "$have" -lt "$size" ]; then
+      rm -f "$part.httpcode"
       case "$src" in
         /*) { cp -c "$src" "$part" 2>/dev/null || cp "$src" "$part"; } 2>>"$LOG" & ;; # a local folder: an APFS clone when it can (no extra disk)
-        *) if [ "$auth" = 1 ]; then curl -fL --retry 3 --retry-delay 2 --connect-timeout 20 -C - -H @"$AUTH_HEADER" -H "Accept: application/octet-stream" -o "$part" "$src" 2>>"$LOG" &
-           else curl -fL --retry 3 --retry-delay 2 --connect-timeout 20 -C - -o "$part" "$src" 2>>"$LOG" & fi ;;
+        *) if [ "$auth" = 1 ]; then curl -fL --retry 3 --retry-delay 2 --connect-timeout 20 -C - -H @"$AUTH_HEADER" -H "Accept: application/octet-stream" -o "$part" -w '%{http_code}' "$src" > "$part.httpcode" 2>>"$LOG" &
+           else curl -fL --retry 3 --retry-delay 2 --connect-timeout 20 -C - -o "$part" -w '%{http_code}' "$src" > "$part.httpcode" 2>>"$LOG" & fi ;;
       esac
       BG_PID=$!
       while kill -0 "$BG_PID" 2>/dev/null; do
@@ -455,18 +502,27 @@ fetch() {
         sleep 0.25
       done
       wait "$BG_PID"; rc=$?; BG_PID=""
-      if [ "$rc" = 33 ] || [ "$rc" = 36 ]; then rm -f "$part"; short=$((short + 1)); continue; fi # that server cannot resume: start over
+      [ -f "$part.httpcode" ] && FETCH_HTTP="$(cat "$part.httpcode" 2>/dev/null)"
+      if [ "$rc" = 33 ] || [ "$rc" = 36 ]; then FETCH_KIND="range"; FETCH_CAUSE="the server at $(host_of "$src") refused the resumed transfer"; rm -f "$part"; short=$((short + 1)); continue; fi # that server cannot resume: start over
     fi
     have="$(fsize "$part")"
     if [ "$have" = "$size" ]; then
-      [ "$(sha256 "$part")" = "$sha" ] && { mv "$part" "$dest" && echo "$sha" > "$dest.ok" && return 0; }
+      [ "$(sha256 "$part")" = "$sha" ] && { rm -f "$part.httpcode"; mv "$part" "$dest" && echo "$sha" > "$dest.ok" && return 0; }
       echo "sha256 mismatch for $(basename "$dest"); fetching it again" >> "$LOG"
+      FETCH_KIND="sha"; FETCH_CAUSE="it downloaded in full from $(host_of "$src") but the sha256 did not match"
       rm -f "$part"; bad=$((bad + 1))
     else
       echo "transfer of $(basename "$dest") stopped at $have of $size bytes; resuming" >> "$LOG"
+      case "$FETCH_HTTP" in
+        ''|200|206) FETCH_KIND="short"; FETCH_CAUSE="the transfer from $(host_of "$src") kept stopping (last try reached $have of $size bytes)" ;;
+        000) FETCH_KIND="conn"; FETCH_CAUSE="no connection to $(host_of "$src")" ;;
+        *) FETCH_KIND="http"; FETCH_CAUSE="HTTP $FETCH_HTTP from $(host_of "$src")" ;;
+      esac
       short=$((short + 1))
     fi
   done
+  rm -f "$part.httpcode"
+  [ -n "$FETCH_CAUSE" ] || { FETCH_KIND="short"; FETCH_CAUSE="the transfer from $(host_of "$src") did not complete"; }
   return 1
 }
 
@@ -475,17 +531,33 @@ DONE_BYTES=0; i=0
 while [ "$i" -lt "$PART_COUNT" ]; do
   name="$(mf "parts.$i.name")"; sha="$(mf "parts.$i.sha256")"; size="$(mfn "parts.$i.size")"
   case "$name" in ''|*/*|.*) fail "The release manifest has a bad part name." ;; esac
-  auth=0
-  if [ -n "$SOURCE" ]; then src="$(cd "$SOURCE" && pwd -P)/$name"
-  elif [ -n "$BASE_URL" ]; then src="${BASE_URL%/}/$name"; [ -n "$AUTH_HEADER" ] && auth=1
+  auth=0; primary="github"
+  if [ -n "$SOURCE" ]; then src="$(cd "$SOURCE" && pwd -P)/$name"; primary="folder"
+  elif [ -n "$BASE_URL" ]; then src="${BASE_URL%/}/$name"; [ -n "$AUTH_HEADER" ] && auth=1; primary="update"
   elif [ -n "$TOKEN" ]; then id="$(asset_id "$name")" || fail "Release $TAG has no asset $name."; src="$GITHUB_API/repos/$REPO/releases/assets/$id"; auth=1
   else src="https://github.com/$REPO/releases/download/$TAG/$name"; fi
   PHASE_LABEL="Downloading Kingmaker (part $((i + 1)) of $PART_COUNT)"
   if ! fetch "$CACHE/parts/$name" "$sha" "$size" "$src" "$auth" "$DONE_BYTES" "$ARCHIVE_SIZE"; then
-    if [ -z "$SOURCE" ] && [ -z "$BASE_URL" ] && [ -z "$TOKEN" ] && grep -q 'error: 404\|returned error: 404' "$LOG"; then
+    first_kind="$FETCH_KIND"; first_cause="$FETCH_CAUSE"
+    if [ "$primary" = "update" ]; then
+      # The update host could not serve this part (a stale update key, or a release the host does not carry):
+      # fall back to the GitHub release before declaring the part failed. The update key is left exactly as it
+      # was — the failover is noted in the log and on screen, never silent, and nothing on this Mac is rewritten.
+      note "The update host could not serve $name ($first_cause); trying the GitHub release."
+      echo "update host failed for $name ($first_cause); falling back to GitHub" >> "$LOG"
+      if github_fetch "$CACHE/parts/$name" "$sha" "$size" "$name" "$DONE_BYTES" "$ARCHIVE_SIZE"; then
+        note "GitHub served $name after the update host failed ($first_cause). The update key on this Mac may be stale; it was not changed."
+        echo "failover: GitHub served $name after the update host failed ($first_cause)" >> "$LOG"
+      else
+        fail "Part $name failed to download ($first_cause); the GitHub fallback also failed ($FETCH_CAUSE). The verified parts are kept: press Download & Install again to resume."
+      fi
+    elif [ "$first_kind" = "sha" ]; then
+      fail "Part $name downloaded in full, twice, but did not match its sha256. The verified parts are kept: press Download & Install again to resume."
+    elif [ "$primary" = "github" ] && [ -z "$TOKEN" ] && [ "$FETCH_HTTP" = "404" ]; then
       fail "Could not download $name (404): the release is not public, or it is private and this Mac needs a GitHub sign-in (gh auth login)."
+    else
+      fail "Part $name failed to download ($first_cause). The verified parts are kept: press Download & Install again to resume."
     fi
-    fail "Part $name did not download or did not match its sha256, twice. The verified parts are kept: press Download & Install again to resume."
   fi
   DONE_BYTES=$((DONE_BYTES + size))
   i=$((i + 1))
@@ -563,14 +635,31 @@ elif [ -n "$L_ARCHIVE" ]; then
   rm -f "$LAUNCHER_CHOICE" 2>/dev/null || true
   case "$L_ARCHIVE" in *.zip) ;; *) fail "The release's Ronin Launcher pin is not a zip." ;; esac
   case "$L_ARCHIVE" in */*|.*) fail "The release manifest has a bad Ronin Launcher name." ;; esac
-  L_SHA="$(mf launcher.sha256)"; L_SIZE="$(mfn launcher.size)"; L_URL="$(mf launcher.url)"; auth=0
-  if [ -n "$SOURCE" ]; then src="$(cd "$SOURCE" && pwd -P)/$L_ARCHIVE"
-  elif [ -n "$L_URL" ] && [ "$L_URL" != "null" ]; then src="$L_URL"
-  elif [ -n "$BASE_URL" ]; then src="${BASE_URL%/}/$L_ARCHIVE"; [ -n "$AUTH_HEADER" ] && auth=1
+  L_SHA="$(mf launcher.sha256)"; L_SIZE="$(mfn launcher.size)"; L_URL="$(mf launcher.url)"; auth=0; lprimary="github"
+  if [ -n "$SOURCE" ]; then src="$(cd "$SOURCE" && pwd -P)/$L_ARCHIVE"; lprimary="folder"
+  elif [ -n "$L_URL" ] && [ "$L_URL" != "null" ]; then src="$L_URL"; lprimary="url"
+  elif [ -n "$BASE_URL" ]; then src="${BASE_URL%/}/$L_ARCHIVE"; [ -n "$AUTH_HEADER" ] && auth=1; lprimary="update"
   elif [ -n "$TOKEN" ]; then id="$(asset_id "$L_ARCHIVE")" || fail "Release $TAG has no asset $L_ARCHIVE."; src="$GITHUB_API/repos/$REPO/releases/assets/$id"; auth=1
   else src="https://github.com/$REPO/releases/download/$TAG/$L_ARCHIVE"; fi
   phase 55 0 "Getting the Ronin Launcher"   # a small zip: the bar holds where it is
-  fetch "$CACHE/Ronin-Launcher.zip" "$L_SHA" "$L_SIZE" "$src" "$auth" 0 "$L_SIZE" || fail "The Ronin Launcher did not download or did not match its sha256. It's a required part of Kingmaker; press Download & Install again."
+  if ! fetch "$CACHE/Ronin-Launcher.zip" "$L_SHA" "$L_SIZE" "$src" "$auth" 0 "$L_SIZE"; then
+    l_kind="$FETCH_KIND"; l_cause="$FETCH_CAUSE"
+    if [ "$lprimary" = "update" ]; then
+      # Same ladder, same fallback as the parts: the update host could not serve the Launcher, so GitHub does.
+      note "The update host could not serve the Ronin Launcher ($l_cause); trying the GitHub release."
+      echo "update host failed for $L_ARCHIVE ($l_cause); falling back to GitHub" >> "$LOG"
+      if github_fetch "$CACHE/Ronin-Launcher.zip" "$L_SHA" "$L_SIZE" "$L_ARCHIVE" 0 "$L_SIZE"; then
+        note "GitHub served the Ronin Launcher after the update host failed ($l_cause). The update key on this Mac may be stale; it was not changed."
+        echo "failover: GitHub served $L_ARCHIVE after the update host failed ($l_cause)" >> "$LOG"
+      else
+        fail "The Ronin Launcher failed to download ($l_cause); the GitHub fallback also failed ($FETCH_CAUSE). It's a required part of Kingmaker; press Download & Install again."
+      fi
+    elif [ "$l_kind" = "sha" ]; then
+      fail "The Ronin Launcher downloaded in full, twice, but did not match its sha256. It's a required part of Kingmaker; press Download & Install again."
+    else
+      fail "The Ronin Launcher failed to download ($l_cause). It's a required part of Kingmaker; press Download & Install again."
+    fi
+  fi
   rm -rf "$STAGE/launcher"; mkdir -p "$STAGE/launcher"
   ditto -x -k "$CACHE/Ronin-Launcher.zip" "$STAGE/launcher" 2>>"$LOG" || fail "Unpacking the Ronin Launcher failed."
   LAUNCHER_STAGED="$STAGE/launcher/Ronin Launcher.app"
