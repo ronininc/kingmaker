@@ -1,0 +1,6 @@
+CAP_GB=19
+HEADLESS=always
+IMAGE_PINS=base=kingmaker-0.4.2-app;runtime=ollama-0.40.7;engine=15f2c0ec
+PROFILE=m5pro-24gb
+RAM_GB=24
+RUNTIME=kingmaker-runtime (pinned by release manifest)

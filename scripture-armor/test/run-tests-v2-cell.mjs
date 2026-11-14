@@ -14,8 +14,6 @@
 // (unshare namespaces) end-to-end and proves the HARD path as a named
 // refusal/probe — never as a fake pass.
 
-import { probeCells } from '../cell.mjs';
-import { legacyFixtureHome } from './legacy-v1-fixture.mjs';
 import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -30,7 +28,7 @@ import {
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.dirname(HERE);
-const V1 = legacyFixtureHome(path.join(ROOT, '..', 'scripture-armor-standalone'));
+const V1 = path.join(ROOT, '..', 'scripture-armor-standalone');
 const ARMOR = path.join(ROOT, 'armor.mjs');
 const VAULTD = path.join(ROOT, 'vaultd.mjs');
 const NODE = process.execPath;
@@ -130,31 +128,31 @@ function rpcOnce(socket, obj, timeoutMs = 15000) {
   return new Promise((resolve, reject) => {
     const conn = net.createConnection(socket);
     let buf = '';
-    const timer = setTimeout(() => { try { conn.destroy(); } catch {} reject(new Error('rpc timeout')); }, timeoutMs);
     conn.on('connect', () => conn.write(JSON.stringify(obj) + '\n'));
     conn.on('data', (d) => {
       buf += d;
       const i = buf.indexOf('\n');
-      if (i >= 0) { clearTimeout(timer); try { conn.end(); } catch {} resolve(JSON.parse(buf.slice(0, i))); }
+      if (i >= 0) { try { conn.end(); } catch {} resolve(JSON.parse(buf.slice(0, i))); }
     });
-    conn.on('error', (error) => { clearTimeout(timer); reject(error); });
+    conn.on('error', reject);
+    setTimeout(() => { try { conn.destroy(); } catch {} reject(new Error('rpc timeout')); }, timeoutMs);
   });
 }
 // Streaming activate: collects every daemon message until the terminal
 // one (activation-complete / refusal). .pending resolves at the pend.
 function activateStream(socket, pkgPath, { entry = null } = {}) {
   const msgs = [];
-  let pendingResolve, pendingTimer, finalTimer;
+  let pendingResolve;
   const pending = new Promise((r) => {
     pendingResolve = r;
     // A refusal (or a grant launch) never pends: resolve null on a
     // timer so a caller awaiting the pend cannot hang forever.
-    pendingTimer = setTimeout(() => r(null), 60000);
+    setTimeout(() => r(null), 60000);
   });
   const final = new Promise((resolve) => {
     const conn = net.createConnection(socket);
     let buf = '';
-    const done = () => { clearTimeout(pendingTimer); clearTimeout(finalTimer); pendingResolve(null); try { conn.end(); } catch {} resolve(msgs); };
+    const done = () => { try { conn.end(); } catch {} resolve(msgs); };
     conn.on('connect', () => conn.write(JSON.stringify({ cmd: 'activate', path: pkgPath, entry }) + '\n'));
     conn.on('data', (d) => {
       buf += d; let i;
@@ -166,8 +164,8 @@ function activateStream(socket, pkgPath, { entry = null } = {}) {
         if (m.state === 'activation-complete' || m.ok === false || m.beacon) { setTimeout(done, 50); return; }
       }
     });
-    conn.on('error', done);
-    finalTimer = setTimeout(done, 150000);
+    conn.on('error', () => resolve(msgs));
+    setTimeout(done, 150000);
   });
   return { pending, final, msgs };
 }
@@ -242,13 +240,6 @@ const wrapEgress = (storeDir, socket, file, extra = []) => armor(
 
 async function main() {
   console.log('Scripture Armor v2 — Closure 2 acceptance battery');
-  const substrate = probeCells();
-  const refusalOnly = process.argv.includes('--refusal-only');
-  if (!substrate.soft.available && !refusalOnly) {
-    console.log(`BLOCKED: SOFT cell substrate unavailable; full cell execution cannot be proved on ${process.platform}. HARD status: ${JSON.stringify(substrate.hard)}. Run --refusal-only for real pre-execution denial proofs.`);
-    process.exitCode = 2; return;
-  }
-  if (refusalOnly) console.log('REFUSAL-ONLY: positive execution/egress/capability outcomes remain BLOCKED, never counted as PASS.');
   const T = fs.mkdtempSync(path.join(os.tmpdir(), 'sa2c-battery-'));
   const BIN = path.join(T, 'bin'); fs.mkdirSync(BIN);
   const gcc = run('gcc', ['-O1', '-U_FORTIFY_SOURCE', '-D_FORTIFY_SOURCE=0', '-o', path.join(BIN, 'clean.bin'), path.join(HERE, 'fixtures-src', 'clean.c')]);
@@ -276,7 +267,6 @@ async function main() {
   const echoBytes = fs.readFileSync(echoFile);
   const echoSha = sha256Hex(echoBytes);
 
-  if (!refusalOnly) {
   // ================= Case 1: activation + emission + return-match =====
   console.log('\n[1] pass-verdict activation runs; stdout emission arrives as a registered package at the peer; return-match succeeds');
   {
@@ -605,8 +595,6 @@ async function main() {
       (rec?.activations || []).some((a) => a.downgraded === true && a.cell_class === 'soft'));
   }
 
-  } else console.log("BLOCKED: SOFT execution, confinement, egress and capability checks require a real cell substrate.");
-
   // ================= Deferred 21: Tier-2 placement =====================
   console.log('\n[D21] Tier-2 placement: HARD-cell-only + airlock-only egress; on a HARD-less host activation refuses (no downgrade exists)');
   {
@@ -641,7 +629,6 @@ async function main() {
     check('tampered report ⇒ activation refused (report-mismatch)',
       r.last?.ok === false && /report-mismatch/.test(r.last?.error || ''), JSON.stringify(r.last).slice(0, 220));
     fs.writeFileSync(reportPath, pristine);
-    if (!refusalOnly) {
     const r2 = await activateAndApprove(dA.socket, `${tp}.scripture`);
     check('pristine report ⇒ activation proceeds', r2.last?.state === 'activation-complete', JSON.stringify(r2.last).slice(0, 200));
     // Tier 1 re-verifies EVERY activation: tamper after a completed run.
@@ -661,7 +648,6 @@ async function main() {
       rb.last?.ok === false && /report-mismatch/.test(rb.last?.error || ''), JSON.stringify(rb.last).slice(0, 220));
   }
 
-    }
   // ================= Deferred 11: v1 package ⇒ refusal ==============
   console.log('\n[D11] v1-wrapped package presented for activation: classified untiered ⇒ refused');
   {
@@ -727,7 +713,7 @@ async function main() {
     const regEntries = [];
     for (const rel of ['prog.mjs', 'data.txt']) {
       const bytes = fs.readFileSync(path.join(srcDir, rel));
-      const sealed = sealPlaintext(bytes, me, me, {});
+      const sealed = sealPlaintext(bytes, me, { seal_pub: me.seal_pub }, {});
       const pkgRel = `files/${rel}.part-0.scripture`;
       fs.writeFileSync(path.join(wrappedDir, pkgRel), sealed.text);
       manifestFiles.push({
@@ -740,7 +726,7 @@ async function main() {
       });
     }
     const manifest = { format: 'scripture-armor-repo/2', created: new Date().toISOString(), files: manifestFiles, fileCount: 2, partCount: 2, totalBytes: manifestFiles.reduce((a, f) => a + f.size, 0) };
-    const sealedManifest = sealPlaintext(Buffer.from(JSON.stringify(manifest, null, 2), 'utf8'), me, me, {});
+    const sealedManifest = sealPlaintext(Buffer.from(JSON.stringify(manifest, null, 2), 'utf8'), me, { seal_pub: me.seal_pub }, {});
     fs.writeFileSync(path.join(wrappedDir, 'MANIFEST.scripture'), sealedManifest.text);
     regEntries.push({
       canary: sealedManifest.frame.canary, digest: frameDigest(sealedManifest.frame), digest_kind: 'commit',
@@ -754,7 +740,6 @@ async function main() {
     check('untiered repo activation refused', r.last?.ok === false && /untiered part/.test(r.last?.error || ''),
       JSON.stringify(r.last).slice(0, 220));
     check('the refusal NAMES the untiered part', /prog\.mjs/.test(r.last?.error || ''), r.last?.error || '');
-    if (!refusalOnly) {
     // The same tree wrapped properly (every part tiered) activates whole.
     const outDir = path.join(T, 'repo-wrapped');
     const wr = armor(['wrap-repo', srcDir, '--to', 'cell-host', '--for-activation', '--out', outDir, '--socket', dA.socket, '--identity-dir', A]);
@@ -766,7 +751,6 @@ async function main() {
       (rr.last?.stdout_tail || '').slice(0, 150));
   }
 
-    }
   stopDaemon(dA); stopDaemon(dB);
   console.log('\n[16] v1 regression — the full v1 suite is run separately (test/run-tests.mjs); it must stay 53/53.');
   console.log(`\n${passed}/${passed + failed} checks passed`);
@@ -775,7 +759,7 @@ async function main() {
     for (const f of failures) console.log(`  - ${f}`);
     process.exitCode = 1;
   } else {
-    console.log(refusalOnly ? 'RUNNABLE REFUSAL CHECKS PASSED; positive cell execution remains BLOCKED' : 'ALL CELL BATTERY CHECKS PASSED');
+    console.log('ALL CELL BATTERY CHECKS PASSED');
   }
 }
 

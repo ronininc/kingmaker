@@ -1,0 +1,28 @@
+{
+  "about": "Kingmaker (formerly Sol Ghost) = Solomon with no UI. scripts/import-solomon.mjs copies a TSS commit into solomon/ and removes what is listed here, so the same strip runs every time TSS moves and Ghost never drifts from Solomon's engines.",
+  "remove": {
+    "app/": "the React UI (the Machine board and every window surface)",
+    "desktop/main.mjs": "the Electron window shell (windows, tray, IPC, renderer wiring)",
+    "desktop/preload.mjs": "the renderer bridge",
+    "CLAUDE.md": "the window UI lock; it does not apply to a UI-less Solomon",
+    ".claude/": "agent tooling for the TSS repo, not part of Solomon",
+    ".claude-plugin/": "the TSS repo's Claude Code plugin marketplace, not part of Solomon",
+    "plugins/": "Claude Code plugins for the TSS repo (the Muse council drives the Ronin CRM), not part of Solomon",
+    ".github/": "TSS CI",
+    "reports/": "dated working reports",
+    "hermes-wrapper/": "Hermes appendage, No-Go"
+  },
+  "removeTestsReferencing": [
+    "(from|import\\()\\s*['\"][^'\"]*app/src/",
+    "['\"]electron['\"]",
+    "desktop/(main|preload)\\.mjs"
+  ],
+  "kingmakerOnly": {
+    "about": "Founder-layer (Kingmaker-side) material consolidated from ronininc/kingmaker-os on 2026-10-23 under the ruling 'kingmaker-os is just a title \u2014 put all the abilities within it into kingmaker-private, to be staged at the publish gate.' These paths are Kingmaker's alone: never copied from TSS, never part of Solomon; the Solomon build excludes them by absence, the same rule the LittleBrother split follows.",
+    "paths": [
+      "contracts/",
+      "runtime/",
+      "test-os/"
+    ]
+  }
+}

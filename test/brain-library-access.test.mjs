@@ -1,10 +1,15 @@
+// Load order (pre-existing on main, not a FIX-G condition): brain-library-fetch
+// reads a brain-library constant at module top level inside an import cycle
+// (brain-library → … → tool-streaming → brain-library-fetch), so the graph is
+// entered through it — as the product's own library surface enters — before the
+// access layer. This import therefore stands first.
+import { composeRangeFetchers, fetchModelRange, tetherRangeFetcher } from '../lib/brain-library-fetch.mjs';
 import assert from 'node:assert/strict';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 import { bufferSource, buildCatalogSources, createBrainLibraryAccess, KNOWLEDGE_ID, MAX_PORTION_BYTES, planSegments } from '../lib/brain-library-access.mjs';
-import { composeRangeFetchers, fetchModelRange, tetherRangeFetcher } from '../lib/brain-library-fetch.mjs';
 import { MODE_DOWNLOAD, MODE_STREAM } from '../lib/datasets.mjs';
 
 test('shipped access keeps the 1 MiB portion bound and the segment plan', () => {
@@ -91,4 +96,12 @@ test('fetchModelRange is the model source, and a tether in front can answer firs
   assert.equal(await tether(), null);
   const training = await buildCatalogSources();
   assert.equal(training.has('model:example-writer-q4'), false);
+});
+
+test('remote intelligence (FIX-G): an unreachable repo leaves the bundled floor standing, named on remoteError', async () => {
+  const sources = await buildCatalogSources({ remote: { baseUrl: 'http://127.0.0.1:1', timeoutMs: 2_000 } });
+  assert.equal(sources.remoteError?.code, 'REPO_FETCH_FAILED');
+  assert.ok(sources.has(KNOWLEDGE_ID));
+  assert.ok([...sources.keys()].some((id) => id.startsWith('method:')));
+  assert.equal([...sources.keys()].some((id) => id.startsWith('skill:')), false);
 });

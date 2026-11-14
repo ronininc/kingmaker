@@ -14,8 +14,6 @@
 //
 // Self-contained like the other batteries: own stores, own daemons,
 // serial. Run AFTER the other v2 batteries.
-import { probeCells } from '../cell.mjs';
-import { legacyFixtureHome } from './legacy-v1-fixture.mjs';
 import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -33,10 +31,10 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.dirname(HERE);
 const ARMOR = path.join(ROOT, 'armor.mjs');
 const VAULTD = path.join(ROOT, 'vaultd.mjs');
-const ARMOR_V1 = path.join(legacyFixtureHome(path.join(os.homedir(), 'workspace', 'scripture-armor-standalone')), 'armor.mjs');
+const ARMOR_V1 = path.join(os.homedir(), 'workspace', 'scripture-armor-standalone', 'armor.mjs');
 const NODE = process.execPath;
 
-let passed = 0, failed = 0, blocked = 0;
+let passed = 0, failed = 0;
 const failures = [];
 function check(name, cond, extra = '') {
   if (cond) { passed++; console.log(`  PASS  ${name}`); }
@@ -76,8 +74,6 @@ function trustSelf(storeDir) {
   if (r.code !== 0) throw new Error(`self-trust: ${r.err}`);
 }
 function writePolicy(storeDir, policy) {
-  // The keyless airlock child inherits only PATH: pass reviewed engine paths through its scan policy.
-  policy = { ...policy, scan: { ghidra_home: process.env.SCRIPTURE_GHIDRA_HOME || null, jdk_home: process.env.JAVA_HOME || null, ...(policy.scan || {}) } };
   fs.writeFileSync(path.join(storeDir, 'policy.json'), JSON.stringify(policy, null, 2), { mode: 0o600 });
 }
 function registryOf(storeDir) {
@@ -305,7 +301,7 @@ async function main() {
       JSON.stringify(last).slice(0, 200));
 
     // (h) Owner-channel registration provenance.
-    const sealed = sealPlaintext(Buffer.from('owner-registered bytes\n', 'utf8'), idB, idB, {});
+    const sealed = sealPlaintext(Buffer.from('owner-registered bytes\n', 'utf8'), idB, { seal_pub: idB.seal_pub }, {});
     const pkgPath = writePayload('owner-reg.scripture', sealed.text);
     const regRes = await ownerRpc(dB.socket, {
       cmd: 'register',
@@ -373,15 +369,15 @@ async function main() {
   }
 
   // ================= S4: plaintext-hash oracle + legacy ==============
-  console.log('\n[S4] FIX 3 — no offline oracle on the sealed frame; legacy frames stay coherent');
+  console.log('\n[S4] FIX 3 — no offline oracle on v3; legacy frames stay coherent');
   {
     dA = await startDaemon(A);
     const pin = writePayload('pin.txt', '4821');
     const w = armor(['wrap', pin, '--to', 'bravo', '--identity-dir', A, '--register-socket', dB.socket]);
     check('PIN wraps', w.code === 0, w.err.slice(0, 150));
     const { frame } = parseScriptureFile(fs.readFileSync(`${pin}.scripture`, 'utf8'));
-    check('the frame is v4 and carries no sha256 field',
-      frame.v === 4 && frame.sha256 === undefined && typeof frame.commit === 'string');
+    check('the frame is v3 and carries no sha256 field',
+      frame.v === 3 && frame.sha256 === undefined && typeof frame.commit === 'string');
     check('the commitment is not the plaintext hash',
       frame.commit !== sha256Hex(Buffer.from('4821')));
     const fieldValues = new Set(Object.values(frame).filter((v) => typeof v === 'string'));
@@ -397,7 +393,7 @@ async function main() {
     check('two wraps of the same low-entropy plaintext share no digest (unlinkable)',
       w2.code === 0 && frame2.commit !== frame.commit);
     const back = await presentAndApprove(dB.socket, `${pin}.scripture`, 'pin-back.txt');
-    check('the v4 PIN package still return-matches and unwraps for its owner',
+    check('the v3 PIN package still return-matches and unwraps for its owner',
       back.last?.state === 'unwrapped' && fs.readFileSync(path.join(B, 'out', 'pin-back.txt'), 'utf8') === '4821');
 
     // Legacy: a v1-wrapped package (the standalone tool) still opens
@@ -431,7 +427,6 @@ async function main() {
 
   // ================= S5: SOFT cell escape ============================
   console.log('\n[S5] FIX 2 — the red team escape payload, re-attempted');
-  if (probeCells().soft.available) {
   {
     writePolicy(A, { scan: {} });
     const escSrc = [
@@ -472,7 +467,6 @@ async function main() {
       tail.includes('selfread=ok'), tail.slice(0, 200));
   }
 
-  } else { blocked++; console.log('BLOCKED S5: actual SOFT substrate unavailable; confinement and in-cell capability are not proved on this host.'); }
   await stopDaemon(dA); dA = null;
   await stopDaemon(dB);
 
@@ -619,9 +613,9 @@ async function main2({ A, B, idA, idB, W, writePayload }) {
     const meA = loadIdentity(A);
     const mkCase = async (name, startedIso) => {
       const rec = { ...record, started: startedIso };
-      const repSealed = sealPlaintext(Buffer.from(canonicalScanRecord(rec), 'utf8'), meA, meA, {});
+      const repSealed = sealPlaintext(Buffer.from(canonicalScanRecord(rec), 'utf8'), meA, { seal_pub: meA.seal_pub }, {});
       fs.writeFileSync(path.join(W, `${name}.scan-report.scripture`), repSealed.text, { mode: 0o600 });
-      const sealed = sealPlaintext(evilBytes, meA, meA, {
+      const sealed = sealPlaintext(evilBytes, meA, { seal_pub: meA.seal_pub }, {
         expires: Date.now() + 3600e3,
         scan: {
           verdict: rec.verdict, digest, reportCanary: repSealed.frame.canary,
@@ -739,9 +733,9 @@ net.createServer((client) => {
   }
 
   await stopDaemon(dB);
-  console.log(`\nTOTAL: ${passed} passed, ${failed} failed, ${blocked} blocked groups`);
+  console.log(`\nTOTAL: ${passed} passed, ${failed} failed`);
   if (failures.length) { console.log(`failures: ${failures.join(' | ')}`); process.exit(1); }
-  console.log(blocked ? 'RUNNABLE PHASE-4 CHECKS PASSED; platform execution groups remain BLOCKED' : 'ALL PHASE-4 REGRESSION CHECKS PASSED');
+  console.log('ALL PHASE-4 REGRESSION CHECKS PASSED');
 }
 
 // The airlock peer script + dock helpers (Closure 3 battery shapes).

@@ -1,0 +1,8 @@
+{
+  "source": "Owner-provided screenshot, 2026-10-18",
+  "reference": "KM-UI-20261018-A",
+  "foregroundRequest": "Summarize these six soak acceptance requirements as six numbered lines. Reference KM-UI-20261018-A. Zero local generated tokens fails. Zero completed local jobs fails. Missing telemetry is unknown. Truncated output fails. Cloud fallback is not a local completion. Memory recovery requires measurement. Use only this supplied text; do not perform actions or claim tests ran.",
+  "unrelatedOutputExcerpt": "Overnight list for 2026-10-18 (open)",
+  "observation": "The screenshot displays unrelated overnight-list output beneath the foreground request.",
+  "limits": "The screenshot is UI evidence, not a captured engine trace. Regression interleavings are synthetic and run through the open CLI queue and native consumer. No production inference result is asserted."
+}

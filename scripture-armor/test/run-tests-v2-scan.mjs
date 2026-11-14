@@ -11,7 +11,6 @@
 // Needs: gcc (fixtures), Ghidra + JDK (under ~/workspace/tools), UPX
 // (packed fixture; case 6 skips loudly if absent).
 
-import { legacyFixtureHome } from './legacy-v1-fixture.mjs';
 import { execFile, spawn, spawnSync } from 'node:child_process';
 import { promisify } from 'node:util';
 import crypto from 'node:crypto';
@@ -30,7 +29,7 @@ import { TERMS_VERSION, termsSha256 } from '../terms.mjs';
 const execFileP = promisify(execFile);
 const HERE = path.dirname(new URL(import.meta.url).pathname);
 const ROOT = path.join(HERE, '..');
-const V1 = legacyFixtureHome(path.join(ROOT, '..', 'scripture-armor-standalone'));
+const V1 = path.join(ROOT, '..', 'scripture-armor-standalone');
 const ARMOR = path.join(ROOT, 'armor.mjs');
 const VAULTD = path.join(ROOT, 'vaultd.mjs');
 const LAUNCH = path.join(ROOT, 'launch.mjs');
@@ -197,7 +196,7 @@ async function main() {
       m ? `${m[1]}/${m[2]}` : (r.out + r.err).slice(-400));
   }
 
-  const T = fs.mkdtempSync(path.join(process.env.ARMOR_TEST_WORK_ROOT || os.tmpdir(), 'sa2-battery-'));
+  const T = fs.mkdtempSync(path.join(os.tmpdir(), 'sa2-battery-'));
   // ---- fixtures ------------------------------------------------------
   const BIN = path.join(T, 'bin'); fs.mkdirSync(BIN);
   const gcc = run('gcc', ['-O1', '-U_FORTIFY_SOURCE', '-D_FORTIFY_SOURCE=0', '-o', path.join(BIN, 'bad.bin'), path.join(HERE, 'fixtures-src', 'bad.c')]);
@@ -205,13 +204,9 @@ async function main() {
   if (gcc.code !== 0) throw new Error(`gcc fixture build failed: ${gcc.err}`);
   const badBin = path.join(BIN, 'bad.bin'), cleanBin = path.join(BIN, 'clean.bin');
   let packedBin = null;
-  const approvedUpx = process.env.ARMOR_APPROVED_UPX;
-  if (approvedUpx && sha256Hex(fs.readFileSync(approvedUpx)) !== 'ad8849794063dcaaf8c0dbcf16e66435b1d10841ed9d126d7c36ff71221bdd12') throw new Error('Owner-approved fixture packer hash mismatch');
-  const upxPath = approvedUpx || (fs.existsSync(path.join(os.homedir(), 'workspace', 'tools', 'upx', 'upx'))
-    ? path.join(os.homedir(), 'workspace', 'tools', 'upx', 'upx') : 'upx');
-  // Vendor currently disables macOS packing by default. This override produces
-  // inspection bytes only: neither original nor packed fixture is ever executed.
-  const upx = run(upxPath, [...(process.platform === 'darwin' ? ['--force-macos'] : []), '-q', '--best', '-o', path.join(BIN, 'packed.bin'), badBin]);
+  const upxPath = fs.existsSync(path.join(os.homedir(), 'workspace', 'tools', 'upx', 'upx'))
+    ? path.join(os.homedir(), 'workspace', 'tools', 'upx', 'upx') : 'upx';
+  const upx = run(upxPath, ['-q', '--best', '-o', path.join(BIN, 'packed.bin'), badBin]);
   if (upx.code === 0) packedBin = path.join(BIN, 'packed.bin');
 
   const S = mkStore('wrap-side');
@@ -276,7 +271,7 @@ async function main() {
     // recomputable by the report's holder (who recovers the file key),
     // never by an outsider holding only the artifact.
     check('refused report is anchored by its own frame commitment (commit == HMAC(file key, plaintext))',
-      commitFor(unsealFileKey(loadIdentity(R), badReportFrame), plain) === badReportFrame.commit,
+      commitFor(unsealFileKey(loadIdentity(R).sealPriv, badReportFrame), plain) === badReportFrame.commit,
       `commit=${badReportFrame.commit}`);
     check('report findings match the direct scan', rec.verdict === 'critical' && rec.findings.length === scanBad.findings.length);
     // The §0.3 digest binding on a WRAPPED target: the target frame's

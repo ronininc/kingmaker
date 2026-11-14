@@ -40,10 +40,9 @@
 //
 // Run:    node vaultd.mjs serve [--identity-dir <dir>]
 //                 [--socket <path>] [--out-dir <dir>] [--approval-window-ms <n>]
-// Client: node vaultd.mjs <status|pending|approve|recovery|unwrap> …
+// Client: node vaultd.mjs <status|pending|approve|unwrap> …
 
 import net from 'node:net';
-import { assertProductIdentityDir } from './product-paths.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import { spawn } from 'node:child_process';
@@ -53,7 +52,6 @@ import {
   loadIdentity, defaultIdentityDir, parseScriptureFile, verifyFrameSignature,
   armorDecode, unsealFileKey, openSealedFile, loadAddressBook, sealPlaintext,
   sha256Hex, signPayload, verifyPayload, meshRpc, fingerprintOfRaw,
-  frameDigestKind, storeIntegrityKey, outboxSummary,
   loadRevocations, saveRevocations, signRevocation, revocationFor,
   verifyRevocation, loadEstateState, saveEstateState, appendIssuedLog, loadIssuedLog,
   commitFor, frameDigest, verifyLocalRegister, signLocalRegister,
@@ -67,6 +65,14 @@ import {
 import {
   TERMS_TEXT, TERMS_VERSION, termsSha256, recordAcceptance, hasCurrentAcceptance,
 } from './terms.mjs';
+import {
+  chainRegistrySave, verifyAnchoredRegistry, verifyChain, registryChainFile,
+  saveAttestation, loadAttestation, anchorAdvance, loadAnchorState, saveAnchorState,
+  spendBudget, sealLogSegment,
+} from './refit-store.mjs';
+import {
+  pendingDigestOf, verifyOwnerAct, loadOwnerKey, decideCellRoute, watchDeviation,
+} from './refit-gates.mjs';
 
 function parseFlags(args) {
   const flags = {};
@@ -109,7 +115,7 @@ function rpc(socketPath, obj, { stream = false } = {}) {
 }
 
 async function clientMain(cmd, flags, pos) {
-  const dir = assertProductIdentityDir(flags['identity-dir'] ? path.resolve(flags['identity-dir']) : defaultIdentityDir());
+  const dir = flags['identity-dir'] ? path.resolve(flags['identity-dir']) : defaultIdentityDir();
   const socketPath = flags.socket ? path.resolve(flags.socket) : path.join(dir, 'vaultd.sock');
   // Owner acts ride the OWNER channel (FIX 1): this CLI reads the
   // per-daemon owner token from beside the owner socket and presents
@@ -120,40 +126,8 @@ async function clientMain(cmd, flags, pos) {
     if (!token) throw new Error(`owner channel unavailable: no owner token beside ${socketPath} — is the daemon running?`);
     return rpc(ownerSocketFor(socketPath), { ...obj, owner_token: token }, opts);
   };
-  if (cmd === 'log-verify') {
-    // M.26 owner act: verify the live log's hash chain + HMAC seals.
-    // Names the exact line where the chain first breaks; a clean chain
-    // proves no line was altered, inserted, reordered, or truncated
-    // after the fact. Sealed history lives in log-segments/ as v4
-    // packages and opens through the ordinary owner unwrap flow.
-    const idv = loadIdentity(dir);
-    if (!idv) { console.error('no identity in ' + dir); process.exit(1); }
-    const key = Buffer.from(crypto.hkdfSync('sha256',
-      Buffer.from(idv.seal_priv, 'base64url'), Buffer.from('scripture-armor/log'),
-      Buffer.from('scripture-armor/log/v1'), 32));
-    const lf = path.join(dir, 'vaultd.log');
-    const lines = fs.existsSync(lf) ? fs.readFileSync(lf, 'utf8').split('\n').filter(Boolean) : [];
-    let prevHash = null;
-    for (let i = 0; i < lines.length; i++) {
-      let rec;
-      try { rec = JSON.parse(lines[i]); } catch { console.log(`CHAIN BREAK at line ${i + 1}: unparseable`); process.exit(1); }
-      if (!rec.mac || !rec.prev) { console.log(`CHAIN BREAK at line ${i + 1}: unsealed record (pre-M.26 or forged)`); process.exit(1); }
-      if (i > 0 && rec.prev !== prevHash) { console.log(`CHAIN BREAK at line ${i + 1}: prev does not match the previous line's hash`); process.exit(1); }
-      const { mac, ...rest } = rec;
-      const expect = crypto.createHmac('sha256', key).update(JSON.stringify(rest)).digest('hex');
-      if (expect !== mac) { console.log(`CHAIN BREAK at line ${i + 1}: HMAC mismatch — this record was altered after writing`); process.exit(1); }
-      prevHash = crypto.createHash('sha256').update(lines[i]).digest('hex');
-    }
-    const segDir = path.join(dir, 'log-segments');
-    const segs = fs.existsSync(segDir) ? fs.readdirSync(segDir).filter((f) => f.endsWith('.scripture')).length : 0;
-    console.log(`log chain OK: ${lines.length} live record(s) verified, 0 breaks; ${segs} sealed history segment(s) in log-segments/`);
-    return;
-  }
   if (cmd === 'status') await orpc({ cmd: 'status' });
   else if (cmd === 'pending') await orpc({ cmd: 'pending' });
-  else if (cmd === 'recovery') {
-    await orpc({ cmd: 'recovery' });
-  }
   else if (cmd === 'approve') {
     const lines = await orpc({ cmd: 'approve', id: flags.id || pos[0] || null, confirm: flags.confirm || null });
     const stage1 = lines.find((m) => m.approved_stage === 1);
@@ -231,7 +205,7 @@ async function clientMain(cmd, flags, pos) {
 // ---------------------------------------------------------------------------
 
 function serve(flags) {
-  const dir = assertProductIdentityDir(flags['identity-dir'] ? path.resolve(flags['identity-dir']) : defaultIdentityDir());
+  const dir = flags['identity-dir'] ? path.resolve(flags['identity-dir']) : defaultIdentityDir();
   const socketPath = flags.socket ? path.resolve(flags.socket) : path.join(dir, 'vaultd.sock');
   const outDir = flags['out-dir'] ? path.resolve(flags['out-dir']) : path.join(dir, 'out');
   const windowMs = flags['approval-window-ms'] ? Number(flags['approval-window-ms']) : 120000;
@@ -248,120 +222,24 @@ function serve(flags) {
       console.error(`error: refusing to serve: the daemon socket directory ${socketDir} is not private (mode ${mode.toString(8)}).`);
       console.error('  A daemon socket outside a private (0700) directory exposes the API to other local users.');
       console.error('  Serve from the identity store (the default) or another 0700 directory.');
-      // Exit 78 (EX_CONFIG): a configuration-class refusal that
-      // restarting cannot fix — the systemd units carry
-      // RestartPreventExitStatus=78 for exactly this exit and the
-      // no-identity exit below.
-      process.exit(78);
+      process.exit(1);
     }
   }
 
   const id = loadIdentity(dir);
   if (!id) {
     console.error(`error: no identity in ${dir} — run armor.mjs identity first`);
-    // Exit 78 (EX_CONFIG): see the socket-directory refusal above.
-    process.exit(78);
+    process.exit(1);
   }
   fs.mkdirSync(outDir, { recursive: true, mode: 0o700 });
   const logFile = path.join(dir, 'vaultd.log');
   const startedAt = Date.now();
   const pending = new Map();
-  // M.19 budgets: defenses fire only on evidence, and abuse burns only
-  // the abuser's budget. Pendings per origin are capped (excess is shed
-  // and counted, never shown to the owner as individual approvals), and
-  // registrations per sender per hour are capped (registry bloat is a
-  // cost imposed on the store, so it is budgeted like everything else).
-  const PENDING_CAP_PER_ORIGIN = 32;
-  const REGISTER_BUDGET_PER_SENDER_HOUR = 10000;
-  let shedPendings = 0;
 
-  // Recovery candidates (Gemini fix 1): a presented package whose
-  // canary this loop never registered beacons never-issued — that
-  // testimony never changes. But when the frame's signature verifies,
-  // the sender is this copy or an enrolled peer, and the store's
-  // integrity stands, the daemon ALSO records a recovery candidate:
-  // the owner may approve it on the owner channel, and only that
-  // approval derives the issuance from the package itself and
-  // registers it (the outbox-desync loop-hole, closed by the owner's
-  // act instead of a dead end). Candidates are bounded, expire with
-  // the approval window's horizon, and vanish the moment their canary
-  // registers or is consumed through any ordinary path.
-  // Verify grants (Gemini fix 3): an owner-approved verify-open arms
-  // the package's one-shot return for the approval window — the
-  // consuming unwrap that follows immediately (unwrap-repo verifying
-  // a manifest against its sidecar before spending the return) runs
-  // every return-match gate again and executes under the SAME owner
-  // decision: digest-bound, single-use, window-bound. The verify
-  // itself never consumes; a grant that is never used just expires.
-  const verifyGrants = new Map(); // canary -> {digest, expiresAt}
-  const recoveryCandidates = new Map(); // id -> {id, canary, filePath, outName, sender_sign_fp, digest, createdAt}
-  const RECOVERY_CANDIDATE_CAP = 32;
-  function dropRecoveryCandidates(canaries) {
-    const set = new Set(canaries);
-    for (const [cid, cand] of recoveryCandidates) {
-      if (set.has(cand.canary)) recoveryCandidates.delete(cid);
-    }
-  }
-  function pruneRecoveryCandidates() {
-    const horizon = Date.now() - Math.max(windowMs, 3600_000);
-    for (const [cid, cand] of recoveryCandidates) {
-      if (cand.createdAt < horizon) recoveryCandidates.delete(cid);
-    }
-  }
-  // The issuance a package testifies about itself — the same
-  // derivation `armor register` performs from a package's frame.
-  function issuanceFromFrame(frame) {
-    return {
-      canary: frame.canary,
-      digest: frameDigest(frame),
-      digest_kind: frameDigestKind(frame),
-      recipient_seal_fp: frame.recipient_seal_fp,
-      sender_sign_fp: frame.sender_sign_fp,
-      expiry: frame.expiry ?? null,
-      issued_at: frame.created || new Date().toISOString(),
-      origin: 'egress',
-      scan: frame.scan_verdict != null
-        ? { verdict: frame.scan_verdict, digest: frame.scan_digest ?? null, report_canary: frame.scan_report ?? null }
-        : null,
-      tier: frame.armor_tier != null ? { tier: frame.armor_tier, params: null } : null,
-      repo: null, report_for: null, report_only: false, estate: null,
-    };
-  }
-
-  // M.26 — the armor's logs get the armor's discipline. Every record is
-  // a link in an append-only hash chain, HMAC-sealed under a key derived
-  // from this identity: alter, insert, reorder, or truncate any line and
-  // verification names the exact line where the chain breaks. On daemon
-  // start, a non-empty previous log is rotated into log-segments/ and
-  // SEALED as an ordinary v4 package to this same identity — at rest,
-  // history is ciphertext; the live segment is chained and confesses
-  // tampering (verify with: vaultd.mjs log-verify --identity-dir <dir>).
-  const logKey = Buffer.from(crypto.hkdfSync('sha256',
-    Buffer.from(id.seal_priv, 'base64url'), Buffer.from('scripture-armor/log'),
-    Buffer.from('scripture-armor/log/v1'), 32));
-  let logPrev = 'GENESIS';
   function log(event) {
-    const rec = { ts: new Date().toISOString(), ...event, prev: logPrev };
-    const mac = crypto.createHmac('sha256', logKey).update(JSON.stringify(rec)).digest('hex');
-    const line = JSON.stringify({ ...rec, mac });
-    logPrev = crypto.createHash('sha256').update(line).digest('hex');
+    const line = JSON.stringify({ ts: new Date().toISOString(), ...event });
     fs.appendFileSync(logFile, line + '\n', { mode: 0o600 });
   }
-  function rotateLogSegment() {
-    try {
-      if (!fs.existsSync(logFile) || fs.statSync(logFile).size === 0) return;
-      const segDir = path.join(dir, 'log-segments');
-      fs.mkdirSync(segDir, { recursive: true, mode: 0o700 });
-      const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const raw = fs.readFileSync(logFile);
-      const sealed = sealPlaintext(raw, id, id, {});
-      const segPath = path.join(segDir, `vaultd-${stamp}.scripture`);
-      fs.writeFileSync(segPath, sealed.text, { mode: 0o600 });
-      fs.rmSync(logFile);
-      logPrev = crypto.createHash('sha256').update(raw).digest('hex');
-    } catch { /* testimony is never destroyed by a failed rotation */ }
-  }
-  rotateLogSegment();
 
   // --- Issued-hash registry (the loop's memory of what it sent out) -------
   // registry.json in the identity dir, mode 0600, rewritten atomically on
@@ -373,130 +251,97 @@ function serve(flags) {
   // pending request holds the entry (claim-at-pend, see handleUnwrap).
   const registryFile = path.join(dir, 'registry.json');
 
-  // Store integrity + read cache (Gemini fixes 2b/5; register #1).
-  // The registry carries an HMAC tag keyed from this identity (the
-  // M.26 pattern, via armor's store key), verified on every load.
-  // Loads are cached on (mtime, size): an untouched file is parsed
-  // once, not once per request — and an external edit invalidates the
-  // cache and is re-verified, never silently trusted (the estate
-  // battery edits this file on disk mid-run and the daemon must SEE
-  // those edits: forged entries surfacing as sync conflicts, deleted
-  // entries beaconing never-issued and being repaired by sync).
-  // A tag mismatch therefore does NOT brick the store: it is logged
-  // loudly, surfaced on the owner status, and fails closed exactly
-  // where the registry would be TRUSTED — a package whose entry sits
-  // in a tampered registry never opens — while registration and the
-  // estate sync/repair machinery keep running, and saveRegistry
-  // re-tags (heals) the store on the next legitimate write. This is
-  // tamper-EVIDENCE, not the M.1 countersigned store (designed,
-  // unbuilt).
-  const registryKey = storeIntegrityKey(id.seal_priv);
-  let registryCache = null; // {mtimeMs, size, doc (integrity field stripped), integrityOk}
-  let registryIntegrityState = 'ok';
-  // Whether a tagged store has been seen or written this run. A file
-  // that arrives UNTAGGED before that is a pre-tag (legacy) store and
-  // migrates; a file that arrives untagged AFTER it was externally
-  // rewritten — the tag was stripped — and that is tamper, not legacy.
-  let registryWasTagged = false;
-  function registryCanonical(doc) {
-    const copy = { ...doc };
-    delete copy.integrity;
-    return JSON.stringify(copy);
+  function loadRegistry() {
+    try {
+      const reg = JSON.parse(fs.readFileSync(registryFile, 'utf8'));
+      if (reg && typeof reg === 'object' && reg.entries) return reg;
+    } catch {}
+    return { v: 1, entries: {} };
   }
-  function noteRegistryIntegrity(ok, why) {
-    const state = ok ? 'ok' : 'failed';
-    if (state === registryIntegrityState) return;
-    registryIntegrityState = state;
-    if (!ok) {
-      console.error(`store-integrity: registry.json failed its integrity check (${why}) — entries will not be trusted for opening until the store is repaired`);
-      log({ event: 'store-integrity', result: 'failed: registry.json HMAC mismatch', detail: why });
-    } else {
-      log({ event: 'store-integrity', result: 'ok: registry.json integrity restored' });
-    }
-  }
-  function writeRegistryFile(doc) {
-    const out = { ...doc };
-    delete out.integrity;
-    out.integrity = crypto.createHmac('sha256', registryKey).update(registryCanonical(out), 'utf8').digest('hex');
+
+  function saveRegistry(reg) {
     const tmp = `${registryFile}.tmp-${process.pid}`;
-    fs.writeFileSync(tmp, JSON.stringify(out, null, 2), { mode: 0o600 });
+    fs.writeFileSync(tmp, JSON.stringify(reg, null, 2), { mode: 0o600 });
     fs.renameSync(tmp, registryFile);
     try { fs.chmodSync(registryFile, 0o600); } catch {}
-    registryWasTagged = true;
-    try {
-      const st = fs.statSync(registryFile);
-      const cachedDoc = { ...out };
-      delete cachedDoc.integrity;
-      registryCache = { mtimeMs: st.mtimeMs, size: st.size, doc: cachedDoc, integrityOk: true };
-    } catch { registryCache = null; }
-    noteRegistryIntegrity(true);
+    // REFIT M.1: every save is chained (the chain binds the exact
+    // bytes) and the anchor is asked to countersign the new head.
+    if (refitOn()) {
+      try { chainRegistrySave(dir, registryFile); } catch {}
+      void refitAnchorRound();
+    }
   }
-  function loadRegistry() {
-    let st = null;
-    try { st = fs.statSync(registryFile); } catch {}
-    if (st && registryCache && registryCache.mtimeMs === st.mtimeMs && registryCache.size === st.size) {
-      return structuredClone(registryCache.doc);
-    }
-    if (!st) {
-      // No store file. Fresh installs live here; a store that existed
-      // tagged and then vanished was removed outside the daemon.
-      registryCache = null;
-      if (registryWasTagged) noteRegistryIntegrity(false, 'registry.json disappeared — the store was removed outside the daemon');
-      return { v: 1, entries: {} };
-    }
-    let doc = null;
-    for (let attempt = 0; attempt < 2 && !doc; attempt++) {
+
+  // --- Addendum M (refit) -------------------------------------------------
+  // Every mechanism in this section is INERT unless policy.refit.enabled
+  // — a store without refit policy behaves byte-identically to shipped
+  // v2 (the regression batteries run that way).
+  const refitOn = () => !!pol().refit?.enabled;
+  const refitSignedActsOn = () => refitOn() && !!pol().refit?.signed_owner_acts;
+  // M.1 anchor liveness cache: refreshed by a timer and after saves;
+  // consumption reads may use a cache at most 10 s old as the anchor's
+  // live report — older than that, the anchor counts as unreachable
+  // and consumption of not-yet-anchored state refuses (fail closed).
+  const anchorCache = { live: null, at: 0 };
+  function refitAnchorPeer() {
+    const fp = pol().refit?.anchor_sign_fp;
+    return fp ? peerBySignFp(fp) : null;
+  }
+  let anchorRoundInFlight = null;
+  function refitAnchorRound() {
+    // Serialized: concurrent rounds (save-triggered + timer) would
+    // race their attestations backwards. One round at a time, and a
+    // round loops until the attestation covers the current head.
+    if (anchorRoundInFlight) return anchorRoundInFlight;
+    anchorRoundInFlight = (async () => {
       try {
-        const parsed = JSON.parse(fs.readFileSync(registryFile, 'utf8'));
-        if (parsed && typeof parsed === 'object' && parsed.entries) doc = parsed;
+        if (!refitOn()) return;
+        const found = refitAnchorPeer();
+        if (!found) return;
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const chain = verifyChain(registryChainFile(dir));
+          if (!chain.ok || !chain.entries.length) break;
+          const resp = await meshCall(found.peer, 'anchor-head', {
+            vault_sign_fp: id.signFp, head: chain.head, seq: chain.seq,
+          });
+          if (resp && resp.body?.attestation) saveAttestation(dir, resp.body.attestation);
+          const att = loadAttestation(dir);
+          if (att && att.body.seq >= chain.seq) break;
+        }
+        const st = await meshCall(found.peer, 'anchor-status', {});
+        if (st && st.body && typeof st.body.seq === 'number') {
+          anchorCache.live = { seq: st.body.seq, head: st.body.head };
+          anchorCache.at = Date.now();
+        }
       } catch {}
-    }
-    if (!doc) {
-      registryCache = null;
-      if (registryWasTagged) noteRegistryIntegrity(false, 'registry.json is unparseable — the store was altered outside the daemon');
-      return { v: 1, entries: {} };
-    }
-    if (doc.integrity === undefined) {
-      if (registryWasTagged) {
-        // The tag was stripped by an external rewrite: tamper, not
-        // legacy. Entries still load (sync/repair must see them);
-        // trust decisions fail closed via registryIntegrityOk().
-        const clean = { ...doc };
-        registryCache = { mtimeMs: st.mtimeMs, size: st.size, doc: clean, integrityOk: false };
-        noteRegistryIntegrity(false, 'integrity tag missing — the registry was rewritten outside the daemon');
-        return structuredClone(clean);
-      }
-      // Pre-tag store: migrate in place (tag added; entries untouched).
-      const clean = { ...doc };
-      try { writeRegistryFile(clean); } catch { return clean; }
-      return structuredClone(clean);
-    }
-    registryWasTagged = true;
-    const expect = crypto.createHmac('sha256', registryKey).update(registryCanonical(doc), 'utf8').digest('hex');
-    const integrityOk = expect === doc.integrity;
-    const clean = { ...doc };
-    delete clean.integrity;
-    registryCache = { mtimeMs: st.mtimeMs, size: st.size, doc: clean, integrityOk };
-    noteRegistryIntegrity(integrityOk, 'HMAC mismatch — the registry was altered outside the daemon');
-    return structuredClone(clean);
+    })().finally(() => { anchorRoundInFlight = null; });
+    return anchorRoundInFlight;
   }
-  // Fail-closed read for trust decisions: false whenever the store's
-  // integrity state stands failed — tag mismatch, stripped tag,
-  // unparseable, or vanished-after-tagged. (A store that never
-  // existed is an empty store, not a tampered one.)
-  function registryIntegrityOk() {
-    loadRegistry();
-    if (registryIntegrityState !== 'ok') return false;
-    return registryCache ? registryCache.integrityOk !== false : true;
+  // M.1 consumption gate (unwrap + approve): the anchored-registry
+  // verification of refit-store, with the anchor's live report when
+  // fresh. Chaining-only mode (no anchor configured) imposes no gate.
+  function refitConsumptionGate() {
+    if (!refitOn()) return { ok: true };
+    const cfg = pol().refit;
+    if (!cfg.anchor_sign_fp) return { ok: true };
+    const live = (Date.now() - anchorCache.at < 10000) ? anchorCache.live : null;
+    return verifyAnchoredRegistry(dir, registryFile, cfg.anchor_sign_fp, { liveAnchor: live });
   }
-  function saveRegistry(reg) {
-    writeRegistryFile(reg);
-  }
-  // Verify once at startup so a tampered store is loud from boot,
-  // not discovered at the first presentation.
-  loadRegistry();
-  if (registryIntegrityState !== 'ok') {
-    console.error('store-integrity: registry.json FAILED its integrity check at startup — entries will not be trusted for opening until the store is repaired (see vaultd.log)');
+  // M.4/M.13: daemon-issued approval nonces + consumed-act nonces.
+  const ownerNonces = new Map(); // nonce -> expiry ms
+  const ownerConsumedNonces = new Set();
+  function refitPendingDigest(entry) {
+    return pendingDigestOf({
+      id: entry.id, canary: entry.frame?.canary ?? null,
+      digest: entry.frame ? frameDigest(entry.frame) : null,
+      verdict: entry.frame?.scan_verdict ?? null,
+      scan_digest: entry.frame?.scan_digest ?? null,
+      tier: entry.tierSnapshot?.tier ?? null,
+      notices: entry.notices ?? [],
+      registry_status: entry.registryStatus ?? null,
+      provenance: entry.provenance ?? null,
+      kind: entry.kind || 'unwrap',
+    });
   }
 
   // Release a pending request's claim on a registry entry. Only the claim
@@ -647,7 +492,7 @@ function serve(flags) {
   // equality IS the "verified image" — the bytes about to run are
   // provably the bytes that were issued, scanned, and granted.
   function openPackage(frame, payload) {
-    const fileKey = unsealFileKey(id, frame);
+    const fileKey = unsealFileKey(id.sealPriv, frame);
     const plaintext = openSealedFile(fileKey, frame, payload);
     // Content integrity (Phase 4, FIX 3): a v3 frame verifies its
     // keyed commitment — recomputable only here, where the file key
@@ -699,18 +544,6 @@ function serve(flags) {
         }
         registered.push(e.canary);
         continue;
-      }
-      {
-        const senderKey = fromSignFp ?? e.sender_sign_fp ?? 'unknown';
-        const hourAgo = Date.now() - 3600_000;
-        let recent = 0;
-        for (const x of Object.values(reg.entries)) {
-          if ((x.registered_from ?? x.sender_sign_fp) === senderKey && Date.parse(x.issued_at || 0) > hourAgo) recent++;
-        }
-        if (recent >= REGISTER_BUDGET_PER_SENDER_HOUR) {
-          refused.push({ canary: e.canary, error: 'register-budget-exceeded: per-sender registration budget for this epoch is exhausted (M.19)' });
-          continue;
-        }
       }
       reg.entries[e.canary] = {
         canary: e.canary,
@@ -904,66 +737,7 @@ function serve(flags) {
       count: res.registered.length, canaries: res.registered,
       refused: [...refused, ...res.refused].length ? [...refused, ...res.refused] : undefined,
     });
-    if (res.registered.length) dropRecoveryCandidates(res.registered);
     return { registered: res.registered, refused: [...refused, ...res.refused] };
-  }
-
-  // Owner-approved recovery (Gemini fix 1): re-read the package as it
-  // stands NOW, re-verify everything the candidate was recorded on,
-  // derive the issuance from the package itself, register it, and
-  // open the package in the same act. Any divergence since the
-  // presentation refuses closed; a registration conflict refuses
-  // without overwriting anything; a successful registration whose
-  // open fails leaves the package registered and presentable through
-  // the ordinary flow (reported, not hidden).
-  function executeRecoveryApproval(conn, cand) {
-    recoveryCandidates.delete(cand.id);
-    let parsed;
-    try {
-      parsed = parseScriptureFile(fs.readFileSync(cand.filePath, 'utf8'));
-    } catch (err) {
-      log({ event: 'recovery', result: `refused: package unreadable (${err.message})`, canary: cand.canary, candidate: cand.id });
-      send(conn, { ok: false, error: `recovery-refused: the package at ${cand.filePath} can no longer be read (${err.message})`, canary: cand.canary });
-      return;
-    }
-    const { frame, body } = parsed;
-    const refuseRec = (why) => {
-      log({ event: 'recovery', result: `refused: ${why}`, canary: cand.canary, candidate: cand.id });
-      send(conn, { ok: false, error: `recovery-refused: ${why}`, canary: cand.canary });
-    };
-    if (frame.canary !== cand.canary) return refuseRec('the package at the recorded path carries a different canary now');
-    if (frame.recipient_seal_fp !== id.sealFp) return refuseRec('the package is not sealed to this copy');
-    if (frame.v >= 4 && frame.recipient_kem_fp !== id.kemFp) return refuseRec('recipient-kem-mismatch: this v4 package was not KEM-sealed to this copy');
-    if (!verifyFrameSignature(frame, body)) return refuseRec('the frame signature no longer verifies');
-    if (frame.expiry && Date.parse(frame.expiry) < Date.now()) return refuseRec('the package has expired');
-    if (revocationInForce(frame.sender_sign_fp)) return refuseRec('the sender stands revoked');
-    if (loadRegistry().entries[frame.canary]) return refuseRec('the canary registered through an ordinary path meanwhile — recovery is moot');
-    const res = registerEntries([issuanceFromFrame(frame)], 'owner-recovery', id.signFp);
-    if (!res.registered.length) {
-      log({ event: 'recovery', result: 'refused: registration-conflict', canary: frame.canary, candidate: cand.id, refused: res.refused });
-      send(conn, { ok: false, error: 'recovery-registration-refused: the derived issuance conflicts with the registry as it now stands', canary: frame.canary });
-      return;
-    }
-    log({ event: 'register', result: 'recovered-issuance', canary: frame.canary, candidate: cand.id });
-    try {
-      const payload = armorDecode(body, Buffer.from(frame.armor_seed, 'base64'));
-      const plaintext = openPackage(frame, payload);
-      const outName = path.basename(cand.outName || `recovered-${frame.canary.slice(0, 8)}.bin`);
-      const dest = path.join(outDir, outName);
-      fs.writeFileSync(dest, plaintext, { mode: 0o600 });
-      try { fs.chmodSync(dest, 0o600); } catch {}
-      const reg = loadRegistry();
-      if (reg.entries[frame.canary]) {
-        reg.entries[frame.canary].returned_at = new Date().toISOString();
-        delete reg.entries[frame.canary].claim;
-        saveRegistry(reg);
-      }
-      log({ event: 'unwrap', result: 'unwrapped', canary: frame.canary, digest: frameDigest(frame), out: dest, registry: 'returned', via: 'owner-recovery' });
-      send(conn, { ok: true, approved: cand.id, recovered: frame.canary, state: 'unwrapped', out: dest, digest: frameDigest(frame), canary: frame.canary });
-    } catch (err) {
-      log({ event: 'recovery', result: `registered-open-failed: ${err.message}`, canary: frame.canary, candidate: cand.id });
-      send(conn, { ok: true, approved: cand.id, recovered: frame.canary, state: 'registered', canary: frame.canary, note: `issuance recovered and registered; the open failed (${err.message}) — the package now presents through the ordinary unwrap flow` });
-    }
   }
 
   // OWNER-channel registration: unsigned — the channel itself (0700
@@ -1165,36 +939,6 @@ function serve(flags) {
     }
   }
 
-  // Verify-only open (Gemini fix 3): the package opens and the
-  // plaintext is handed back, but the return is NOT consumed —
-  // returned_at stays null and the claim is simply released, so the
-  // package can still be presented for its real unwrap afterwards.
-  function executeVerifyOpen(entry) {
-    const { frame, conn } = entry;
-    try {
-      const plaintext = openPackage(frame, entry.payload);
-      const digest = frameDigest(frame);
-      const outName = path.basename(entry.outName || `verified-${frame.canary.slice(0, 8)}.bin`);
-      const dest = path.join(outDir, outName);
-      fs.writeFileSync(dest, plaintext, { mode: 0o600 });
-      try { fs.chmodSync(dest, 0o600); } catch {}
-      if (entry.id) releaseClaim(frame.canary, entry.id);
-      // Arm the return under this same owner decision (see
-      // verifyGrants): the consuming unwrap re-runs every gate and
-      // needs no second approval for the same package.
-      verifyGrants.set(frame.canary, { digest, expiresAt: Date.now() + windowMs });
-      log({ event: 'verify-open', result: 'verified-open', canary: frame.canary, digest, out: dest, registry: 'not-consumed' });
-      send(conn, { ok: true, state: 'verified-open', out: dest, digest, canary: frame.canary, digest_verified: true });
-    } catch (err) {
-      if (entry.id) releaseClaim(frame.canary, entry.id);
-      log({
-        event: 'verify-open', result: `failed: ${err.message}`,
-        canary: frame.canary, sha256: frame.sha256, file: entry.filePath,
-      });
-      send(conn, { ok: false, error: `verify-open-failed: ${err.message}` });
-    }
-  }
-
   // The approval window, (re)armable: Tier-2 dual approval restarts it
   // after stage 1 so the second decision gets its own full window.
   function armApprovalWindow(entry) {
@@ -1213,12 +957,7 @@ function serve(flags) {
     }, windowMs);
   }
 
-  // handleUnwrap serves two requester commands: `unwrap` (the
-  // consuming one-shot return) and `verify-open` (Gemini fix 3: the
-  // same gate sequence and owner approval, plaintext handed back,
-  // but the registry entry is NOT consumed — restore flows verify a
-  // manifest against its sidecar before spending the return).
-  function handleUnwrap(conn, req, verifyOnly = false) {
+  function handleUnwrap(conn, req) {
     const filePath = req.path;
     let parsed;
     try {
@@ -1230,7 +969,7 @@ function serve(flags) {
     }
     const { frame, body } = parsed;
     const entry = {
-      kind: verifyOnly ? 'verify-open' : 'unwrap', claimCanary: frame.canary,
+      kind: 'unwrap', claimCanary: frame.canary,
       frame, filePath, outName: req.out, conn, payload: null,
       context: typeof req.context === 'string' ? req.context.slice(0, 300) : null,
       purpose: typeof req.purpose === 'string' ? req.purpose : null,
@@ -1240,9 +979,24 @@ function serve(flags) {
       refuse(conn, entry, 'recipient-mismatch: this package was not sealed to this copy');
       return;
     }
-    if (frame.v >= 4 && frame.recipient_kem_fp !== id.kemFp) {
-      refuse(conn, entry, 'recipient-kem-mismatch: this v4 package was not KEM-sealed to this copy');
-      return;
+    // REFIT M.3 — legacy frames die at the window's close: the v1/v2
+    // parsers leave the consumption path and the store gains no new
+    // legacy entries. Inside the window a legacy frame is consumed
+    // ONLY as an explicit re-seal relay (req.legacy_relay), never as
+    // a routine open; at the deadline the refusal is the same shape
+    // as any other dead frame.
+    if (refitOn() && frame.v < 3) {
+      const until = pol().refit?.legacy_window_until;
+      if (until && Date.now() > Date.parse(until)) {
+        log({ event: 'unwrap', result: 'refused: legacy-frame-dead', canary: frame.canary, frame_v: frame.v });
+        refuse(conn, entry, `legacy-frame-dead: this is a v${frame.v} frame and the forced re-seal window closed at ${until} — legacy frames are out of the consumption path; re-seal through the current armor`);
+        return;
+      }
+      if (req.legacy_relay !== true) {
+        refuse(conn, entry, 'legacy-relay-required: pre-v3 frames are consumed only as explicit re-seal relays inside the migration window');
+        return;
+      }
+      entry.legacyRelay = true;
     }
     // RETURN-MATCH — the closed loop's core check, before approval exists.
     // The presented frame must equal what this machine issued under this
@@ -1251,56 +1005,7 @@ function serve(flags) {
     // by a successful return — is a beacon event, never a routine approval.
     const issued = loadRegistry().entries[frame.canary];
     if (!issued) {
-      // The beacon is the testimony and it never changes: this loop
-      // never issued this canary.
       beacon(conn, { frame, filePath, reason_class: 'never-issued' });
-      // RECOVERY CANDIDATE (Gemini fix 1) — the beacon used to be a
-      // dead end, and that dead end is where an honest package lands
-      // when its issuance sat in the sender's offline outbox and the
-      // queue never synced (register #27: the recipient locked out of
-      // a package addressed to them). The owner is the loop's court
-      // of last resort: when the frame's signature VERIFIES, the
-      // sender is this copy or an enrolled peer, the frame is
-      // unexpired and unrevoked, and the registry's own integrity
-      // stands, the daemon records a recovery candidate. NOTHING is
-      // registered by the presentation itself — only the owner's
-      // explicit approval on the owner channel derives the issuance
-      // from the package and records it (handleApprove). An
-      // unenrolled sender, a bad signature, a tampered store, or a
-      // verify-open leaves the beacon as the whole story, exactly as
-      // before.
-      if (!verifyOnly
-        && registryIntegrityOk()
-        && (frame.sender_sign_fp === id.signFp || peerBySignFp(frame.sender_sign_fp))
-        && verifyFrameSignature(frame, body)
-        && !(frame.expiry && Date.parse(frame.expiry) < Date.now())
-        && !revocationInForce(frame.sender_sign_fp)) {
-        pruneRecoveryCandidates();
-        let already = null;
-        for (const cand of recoveryCandidates.values()) if (cand.canary === frame.canary) already = cand;
-        if (!already && recoveryCandidates.size < RECOVERY_CANDIDATE_CAP) {
-          const cand = {
-            id: crypto.randomUUID(), canary: frame.canary, filePath,
-            outName: req.out || null, sender_sign_fp: frame.sender_sign_fp,
-            digest: frameDigest(frame), createdAt: Date.now(),
-          };
-          recoveryCandidates.set(cand.id, cand);
-          log({
-            event: 'recovery', result: 'candidate-recorded', canary: frame.canary,
-            candidate: cand.id, sender_sign_fp: frame.sender_sign_fp, file: filePath,
-            note: 'owner may approve on the owner channel: vaultd.mjs approve --id <candidate> (see vaultd.mjs recovery)',
-          });
-        }
-      }
-      return;
-    }
-    // STORE INTEGRITY GATE (Gemini fix 5): an entry that exists is
-    // only worth trusting if the store holding it verified. When the
-    // registry's tag has failed, NO presentation opens — the refusal
-    // is precise and the tamper record is already in the log.
-    if (!registryIntegrityOk()) {
-      log({ event: 'unwrap', result: 'refused: store-integrity (registry.json HMAC mismatch)', canary: frame.canary, file: filePath });
-      refuse(conn, entry, 'store-integrity: registry.json failed its integrity check — refusing to trust its entries until the store is repaired');
       return;
     }
     if (issued.returned_at) {
@@ -1334,6 +1039,17 @@ function serve(flags) {
       }
     }
     entry.registryStatus = 'issued-by-this-machine';
+    // REFIT M.1 — consumption verifies the anchored registry BEFORE
+    // any approval exists: an edited, truncated, or replayed store
+    // refuses here (prevention at read time, not detection after).
+    {
+      const gate = refitConsumptionGate();
+      if (!gate.ok) {
+        log({ event: 'unwrap', result: `refused: ${gate.error}`, canary: frame.canary });
+        refuse(conn, entry, gate.error);
+        return;
+      }
+    }
     // Provenance (FIX 1): the approval surface names the authenticated
     // path this issuance actually arrived by — owner channel, sender
     // signature, estate mesh/sync, or a daemon-internal origin. The
@@ -1382,6 +1098,9 @@ function serve(flags) {
     }
     entry.tierSnapshot = issued.tier ?? null;
     entry.notices = buildNotices(issued, frame);
+    if (entry.legacyRelay) {
+      entry.notices.push('legacy-relay: pre-v3 frame admitted as a re-seal relay inside the migration window — consumed to re-seal, not opened as a routine return');
+    }
     if (!verifyFrameSignature(frame, body)) {
       // A registered canary presented with an invalid frame signature
       // is a forgery-shaped event: beacon it (doctrine: mismatches at
@@ -1430,39 +1149,6 @@ function serve(flags) {
       regEntry.claim = { id: reqId, at: new Date().toISOString() };
       saveRegistry(reg);
     }
-    // VERIFY GRANT (Gemini fix 3): a verify-open the owner approved
-    // within the window arms this package's return. Every gate above
-    // has re-run for THIS presentation (return-match, scan/tier,
-    // signature, expiry, claim); the grant only waives the second
-    // interactive approval for the same package under the same owner
-    // decision. Digest-bound and single-use; a stale or mismatched
-    // grant is dropped, never honored.
-    if (!verifyOnly) {
-      const grant = verifyGrants.get(frame.canary);
-      if (grant) {
-        verifyGrants.delete(frame.canary);
-        if (grant.digest === frameDigest(frame) && grant.expiresAt > Date.now()) {
-          entry.id = reqId;
-          log({
-            event: 'unwrap', result: 'verify-grant: executing under the verify-open approval', canary: frame.canary,
-            digest: frameDigest(frame), file: filePath, claim: reqId,
-          });
-          executeUnwrap(entry);
-          return;
-        }
-      }
-    }
-    {
-      let sameOrigin = 0;
-      for (const p of pending.values()) if (p.frame?.sender_sign_fp === frame.sender_sign_fp) sameOrigin++;
-      if (sameOrigin >= PENDING_CAP_PER_ORIGIN) {
-        releaseClaim(frame.canary, reqId);
-        shedPendings++;
-        log({ event: 'unwrap', result: 'pending-shed-budget', canary: frame.canary, sender_sign_fp: frame.sender_sign_fp, shed_total: shedPendings });
-        send(conn, { ok: false, error: 'pending budget for this origin is exhausted — the owner sees a count, not a flood (M.19)', canary: frame.canary });
-        return;
-      }
-    }
     entry.id = reqId;
     entry.createdAt = Date.now();
     entry.requiredApprovals = entry.tierSnapshot?.params?.dual_approval ? 2 : 1;
@@ -1491,12 +1177,6 @@ function serve(flags) {
   }
 
   function handleApprove(conn, req) {
-    // Recovery candidates are approved by id on this same channel
-    // (Gemini fix 1) — checked before pendings; ids never collide.
-    if (req.id && recoveryCandidates.has(req.id)) {
-      executeRecoveryApproval(conn, recoveryCandidates.get(req.id));
-      return;
-    }
     let entry = null;
     if (req.id) entry = pending.get(req.id) || null;
     else if (pending.size === 1) entry = [...pending.values()][0];
@@ -1527,6 +1207,53 @@ function serve(flags) {
         send(entry.conn, { ok: false, error: 'approval-refused: claim-not-held', canary: entry.frame.canary });
         return;
       }
+    }
+    // REFIT M.1 — an approval executes only against an anchored
+    // store: if the registry's chain/anchor state has diverged since
+    // the pend, the approval refuses and the registry is untouched.
+    {
+      const gate = refitConsumptionGate();
+      if (!gate.ok) {
+        log({ event: 'approve', result: `refused: ${gate.error}`, id: entry.id, canary: entry.frame?.canary ?? null });
+        send(conn, { ok: false, error: gate.error, canary: entry.frame?.canary ?? null });
+        return;
+      }
+    }
+    // REFIT M.4/M.13 — signed owner acts: in signed mode the approval
+    // must BE a signature, by the registered owner key, over THIS
+    // pending's digest (canary, frame digest, verdict, tier, notices,
+    // registry status, provenance), carrying a fresh daemon-issued
+    // nonce. A captured exchange replays to nothing (nonce consumed),
+    // a swapped package invalidates the act (digest mismatch), and a
+    // fake prompt holds no key. The confirm-file path is superseded
+    // in this mode; Tier-2 still takes two acts, one per stage.
+    if (refitSignedActsOn()) {
+      const keyRec = loadOwnerKey(dir);
+      if (!keyRec) {
+        log({ event: 'approve', result: 'refused: owner-act-key-missing', id: entry.id });
+        send(conn, { ok: false, error: 'owner-act-key-missing: signed_owner_acts is on but no owner key is registered (owner-act.json)', canary: entry.frame?.canary ?? null });
+        return;
+      }
+      const actDoc = req.owner_act || null;
+      const nExp = actDoc ? ownerNonces.get(actDoc.nonce) : null;
+      if (!actDoc || !nExp || nExp < Date.now()) {
+        log({ event: 'approve', result: 'refused: owner-act-nonce (not daemon-issued or expired)', id: entry.id, canary: entry.frame?.canary ?? null });
+        send(conn, { ok: false, error: 'owner-act: a fresh daemon-issued nonce is required (owner cmd: owner-nonce)', canary: entry.frame?.canary ?? null });
+        return;
+      }
+      ownerNonces.delete(actDoc.nonce);
+      const v = verifyOwnerAct(actDoc, {
+        ownerSignPub: keyRec.sign_pub,
+        pending: { id: entry.id },
+        pendingDigest: refitPendingDigest(entry),
+        consumedNonces: ownerConsumedNonces,
+      });
+      if (!v.ok) {
+        log({ event: 'approve', result: `refused: ${v.error}`, id: entry.id, canary: entry.frame?.canary ?? null });
+        send(conn, { ok: false, error: v.error, canary: entry.frame?.canary ?? null });
+        return;
+      }
+      log({ event: 'approve', result: 'owner-act-verified', id: entry.id, stage: (entry.approvalStage ?? 0) + 1, canary: entry.frame?.canary ?? null });
     }
     // DUAL APPROVAL (Tier 2, SPEC §1.7.4) — two separate, deliberate
     // owner acts on the same claim: stage 1 restarts the window and
@@ -1594,8 +1321,6 @@ function serve(flags) {
       launchActivation(entry);
     } else if (entry.kind === 'dock') {
       openAirlockSession(entry);
-    } else if (entry.kind === 'verify-open') {
-      executeVerifyOpen(entry);
     } else {
       executeUnwrap(entry);
     }
@@ -1649,10 +1374,6 @@ function serve(flags) {
     const { frame } = parsed;
     if (frame.recipient_seal_fp !== id.sealFp) {
       send(conn, { ok: false, error: 'package was sealed to a different copy', canary: frame.canary });
-      return;
-    }
-    if (frame.v >= 4 && frame.recipient_kem_fp !== id.kemFp) {
-      send(conn, { ok: false, error: 'v4 package was KEM-sealed to a different copy', canary: frame.canary });
       return;
     }
     if (path.basename(req.path) === 'MANIFEST.scripture') {
@@ -1802,6 +1523,27 @@ function serve(flags) {
     // CELL DECISION (§2.2): meet the required class or refuse; a
     // downgrade exists only where the tier allows it, and only as an
     // owner tap at the prompt — never silent.
+    // REFIT M.5 pre-decision: with the refit on, executable activation
+    // is HARD-only — decideCellRoute is the law (local HARD → run;
+    // estate HARD host → route; neither → refuse cell-unavailable).
+    // The v2 downgrade machinery below still computes its answer, but
+    // its refusals stand down (the refit decision already refused if
+    // it meant to) and its SOFT answer is overridden after the block.
+    let routeHost = null;
+    let refitCellDecided = false;
+    if (refitOn()) {
+      const decision = decideCellRoute({
+        contentClass: targetClass === 'source' ? 'source' : 'binary',
+        hardLocal: substrates.hard.available,
+        hardHosts: pol().refit?.hard_hosts || [],
+      });
+      if (decision.action === 'refuse') {
+        refuseActivation(conn, frame, req.path, `cell-unavailable: ${decision.reason}`);
+        return;
+      }
+      refitCellDecided = true;
+      if (decision.action === 'route') routeHost = decision.host;
+    }
     let required = 'hard';
     if (params && params.min_cell && params.min_cell !== 'policy-default') required = params.min_cell;
     else if (targetClass === 'source' && policy.cell?.soft_for_source) required = 'soft';
@@ -1809,12 +1551,12 @@ function serve(flags) {
     let downgraded = false;
     if (required === 'hard' && !substrates.hard.available) {
       const downgradeAllowed = params ? params.downgrade_allowed !== false : true;
-      if (!downgradeAllowed) {
+      if (!downgradeAllowed && !refitCellDecided) {
         refuseActivation(conn, frame, req.path,
           `cell-unavailable: this tier requires a HARD cell (Firecracker microVM) and forbids downgrade; this host cannot provide one (missing: ${substrates.hard.missing.join(', ')})`);
         return;
       }
-      if (!substrates.soft.available) {
+      if (!substrates.soft.available && !refitCellDecided) {
         refuseActivation(conn, frame, req.path,
           `cell-unavailable: no cell substrate on this host (HARD missing: ${substrates.hard.missing.join(', ')}; SOFT unavailable)`);
         return;
@@ -1824,9 +1566,25 @@ function serve(flags) {
       pendReasons.push('cell-downgrade');
       notices.push(`cell: SOFT (${substrates.soft.kind}) — the required HARD cell is unavailable on this host (missing: ${substrates.hard.missing.join(', ')}); approving accepts the downgrade and the record will say so`);
     }
-    if (cellClass === 'soft' && !substrates.soft.available) {
+    if (cellClass === 'soft' && !substrates.soft.available && !refitCellDecided) {
       refuseActivation(conn, frame, req.path, 'cell-unavailable: SOFT substrate unavailable on this host');
       return;
+    }
+    // REFIT M.5 enforcement: whatever the v2 machinery computed, an
+    // executable activation under the refit is HARD — locally, or
+    // routed — and the downgrade artifacts (reason + notice) are
+    // struck from the record: there was no downgrade.
+    if (refitCellDecided) {
+      required = 'hard';
+      cellClass = 'hard';
+      if (downgraded) {
+        downgraded = false;
+        for (let i = pendReasons.length - 1; i >= 0; i--) if (pendReasons[i] === 'cell-downgrade') pendReasons.splice(i, 1);
+        for (let i = notices.length - 1; i >= 0; i--) if (String(notices[i]).startsWith('cell: SOFT')) notices.splice(i, 1);
+      }
+      if (routeHost) {
+        notices.push(`cell: HARD (routed) — this host has no hypervisor cell; the activation routes to the estate HARD host (${routeHost.sign_fp ? routeHost.sign_fp.slice(0, 12) : routeHost.addr}) and runs there or refuses — it never downgrades`);
+      }
     }
 
     // GRANT + LEASE GATE (§2.3): a live grant launches tap-free; the
@@ -1844,7 +1602,7 @@ function serve(flags) {
       launchActivation({
         kind: 'activation', frame, payload, plaintext, filePath: req.path, conn,
         targetClass, cellClass, downgraded: false, tierSnapshot: tierSnap,
-        entryRelpath: null, repo: false,
+        entryRelpath: null, repo: false, routeHost,
       });
       return;
     }
@@ -1868,7 +1626,7 @@ function serve(flags) {
       context: typeof req.context === 'string' ? req.context.slice(0, 300) : null,
       purpose: null, registryStatus: 'activation-store',
       targetClass, cellClass, downgraded, tierSnapshot: tierSnap,
-      entryRelpath: null, repo: false,
+      entryRelpath: null, repo: false, routeHost,
       // A scan-missing override is one-time and never grants (§1.6); a
       // warn/override/downgrade pend rides on an existing grant or
       // creates one at approval (first activation).
@@ -1937,7 +1695,6 @@ function serve(flags) {
         try { pp = parseScriptureFile(fs.readFileSync(path.join(wrappedDir, p.package), 'utf8')); }
         catch { send(conn, { ok: false, error: `repo part ${p.package} unreadable` }); return; }
         if (pp.frame.recipient_seal_fp !== id.sealFp) { send(conn, { ok: false, error: `repo part ${p.package} sealed to a different copy` }); return; }
-        if (pp.frame.v >= 4 && pp.frame.recipient_kem_fp !== id.kemFp) { send(conn, { ok: false, error: `repo part ${p.package} KEM-sealed to a different copy` }); return; }
         if ((pp.frame.armor_tier ?? null) == null) untiered.push(f.path);
         let pdata;
         try { pdata = armorDecode(pp.body, Buffer.from(pp.frame.armor_seed, 'base64')); }
@@ -1961,6 +1718,21 @@ function serve(flags) {
     const entryPart = partsMeta.find((p) => p.relpath === entryRelpath);
     if (!entryPart) { refuseActivation(conn, frame, req.path, `repo-entry-missing: ${entryRelpath} is not in this repo`); return; }
     const targetClass = /\.m?js$/.test(entryRelpath) ? 'source' : 'binary';
+    // REFIT M.5 pre-decision (same law as single-file activation).
+    let routeHost = null;
+    let refitCellDecided = false;
+    if (refitOn()) {
+      const decision = decideCellRoute({
+        contentClass: targetClass, hardLocal: substrates.hard.available,
+        hardHosts: pol().refit?.hard_hosts || [],
+      });
+      if (decision.action === 'refuse') {
+        refuseActivation(conn, frame, req.path, `cell-unavailable: ${decision.reason}`);
+        return;
+      }
+      refitCellDecided = true;
+      if (decision.action === 'route') routeHost = decision.host;
+    }
     // Repos run under the manifest's own tier gates + grant machinery.
     const tierSnap = issued.tier ?? null;
     const params = tierSnap?.params ?? null;
@@ -1974,14 +1746,28 @@ function serve(flags) {
     const notices = buildNotices(issued, frame);
     if (required === 'hard' && !substrates.hard.available) {
       const downgradeAllowed = params ? params.downgrade_allowed !== false : true;
-      if (!downgradeAllowed) {
+      if (!downgradeAllowed && !refitCellDecided) {
         refuseActivation(conn, frame, req.path,
           `cell-unavailable: this tier requires a HARD cell and forbids downgrade; this host cannot provide one (missing: ${substrates.hard.missing.join(', ')})`);
         return;
       }
-      if (!substrates.soft.available) { refuseActivation(conn, frame, req.path, 'cell-unavailable: no cell substrate on this host'); return; }
+      if (!substrates.soft.available && !refitCellDecided) { refuseActivation(conn, frame, req.path, 'cell-unavailable: no cell substrate on this host'); return; }
       cellClass = 'soft'; downgraded = true; pendReasons.push('cell-downgrade');
       notices.push(`cell: SOFT (${substrates.soft.kind}) — the required HARD cell is unavailable on this host (missing: ${substrates.hard.missing.join(', ')}); approving accepts the downgrade and the record will say so`);
+    }
+    // REFIT M.5 enforcement (repo path): HARD, local or routed; the
+    // downgrade artifacts are struck — there was no downgrade.
+    if (refitCellDecided) {
+      required = 'hard';
+      cellClass = 'hard';
+      if (downgraded) {
+        downgraded = false;
+        for (let i = pendReasons.length - 1; i >= 0; i--) if (pendReasons[i] === 'cell-downgrade') pendReasons.splice(i, 1);
+        for (let i = notices.length - 1; i >= 0; i--) if (String(notices[i]).startsWith('cell: SOFT')) notices.splice(i, 1);
+      }
+      if (routeHost) {
+        notices.push(`cell: HARD (routed) — this host has no hypervisor cell; the activation routes to the estate HARD host (${routeHost.sign_fp ? routeHost.sign_fp.slice(0, 12) : routeHost.addr}) and runs there or refuses — it never downgrades`);
+      }
     }
     const grantLive = issued.grants && (!issued.grants.expires || Date.now() < Date.parse(issued.grants.expires));
     if (grantLive && pendReasons.length === 0) {
@@ -1989,7 +1775,7 @@ function serve(flags) {
       launchActivation({
         kind: 'activation', frame, payload: null, filePath: req.path, conn,
         targetClass, cellClass, downgraded: false, tierSnapshot: tierSnap,
-        entryRelpath, repo: true, partsMeta,
+        entryRelpath, repo: true, partsMeta, routeHost,
       });
       return;
     }
@@ -1998,7 +1784,7 @@ function serve(flags) {
       frame, filePath: req.path, conn, payload: null,
       context: null, purpose: null, registryStatus: 'activation-store',
       targetClass, cellClass, downgraded, tierSnapshot: tierSnap,
-      entryRelpath, repo: true, partsMeta,
+      entryRelpath, repo: true, partsMeta, routeHost,
       createGrant: true, maxInstances: 1,
       notices, requiredApprovals: params?.dual_approval ? 2 : 1,
       approvalStage: 0, confirmCode: null,
@@ -2026,6 +1812,29 @@ function serve(flags) {
       approvals_required: entry.requiredApprovals,
       note: 'owner approval required: vaultd.mjs approve (the streaming activate call stays open)',
     });
+  }
+
+  // REFIT M.11 — runtime watch intake: a cell's observed behavior is
+  // reported against the package's declared profile (scan record).
+  // Deviation is not a warning: the entry takes an anomaly (which the
+  // shipped gates already enforce as a hold) and its activation grant
+  // is revoked estate-wide in effect — the grant lives in the synced
+  // registry entry, so the revocation rides the next sync.
+  function handleWatchReport(conn, req) {
+    if (!refitOn()) { send(conn, { ok: false, error: 'refit-disabled' }); return; }
+    const d = watchDeviation(req.declared || {}, req.observed || {});
+    let grantRevoked = false;
+    if (d.deviated && req.canary) {
+      const reg = loadRegistry();
+      const e = reg.entries[req.canary];
+      if (e) {
+        e.anomaly = { at: new Date().toISOString(), kind: 'runtime-watch', deviations: d.deviations };
+        if (e.grants) { e.grants = null; grantRevoked = true; }
+        saveRegistry(reg);
+      }
+      log({ event: 'watch', result: 'anomaly+grant-revoked', canary: req.canary, deviations: d.deviations, grant_revoked: grantRevoked });
+    }
+    send(conn, { ok: true, ...d, grant_revoked: grantRevoked });
   }
 
   function handleRevokeGrant(conn, req) {
@@ -2063,7 +1872,85 @@ function serve(flags) {
     return { parts, entryRelpath: entry.entryRelpath };
   }
 
+  // REFIT M.5 — launch by routing. The full local gate pipeline has
+  // already run for this entry (return-match, scan binding, owner
+  // approval); only the CELL is remote. The verified image is
+  // materialized in memory here, shipped inside the signed mesh doc,
+  // and executed by the host's HARD cell — or the host's refusal
+  // becomes this activation's refusal. There is no local fallback and
+  // no SOFT anywhere in the path.
+  async function runRoutedActivation(entry) {
+    const frame = entry.frame;
+    const activationId = crypto.randomUUID();
+    const startedAt = new Date().toISOString();
+    const record = {
+      id: activationId, canary: frame.canary, at: startedAt,
+      cell_class: 'hard', routed: true, routed_host: entry.routeHost?.sign_fp ?? null,
+      downgraded: false, target_class: entry.targetClass, repo: !!entry.repo,
+      ended_at: null, exit: null, emissions: [], artifacts: [], destroyed: true,
+    };
+    const finish = (outcome) => {
+      record.ended_at = new Date().toISOString();
+      Object.assign(record, outcome);
+      const reg = loadRegistry();
+      const e = reg.entries[frame.canary];
+      if (e) {
+        e.activations = [...(e.activations || []), record];
+        if (e.lease?.activation === activationId) e.lease = null;
+        if (e.claim && entry.id && e.claim.id === entry.id) delete e.claim;
+        saveRegistry(reg);
+      }
+      log({ event: 'activation-complete', activation: activationId, canary: frame.canary, routed: true, ...outcome });
+      send(entry.conn, {
+        ok: true, state: 'activation-complete', id: activationId, canary: frame.canary,
+        cell_class: 'hard', routed: true, downgraded: false, destroyed: true,
+        exit: record.exit ?? null, killed: null,
+        boot_failed: record.boot_failed ?? null, refused: record.refused ?? null,
+        emissions: [], artifacts: [],
+        stdout_tail: record.stdout_tail ?? null, stderr_tail: record.stderr_tail ?? null,
+      });
+    };
+    try {
+      const reg = loadRegistry();
+      const e = reg.entries[frame.canary];
+      if (e) {
+        e.lease = { activation: activationId, at: startedAt, expires: new Date(Date.now() + (pol().cell?.lease_s ?? 30) * 1000).toISOString() };
+        saveRegistry(reg);
+      }
+      let parts, entryRelpath;
+      try { ({ parts, entryRelpath } = materializeParts(entry)); }
+      catch (err) {
+        log({ event: 'beacon', canary: frame.canary, sha256: frame.sha256, reason_class: 'image-mismatch', surface: { label: id.label, seal_fp: id.sealFp, sign_fp: id.signFp } });
+        finish({ refused: `image-mismatch: ${err.message}` });
+        return;
+      }
+      const hostFp = entry.routeHost?.sign_fp;
+      const found = hostFp ? peerBySignFp(hostFp) : null;
+      if (!found) { finish({ refused: `cell-unavailable: routed HARD host ${hostFp} is not in the address book` }); return; }
+      log({ event: 'activate', result: 'routed', activation: activationId, canary: frame.canary, host: found.label });
+      send(entry.conn, { ok: true, state: 'activated', id: activationId, canary: frame.canary, cell_class: 'hard', routed: true, host: found.label });
+      const resp = await meshCall(found.peer, 'activate-remote', {
+        canary: frame.canary, entry: entryRelpath, target_class: entry.targetClass,
+        parts: parts.map((p) => ({
+          relpath: p.relpath, executable: p.executable,
+          sha256: sha256Hex(p.bytes), bytes_b64: p.bytes.toString('base64'),
+        })),
+      });
+      if (!resp) { finish({ refused: 'cell-unavailable: HARD host unreachable (no response)' }); return; }
+      if (!resp.body?.ok) { finish({ refused: resp.body?.error || 'cell-unavailable: HARD host refused' }); return; }
+      finish({
+        exit: resp.body.exit ?? 0,
+        stdout_tail: resp.body.stdout_tail ?? null,
+        stderr_tail: resp.body.stderr_tail ?? null,
+      });
+    } catch (err) {
+      finish({ boot_failed: err.message });
+    }
+  }
+
   async function launchActivation(entry) {
+    // REFIT M.5: a routed entry never touches a local cell.
+    if (entry.routeHost) { await runRoutedActivation(entry); return; }
     const frame = entry.frame;
     const policy = pol();
     const activationId = crypto.randomUUID();
@@ -2079,7 +1966,6 @@ function serve(flags) {
       id: activationId, canary: frame.canary, staging, record, conn: entry.conn,
       tierSnapshot: entry.tierSnapshot, cell: null, egressServer: null,
       heartbeat: null, emissionCount: 0, finished: false,
-      egressInFlight: new Set(), egressConns: new Set(), egressClosed: false,
     };
     activations.set(activationId, run);
     {
@@ -2172,26 +2058,10 @@ function serve(flags) {
         cell_class: entry.cellClass, downgraded: !!entry.downgraded, pid: cell.pid,
       });
       const res = await cell.done;
-      // The cell is dead; its emissions may not be. Egress frames are
-      // handled asynchronously (a promotion scans, seals, registers),
-      // and a fast-exiting cell otherwise outruns its own emissions:
-      // the record would close over work that lands afterwards,
-      // unrecorded (the case-11 defect — a clean promotion existed in
-      // the store but the activation record showed no artifact). An
-      // activation is not finished until every frame it sent has
-      // been fully handled and every egress connection has closed.
-      const drain = await drainEgress(run);
-      // The record is final from here: frames arriving now are
-      // refused at the handler (egress-late-drop) and handlers still
-      // in flight complete under testimony — neither may silently
-      // merge into a closed record (F-06c).
-      run.egressClosed = true;
       finish({
         exit: res.exit, signal: res.signal, killed: res.killedBy,
         stdout_tail: res.stdout.toString('utf8').slice(-2000) || null,
         stderr_tail: res.stderr.toString('utf8').slice(-2000) || null,
-        egress_drained: drain.drained,
-        ...(drain.drained ? {} : { egress_unresolved: { in_flight: drain.in_flight, open_conns: drain.open_conns } }),
       });
     } catch (e) {
       finish({ boot_failed: e.message });
@@ -2200,70 +2070,25 @@ function serve(flags) {
 
   // --- egress: the only way a byte leaves a cell (§2.5) ---------------------
 
-  // Framing bounds (F-06a): the header is small JSON and a payload can
-  // never legitimately exceed the policy emission cap — the handler
-  // enforces that cap only AFTER a frame has been fully buffered, so
-  // without framing bounds a faulty or compromised cell could make the
-  // daemon accumulate unbounded memory waiting for a frame that can
-  // never complete, or desync the stream with a wrapped length (the
-  // old code coerced header.bytes with `| 0`: >= 2^31 wraps negative,
-  // non-integers truncate silently). A frame that breaks the bounds is
-  // refused and its connection destroyed; the refusal is testified.
-  const EGRESS_MAX_HEADER_BYTES = 64 * 1024;
-  const EGRESS_IDLE_MS = 600000; // aligned with the drain cap below
-
   function startEgressServer(run) {
     return new Promise((resolve) => {
       const srv = net.createServer((c) => {
-        run.egressConns.add(c);
-        c.on('close', () => run.egressConns.delete(c));
-        c.setTimeout(EGRESS_IDLE_MS, () => {
-          log({ event: 'egress-frame-refused', activation: run.id, reason: 'idle-timeout' });
-          c.destroy();
-        });
         let buf = Buffer.alloc(0);
         c.on('data', (d) => {
           buf = Buffer.concat([buf, d]);
-          const maxPayload = pol().cell?.max_emission_bytes ?? 16 * 1024 * 1024;
-          const maxBuffered = 4 + EGRESS_MAX_HEADER_BYTES + maxPayload;
           for (;;) {
-            if (buf.length > maxBuffered) {
-              log({ event: 'egress-frame-refused', activation: run.id, reason: 'buffer-overrun', buffered: buf.length, cap: maxBuffered });
-              c.destroy(); return;
-            }
             if (buf.length < 4) return;
             const hlen = buf.readUInt32BE(0);
-            if (hlen === 0 || hlen > EGRESS_MAX_HEADER_BYTES) {
-              log({ event: 'egress-frame-refused', activation: run.id, reason: 'header-length', hlen });
-              c.destroy(); return;
-            }
             if (buf.length < 4 + hlen) return;
             let header;
             try { header = JSON.parse(buf.subarray(4, 4 + hlen).toString('utf8')); } catch { c.destroy(); return; }
-            const declared = header.bytes === undefined ? 0 : header.bytes;
-            if (!Number.isSafeInteger(declared) || declared < 0 || declared > maxPayload) {
-              log({ event: 'egress-frame-refused', activation: run.id, reason: 'payload-length', declared: String(header.bytes) });
-              c.destroy(); return;
-            }
-            const total = 4 + hlen + declared;
+            const total = 4 + hlen + (header.bytes | 0);
             if (buf.length < total) return;
             const payload = buf.subarray(4 + hlen, total);
             buf = buf.subarray(total);
-            // Track every frame's handling so launchActivation can
-            // drain egress before finalizing the activation record
-            // (see drainEgress). The .catch keeps this promise from
-            // ever rejecting, so the Set holds only live work.
-            const handled = handleEgressFrame(run, header, Buffer.from(payload)).catch((e) => {
+            handleEgressFrame(run, header, Buffer.from(payload)).catch((e) => {
               log({ event: 'egress-error', activation: run.id, error: e.message });
-            }).then(() => {
-              // A handler that completes after the activation record
-              // was finalized (drain cap expired — see F-06c) lands
-              // outside the record by construction; testify the late
-              // completion so it is never a silent landing.
-              if (run.egressClosed) log({ event: 'egress-completed-after-finalize', activation: run.id, canary: run.canary, kind: header.kind ?? null });
             });
-            run.egressInFlight.add(handled);
-            handled.finally(() => run.egressInFlight.delete(handled));
           }
         });
         c.on('error', () => {});
@@ -2272,35 +2097,6 @@ function serve(flags) {
       run.egressServer = srv;
       srv.listen(run.staging.egressSock, () => resolve());
     });
-  }
-
-  // Wait until every egress frame the cell sent has been fully
-  // handled and every egress connection has closed. The empty
-  // condition must hold across 3 consecutive polls (~25 ms apart) so
-  // socket events already queued — a final frame, a close — land
-  // before the drain is called done. The cap is generous on purpose:
-  // promoting a binary emission runs a full Ghidra scan (measured
-  // ~28 s on a small VM, slower under load). If the cap ever expires,
-  // the timeout is testified in the log AND the activation record is
-  // finalized as explicitly indeterminate (egress_drained: false +
-  // egress_unresolved counts — F-06c) instead of reading as complete;
-  // frames arriving afterwards are refused at the handler and late
-  // completions are testified, never silently merged.
-  async function drainEgress(run) {
-    const CAP_MS = pol().cell?.egress_drain_cap_ms ?? 600000;
-    const started = Date.now();
-    let quietPolls = 0;
-    while (Date.now() - started < CAP_MS) {
-      if (run.egressInFlight.size === 0 && run.egressConns.size === 0) {
-        quietPolls += 1;
-        if (quietPolls >= 3) return { drained: true };
-      } else {
-        quietPolls = 0;
-      }
-      await new Promise((r) => setTimeout(r, 25));
-    }
-    log({ event: 'egress-drain-timeout', activation: run.id, canary: run.canary, in_flight: run.egressInFlight.size, open_conns: run.egressConns.size });
-    return { drained: false, in_flight: run.egressInFlight.size, open_conns: run.egressConns.size };
   }
 
   function queueOutbox(issuance) {
@@ -2326,14 +2122,6 @@ function serve(flags) {
   }
 
   async function handleEgressFrame(run, header, payload) {
-    if (run.egressClosed) {
-      // The activation record has been finalized (its drain returned,
-      // drained or not). A frame arriving now can never be part of
-      // that record — refuse it, testified, never process it into a
-      // late landing (F-06c).
-      log({ event: 'egress-late-drop', activation: run.id, canary: run.canary, kind: header.kind ?? null, bytes: payload.length });
-      return;
-    }
     const policy = pol();
     if (header.kind === 'log') {
       log({ event: 'cell-log', activation: run.id, canary: run.canary, text: payload.toString('utf8').slice(0, 2000) });
@@ -2448,9 +2236,9 @@ function serve(flags) {
       return;
     }
     const digest = scanDigestOf(record);
-    const reportSealed = sealPlaintext(Buffer.from(JSON.stringify(record, null, 2) + '\n', 'utf8'), id, id, {});
+    const reportSealed = sealPlaintext(Buffer.from(JSON.stringify(record, null, 2) + '\n', 'utf8'), id, { seal_pub: id.seal_pub }, {});
     const tier = record.risk?.tier ?? 0;
-    const sealed = sealPlaintext(payload, id, id, {
+    const sealed = sealPlaintext(payload, id, { seal_pub: id.seal_pub }, {
       scan: { verdict: record.verdict, digest, reportCanary: reportSealed.frame.canary, tier },
     });
     fs.mkdirSync(path.join(dir, 'candidates'), { recursive: true, mode: 0o700 });
@@ -2561,7 +2349,6 @@ function serve(flags) {
         docks.delete(sessionId);
         airlockRecord({ event: 'close', session: sessionId, profile: dock.profileName, reason: 'airlock-fault', peer: dock.peerDesc });
         log({ event: 'incident', kind: 'airlock-fault', session: sessionId, code, signal });
-        reconcileCustodyTestimony(dock);
         fs.rmSync(sdir, { recursive: true, force: true });
       }
     });
@@ -2597,27 +2384,6 @@ function serve(flags) {
     try { dock.ctrl?.write(JSON.stringify(obj) + '\n'); } catch {}
   }
 
-  // F-06b: before a dock's session dir is removed, reconcile any
-  // custody testimony the airlock persisted locally at close (its
-  // control channel is best-effort; the file is the durable copy).
-  // Each stranded item receives the same record + beacon the live
-  // violation path produces, so a lost ctrl write can no longer mean
-  // silent custody loss.
-  function reconcileCustodyTestimony(dock) {
-    let lines;
-    try { lines = fs.readFileSync(path.join(dock.dir, 'custody-testimony.jsonl'), 'utf8').split('\n').filter((l) => l.trim()); }
-    catch { return; }
-    for (const line of lines) {
-      let item; try { item = JSON.parse(line); } catch { continue; }
-      airlockRecord({
-        event: 'custody-unsettled', session: dock.id, profile: dock.profileName, dir: 'in',
-        bytes: item.bytes ?? null, sha256: item.sha256 ?? null, canary: null,
-        verdict: null, peer: dock.peerDesc, reason_class: 'airlock-protocol',
-      });
-      log({ event: 'beacon', canary: dock.serves, sha256: item.sha256 ?? null, reason_class: 'airlock-protocol', session: dock.id, surface: { label: id.label, seal_fp: id.sealFp, sign_fp: id.signFp } });
-    }
-  }
-
   async function handleAirlockEvent(dock, msg) {
     const policy = pol();
     if (msg.type === 'ready') {
@@ -2643,7 +2409,7 @@ function serve(flags) {
         reportCanary: null,
         tier: record.risk?.tier ?? null,
       } : null;
-      const sealed = sealPlaintext(bytes, id, id, scanBlock ? { scan: scanBlock } : {});
+      const sealed = sealPlaintext(bytes, id, { seal_pub: id.seal_pub }, scanBlock ? { scan: scanBlock } : {});
       const tier = record?.risk?.tier ?? null;
       const quarantined = msg.type === 'quarantine-request';
       const destDir = quarantined ? path.join(dir, 'quarantine') : path.join(dir, 'inbound');
@@ -2694,7 +2460,6 @@ function serve(flags) {
       docks.delete(dock.id);
       airlockRecord({ event: 'close', session: dock.id, profile: dock.profileName, reason: msg.reason, peer: dock.peerDesc });
       log({ event: 'dock', result: `closed: ${msg.reason}`, session: dock.id });
-      reconcileCustodyTestimony(dock);
       try { dock.proc.kill('SIGTERM'); } catch {}
       setTimeout(() => fs.rmSync(dock.dir, { recursive: true, force: true }), 250);
       return;
@@ -2722,7 +2487,7 @@ function serve(flags) {
     let delivered = payload;
     let wrapped = false;
     if (program && !dock.profile.plaintext_code) {
-      delivered = Buffer.from(sealPlaintext(payload, id, id, {}).text, 'utf8');
+      delivered = Buffer.from(sealPlaintext(payload, id, { seal_pub: id.seal_pub }, {}).text, 'utf8');
       wrapped = true;
     }
     airlockRecord({
@@ -3035,6 +2800,19 @@ function serve(flags) {
       log({ event: 'mesh-register', result: 'refused: estate-stale', from_sign_fp: doc.from_sign_fp });
       return { ok: false, error: 'estate-stale: this endpoint has not completed a sync-registry within estate.revocation_max_stale — mesh registrations queue/refuse until it syncs' };
     }
+    // REFIT M.19 — cheap checks first, budgets at the gate: the
+    // signature gate (handleMeshLine) already refused forgeries for
+    // free; an AUTHENTICATED origin's registrations now spend from
+    // its own per-epoch budget BEFORE any state is touched, so abuse
+    // burns only the abuser's budget and the refusal changes nothing.
+    if (refitOn()) {
+      const cap = pol().refit?.budgets?.register_per_peer_epoch ?? 1000;
+      const b = spendBudget(dir, doc.from_sign_fp, 'register', cap);
+      if (!b.ok) {
+        log({ event: 'mesh-register', result: 'refused: budget-exceeded', from_sign_fp: doc.from_sign_fp, used: b.used, cap });
+        return { ok: false, error: `budget-exceeded: this origin's registration budget for the epoch is exhausted (${b.used}/${cap})` };
+      }
+    }
     const entries = Array.isArray(doc.body?.entries) ? doc.body.entries : [];
     if (!entries.length) return { ok: false, error: 'register: no entries' };
     // Attribution is intrinsic to the signed document: a member cannot
@@ -3050,6 +2828,61 @@ function serve(flags) {
     }
     const res = registerEntries(mine, 'mesh', doc.from_sign_fp);
     return { ok: true, registered: res.registered.length, canaries: res.registered, refused: [...refused, ...res.refused] };
+  }
+
+  // REFIT M.1 — anchor role: countersign a vault's registry chain
+  // head, advance-only. The anchor holds no vault data; its whole
+  // state is {seq, head, vault_sign_fp} and it never rewinds. Policy
+  // anchor_vault_sign_fp binds this anchor to one vault when set.
+  function handleMeshAnchorHead(doc) {
+    if (!refitOn()) return { ok: false, error: 'refit-disabled: this daemon does not serve anchor duties' };
+    const cfg = pol().refit || {};
+    if (cfg.anchor_vault_sign_fp && doc.body?.vault_sign_fp !== cfg.anchor_vault_sign_fp) {
+      return { ok: false, error: 'anchor-bound-to-other-vault' };
+    }
+    const st = loadAnchorState(dir);
+    const r = anchorAdvance(id, st, doc.body?.vault_sign_fp, doc.body?.head, doc.body?.seq);
+    if (r.error) return { ok: false, error: r.error };
+    saveAnchorState(dir, r.state);
+    log({ event: 'anchor', result: 'advanced', seq: r.state.seq, vault_sign_fp: r.state.vault_sign_fp });
+    return { ok: true, attestation: r.attestation };
+  }
+
+  // REFIT M.5 — routed executable activation. Admission was enforced
+  // by handleMeshLine (signed doc, address-book member, fresh nonce).
+  // Here: part digests verified, then a HARD cell on THIS host or a
+  // refusal that propagates to the routing daemon — a routed payload
+  // never runs in a lesser cell here either.
+  async function handleMeshActivateRemote(doc) {
+    if (!refitOn()) return { ok: false, error: 'refit-disabled: this daemon does not accept routed activations' };
+    const bodyIn = doc.body || {};
+    const parts = Array.isArray(bodyIn.parts) ? bodyIn.parts : [];
+    const total = parts.reduce((a, p) => a + (typeof p.bytes_b64 === 'string' ? p.bytes_b64.length : 0), 0);
+    if (!parts.length || !bodyIn.entry || total > 700000) {
+      return { ok: false, error: 'activate-remote: bad or oversized payload set' };
+    }
+    if (!substrates.hard.available) {
+      return { ok: false, error: `cell-unavailable: this host cannot provide a HARD cell (missing: ${substrates.hard.missing.join(', ')})` };
+    }
+    const staging = createStaging(cellsRoot, `remote-${crypto.randomUUID()}`);
+    try {
+      for (const p of parts) {
+        const bytes = Buffer.from(p.bytes_b64, 'base64');
+        if (sha256Hex(bytes) !== p.sha256) {
+          return { ok: false, error: `activate-remote: part digest mismatch (${p.relpath})` };
+        }
+        stagePayload(staging, p.relpath, bytes, { executable: !!p.executable });
+      }
+      // runHardCell is the build's HARD runner; on any host where the
+      // substrate probes available it boots the staged image — where
+      // the runner itself refuses, that refusal is the answer.
+      runHardCell();
+      return { ok: false, error: 'cell-unavailable: hard cell did not boot' };
+    } catch (e) {
+      return { ok: false, error: `cell-unavailable: ${e.message}` };
+    } finally {
+      try { destroyStaging(staging.root); } catch {}
+    }
   }
 
   function handleMeshRevoke(doc) {
@@ -3118,7 +2951,7 @@ function serve(flags) {
     send(conn, { ok: true, record: rec, acked_by: ackedBy, revocation_pending: pendingAcks });
   }
 
-  const MESH_TYPES = new Set(['register', 'sync-registry', 'revoke', 'status']);
+  const MESH_TYPES = new Set(['register', 'sync-registry', 'revoke', 'status', 'anchor-head', 'anchor-status', 'activate-remote']);
   const meshNonces = new Map(); // FIX 6: `${from_sign_fp}:${nonce}` -> {at, response}
   let meshServer = null;
   async function handleMeshLine(conn, line) {
@@ -3183,6 +3016,9 @@ function serve(flags) {
     let body;
     try {
       if (doc.type === 'register') body = handleMeshRegister(doc);
+      else if (doc.type === 'anchor-head') body = handleMeshAnchorHead(doc);
+      else if (doc.type === 'anchor-status') body = refitOn() ? { ok: true, ...loadAnchorState(dir) } : { ok: false, error: 'refit-disabled' };
+      else if (doc.type === 'activate-remote') body = await handleMeshActivateRemote(doc);
       else if (doc.type === 'revoke') body = handleMeshRevoke(doc);
       else if (doc.type === 'status') body = { ok: true, ...estateView(), pending: pending.size };
       else body = await handleMeshSync(doc);
@@ -3219,7 +3055,7 @@ function serve(flags) {
   const ownerToken = crypto.randomBytes(24).toString('hex');
   fs.writeFileSync(ownerTokenPathFor(socketPath), `${ownerToken}\n`, { mode: 0o600 });
   try { fs.chmodSync(ownerTokenPathFor(socketPath), 0o600); } catch {}
-  const OWNER_CMDS = new Set(['approve', 'revoke', 'revoke-grant', 'clear-anomaly', 'supersede', 'accept-terms', 'mesh-sync', 'estate-status']);
+  const OWNER_CMDS = new Set(['approve', 'revoke', 'revoke-grant', 'clear-anomaly', 'supersede', 'accept-terms', 'mesh-sync', 'estate-status', 'owner-nonce', 'seal-logs', 'watch-report']);
   function ownerGate(conn, req, channel) {
     if (channel !== 'owner') {
       send(conn, { ok: false, error: 'owner-channel-required: this is an owner act — it is served only on the owner socket (the owner/ directory beside the requester socket), never on the requester channel' });
@@ -3232,40 +3068,8 @@ function serve(flags) {
     return true;
   }
 
-  // Socket budgets (Gemini fix 2a) — M.19's discipline at the socket
-  // layer: concurrent connections and per-connection frames are
-  // capped PER CHANNEL, so a malformed flood on the requester socket
-  // cannot starve the owner channel (the owner budget is separate).
-  // Excess is shed and counted, and the count rides the owner status.
-  // Legitimate clients — one connection, a handful of frames — never
-  // come near these ceilings. (The mesh listener carries its own
-  // frame discipline and signed frames; it is untouched.)
-  const SOCKET_BUDGETS = {
-    requester: { maxConns: 64, maxFrames: 512, live: 0, shed: 0 },
-    owner: { maxConns: 16, maxFrames: 512, live: 0, shed: 0 },
-  };
-  function shedSocket(channel, why) {
-    const b = SOCKET_BUDGETS[channel];
-    b.shed++;
-    if (b.shed === 1 || b.shed % 100 === 0) {
-      log({ event: 'connection', result: `socket-budget-shed: ${why}`, channel, shed_total: b.shed });
-    }
-  }
-  function admitSocket(conn, channel) {
-    const b = SOCKET_BUDGETS[channel];
-    if (b.live >= b.maxConns) {
-      shedSocket(channel, 'connection budget exhausted');
-      conn.destroy();
-      return false;
-    }
-    b.live++;
-    conn.on('close', () => { b.live--; });
-    return true;
-  }
-
   function attachHandlers(conn, channel) {
     let buf = '';
-    let frames = 0;
     conn.on('data', (chunk) => {
       buf += chunk.toString('utf8');
       if (buf.length > MAX_FRAME_BYTES && !buf.includes('\n')) {
@@ -3278,28 +3082,16 @@ function serve(flags) {
       while ((idx = buf.indexOf('\n')) >= 0) {
         const line = buf.slice(0, idx); buf = buf.slice(idx + 1);
         if (!line.trim()) continue;
-        frames++;
-        if (frames > SOCKET_BUDGETS[channel].maxFrames) {
-          shedSocket(channel, 'per-connection frame budget exhausted');
-          conn.destroy();
-          return;
-        }
         let req;
         try { req = JSON.parse(line); } catch { send(conn, { ok: false, error: 'bad-json' }); continue; }
         if (req.cmd === 'status') {
           const regEntries = Object.values(loadRegistry().entries);
           if (channel === 'owner') {
-            const ob = outboxSummary(dir);
             send(conn, {
               ok: true, label: id.label, seal_fp: id.sealFp, sign_fp: id.signFp,
               uptime_s: Math.round((Date.now() - startedAt) / 1000), pending: pending.size,
               registry_issued: regEntries.filter((e) => !e.returned_at).length,
               registry_returned: regEntries.filter((e) => e.returned_at).length,
-              registry_integrity: registryIntegrityState,
-              recovery_candidates: recoveryCandidates.size,
-              outbox_pending: ob.count,
-              outbox_oldest_age_s: ob.count ? ob.age_s : null,
-              socket_shed: { requester: SOCKET_BUDGETS.requester.shed, owner: SOCKET_BUDGETS.owner.shed },
               anomalies: regEntries.filter((e) => e.anomaly).length,
               activations_running: activations.size,
               airlock_sessions: docks.size,
@@ -3363,17 +3155,36 @@ function serve(flags) {
           });
         } else if (req.cmd === 'approve') {
           if (ownerGate(conn, req, channel)) handleApprove(conn, req);
-        } else if (req.cmd === 'recovery') {
+        }
+        else if (req.cmd === 'owner-nonce') {
+          // REFIT M.4: the daemon issues the nonce an owner act must
+          // carry, together with the pending digest the act signs.
           if (ownerGate(conn, req, channel)) {
-            pruneRecoveryCandidates();
-            send(conn, {
-              ok: true,
-              recovery_candidates: [...recoveryCandidates.values()].map((c) => ({
-                id: c.id, canary: c.canary, file: c.filePath, out: c.outName,
-                sender_sign_fp: c.sender_sign_fp, digest: c.digest,
-                age_s: Math.round((Date.now() - c.createdAt) / 1000),
-              })),
-            });
+            const entry = req.id ? pending.get(req.id) : null;
+            if (!entry) send(conn, { ok: false, error: 'owner-nonce: no such pending' });
+            else {
+              const nonce = crypto.randomUUID();
+              ownerNonces.set(nonce, Date.now() + 60000);
+              send(conn, {
+                ok: true, cmd: 'owner-nonce', id: entry.id, nonce,
+                pending_digest: refitPendingDigest(entry), expires_in_s: 60,
+              });
+            }
+          }
+        }
+        else if (req.cmd === 'seal-logs') {
+          // REFIT M.26: rotate the daemon log into a sealed segment.
+          if (ownerGate(conn, req, channel)) {
+            try {
+              const logIdDir = path.join(dir, 'log-identity');
+              if (!fs.existsSync(path.join(logIdDir, 'identity.json'))) {
+                send(conn, { ok: false, error: 'seal-logs: no log identity (log-identity/identity.json) in this store' });
+              } else {
+                const r = sealLogSegment(dir, logFile, logIdDir);
+                if (r) log({ event: 'logs', result: 'segment-sealed', seq: r.seq, canary: r.canary });
+                send(conn, { ok: true, sealed: r ? { seq: r.seq, digest: r.digest, canary: r.canary } : null });
+              }
+            } catch (e) { send(conn, { ok: false, error: `seal-logs: ${e.message}` }); }
           }
         }
         else if (req.cmd === 'register') {
@@ -3381,7 +3192,6 @@ function serve(flags) {
           else handleRegisterSigned(conn, req);
         }
         else if (req.cmd === 'unwrap') handleUnwrap(conn, req);
-        else if (req.cmd === 'verify-open') handleUnwrap(conn, req, true);
         else if (req.cmd === 'activate') {
           handleActivate(conn, req).catch((e) => {
             log({ event: 'activate', result: `error: ${e.message}` });
@@ -3389,6 +3199,7 @@ function serve(flags) {
           });
         }
         else if (req.cmd === 'revoke-grant') { if (ownerGate(conn, req, channel)) handleRevokeGrant(conn, req); }
+        else if (req.cmd === 'watch-report') { if (ownerGate(conn, req, channel)) handleWatchReport(conn, req); }
         else if (req.cmd === 'dock-open') handleDockOpen(conn, req);
         else if (req.cmd === 'dock-send') handleDockSend(conn, req);
         else if (req.cmd === 'dock-close') handleDockClose(conn, req);
@@ -3433,8 +3244,8 @@ function serve(flags) {
     conn.on('error', () => {});
   }
 
-  const server = net.createServer((conn) => { if (admitSocket(conn, 'requester')) attachHandlers(conn, 'requester'); });
-  const ownerServer = net.createServer((conn) => { if (admitSocket(conn, 'owner')) attachHandlers(conn, 'owner'); });
+  const server = net.createServer((conn) => attachHandlers(conn, 'requester'));
+  const ownerServer = net.createServer((conn) => attachHandlers(conn, 'owner'));
   try { fs.unlinkSync(socketPath); } catch {}
   try { fs.unlinkSync(ownerSocketPath); } catch {}
   server.listen(socketPath, () => {
@@ -3483,6 +3294,27 @@ function serve(flags) {
         log({ event: 'mesh', result: 'listening', listen: String(listen) });
         console.log(`vaultd mesh listening on ${listen} (estate RPC — signed; register/sync-registry/revoke/status only)`);
       });
+    }
+  }
+  // REFIT M.1: keep the anchor's countersignature fresh while the
+  // daemon runs (the consumption gate reads at most a 10 s-old live
+  // report; saves also trigger a round via saveRegistry).
+  if (refitOn() && pol().refit?.anchor_sign_fp) {
+    const t = setInterval(() => { void refitAnchorRound(); }, 4000);
+    t.unref?.();
+    void refitAnchorRound();
+  }
+  // REFIT M.26: seal whatever plaintext log the previous run left —
+  // at rest, the log store is armored segments, not plaintext.
+  if (refitOn()) {
+    try {
+      const logIdDir = path.join(dir, 'log-identity');
+      if (fs.existsSync(path.join(logIdDir, 'identity.json'))) {
+        const r = sealLogSegment(dir, logFile, logIdDir);
+        if (r) log({ event: 'logs', result: 'segment-sealed', seq: r.seq, canary: r.canary });
+      }
+    } catch (e) {
+      try { log({ event: 'logs', result: `seal-failed: ${e.message}` }); } catch {}
     }
   }
   const shutdown = () => {

@@ -1,0 +1,803 @@
+{
+ "stack": "kingmaker-stack",
+ "generatedAt": "2026-10-20T10:05:28.899Z",
+ "versionStampSource": "file mtimes (no git metadata in component homes)",
+ "verify": {
+  "command": "node ~/workspace/kingmaker-stack/verify-all.mjs",
+  "suites": 23,
+  "checks": 427,
+  "lastResult": "STACK GREEN (23/23 suites, 427/427 checks) — 2026-10-21; weight-synthesis folded in (50 checks) at the founder's order, built to drop in behind the v0.4.2 release"
+ },
+ "components": [
+  {
+   "id": "router-phase2",
+   "name": "Router Phase 2 — governed per-task routing",
+   "home": "~/workspace/router-phase2",
+   "role": "The governed router: codemod prefilter → cost-shaped bandit → structural verifier → tier escalation, every stage on a hash-chained audit log; plus federation, memory-with-audit, drift checkpoints, guardrails, doctor, rollback.",
+   "versionStamp": "2026-10-20T06:00:06.842Z",
+   "entryModules": [
+    {
+     "path": "router-phase2/lib/governed-router.mjs",
+     "mtime": "2026-10-20T05:59:45.543Z"
+    },
+    {
+     "path": "router-phase2/lib/doctor.mjs",
+     "mtime": "2026-10-20T05:57:47.210Z"
+    },
+    {
+     "path": "router-phase2/lib/rollback.mjs",
+     "mtime": "2026-10-20T05:58:03.509Z"
+    }
+   ],
+   "modules": [
+    {
+     "path": "router-phase2/lib/audit-chain.mjs",
+     "mtime": "2026-10-20T05:46:01.313Z"
+    },
+    {
+     "path": "router-phase2/lib/codemod-prefilter.mjs",
+     "mtime": "2026-10-20T05:48:28.516Z"
+    },
+    {
+     "path": "router-phase2/lib/routing-bandit.mjs",
+     "mtime": "2026-10-20T05:46:52.192Z"
+    },
+    {
+     "path": "router-phase2/lib/output-verifier.mjs",
+     "mtime": "2026-10-20T05:46:35.476Z"
+    },
+    {
+     "path": "router-phase2/lib/federation.mjs",
+     "mtime": "2026-10-20T05:54:36.781Z"
+    },
+    {
+     "path": "router-phase2/lib/memory-audit.mjs",
+     "mtime": "2026-10-20T05:52:18.765Z"
+    },
+    {
+     "path": "router-phase2/lib/drift-checkpoints.mjs",
+     "mtime": "2026-10-20T05:52:28.232Z"
+    },
+    {
+     "path": "router-phase2/lib/guardrails.mjs",
+     "mtime": "2026-10-20T05:57:24.666Z"
+    }
+   ],
+   "testSuites": [
+    {
+     "path": "router-phase2/tests/governed-router.test.mjs",
+     "mtime": "2026-10-20T05:48:49.724Z"
+    },
+    {
+     "path": "router-phase2/tests/federation-memory.test.mjs",
+     "mtime": "2026-10-20T05:54:12.419Z"
+    },
+    {
+     "path": "router-phase2/tests/guardrails-doctor.test.mjs",
+     "mtime": "2026-10-20T05:59:02.527Z"
+    },
+    {
+     "path": "router-phase2/tests/guardrails-router-wiring.test.mjs",
+     "mtime": "2026-10-20T06:00:06.842Z"
+    }
+   ],
+   "license": "Ronin Inc original work; patterns studied clean-room from RuFlow (MIT) — see NOTICE."
+  },
+  {
+   "id": "littlebrother",
+   "name": "LittleBrother — governed OSINT method set",
+   "home": "~/workspace/littlebrother",
+   "role": "Spine-facing lookup core. kingmaker build: 5 public-source methods + 3 tap-gated full methods (stubs until a founder points a live source); solomon build physically excludes the full set (build-solomon.mjs). Every call/refusal on a hash-chained JSONL audit log. INSTALLED 2026-10-20: real code vendored in-stack at kingmaker-stack/littlebrother (ships in the app payload as lib/stack-littlebrother); acceptance suite runs against the installed copy.",
+   "versionStamp": "2026-10-21T02:41:12.883120Z",
+   "entryModules": [
+    {
+     "path": "littlebrother/lib/littlebrother.mjs",
+     "mtime": "2026-10-20T05:51:31.386Z"
+    },
+    {
+     "path": "littlebrother/build-solomon.mjs",
+     "mtime": "2026-10-20T05:52:11.068Z"
+    }
+   ],
+   "modules": [
+    {
+     "path": "littlebrother/lib/methods-public.mjs",
+     "mtime": "2026-10-20T05:50:54.699Z"
+    },
+    {
+     "path": "littlebrother/lib/methods-full.mjs",
+     "mtime": "2026-10-20T05:51:02.965Z"
+    },
+    {
+     "path": "littlebrother/lib/audit-log.mjs",
+     "mtime": "2026-10-20T05:50:48.109Z"
+    }
+   ],
+   "testSuites": [
+    {
+     "path": "littlebrother/tests/run-tests.mjs",
+     "mtime": "2026-10-20T05:51:56.781Z"
+    }
+   ],
+   "license": "Ronin Inc original work, clean-room from the boundary spec (GPL upstream never read) — see NOTICE.",
+   "installedHome": "kingmaker-stack/littlebrother"
+  },
+  {
+   "id": "space-cell",
+   "name": "SPACE cell — sandbox governor (Kingmaker v0.4.1)",
+   "home": "~/workspace/kingmaker-v041/space-cell",
+   "role": "Client + governor for the SPACE microVM platform on the Linux host: intent audited before any request, host-side egress policy, brokered credentials, registered workload kinds (cage-eval, digital-twin, redhat-darkweb, redhat-abliterate, littlebrother-full, kuroko-voice), structural output verification.",
+   "versionStamp": "2026-10-20T06:10:13.832Z",
+   "entryModules": [
+    {
+     "path": "kingmaker-v041/space-cell/lib/cell-governor.mjs",
+     "mtime": "2026-10-20T06:09:27.108Z"
+    },
+    {
+     "path": "kingmaker-v041/space-cell/lib/space-client.mjs",
+     "mtime": "2026-10-20T06:08:54.168Z"
+    }
+   ],
+   "modules": [
+    {
+     "path": "kingmaker-v041/space-cell/lib/audit-chain.mjs",
+     "mtime": "2026-10-20T06:08:32.550Z"
+    }
+   ],
+   "testSuites": [
+    {
+     "path": "kingmaker-v041/space-cell/tests/space-cell.test.mjs",
+     "mtime": "2026-10-20T06:10:13.832Z"
+    }
+   ],
+   "license": "Ronin Inc original work; targets SPACE (Apache-2.0) over its public API, never vendored; kuroko-voice fronts Voice Studio (AGPL-3.0, external-only) — see NOTICE."
+  },
+  {
+   "id": "training-data-pipeline",
+   "name": "Training-data pipeline — exhaust + Cage intake + corpora",
+   "home": "~/workspace/training-data-pipeline",
+   "role": "Turns the fleet’s audit chains into labeled training records (gold/negative/unlabeled/superseded, provenance mandatory, tampered chains refused); triages HF datasets through the Cage (SHA-256 + license class); builds per-agent corpora with dedup, seeded split, signed manifest.",
+   "versionStamp": "2026-10-20T06:30:58.678Z",
+   "entryModules": [
+    {
+     "path": "training-data-pipeline/tools/exhaust-harvester.mjs",
+     "mtime": "2026-10-20T06:28:25.455Z"
+    },
+    {
+     "path": "training-data-pipeline/lib/dataset-intake.mjs",
+     "mtime": "2026-10-20T06:28:44.724Z"
+    },
+    {
+     "path": "training-data-pipeline/lib/corpus-builder.mjs",
+     "mtime": "2026-10-20T06:29:52.931Z"
+    }
+   ],
+   "modules": [
+    {
+     "path": "training-data-pipeline/lib/chain-verify.mjs",
+     "mtime": "2026-10-20T06:27:59.810Z"
+    },
+    {
+     "path": "training-data-pipeline/tools/hf-download.py",
+     "mtime": "2026-10-20T06:29:37.791Z"
+    },
+    {
+     "path": "training-data-pipeline/tools/build-tool-use-brains.mjs",
+     "mtime": "2026-10-20T06:30:58.678Z"
+    }
+   ],
+   "artifacts": [
+    "corpora/tool-use-brains (glaive apache-2.0; 103,915 deduped rows; train 93,527 / eval 10,388; solomonSafe: true)"
+   ],
+   "testSuites": [
+    {
+     "path": "training-data-pipeline/tests/run-tests.mjs",
+     "mtime": "2026-10-20T06:30:12.201Z"
+    }
+   ],
+   "license": "Ronin Inc original work; bundled corpus source glaive-function-calling-v2 is Apache-2.0 — see NOTICE."
+  },
+  {
+   "id": "edge0-minicpm-augmentation",
+   "name": "Edge0 × MiniCPM5 augmentation",
+   "home": "~/workspace/edge0-minicpm-augmentation",
+   "role": "Condense truth pass (affine-int4-g64 format math, MoE-gate fp8 pinning, kvLayerFraction KV correction) + think/no-think lane policy (reflex/standard/deep) for serving; augmentation spec + MTP verification memo (verdict: NOT WIRED upstream).",
+   "versionStamp": "2026-10-20T07:35:27.658Z",
+   "entryModules": [
+    {
+     "path": "edge0-minicpm-augmentation/lib/condense-truth-pass.mjs",
+     "mtime": "2026-10-20T07:35:27.658Z"
+    },
+    {
+     "path": "edge0-minicpm-augmentation/lib/lane-policy.mjs",
+     "mtime": "2026-10-20T07:34:56.365Z"
+    }
+   ],
+   "modules": [],
+   "testSuites": [
+    {
+     "path": "edge0-minicpm-augmentation/tests/run-tests.mjs",
+     "mtime": "2026-10-20T07:35:20.370Z"
+    }
+   ],
+   "license": "Ronin Inc original work; techniques/configs studied from MiniCPM5-1B (Apache-2.0) — see NOTICE."
+  },
+  {
+   "id": "wordcraft",
+   "name": "WordCraft — document production connector",
+   "home": "~/workspace/kingmaker-stack/wordcraft",
+   "role": "Document production layer under the blog/report/book pipeline: wordcraft-cli jobs validated (macro flavors refused, password-file only), run jobs founder-tap gated, and MCP use pinned to both automation roots inside the declared workspace (upstream's default posture is unconfined). Binary NOT downloaded — the pin ships UNPINNED for Cage intake.",
+   "versionStamp": "2026-10-20T10:02:15.428Z",
+   "entryModules": [
+    {
+     "path": "kingmaker-stack/wordcraft/lib/wordcraft-contract.mjs",
+     "mtime": "2026-10-20T10:01:25.732Z"
+    }
+   ],
+   "modules": [
+    {
+     "path": "kingmaker-stack/wordcraft/lib/wordcraft-contract.mjs",
+     "mtime": "2026-10-20T10:01:25.732Z"
+    }
+   ],
+   "testSuites": [
+    {
+     "path": "kingmaker-stack/wordcraft/tests/run-tests.mjs",
+     "mtime": "2026-10-20T10:01:15.421Z"
+    }
+   ],
+   "license": "Upstream storytold/wordcraft is MIT OR Apache-2.0; contract code is Ronin Inc original work — see NOTICE.",
+   "licensePosture": {
+    "class": "clean",
+    "license": "MIT OR Apache-2.0"
+   }
+  },
+  {
+   "id": "artemis",
+   "name": "ARTEMIS — Android device-driving connector (Kingmaker Mobile)",
+   "home": "~/workspace/kingmaker-stack/artemis",
+   "role": "Drives real Android devices for Kingmaker Mobile under governance: console loopback-only, helper-APK install founder-tapped and hash-pinned (signature never trusted — debug keystore), model providers allowlisted to the operator's own keys, MCP stdio only, and the cloud-proxy / installer commands forbidden outright. Kingmaker supplies the brain; upstream ships none.",
+   "versionStamp": "2026-10-20T10:02:15.431Z",
+   "entryModules": [
+    {
+     "path": "kingmaker-stack/artemis/lib/artemis-contract.mjs",
+     "mtime": "2026-10-20T10:01:25.735Z"
+    }
+   ],
+   "modules": [
+    {
+     "path": "kingmaker-stack/artemis/lib/artemis-contract.mjs",
+     "mtime": "2026-10-20T10:01:25.735Z"
+    }
+   ],
+   "testSuites": [
+    {
+     "path": "kingmaker-stack/artemis/tests/run-tests.mjs",
+     "mtime": "2026-10-20T10:01:15.426Z"
+    }
+   ],
+   "license": "Upstream google/artemis is Apache-2.0; contract code is Ronin Inc original work — see NOTICE.",
+   "licensePosture": {
+    "class": "clean",
+    "license": "Apache-2.0"
+   }
+  },
+  {
+   "id": "anatomy",
+   "name": "Anatomy — problem-visualization skill",
+   "home": "~/workspace/kingmaker-stack/anatomy",
+   "role": "Skill registration: renders a FOUND problem as an interactive isometric visual (problem-visualization layer + content figures). Renders, never diagnoses — the seat separation is stated in the descriptor and enforced at the gate, which confines figure jobs to the declared figures directory, requires self-contained figure HTML, and refuses publish/submit/share actions outright (upstream's publish path force-pushes with operator credentials).",
+   "versionStamp": "2026-10-20T10:02:15.473Z",
+   "entryModules": [
+    {
+     "path": "kingmaker-stack/anatomy/lib/anatomy-gate.mjs",
+     "mtime": "2026-10-20T10:01:25.740Z"
+    }
+   ],
+   "modules": [
+    {
+     "path": "kingmaker-stack/anatomy/lib/anatomy-gate.mjs",
+     "mtime": "2026-10-20T10:01:25.740Z"
+    }
+   ],
+   "testSuites": [
+    {
+     "path": "kingmaker-stack/anatomy/tests/run-tests.mjs",
+     "mtime": "2026-10-20T10:01:15.431Z"
+    }
+   ],
+   "license": "Upstream wheresryan22/anatomy is MIT; gate code is Ronin Inc original work — see NOTICE.",
+   "licensePosture": {
+    "class": "clean",
+    "license": "MIT"
+   }
+  },
+  {
+   "id": "solidcraft",
+   "name": "SolidCraft — parametric CAD connector",
+   "home": "~/workspace/kingmaker-stack/solidcraft",
+   "role": "Fabrication + renders (King's Keep parts, product-render source models): script-job paths confined to the declared fabrication workspace, GUI/app refused as a launch target (updater surface), check_updates pinned false. FORK-REQUIRED upstream: the minisign public key is unset, so update authenticity is same-origin checksums until forked. FreeCAD remains the verification oracle for structural parts.",
+   "versionStamp": "2026-10-20T10:02:15.468Z",
+   "entryModules": [
+    {
+     "path": "kingmaker-stack/solidcraft/lib/solidcraft-contract.mjs",
+     "mtime": "2026-10-20T10:01:25.744Z"
+    }
+   ],
+   "modules": [
+    {
+     "path": "kingmaker-stack/solidcraft/lib/solidcraft-contract.mjs",
+     "mtime": "2026-10-20T10:01:25.744Z"
+    }
+   ],
+   "testSuites": [
+    {
+     "path": "kingmaker-stack/solidcraft/tests/run-tests.mjs",
+     "mtime": "2026-10-20T10:01:15.438Z"
+    }
+   ],
+   "license": "Upstream tangency-labs/solidcraft is MIT OR Apache-2.0; contract code is Ronin Inc original work — see NOTICE.",
+   "licensePosture": {
+    "class": "clean",
+    "license": "MIT OR Apache-2.0"
+   }
+  },
+  {
+   "id": "xerj",
+   "name": "XERJ — local search/memory connector",
+   "home": "~/workspace/kingmaker-stack/xerj",
+   "role": "Local memory/search layer complementing ripgrep: server config pins loopback bind, auth on, admin key required by reference, hosted hub off, telemetry env pinned, and the OFFLINE LEXICAL embedder only — the neural mode's model download is refused by the contract (a local-weights path exists only against an intake pin). Index jobs run declared roots through a pre-index secret scan; the field-report tool and share route are refused.",
+   "versionStamp": "2026-10-20T10:02:15.468Z",
+   "entryModules": [
+    {
+     "path": "kingmaker-stack/xerj/lib/xerj-contract.mjs",
+     "mtime": "2026-10-20T10:01:25.746Z"
+    }
+   ],
+   "modules": [
+    {
+     "path": "kingmaker-stack/xerj/lib/xerj-contract.mjs",
+     "mtime": "2026-10-20T10:01:25.746Z"
+    }
+   ],
+   "testSuites": [
+    {
+     "path": "kingmaker-stack/xerj/tests/run-tests.mjs",
+     "mtime": "2026-10-20T10:01:15.446Z"
+    }
+   ],
+   "license": "Upstream xerj-org/xerj is Apache-2.0; contract code is Ronin Inc original work — see NOTICE.",
+   "licensePosture": {
+    "class": "clean",
+    "license": "Apache-2.0"
+   }
+  },
+  {
+   "id": "unsloth",
+   "name": "Unsloth — training-lane contract (core) + Studio external record",
+   "home": "~/workspace/kingmaker-stack/unsloth",
+   "role": "The training lane: fine-tune jobs on local hardware (DGX Spark) as descriptors through a tap-gated runner seam — corpus sha256 required in, model sha256 required out, exact version pins, pinned-source install posture (curl|sh and unpinned pip refused). Studio rides along as an EXTERNAL record (AGPL-3.0): loopback-pinned launches only, Cloudflare quick-tunnel launches refused, telemetry env pinned.",
+   "versionStamp": "2026-10-20T10:02:32.504Z",
+   "entryModules": [
+    {
+     "path": "kingmaker-stack/unsloth/lib/unsloth-contract.mjs",
+     "mtime": "2026-10-20T10:01:25.715Z"
+    }
+   ],
+   "modules": [
+    {
+     "path": "kingmaker-stack/unsloth/lib/unsloth-contract.mjs",
+     "mtime": "2026-10-20T10:01:25.715Z"
+    }
+   ],
+   "testSuites": [
+    {
+     "path": "kingmaker-stack/unsloth/tests/run-tests.mjs",
+     "mtime": "2026-10-20T10:01:15.452Z"
+    }
+   ],
+   "license": "SPLIT — upstream core Apache-2.0, Studio AGPL-3.0 (external-only); contract code is Ronin Inc original work — see NOTICE.",
+   "licensePosture": {
+    "class": "clean",
+    "license": "Apache-2.0 (core) / AGPL-3.0 (Studio, external-only)"
+   }
+  },
+  {
+   "id": "check-if-email-exists",
+   "name": "check-if-email-exists — verification gate",
+   "home": "~/workspace/kingmaker-stack/check-if-email-exists",
+   "role": "Pre-send list verification for the outreach lane: batches open only with listId + provenance + a positive integer allowance + the founder tap, and the allowance is a hard stop enforced in-process. Backend pinned loopback (it ships no auth), Sentry refused at build, Gravatar pinned off, HIBP opt-in per batch only, and provider account-existence probes recorded on every disclosed check.",
+   "versionStamp": "2026-10-20T10:02:32.568Z",
+   "entryModules": [
+    {
+     "path": "kingmaker-stack/check-if-email-exists/lib/verify-gate.mjs",
+     "mtime": "2026-10-20T10:01:25.719Z"
+    }
+   ],
+   "modules": [
+    {
+     "path": "kingmaker-stack/check-if-email-exists/lib/verify-gate.mjs",
+     "mtime": "2026-10-20T10:01:25.719Z"
+    }
+   ],
+   "testSuites": [
+    {
+     "path": "kingmaker-stack/check-if-email-exists/tests/run-tests.mjs",
+     "mtime": "2026-10-20T10:01:15.457Z"
+    }
+   ],
+   "license": "Upstream reacherhq/check-if-email-exists is MIT; gate code is Ronin Inc original work — see NOTICE.",
+   "licensePosture": {
+    "class": "clean",
+    "license": "MIT"
+   }
+  },
+  {
+   "id": "stop-slop",
+   "name": "Stop Slop — anti-slop content skill",
+   "home": "~/workspace/kingmaker-stack/stop-slop",
+   "role": "Skill registration for the blog rotation's anti-slop pass, pinned by commit + per-file sha256 (SKILL.md and all three references, verified against the intake clone). The skill is prose only — no code, no network shape — so the governed surface is the pin itself: a staged copy that differs from the pins is refused by the verifier.",
+   "versionStamp": "2026-10-20T10:02:32.573Z",
+   "entryModules": [
+    {
+     "path": "kingmaker-stack/stop-slop/lib/stop-slop-skill.mjs",
+     "mtime": "2026-10-20T10:01:42.133Z"
+    }
+   ],
+   "modules": [
+    {
+     "path": "kingmaker-stack/stop-slop/lib/stop-slop-skill.mjs",
+     "mtime": "2026-10-20T10:01:42.133Z"
+    }
+   ],
+   "testSuites": [
+    {
+     "path": "kingmaker-stack/stop-slop/tests/run-tests.mjs",
+     "mtime": "2026-10-20T10:01:55.025Z"
+    }
+   ],
+   "license": "Upstream hardikpandya/stop-slop is MIT; pin/verifier code is Ronin Inc original work — see NOTICE.",
+   "licensePosture": {
+    "class": "clean",
+    "license": "MIT"
+   }
+  },
+  {
+   "id": "humanizer",
+   "name": "Humanizer — content skill",
+   "home": "~/workspace/kingmaker-stack/humanizer",
+   "role": "Skill registration for the blog rotation's tell-catalog edit pass (v3.1.0), pinned by commit + SKILL.md sha256 against the intake clone; complements Stop Slop's structure-first rules. The pin is the governed surface: a drifted staged copy is refused.",
+   "versionStamp": "2026-10-20T10:02:32.569Z",
+   "entryModules": [
+    {
+     "path": "kingmaker-stack/humanizer/lib/humanizer-skill.mjs",
+     "mtime": "2026-10-20T10:01:42.133Z"
+    }
+   ],
+   "modules": [
+    {
+     "path": "kingmaker-stack/humanizer/lib/humanizer-skill.mjs",
+     "mtime": "2026-10-20T10:01:42.133Z"
+    }
+   ],
+   "testSuites": [
+    {
+     "path": "kingmaker-stack/humanizer/tests/run-tests.mjs",
+     "mtime": "2026-10-20T10:01:55.039Z"
+    }
+   ],
+   "license": "Upstream blader/humanizer is MIT; pin/verifier code is Ronin Inc original work — see NOTICE.",
+   "licensePosture": {
+    "class": "clean",
+    "license": "MIT"
+   }
+  },
+  {
+   "id": "exifcleaner",
+   "name": "ExifCleaner — external metadata scrubber",
+   "home": "~/workspace/kingmaker-stack/exifcleaner",
+   "role": "EXTERNAL registration: the publishing-hygiene station, operator-driven in its own session — never imported, linked, bundled, or shipped; only its scrubbed outputs cross, through the Cage. Audit of record: fully local processing verified, crash reporter hard-disabled upstream. Release builds are unsigned upstream, so the pin's artifact-hash field ships empty for Cage intake to record out-of-band.",
+   "versionStamp": "2026-10-20T10:02:32.559Z",
+   "entryModules": [
+    {
+     "path": "kingmaker-stack/exifcleaner/lib/exifcleaner-external.mjs",
+     "mtime": "2026-10-20T10:01:42.133Z"
+    }
+   ],
+   "modules": [
+    {
+     "path": "kingmaker-stack/exifcleaner/lib/exifcleaner-external.mjs",
+     "mtime": "2026-10-20T10:01:42.133Z"
+    }
+   ],
+   "testSuites": [
+    {
+     "path": "kingmaker-stack/exifcleaner/tests/run-tests.mjs",
+     "mtime": "2026-10-20T10:01:55.036Z"
+    }
+   ],
+   "license": "Upstream szTheory/exifcleaner is MIT — external posture is a shape choice (GUI operator tool), not a license compulsion; registration code is Ronin Inc original work — see NOTICE.",
+   "licensePosture": {
+    "class": "external",
+    "license": "MIT"
+   }
+  },
+  {
+   "id": "lazy-frames",
+   "name": "Lazy Frames — Cage triage record (DO NOT USE)",
+   "home": "~/workspace/kingmaker-stack/lazy-frames",
+   "role": "TRIAGE record only. A plausible fit for the content render lane, but the repo declares MIT in package.json/README with NO LICENSE file anywhere — a claim, not a grant — so nothing was absorbed. The record carries the tripwire module (render/capture/remote-skill jobs refuse as-shaped), the in-repo skill's sha256 pins, and the clearing ceremony: LICENSE file appears upstream + its sha256 recorded at intake + founder tap.",
+   "versionStamp": "2026-10-20T10:02:32.576Z",
+   "entryModules": [
+    {
+     "path": "kingmaker-stack/lazy-frames/lib/lazy-frames-triage.mjs",
+     "mtime": "2026-10-20T10:01:25.723Z"
+    }
+   ],
+   "modules": [
+    {
+     "path": "kingmaker-stack/lazy-frames/lib/lazy-frames-triage.mjs",
+     "mtime": "2026-10-20T10:01:25.723Z"
+    }
+   ],
+   "testSuites": [
+    {
+     "path": "kingmaker-stack/lazy-frames/tests/run-tests.mjs",
+     "mtime": "2026-10-20T10:01:25.768Z"
+    }
+   ],
+   "license": "UNVERIFIED — MIT declared, no license text exists to rely on; record code is Ronin Inc original work — see NOTICE.",
+   "licensePosture": {
+    "class": "unverified",
+    "license": "UNVERIFIED (MIT declared; no license text exists to rely on)"
+   }
+  },
+  {
+   "id": "kingmaker-stack",
+   "name": "Kingmaker Stack — integration layer",
+   "home": "~/workspace/kingmaker-stack",
+   "role": "This consolidation: STACK.md (integration map), stack-manifest.json (this registry), verify-all.mjs (one runner for all suites + seams), seams.test.mjs (cross-component checks), lib/harvest.mjs (format adapter). Components keep their own homes; nothing was moved or copied.",
+   "versionStamp": "2026-10-20T07:49:30.683Z",
+   "entryModules": [
+    {
+     "path": "kingmaker-stack/verify-all.mjs",
+     "mtime": "2026-10-20T07:48:55.657Z"
+    },
+    {
+     "path": "kingmaker-stack/seams.test.mjs",
+     "mtime": "2026-10-20T07:49:30.683Z"
+    },
+    {
+     "path": "kingmaker-stack/lib/harvest.mjs",
+     "mtime": "2026-10-20T07:49:27.809Z"
+    }
+   ],
+   "modules": [],
+   "testSuites": [
+    {
+     "path": "kingmaker-stack/seams.test.mjs",
+     "mtime": "2026-10-20T07:49:30.683Z"
+    }
+   ],
+   "license": "Ronin Inc original work — see NOTICE."
+  },
+  {
+   "id": "harness2",
+   "name": "Harness² — governed recursive harness improvement (native reconstruction)",
+   "home": "~/workspace/kingmaker-stack/harness2",
+   "role": "Propose–Probe–Compose refinement of the 8 harness components around a frozen model (method: google-research/harness2, Apache-2.0, arXiv 2610.14224 — clean-room re-implementation, no upstream code). Adoption is founder-tap-gated and audit-chained (upstream self-adopts ungated — the one doctrinal change). Improvement library carries adopted lessons across tasks. Doubles as the slash-bucket self-configuration mechanism.",
+   "versionStamp": "2026-10-21T02:41:12.883120Z",
+   "entryModules": [
+    {
+     "path": "harness2/lib/harness2-governed.mjs",
+     "mtime": "2026-10-21T02:41:12.883120Z"
+    }
+   ],
+   "modules": [],
+   "testSuites": [
+    {
+     "path": "harness2/tests/run-tests.mjs",
+     "checks": 11
+    }
+   ],
+   "license": "Apache-2.0 method; original Ronin reconstruction"
+  },
+  {
+   "id": "weight-synthesis",
+   "name": "Weight Synthesis Engine — deterministic weight synthesis, judging, and sealing (native build)",
+   "home": "~/workspace/kingmaker-stack/weight-synthesis",
+   "role": "Given a task lane, the engine finds the best weights for the founder's actual hardware and produces them deterministically: evidence intake whittles candidates to a sourced shortlist (community-measured and reported results; vendor claims are leads, never evidence; dark-web lane under the standing dark-web doctrine, queries normalized); recipes (parents by sha256, algorithm, coefficients, seed, suite, balance rule, environment) are content-addressed data; merge math (linear / slerp / TIES / DARE) runs FP32 in canonical order, CPU path only; the Judge scores suite quality against measured tok/s under the recipe's balance rule with a flagship quality floor; adoption requires proof by reproduction (the headless digital twin — a text spec that becomes an image on command and works a folder's work list down in order — re-runs the recipe to the identical sha256) and a founder tap; pins carry full parentage, inherit the strictest parent license, and load only under a detached ed25519 signature from the offline founder key.",
+   "versionStamp": "2026-10-21T09:29:16.879Z",
+   "entryModules": [
+    {
+     "path": "weight-synthesis/lib/weightsynth-core.mjs",
+     "mtime": "2026-10-21T09:29:16.879Z"
+    },
+    {
+     "path": "weight-synthesis/lib/weightsynth-judge.mjs",
+     "mtime": "2026-10-21T09:29:41.139Z"
+    },
+    {
+     "path": "weight-synthesis/lib/weightsynth-registry.mjs",
+     "mtime": "2026-10-21T09:30:01.400Z"
+    },
+    {
+     "path": "weight-synthesis/lib/weightsynth-twin.mjs",
+     "mtime": "2026-10-21T09:30:11.903Z"
+    }
+   ],
+   "modules": [],
+   "testSuites": [
+    {
+     "path": "weight-synthesis/tests/run-tests.mjs",
+     "mtime": "2026-10-21T09:31:19.403Z"
+    }
+   ]
+  }
+ ],
+ "byteCensus": {
+  "computedAt": "2026-10-21T09:31:47.975Z",
+  "tool": "census.mjs (this file — counted in kingmaker-stack code bytes)",
+  "methodology": "code = lib/ + tools/ + tests/ + root-level .mjs/.py entry scripts; data = corpora/downloads/audit artifacts/archived model sources per component (see dataBreakdown); other = docs and manifests. Exact file bytes, not disk blocks.",
+  "scopeNote": "Census covers the seventeen stack directories (the original six homes plus the eleven absorbed components inside kingmaker-stack/). The ~18.5 GB knowledge library and model weights are not in these homes — they are data under the same rule and stream post-install in the v0.4.1 design.",
+  "payloadRule": "The 4.1 payload ships CODE ONLY. Every data byte below streams post-install (library, corpora, models) or is a local artifact that never ships (audit logs, bundle build output, study sources).",
+  "components": {
+   "router-phase2": {
+    "home": "~/workspace/router-phase2",
+    "codeBytes": 140089,
+    "dataBytes": 0,
+    "otherBytes": 53500,
+    "dataBreakdown": {}
+   },
+   "littlebrother": {
+    "home": "~/workspace/littlebrother",
+    "codeBytes": 37877,
+    "dataBytes": 18027,
+    "otherBytes": 2482,
+    "dataBreakdown": {
+     "audit": {
+      "bytes": 627,
+      "what": "audit log artifact"
+     },
+     "tmp": {
+      "bytes": 17400,
+      "what": "solomon-bundle build output"
+     }
+    }
+   },
+   "space-cell": {
+    "home": "~/workspace/kingmaker-v041/space-cell",
+    "codeBytes": 51947,
+    "dataBytes": 0,
+    "otherBytes": 1266,
+    "dataBreakdown": {}
+   },
+   "training-data-pipeline": {
+    "home": "~/workspace/training-data-pipeline",
+    "codeBytes": 41687,
+    "dataBytes": 294016222,
+    "otherBytes": 4663,
+    "dataBreakdown": {
+     "corpora": {
+      "bytes": 294009909,
+      "what": "built corpora (train/eval JSONL)"
+     },
+     "intake": {
+      "bytes": 6313,
+      "what": "triage records + download metadata"
+     }
+    }
+   },
+   "edge0-minicpm-augmentation": {
+    "home": "~/workspace/edge0-minicpm-augmentation",
+    "codeBytes": 32497,
+    "dataBytes": 97142,
+    "otherBytes": 31204,
+    "dataBreakdown": {
+     "sources": {
+      "bytes": 97142,
+      "what": "archived model configs/cards (study evidence)"
+     }
+    }
+   },
+   "wordcraft": {
+    "home": "~/workspace/kingmaker-stack/wordcraft",
+    "codeBytes": 12167,
+    "dataBytes": 0,
+    "otherBytes": 1955,
+    "dataBreakdown": {}
+   },
+   "artemis": {
+    "home": "~/workspace/kingmaker-stack/artemis",
+    "codeBytes": 14984,
+    "dataBytes": 0,
+    "otherBytes": 2507,
+    "dataBreakdown": {}
+   },
+   "anatomy": {
+    "home": "~/workspace/kingmaker-stack/anatomy",
+    "codeBytes": 8075,
+    "dataBytes": 0,
+    "otherBytes": 2345,
+    "dataBreakdown": {}
+   },
+   "solidcraft": {
+    "home": "~/workspace/kingmaker-stack/solidcraft",
+    "codeBytes": 10491,
+    "dataBytes": 0,
+    "otherBytes": 2408,
+    "dataBreakdown": {}
+   },
+   "xerj": {
+    "home": "~/workspace/kingmaker-stack/xerj",
+    "codeBytes": 17549,
+    "dataBytes": 0,
+    "otherBytes": 2583,
+    "dataBreakdown": {}
+   },
+   "unsloth": {
+    "home": "~/workspace/kingmaker-stack/unsloth",
+    "codeBytes": 13091,
+    "dataBytes": 0,
+    "otherBytes": 2125,
+    "dataBreakdown": {}
+   },
+   "check-if-email-exists": {
+    "home": "~/workspace/kingmaker-stack/check-if-email-exists",
+    "codeBytes": 14612,
+    "dataBytes": 0,
+    "otherBytes": 2063,
+    "dataBreakdown": {}
+   },
+   "stop-slop": {
+    "home": "~/workspace/kingmaker-stack/stop-slop",
+    "codeBytes": 4441,
+    "dataBytes": 0,
+    "otherBytes": 1835,
+    "dataBreakdown": {}
+   },
+   "humanizer": {
+    "home": "~/workspace/kingmaker-stack/humanizer",
+    "codeBytes": 4042,
+    "dataBytes": 0,
+    "otherBytes": 1485,
+    "dataBreakdown": {}
+   },
+   "exifcleaner": {
+    "home": "~/workspace/kingmaker-stack/exifcleaner",
+    "codeBytes": 7748,
+    "dataBytes": 0,
+    "otherBytes": 2320,
+    "dataBreakdown": {}
+   },
+   "lazy-frames": {
+    "home": "~/workspace/kingmaker-stack/lazy-frames",
+    "codeBytes": 11538,
+    "dataBytes": 0,
+    "otherBytes": 2115,
+    "dataBreakdown": {}
+   },
+   "weight-synthesis": {
+    "home": "~/workspace/kingmaker-stack/weight-synthesis",
+    "codeBytes": 54211,
+    "dataBytes": 0,
+    "otherBytes": 5017,
+    "dataBreakdown": {}
+   },
+   "kingmaker-stack": {
+    "home": "~/workspace/kingmaker-stack",
+    "codeBytes": 41525,
+    "dataBytes": 0,
+    "otherBytes": 129673,
+    "dataBreakdown": {}
+   }
+  },
+  "totals": {
+   "codeBytes": 518571,
+   "dataBytes": 294131391,
+   "otherBytes": 251546,
+   "allBytes": 294901508,
+   "stackCodeTotalBytes": 518571
+  }
+ }
+}

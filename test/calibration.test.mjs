@@ -29,6 +29,13 @@ test('anything saved is made valid: unknown keys dropped, numbers clamped and st
   assert.equal('nope' in v, false);
 });
 
+test('the Mac-profile tier control is retired: a macProfile key in an old file is dropped, not honored', () => {
+  assert.equal(FUNCTIONS.some((f) => f.id === 'macProfile'), false, 'no tier control in Customize anymore');
+  const v = normalize({ macProfile: { profile: '16' } });
+  assert.equal('macProfile' in v, false, 'an old calibration.json\'s macProfile key is inert: nothing reads a runtime tier from it');
+  assert.equal(v.writer.context, 4096, 'the writer context default is the floor writer\'s measured working context');
+});
+
 test('saved to the data folder (0600) and read back; a broken file reads as the defaults', () => {
   const dir = mkdtempSync(join(tmpdir(), 'cal-'));
   assert.deepEqual(readCalibration(dir), defaults(), 'no file: defaults');

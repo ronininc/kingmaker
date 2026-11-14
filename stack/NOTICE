@@ -1,0 +1,129 @@
+NOTICE — Kingmaker Stack (roll-up)
+
+This file rolls up the license posture of every component in the stack
+consolidated at ~/workspace/kingmaker-stack/. Per-component NOTICEs remain
+the authoritative texts (router-phase2/NOTICE, kingmaker-v041/space-cell/
+NOTICE, littlebrother/boundary-spec.md, training-data-pipeline/README.md,
+edge0-minicpm-augmentation/augmentation-spec.md).
+
+ORIGINAL CODE — ROBBIE'S
+------------------------
+All code in the five components and in this integration layer is Ronin
+Inc's own work (Robbie Glover), written clean-room for the Kingmaker /
+Solomon / K Office stack:
+
+  - router-phase2/            governed router, bandit, verifier,
+                              federation, memory-audit, drift,
+                              guardrails, doctor, rollback
+  - littlebrother/            method set, core, audit log, solomon
+                              bundle builder
+  - kingmaker-v041/space-cell/  space-client, cell-governor
+  - training-data-pipeline/   exhaust harvester, cage intake, corpus
+                              builder
+  - edge0-minicpm-augmentation/ condense truth pass, lane policy
+  - kingmaker-stack/          STACK.md, manifest, verify-all, seams,
+                              harvest adapter, shared governance +
+                              audit-chain library, and the eleven
+                              absorbed components (registrations below)
+
+STUDIED REFERENCES — NOTHING COPIED
+-----------------------------------
+  RuFlow (https://github.com/ruvnet/ruflo) — MIT License.
+    Behavioral reference for router-phase2 only: patterns were extracted
+    into router-phase2/ruflo-behavior-spec.md and re-implemented under
+    Kingmaker's governance chain. No RuFlow source is reproduced. Its
+    forgeable witness-signing scheme and grant-by-default authorization
+    were studied and deliberately NOT ported.
+
+  MiniCPM5-1B (openbmb/MiniCPM5-1B) — Apache License 2.0.
+    Configs, chat template, and published methodology studied for the
+    Edge0 augmentation (architecture facts, sampling presets, affine
+    int4 group-64 format math). No weights are bundled in the stack.
+
+EXTERNAL PLATFORMS — SPOKEN TO, NEVER VENDORED
+----------------------------------------------
+  SPACE — Sandboxed Platform for Agentic Code Execution
+  (https://github.com/perplexityai/SPACE) — Apache License 2.0.
+    Runs as external infrastructure on the operator's Linux host. The
+    space-cell modules speak to it over its public HTTP API only; no
+    SPACE code is copied or shipped.
+
+EXTERNAL TOOLS — AGPL, EXTERNAL-ONLY RULE
+-----------------------------------------
+  Voice Studio (https://github.com/debpalash/VoiceStudio)
+  — GNU Affero General Public License v3.0 (AGPL-3.0).
+    The engine behind the 'kuroko-voice' workload kind. Driven by
+    subprocess/API from inside the cell only — never imported, never
+    linked, never shipped in any payload. Kingmaker side and Robbie's
+    own content work only; OUT of Solomon and out of any commercial
+    distribution. (Same rule as heretic-llm in the wider stack.)
+
+  Unsloth Studio (https://github.com/unslothai/unsloth/tree/main/studio)
+  — GNU Affero General Public License v3.0 (AGPL-3.0).
+    Folded in 2026-10-20 as an external record inside the unsloth
+    component: loopback-pinned launches only; Cloudflare quick-tunnel
+    (0.0.0.0) launches refused by the contract. Driven never linked,
+    never shipped. The Unsloth CORE is separately Apache-2.0 (below).
+
+ABSORBED COMPONENTS — GOVERNED REGISTRATIONS (folded in 2026-10-20)
+--------------------------------------------------------------------
+All contract/gate/record code in these eleven components is Ronin
+Inc's own work. The upstreams are registered, never vendored; their
+licenses, verified from the files at audit:
+
+  WordCraft (storytold/wordcraft) — MIT OR Apache-2.0.
+    Connector registration (MCP/CLI). The ArtCraft name and logos are
+    trademarked upstream: a redistributed modified build must remove
+    them. Binary pin ships UNPINNED for Cage intake.
+  ARTEMIS (google/artemis) — Apache-2.0.
+    Connector registration (MCP). The on-device helper APK is pinned
+    by sha256; its signature is NOT trusted (repo-shipped debug
+    keystore) — the hash is the whole trust basis.
+  Anatomy (wheresryan22/anatomy) — MIT.
+    Skill registration. Renders, never diagnoses (founder ruling).
+  SolidCraft (tangency-labs/solidcraft) — MIT OR Apache-2.0.
+    Connector registration (MCP + headless CLI). Updater authenticity
+    upstream rests on same-origin checksums (minisign key unset) —
+    fork-required, recorded in the descriptor. Binary pin UNPINNED.
+  XERJ (xerj-org/xerj) — Apache-2.0.
+    Connector registration (MCP). Governed seat runs the offline
+    lexical embedder only.
+  Unsloth core (unslothai/unsloth) — Apache-2.0.
+    Absorbed behind the training contract. The SPLIT license was
+    verified from the files: LICENSE + pyproject (Apache-2.0) for the
+    core; COPYING + studio/LICENSE.AGPL-3.0 for Studio (external-only,
+    above). Install posture: pinned source checkout — the upstream
+    curl|sh installer and unpinned pip installs are refused.
+  check-if-email-exists (reacherhq/check-if-email-exists) — MIT.
+    Connector registration behind the verify gate. A hosted SaaS twin
+    exists upstream and is not used.
+  Stop Slop (hardikpandya/stop-slop) — MIT.
+    Skill registration pinned by commit + per-file sha256.
+  Humanizer (blader/humanizer) — MIT.
+    Skill registration pinned by commit + SKILL.md sha256.
+  ExifCleaner (szTheory/exifcleaner) — MIT, EXTERNAL registration.
+    A desktop operator tool: driven, never linked or shipped, despite
+    the clean license. Upstream release builds are unsigned — the
+    release artifact hash is recorded at Cage intake, out-of-band,
+    before first run.
+  Lazy Frames (cosmicstack-labs/lazy-frames) — UNVERIFIED.
+    MIT is declared in package.json and the README, but NO LICENSE
+    file or license text exists anywhere in the repo: a claim, not a
+    grant. TRIAGE record only — DO NOT USE. Nothing was absorbed,
+    imported, or run. Clears only when a LICENSE file appears
+    upstream, its sha256 is recorded at intake, and the founder taps.
+
+DATA
+----
+  glaiveai/glaive-function-calling-v2 — Apache License 2.0.
+    Verified at intake against Hugging Face's published LFS hash
+    (revision e7f4b6456019f5d8bcb991ef0dd67d8ff23221ac). Source of the
+    bundled corpus corpora/tool-use-brains (solomonSafe: true).
+
+  Salesforce/xlam-function-calling-60k — NOT INCLUDED.
+    The repo is gated; its card's cc-by-4.0 claim could not be verified
+    at file level. Registered metadata-only as licenseClass 'unknown'
+    and excluded from every corpus.
+
+  Fleet exhaust (the stack's own audit chains) — the operator's own
+    data; counts as a clear source in corpus manifests by ownership.

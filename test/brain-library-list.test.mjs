@@ -19,14 +19,15 @@ async function capture(args) {
   return { code, lines, library };
 }
 
-test('the shipped library list prints this Mac\'s role picks from the public catalog', async () => {
+test('the shipped library list prints the floor role picks from the public catalog', async () => {
   const { code, lines, library } = await capture(['list']);
   assert.equal(code, 0);
   assert.ok(lines.some((line) => line.includes(LIBRARY_REPO)));
   assert.ok(lines.some((line) => line.includes('updated 2026-11-03')));
-  const roles = library.classes.find((item) => lines.some((line) => line.includes(`${item.pack}`)));
-  assert.ok(roles);
-  assert.ok(lines.some((line) => line.includes(roles.roles.writer)));
+  assert.ok(library.floor && library.floor.roles, 'the catalog carries the floor, not classes');
+  for (const tag of Object.values(library.floor.roles)) {
+    assert.ok(lines.some((line) => line.includes(tag)), `the floor's ${tag} is listed`);
+  }
 });
 
 test('an unknown library verb is refused', async () => {
