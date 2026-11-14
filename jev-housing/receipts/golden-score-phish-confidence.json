@@ -1,0 +1,23 @@
+{
+  "answers": {
+    "phish_likelihood": {
+      "type": "score",
+      "score": 3.345334244270764,
+      "probabilities": {
+        "0": 0.012293513096644488,
+        "1": 0.01733499556262097,
+        "2": 0.04546651555438836,
+        "3": 0.46255368554601883,
+        "4": 0.46235129024032745
+      },
+      "confidence": 0.5171930531584239,
+      "legend": {
+        "0": "Almost certainly legitimate.",
+        "1": "Probably legitimate.",
+        "2": "Uncertain either way.",
+        "3": "Probably phishing.",
+        "4": "Almost certainly phishing."
+      }
+    }
+  }
+}

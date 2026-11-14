@@ -1,0 +1,110 @@
+{
+ "shards": {
+  "model-00001-of-00003.safetensors": "bebbc8639bd97b684fd65ed49a3714aaa205c96cf3da387d5f7d901a12a6c3ef",
+  "model-00002-of-00003.safetensors": "916f94a490d551a31733935840317a81b62e5f16728bd316a5d0aad6c7a79577",
+  "model-00003-of-00003.safetensors": "07d28bd9bd6b338411c43855ad4bda3315830ea7df9dd2bcbb000af9d30a5ea6"
+ },
+ "index": "model.safetensors.index.json",
+ "sha256": {
+  "model-00001-of-00003.safetensors": "bebbc8639bd97b684fd65ed49a3714aaa205c96cf3da387d5f7d901a12a6c3ef",
+  "model-00002-of-00003.safetensors": "916f94a490d551a31733935840317a81b62e5f16728bd316a5d0aad6c7a79577",
+  "model-00003-of-00003.safetensors": "07d28bd9bd6b338411c43855ad4bda3315830ea7df9dd2bcbb000af9d30a5ea6"
+ },
+ "target_modules": 60,
+ "scaling": 2.0,
+ "total_size": 4548144832,
+ "spot_cast_max_err": [
+  {
+   "tensor": "model.language_model.layers.0.linear_attn.in_proj_qkv.weight",
+   "cast_max_err": 0.0009105205535888672,
+   "delta_max": 0.006325070280581713
+  },
+  {
+   "tensor": "model.language_model.layers.0.linear_attn.out_proj.weight",
+   "cast_max_err": 0.0009663701057434082,
+   "delta_max": 0.005701406393200159
+  },
+  {
+   "tensor": "model.language_model.layers.1.linear_attn.in_proj_qkv.weight",
+   "cast_max_err": 0.0007602870464324951,
+   "delta_max": 0.006552418228238821
+  },
+  {
+   "tensor": "model.language_model.layers.1.linear_attn.out_proj.weight",
+   "cast_max_err": 0.000933229923248291,
+   "delta_max": 0.004845547489821911
+  },
+  {
+   "tensor": "model.language_model.layers.10.linear_attn.in_proj_qkv.weight",
+   "cast_max_err": 0.0004810243844985962,
+   "delta_max": 0.005115988664329052
+  },
+  {
+   "tensor": "model.language_model.layers.10.linear_attn.out_proj.weight",
+   "cast_max_err": 0.0009540319442749023,
+   "delta_max": 0.004986381158232689
+  }
+ ],
+ "targets": [
+  "model.language_model.layers.0.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.0.linear_attn.out_proj.weight",
+  "model.language_model.layers.1.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.1.linear_attn.out_proj.weight",
+  "model.language_model.layers.10.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.10.linear_attn.out_proj.weight",
+  "model.language_model.layers.11.self_attn.k_proj.weight",
+  "model.language_model.layers.11.self_attn.o_proj.weight",
+  "model.language_model.layers.11.self_attn.q_proj.weight",
+  "model.language_model.layers.11.self_attn.v_proj.weight",
+  "model.language_model.layers.12.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.12.linear_attn.out_proj.weight",
+  "model.language_model.layers.13.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.13.linear_attn.out_proj.weight",
+  "model.language_model.layers.14.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.14.linear_attn.out_proj.weight",
+  "model.language_model.layers.15.self_attn.k_proj.weight",
+  "model.language_model.layers.15.self_attn.o_proj.weight",
+  "model.language_model.layers.15.self_attn.q_proj.weight",
+  "model.language_model.layers.15.self_attn.v_proj.weight",
+  "model.language_model.layers.16.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.16.linear_attn.out_proj.weight",
+  "model.language_model.layers.17.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.17.linear_attn.out_proj.weight",
+  "model.language_model.layers.18.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.18.linear_attn.out_proj.weight",
+  "model.language_model.layers.19.self_attn.k_proj.weight",
+  "model.language_model.layers.19.self_attn.o_proj.weight",
+  "model.language_model.layers.19.self_attn.q_proj.weight",
+  "model.language_model.layers.19.self_attn.v_proj.weight",
+  "model.language_model.layers.2.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.2.linear_attn.out_proj.weight",
+  "model.language_model.layers.20.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.20.linear_attn.out_proj.weight",
+  "model.language_model.layers.21.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.21.linear_attn.out_proj.weight",
+  "model.language_model.layers.22.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.22.linear_attn.out_proj.weight",
+  "model.language_model.layers.23.self_attn.k_proj.weight",
+  "model.language_model.layers.23.self_attn.o_proj.weight",
+  "model.language_model.layers.23.self_attn.q_proj.weight",
+  "model.language_model.layers.23.self_attn.v_proj.weight",
+  "model.language_model.layers.3.self_attn.k_proj.weight",
+  "model.language_model.layers.3.self_attn.o_proj.weight",
+  "model.language_model.layers.3.self_attn.q_proj.weight",
+  "model.language_model.layers.3.self_attn.v_proj.weight",
+  "model.language_model.layers.4.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.4.linear_attn.out_proj.weight",
+  "model.language_model.layers.5.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.5.linear_attn.out_proj.weight",
+  "model.language_model.layers.6.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.6.linear_attn.out_proj.weight",
+  "model.language_model.layers.7.self_attn.k_proj.weight",
+  "model.language_model.layers.7.self_attn.o_proj.weight",
+  "model.language_model.layers.7.self_attn.q_proj.weight",
+  "model.language_model.layers.7.self_attn.v_proj.weight",
+  "model.language_model.layers.8.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.8.linear_attn.out_proj.weight",
+  "model.language_model.layers.9.linear_attn.in_proj_qkv.weight",
+  "model.language_model.layers.9.linear_attn.out_proj.weight"
+ ]
+}

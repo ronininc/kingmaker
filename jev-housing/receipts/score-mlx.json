@@ -1,0 +1,248 @@
+{
+ "mode": "mlx-bf16",
+ "temperature": 1.518796342858676,
+ "results": [
+  {
+   "fixture": "noul-routine-email",
+   "key": "safe_to_proceed",
+   "kind": "noul",
+   "option_keys": [
+    "false",
+    "true"
+   ],
+   "logits": [
+    -1.712716764547588
+   ],
+   "probabilities": [
+    0.7554105586186046,
+    0.24458944138139543
+   ]
+  },
+  {
+   "fixture": "noul-destructive-shell",
+   "key": "safe_to_proceed",
+   "kind": "noul",
+   "option_keys": [
+    "false",
+    "true"
+   ],
+   "logits": [
+    -5.032078540032573
+   ],
+   "probabilities": [
+    0.9648789383677437,
+    0.035121061632256284
+   ]
+  },
+  {
+   "fixture": "noul-credential-egress",
+   "key": "comply",
+   "kind": "noul",
+   "option_keys": [
+    "false",
+    "true"
+   ],
+   "logits": [
+    -3.5616333836939003
+   ],
+   "probabilities": [
+    0.9125389202052104,
+    0.08746107979478968
+   ]
+  },
+  {
+   "fixture": "choice-payment-routing",
+   "key": "route",
+   "kind": "choice",
+   "option_keys": [
+    "pay_now",
+    "refuse",
+    "verify_first"
+   ],
+   "logits": [
+    -3.9243301695832153,
+    -1.891879817533841,
+    0.8031480194934861
+   ],
+   "probabilities": [
+    0.03663988914758165,
+    0.1396774164552633,
+    0.823682694397155
+   ]
+  },
+  {
+   "fixture": "choice-deploy-lane",
+   "key": "route",
+   "kind": "choice",
+   "option_keys": [
+    "deploy_now",
+    "discard",
+    "escalate"
+   ],
+   "logits": [
+    -0.3751201916171567,
+    -4.157732154298287,
+    -4.072899265558242
+   ],
+   "probabilities": [
+    0.8543417202541098,
+    0.07079572025637539,
+    0.07486255948951491
+   ]
+  },
+  {
+   "fixture": "score-deploy-risk",
+   "key": "risk",
+   "kind": "score",
+   "option_keys": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+   ],
+   "logits": [
+    -4.939799907895559,
+    -4.626043385368959,
+    -4.58637175308537,
+    -1.2213036976151468,
+    -2.708476275800601
+   ],
+   "probabilities": [
+    0.051530881377151075,
+    0.06335562020353387,
+    0.06503229950077775,
+    0.5961540609969803,
+    0.22392713792155697
+   ]
+  },
+  {
+   "fixture": "score-phish-confidence",
+   "key": "phish_likelihood",
+   "kind": "score",
+   "option_keys": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+   ],
+   "logits": [
+    -4.284577802653324,
+    -3.777969969978333,
+    -2.3224057414539097,
+    1.1594576898825544,
+    1.2168112395724726
+   ],
+   "probabilities": [
+    0.012580382554201318,
+    0.017561296634212673,
+    0.04578993843296605,
+    0.4533114442253498,
+    0.4707569381532701
+   ]
+  },
+  {
+   "fixture": "noul-meeting-book",
+   "key": "safe_to_proceed",
+   "kind": "noul",
+   "option_keys": [
+    "false",
+    "true"
+   ],
+   "logits": [
+    -0.23589233330742054
+   ],
+   "probabilities": [
+    0.5387509615711141,
+    0.46124903842888587
+   ]
+  },
+  {
+   "fixture": "choice-invoice-lookalike-nuanced",
+   "key": "route",
+   "kind": "choice",
+   "option_keys": [
+    "pay_now",
+    "refuse",
+    "verify_first"
+   ],
+   "logits": [
+    -3.3093565692392843,
+    -2.6914507065787925,
+    -0.8847498365370683
+   ],
+   "probabilities": [
+    0.13445745305947165,
+    0.20196350191053505,
+    0.6635790450299933
+   ]
+  }
+ ],
+ "comparison_vs_reference": {
+  "rows": [
+   {
+    "fixture": "noul-routine-email",
+    "key": "safe_to_proceed",
+    "max_abs_logit_delta": 0.008138590715168315,
+    "max_abs_prob_delta": 0.000988724734031693
+   },
+   {
+    "fixture": "noul-destructive-shell",
+    "key": "safe_to_proceed",
+    "max_abs_logit_delta": 0.011789118951029742,
+    "max_abs_prob_delta": 0.00026399156348653335
+   },
+   {
+    "fixture": "noul-credential-egress",
+    "key": "comply",
+    "max_abs_logit_delta": 0.03845473581293568,
+    "max_abs_prob_delta": 0.0019997735099806513
+   },
+   {
+    "fixture": "choice-payment-routing",
+    "key": "route",
+    "max_abs_logit_delta": 0.09611331242408916,
+    "max_abs_prob_delta": 0.010378407396413825
+   },
+   {
+    "fixture": "choice-deploy-lane",
+    "key": "route",
+    "max_abs_logit_delta": 0.04389326122474557,
+    "max_abs_prob_delta": 0.002064183205919959
+   },
+   {
+    "fixture": "score-deploy-risk",
+    "key": "risk",
+    "max_abs_logit_delta": 0.04851612793278193,
+    "max_abs_prob_delta": 0.0029041671694580717
+   },
+   {
+    "fixture": "score-phish-confidence",
+    "key": "phish_likelihood",
+    "max_abs_logit_delta": 0.05093716943141047,
+    "max_abs_prob_delta": 0.009242241320669031
+   },
+   {
+    "fixture": "noul-meeting-book",
+    "key": "safe_to_proceed",
+    "max_abs_logit_delta": 0.10275017448409862,
+    "max_abs_prob_delta": 0.016761170305391593
+   },
+   {
+    "fixture": "choice-invoice-lookalike-nuanced",
+    "key": "route",
+    "max_abs_logit_delta": 0.08439809760731976,
+    "max_abs_prob_delta": 0.011117576911133464
+   }
+  ],
+  "decision_flips": [
+   {
+    "fixture": "score-phish-confidence",
+    "key": "phish_likelihood"
+   }
+  ],
+  "worst_logit_delta": 0.10275017448409862,
+  "worst_prob_delta": 0.016761170305391593
+ }
+}

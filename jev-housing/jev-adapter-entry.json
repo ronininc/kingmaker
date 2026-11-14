@@ -1,0 +1,110 @@
+{
+ "tag": "zefancai/open-jev-2b:adapter",
+ "slug": "zefancai-open-jev-2b",
+ "from": "ZefanCai/Open-Jev-2B (Hugging Bay artifact hf-model-zefancai-open-jev-2b)",
+ "base": "Qwen/Qwen3.5-2B",
+ "license": "apache-2.0",
+ "kind": "adapter-package",
+ "redistributable": true,
+ "note": "NOT a servable model: a rank-8 LoRA adapter + fp32 scalar decision head for Qwen/Qwen3.5-2B at the pinned revision. Housed as the honest intermediate; the servable artifact is the merged GGUF (see zefancai-open-jev-2b-merged entry). Weights Apache-2.0; loader code MIT (LICENSE-CODE, sha256 ef2f6f6d1c74d78ac4a2b01ce982ba54a26fa15a0d26b56d5d4942cb557ae84b); CC0 attaches to generated data only, never the weights.",
+ "capabilities": [
+  "scoring"
+ ],
+ "picks": [],
+ "status": "option",
+ "bench": [],
+ "weights": null,
+ "package": {
+  "type": "lora-adapter+scalar-head",
+  "baseModel": "Qwen/Qwen3.5-2B",
+  "baseRevision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+  "lora": {
+   "rank": 8,
+   "alpha": 16,
+   "scaling": 2.0,
+   "dropout": 0.0,
+   "targetModules": [
+    "o_proj",
+    "in_proj_qkv",
+    "v_proj",
+    "q_proj",
+    "k_proj",
+    "out_proj"
+   ]
+  },
+  "head": {
+   "file": "package/checkpoint/head.pt",
+   "shape": [
+    1,
+    2048
+   ],
+   "dtype": "float32",
+   "sha256": "3532cd571ed492a976199cb3ed7b0ce9f349e9ba0d0d596aee43aed085001f2a"
+  },
+  "temperature": 1.518796342858676,
+  "maxLength": 4096,
+  "files": [
+   {
+    "path": "README.md",
+    "size": 7400,
+    "sha256": "2e0005c57ee7e3fe0f6fff57071314d260fd7978bf72dba70237865bcb4f9538"
+   },
+   {
+    "path": "evaluation/full-data.json",
+    "size": 181427,
+    "sha256": "a7313152440ae9ecfd8e9b25b73564ee505e3ca6f3080294d84f8b350baf89f7"
+   },
+   {
+    "path": "package/README.md",
+    "size": 3490,
+    "sha256": "396ae55276e6535efd13c818388085d6e3bf41102320616acbae612bb5c19514"
+   },
+   {
+    "path": "package/checkpoint/adapter/adapter_config.json",
+    "size": 1170,
+    "sha256": "d27624bdbbe984cf175e10c7fa3d9beaea9876231ce943a248ad40e12742fe74"
+   },
+   {
+    "path": "package/checkpoint/adapter/adapter_model.safetensors",
+    "size": 10042480,
+    "sha256": "2d23935b1a7380db444abac572c04646918ba794e59002d1588236182a3ca18f"
+   },
+   {
+    "path": "package/checkpoint/head.pt",
+    "size": 9997,
+    "sha256": "3532cd576c58d5ad5bf17c3e9f2df4be8c70e08c07fa6bb7fa673dcd7b401f2a"
+   },
+   {
+    "path": "package/checkpoint/model.json",
+    "size": 186,
+    "sha256": "d985eafa4d635113ee8cc912e0512a95aac0bed3426e9256931235b75cb3d6c5"
+   },
+   {
+    "path": "package/checkpoint/temperature.json",
+    "size": 161,
+    "sha256": "090fb330a616338210a924d1c370c934e934f30f53f92c8a52a5cc7852cadd99"
+   },
+   {
+    "path": "package/manifest.json",
+    "size": 1888,
+    "sha256": "58319da5c2a948a4645e46d9c982be44867d78779ea1c3bfb81b64867f58ef3a"
+   },
+   {
+    "path": "package/metrics.json",
+    "size": 1932691,
+    "sha256": "cfa9b7450af2858723385300d99410ecad68eea4ccd2b4154dd1de17e91f0a66"
+   },
+   {
+    "path": "package/provenance.json",
+    "size": 4349,
+    "sha256": "2fe168e8d4569b8d351312fc30b884105924bb79e17c7f62c0f7882d36dbc995"
+   },
+   {
+    "path": "release-manifest.json",
+    "size": 3296,
+    "sha256": "fd4c1b0785b3b57fa05b1aa06d7e4daf08445ffcd27e9bd2da6fca949823407e"
+   }
+  ],
+  "serving": "Requires the base at the pinned revision. Score = head(last-token final hidden state of the chat-templated candidate prompt); probabilities = softmax over candidate logits at the package temperature (noul: logits [0, s]). Full contract in the merged entry and BUILD-REPORT.md."
+ }
+}

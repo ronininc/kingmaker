@@ -1,0 +1,149 @@
+{
+ "asset": "zefancai/open-jev-2b (Open-Jev-2B) housed for Kingmaker",
+ "built": "2026-11-14",
+ "route": "route/house.py \u2014 format-agnostic: fetch (Hugging Bay, pin-verified) -> merge ONCE -> emit per target -> verify per target",
+ "sources": {
+  "base": {
+   "repo": "Qwen/Qwen3.5-2B",
+   "revision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+   "fetch": "receipts/base-fetch.log (ALL PINS MATCH)",
+   "weightsFile": {
+    "path": "src/qwen3.5-2b/model.safetensors-00001-of-00001.safetensors",
+    "size": 4548221488,
+    "sha256": "aa33250c4fc64891ddfaba3a314fd9542ea371843c387178b425fbcc5ed680b1"
+   }
+  },
+  "adapterPackage": {
+   "repo": "ZefanCai/Open-Jev-2B",
+   "fetch": "receipts/adapter-fetch.log (ALL PINS MATCH)",
+   "adapterModelSha256": "2d23935b1a7380db444abac572c04646918ba794e59002d1588236182a3ca18f",
+   "headSha256": "3532cd576c58d5ad5bf17c3e9f2df4be8c70e08c07fa6bb7fa673dcd7b401f2a"
+  }
+ },
+ "merge": {
+  "method": "W' = W + 2.0 * (B @ A) computed in fp32, stored bf16 (work/merge.py, streamed shard-by-shard)",
+  "targetModules": 60,
+  "receipt": "receipts/merge-receipt.json",
+  "canonicalCheckpoint": "work/merged/",
+  "shards": [
+   {
+    "path": "work/merged/model-00001-of-00003.safetensors",
+    "size": 2193257288,
+    "sha256": "bebbc8639bd97b684fd65ed49a3714aaa205c96cf3da387d5f7d901a12a6c3ef"
+   },
+   {
+    "path": "work/merged/model-00002-of-00003.safetensors",
+    "size": 2175098992,
+    "sha256": "916f94a490d551a31733935840317a81b62e5f16728bd316a5d0aad6c7a79577"
+   },
+   {
+    "path": "work/merged/model-00003-of-00003.safetensors",
+    "size": 179865008,
+    "sha256": "07d28bd9bd6b338411c43855ad4bda3315830ea7df9dd2bcbb000af9d30a5ea6"
+   }
+  ],
+  "config": {
+   "path": "work/merged/config.json",
+   "size": 2908,
+   "sha256": "ed1c1723241f23f7f4e23430759cbd7dcfb4103cbdfe052bfe7626b57c2615b4"
+  },
+  "index": {
+   "path": "work/merged/model.safetensors.index.json",
+   "size": 55606,
+   "sha256": "573962fce6e2514ce6c8fb5d4ca1dc1c8c5a0cbbe656c7382f12ff4a7d9220fd"
+  },
+  "tensors": {
+   "total": 632,
+   "languageModel": 320,
+   "vision": 297,
+   "mtp": 15
+  }
+ },
+ "head": {
+  "source": "src/open-jev-2b/package/checkpoint/head.pt (fp32, shape [1, 2048], sha256 3532cd576c58d5ad\u2026)",
+  "portableForm": "work/head_w.npy + work/head_b.npy (float64; route `head` step verified byte-identical extraction)",
+  "temperature": 1.518796342858676,
+  "wiring": "score = head(last-token final hidden state of the chat-templated candidate prompt); probs = softmax over candidate logits at temperature (noul: logits [0, s]); identical contract on every target"
+ },
+ "targets": {
+  "safetensors": {
+   "grade": "DONE-PROVEN",
+   "servingClass": "Transformers / vLLM",
+   "artifact": "work/merged/ (the canonical merged checkpoint itself)",
+   "behavioral": {
+    "receipt": "receipts/score-merged-safetensors.json vs receipts/score-unmerged.json",
+    "records": 9,
+    "worstLogitDelta": 0.06588220596313477,
+    "worstProbDelta": 0.00790844849734873,
+    "decisionFlips": [
+     [
+      "score-phish-confidence",
+      "phish_likelihood"
+     ]
+    ]
+   }
+  },
+  "mlx": {
+   "grade": "DONE-PROVEN (conversion + behavioral on this node's MLX CPU runtime; execution on Apple Silicon hardware unexercised)",
+   "servingClass": "MLX (Apple Silicon)",
+   "artifact": "work/mlx/",
+   "weights": {
+    "path": "work/mlx/model.safetensors",
+    "size": 3763692325,
+    "sha256": "3d785b5c9bbdd8c2ee7d8f9c496bdc46c5dd8a567de3192008de5b260ba90ff2"
+   },
+   "config": {
+    "path": "work/mlx/config.json",
+    "size": 2420,
+    "sha256": "645848b5fc849a9f9c58c377edba49732a3bfafa015fe7086285e9508995d094"
+   },
+   "carriage": "320/320 language-model tensors; vision tower + MTP head not carried (Jev scoring is text-only)",
+   "behavioral": {
+    "receipt": "receipts/score-mlx.json vs receipts/score-unmerged.json",
+    "records": 9,
+    "worstLogitDelta": 0.10275017448409862,
+    "worstProbDelta": 0.016761170305391593,
+    "decisionFlips": [
+     {
+      "fixture": "score-phish-confidence",
+      "key": "phish_likelihood"
+     }
+    ]
+   }
+  },
+  "gguf-f16": {
+   "grade": "DONE-PROVEN at weight level; behavioral scoring WALL on this node (see BUILD-REPORT.md)",
+   "servingClass": "llama.cpp / Ollama",
+   "weights": {
+    "path": "work/gguf/open-jev-2b-merged-f16.gguf",
+    "size": 3897385504,
+    "sha256": "e96c586586c5014651d49ac5edee922234e7517bb0515eaa40a81b8679373ea5"
+   },
+   "verification": {
+    "receipt": "receipts/gguf-tensor-check-f16.json",
+    "paramCoverage": 1.0,
+    "worstMaxAbsDiff": 2.9802322387695312e-08,
+    "errors": 0,
+    "unmapped": 0
+   }
+  },
+  "gguf-q4_k_m": {
+   "grade": "DONE-PROVEN at weight level; behavioral scoring WALL on this node (see BUILD-REPORT.md)",
+   "servingClass": "llama.cpp / Ollama",
+   "weights": {
+    "path": "work/gguf/open-jev-2b-merged-q4_k_m.gguf",
+    "size": 1322975776,
+    "sha256": "3fd8cc381e77cb3bf2722757825d1f46be6b689b45516796bee72f8a1eda336f"
+   },
+   "verification": {
+    "receipt": "receipts/gguf-tensor-check-q4.json",
+    "paramCoverage": 1.0,
+    "worstRelL2": 0.08950144342862452,
+    "errors": 0,
+    "unmapped": 0
+   }
+  }
+ },
+ "referencePath": "unmerged: base + PeftModel adapter, receipts/score-unmerged.json (9 records, full logits + probabilities); package golden receipts on file for 4 records (receipts/golden-*.json)",
+ "knownFlip": "score-phish-confidence / phish_likelihood is a near-tie in the reference itself (top-two probs 0.46255 vs 0.46235); every emitted target flips it the same way; disclosed, not hidden"
+}

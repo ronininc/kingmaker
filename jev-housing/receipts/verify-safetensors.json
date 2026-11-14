@@ -1,0 +1,67 @@
+{
+ "target": "safetensors (merged HF checkpoint, bf16)",
+ "rows": [
+  {
+   "fixture": "noul-routine-email",
+   "key": "safe_to_proceed",
+   "max_abs_logit_delta": 0.008446931838989258,
+   "max_abs_prob_delta": 0.001026237162700283
+  },
+  {
+   "fixture": "noul-destructive-shell",
+   "key": "safe_to_proceed",
+   "max_abs_logit_delta": 0.021871566772460938,
+   "max_abs_prob_delta": 0.00048825946079732174
+  },
+  {
+   "fixture": "noul-credential-egress",
+   "key": "comply",
+   "max_abs_logit_delta": 0.034898996353149414,
+   "max_abs_prob_delta": 0.00177888909641144
+  },
+  {
+   "fixture": "choice-payment-routing",
+   "key": "route",
+   "max_abs_logit_delta": 0.03840172290802002,
+   "max_abs_prob_delta": 0.0030842543375299014
+  },
+  {
+   "fixture": "choice-deploy-lane",
+   "key": "route",
+   "max_abs_logit_delta": 0.034403324127197266,
+   "max_abs_prob_delta": 0.0005960271814661466
+  },
+  {
+   "fixture": "score-deploy-risk",
+   "key": "risk",
+   "max_abs_logit_delta": 0.06588220596313477,
+   "max_abs_prob_delta": 0.005373531598908493
+  },
+  {
+   "fixture": "score-phish-confidence",
+   "key": "phish_likelihood",
+   "max_abs_logit_delta": 0.028415679931640625,
+   "max_abs_prob_delta": 0.00542036050419531
+  },
+  {
+   "fixture": "noul-meeting-book",
+   "key": "safe_to_proceed",
+   "max_abs_logit_delta": 0.009645819664001465,
+   "max_abs_prob_delta": 0.0015687174764967837
+  },
+  {
+   "fixture": "choice-invoice-lookalike-nuanced",
+   "key": "route",
+   "max_abs_logit_delta": 0.039053142070770264,
+   "max_abs_prob_delta": 0.00790844849734873
+  }
+ ],
+ "worst_logit_delta": 0.06588220596313477,
+ "worst_prob_delta": 0.00790844849734873,
+ "decision_flips": [
+  [
+   "score-phish-confidence",
+   "phish_likelihood"
+  ]
+ ]
+}

@@ -39,22 +39,26 @@ export COPYFILE_DISABLE=1
 HERE="$(cd "$(dirname "$0")" && pwd -P)"
 if [ -n "${KINGMAKER_PATH:-}" ]; then export PATH="$KINGMAKER_PATH"; else export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin${PATH:+:$PATH}"; fi
 
-WAKE=""; TERMS=""; MANIFEST="$HERE/kingmaker-manifest.json"; SOURCE=""; BASE_URL=""; PREFIX=""; WITH_TOOLS=0; NO_LAUNCH=0; INSPECT=0; PACK=""
+GUARD_INSTALLED_UPDATE=0
+WAKE=""; TERMS=""; MANIFEST="$HERE/kingmaker-manifest.json"; SOURCE=""; BASE_URL=""; PREFIX=""; WITH_TOOLS=0; NO_LAUNCH=0; INSPECT=0
+WITHOUT_LAUNCHER="${KINGMAKER_WITHOUT_LAUNCHER:-0}"
 # The pinned release-signing public key (build-installer.sh ships it beside engine.sh) and whether an unsigned release
 # is refused. The running app passes --require-signed for updates; first install may be transitional (see below).
 RELEASE_PUBKEY="$HERE/kingmaker-release-public.pem"; REQUIRE_SIGNED="${KINGMAKER_REQUIRE_SIGNED:-0}"
 while [ $# -gt 0 ]; do
   case "$1" in
     --wake-word) WAKE="${2:-}"; shift 2 ;;
+    --guard-installed-update) GUARD_INSTALLED_UPDATE=1; shift ;;
     --manifest) MANIFEST="${2:-}"; shift 2 ;;
     --require-signed) REQUIRE_SIGNED=1; shift ;;
+    --release-pubkey) RELEASE_PUBKEY="${2:-}"; shift 2 ;;
     --source) SOURCE="${2:-}"; shift 2 ;;
     --base-url) BASE_URL="${2:-}"; shift 2 ;;
     --prefix) PREFIX="${2:-}"; shift 2 ;;
     --with-tools) WITH_TOOLS=1; shift ;;
     --no-launch) NO_LAUNCH=1; shift ;;
+    --without-launcher) WITHOUT_LAUNCHER=1; shift ;; # install Kingmaker undocked: the Ronin Launcher is neither fetched nor placed
     --inspect) INSPECT=1; shift ;;
-    --pack) PACK="${2:-}"; shift 2 ;; # the profile pack the owner picked (lib/mac-profiles.mjs PACKS; the manifest's packs)
     --terms-accepted) TERMS="${2:-}"; shift 2 ;; # sha256 of the TERMS.md the install screen showed (the terms hook)
     *) echo "engine.sh: unknown argument $1" >&2; exit 2 ;;
   esac
@@ -133,22 +137,20 @@ legacy_apps() { # older "Sol Ghost.app" copies (same product, same bundle id), o
 }
 cemented_word() { [ -f "$DATA/install.json" ] && plutil -extract wakeWord raw -o - "$DATA/install.json" 2>/dev/null; }
 
-# The Mac, for the profile packs: its memory (GiB as sold), chip, and the pack it should take (lib/mac-profiles.mjs
-# classFor: the largest class at or under its memory).
+# This Mac, as information for the install screen: its memory (GiB as sold) and chip. Nothing is
+# picked from these numbers — the starter set is the same on every Mac, and models beyond it are
+# chosen per task at runtime and metered in.
 MEM_GB="$(sysctl -n hw.memsize 2>/dev/null | awk '{ printf "%d", $1 / 1073741824 + 0.5 }')"; [ -n "$MEM_GB" ] || MEM_GB=8
 CHIP="$(sysctl -n machdep.cpu.brand_string 2>/dev/null || true)"
-REC_PACK=8; for c in 64 48 32 24 16 8; do [ "$MEM_GB" -ge "$c" ] && { REC_PACK="$c"; break; }; done
-pack_listed() { local n i=0; n="$(mfn packs)"; while [ "$i" -lt "$n" ]; do [ "$(mf "packs.$i.id")" = "$1" ] && return 0; i=$((i + 1)); done; return 1; }
 
 if [ "$INSPECT" = 1 ]; then
   app="$(installed_app)"; word=""; [ -n "$app" ] && word="$(cemented_word)"
   legacy="$(legacy_apps | head -1)"
-  packs="$(plutil -extract packs json -o - "$MANIFEST" 2>/dev/null || echo '[]')"
   free_gb="$(df -k "$HOME" 2>/dev/null | awk 'NR==2 { printf "%.1f", $4 / 1000000 * 1.024 }')"
-  printf '{"installed":%s,"app":%s,"legacyApp":%s,"cemented":%s,"wakeWord":%s,"release":%s,"version":%s,"memGb":%s,"chip":%s,"freeGb":%s,"recommendedPack":%s,"packs":%s}\n' \
+  printf '{"installed":%s,"app":%s,"legacyApp":%s,"cemented":%s,"wakeWord":%s,"release":%s,"version":%s,"memGb":%s,"chip":%s,"freeGb":%s}\n' \
     "$([ -n "$app" ] && echo true || echo false)" "$(json_str "$app")" "$(json_str "$legacy")" \
     "$([ -n "$word" ] && echo true || echo false)" "$(json_str "$word")" "$(json_str "$(mf tag)")" "$(json_str "$(mf version)")" \
-    "$MEM_GB" "$(json_str "$CHIP")" "${free_gb:-0}" "$(json_str "$REC_PACK")" "$packs"
+    "$MEM_GB" "$(json_str "$CHIP")" "${free_gb:-0}"
   exit 0
 fi
 
@@ -187,6 +189,9 @@ fail() {
 }
 fail_at() { [ "${KINGMAKER_FAIL_AT:-}" = "$1" ] && fail "stopped on purpose at $1 (KINGMAKER_FAIL_AT)"; true; }
 trap 'fail "Cancelled."' INT TERM HUP
+# An update holds Kingmaker's update lock while this runs (lib/update.mjs hands it to this process): give it back when
+# this ends, installed or not, so the next update never waits on a finished one.
+trap 'rm -f "$DATA/update.lock"' EXIT
 
 run_logged() { "$@" >> "$LOG" 2>&1; }
 
@@ -209,6 +214,7 @@ printf '\n=== %s Kingmaker %s install (prefix %s) ===\n' "$(date -u +%FT%TZ)" "$
 #   - signature present + fails     → refuse, always (tampering, or wrong key).
 #   - signature absent              → refuse if --require-signed / KINGMAKER_REQUIRE_SIGNED=1 (updates do), else warn
 #                                      and proceed (a transitional unsigned release; real builds are always signed).
+RELEASE_VERIFIED=0
 verify_release_signature() {
   local sig="$MANIFEST.sig" bin="$CACHE/.manifest.sig.bin"
   if [ ! -s "$RELEASE_PUBKEY" ]; then
@@ -225,6 +231,7 @@ verify_release_signature() {
   base64 -D -i "$sig" -o "$bin" 2>>"$LOG" || base64 -d -i "$sig" -o "$bin" 2>>"$LOG" || fail "The release signature is not valid base64."
   if openssl dgst -sha256 -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:-1 -verify "$RELEASE_PUBKEY" -signature "$bin" "$MANIFEST" >>"$LOG" 2>&1; then
     rm -f "$bin"
+    RELEASE_VERIFIED=1
     note "Release signature verified: this is Ronin Inc.'s own $TAG."
   else
     rm -f "$bin"
@@ -285,12 +292,6 @@ fi
 PART_COUNT="$(mfn parts)"; [ "$PART_COUNT" -ge 1 ] || fail "The release manifest lists no parts."
 ARCHIVE_SIZE="$(mfn app.size)"; ARCHIVE_SHA="$(mf app.sha256)"; BUNDLE_ID="$(mf app.bundleId)"
 UNPACKED="$(mfn app.unpackedBytes)"; [ "$UNPACKED" -gt 0 ] || UNPACKED=$((ARCHIVE_SIZE * 3 / 2))
-# The pack: the owner's pick, else this Mac's own (a release without packs installs as before).
-if [ "$(mfn packs)" -gt 0 ]; then
-  [ -n "$PACK" ] || PACK="$REC_PACK"
-  pack_listed "$PACK" || fail "This release has no \"$PACK\" pack."
-  note "Pack: $PACK GB$([ "$PACK" = "$REC_PACK" ] && echo " (recommended for this Mac)" || echo " (your choice; this Mac's own is $REC_PACK GB)")."
-else PACK=""; fi
 note "Release $TAG (Kingmaker $VERSION): $PART_COUNT part(s), $(gb "$ARCHIVE_SIZE") to download, $(gb "$UNPACKED") installed; this Mac has ${MEM_GB} GB of memory."
 
 # Tool lookups (Ollama, brew, python, a formula's binary): PATH, then the usual app folders.
@@ -321,13 +322,9 @@ installed_digest() { # installed_digest <tags.json> <model name> → its digest,
   done
   return 1
 }
-model_wanted() { # model_wanted <index>: a pack's own model only for that pack; the rest sized to the pack (or this Mac)
-  local min max packs mem="${PACK:-$MEM_GB}"
-  packs="$(mf "models.$1.packs" || true)"
-  if [ -n "$packs" ]; then case ",$packs," in *",${PACK:-$REC_PACK},"*) return 0 ;; *) return 1 ;; esac; fi
-  min="$(mfn "models.$1.minMemGb")"; max="$(mfn "models.$1.maxMemGb")"
-  [ "$min" -gt 0 ] && [ "$mem" -lt "$min" ] && return 1
-  [ "$max" -gt 0 ] && [ "$mem" -ge "$max" ] && return 1
+model_wanted() { # model_wanted <index>: every model in the manifest is pulled — the manifest's list IS
+  # the starter set, identical on every Mac. Nothing is sized or filtered by this Mac's memory: what a
+  # task runs is picked at runtime, and models beyond the starter set are metered in per task.
   return 0
 }
 receipts_complete() { # receipts_complete <sources dir>: every confirmed corpus has its receipt and its files
@@ -538,7 +535,7 @@ PIN="${KINGMAKER_EXPECT_LEAF:-}"
 [ -n "$PIN" ] || PIN="$(plutil -extract sha1 raw -o - "$HERE/release-identity.json" 2>/dev/null || true)"
 case "$PIN" in *[!0-9A-Fa-f]*|"") PIN="" ;; *) [ ${#PIN} -eq 40 ] || PIN="" ;; esac
 if [ -n "$PIN" ]; then
-  codesign --verify --deep --strict -R="identifier \"com.ronininc.solghost\" and certificate leaf = H\"$PIN\"" "$STAGED_APP" >>"$LOG" 2>&1 \
+  /usr/bin/codesign --verify --deep --strict -R="identifier \"com.ronininc.solghost\" and certificate leaf = H\"$PIN\"" "$STAGED_APP" >>"$LOG" 2>&1 \
     || fail "This Kingmaker.app is not signed by Ronin Inc.'s Kingmaker Release certificate, so it was not installed. Download Kingmaker again from ronininc.org."
   note "Kingmaker.app is signed by the Kingmaker Release certificate."
 fi
@@ -551,7 +548,19 @@ fail_at unpack
 # Same source as the parts, sha256 and size checked, its signature checked, staged beside Kingmaker.app. Never opened.
 LAUNCHER_STAGED=""
 L_ARCHIVE="$(mf launcher.archive)"
-if [ -n "$L_ARCHIVE" ]; then
+# UNDOCKED (owner's choice: --without-launcher or KINGMAKER_WITHOUT_LAUNCHER=1). Kingmaker is free and runs on its own;
+# the launcher docks to it, never the other way round. Undocked skips the launcher entirely — nothing is fetched,
+# nothing in Applications is touched. It is never a fallback: a launcher that fails its checks below still fails
+# the install, because a release carrying a launcher that is not the pinned one is a release not to trust.
+# The choice is written down so a later "kingmaker update" keeps it (lib/update.mjs reads this file and passes
+# --without-launcher). An install that takes the launcher clears it.
+LAUNCHER_CHOICE="$DATA/launcher-choice"
+if [ "$WITHOUT_LAUNCHER" = 1 ]; then
+  note "Installing Kingmaker undocked: the Ronin Launcher is not part of this install. It can be added later."
+  mkdir -p "$DATA" 2>/dev/null || true
+  printf 'without\n' > "$LAUNCHER_CHOICE" 2>/dev/null || true
+elif [ -n "$L_ARCHIVE" ]; then
+  rm -f "$LAUNCHER_CHOICE" 2>/dev/null || true
   case "$L_ARCHIVE" in *.zip) ;; *) fail "The release's Ronin Launcher pin is not a zip." ;; esac
   case "$L_ARCHIVE" in */*|.*) fail "The release manifest has a bad Ronin Launcher name." ;; esac
   L_SHA="$(mf launcher.sha256)"; L_SIZE="$(mfn launcher.size)"; L_URL="$(mf launcher.url)"; auth=0
@@ -774,6 +783,22 @@ if [ "$KEEP_CONFIG" = 0 ]; then
   [ "$(plutil -extract wakeWord raw -o - "$DSTAGE/config/install.json")" = "$WAKE" ] || fail "The install config did not read back."
 fi
 
+# BEGIN installed-release receipt staging
+# Bind the authenticated manifest to this exact installed open payload and native executables.
+# This remains staging-only until every app/config move succeeds.
+RECEIPT="$DSTAGE/config/installed-release.json"
+if [ "$RELEASE_VERIFIED" = 1 ]; then
+  receipt_files=""
+  for rel in Contents/MacOS/Kingmaker Contents/MacOS/KingmakerEngine Contents/Resources/sol-ghost/payload.json Contents/Info.plist Contents/_CodeSignature/CodeResources; do
+    [ -f "$STAGED_APP/$rel" ] || fail "Cannot establish installed release provenance: $rel is missing."
+    hash="$(shasum -a 256 "$STAGED_APP/$rel" | awk '{print $1}')"
+    receipt_files="$receipt_files$( [ -n "$receipt_files" ] && printf ',' )$(json_str "$rel"):$(json_str "$hash")"
+  done
+  ( umask 077; printf '{"schema":"kingmaker.installed-release/1","manifest":"%s","signature":%s,"files":{%s}}\n' \
+    "$(base64 < "$MANIFEST" | tr -d '\r\n')" "$(json_str "$(cat "$MANIFEST.sig")")" "$receipt_files" > "$RECEIPT" ) || fail "Could not stage release provenance."
+fi
+# END installed-release receipt staging
+
 # A running Kingmaker (or Sol Ghost) is asked to quit first: never in a dry run.
 if [ -z "$PREFIX" ] && pgrep -f 'Contents/MacOS/(Kingmaker|Sol Ghost)$' >/dev/null 2>&1; then
   note "Asking the running Kingmaker to quit."
@@ -781,6 +806,27 @@ if [ -z "$PREFIX" ] && pgrep -f 'Contents/MacOS/(Kingmaker|Sol Ghost)$' >/dev/nu
   for _ in $(seq 1 40); do pgrep -f 'Contents/MacOS/(Kingmaker|Sol Ghost)$' >/dev/null 2>&1 || break; sleep 1; done
   pgrep -f 'Contents/MacOS/(Kingmaker|Sol Ghost)$' >/dev/null 2>&1 && fail "Kingmaker is still running. Quit it (or run: kingmaker stop) and press Download & Install again."
 fi
+
+# BEGIN installed-update compare-and-swap guard
+# Downloads and graceful shutdown may take minutes. Revalidate the approved app and receipt at the commit boundary.
+if [ "$GUARD_INSTALLED_UPDATE" = 1 ]; then
+  target_real="$(cd "$TARGET_APP" 2>/dev/null && pwd -P)" || fail "Update unconfirmed: installed app path is unavailable."
+  expected_real="$(cd "${KINGMAKER_UPDATE_EXPECTED_APP:-}" 2>/dev/null && pwd -P)" || fail "Update unconfirmed: approved app path is unavailable."
+  [ -n "${KINGMAKER_UPDATE_EXPECTED_APP:-}" ] && [ "$target_real" = "$expected_real" ] || fail "Update unconfirmed: installed app path changed."
+  [ -n "${KINGMAKER_EXPECT_LEAF:-}" ] || fail "Update unconfirmed: missing installed signature pin."
+  /usr/bin/codesign --verify --deep --strict -R="identifier \"com.ronininc.solghost\" and certificate leaf = H\"$KINGMAKER_EXPECT_LEAF\"" "$TARGET_APP" >>"$LOG" 2>&1 || fail "Update unconfirmed: installed bundle seal changed."
+  [ -f "$DATA/installed-release.json" ] && [ "$(sha256 "$DATA/installed-release.json")" = "${KINGMAKER_UPDATE_EXPECTED_RECEIPT:-}" ] || fail "Update unconfirmed: installed receipt changed."
+  expected="${KINGMAKER_UPDATE_EXPECTED_FILES:-}"
+  set -f
+  set -- $expected
+  set +f
+  [ "$#" = 5 ] || fail "Update unconfirmed: incomplete installed snapshot."
+  for rel in Contents/MacOS/Kingmaker Contents/MacOS/KingmakerEngine Contents/Resources/sol-ghost/payload.json Contents/Info.plist Contents/_CodeSignature/CodeResources; do
+    [ -f "$TARGET_APP/$rel" ] && [ "$(sha256 "$TARGET_APP/$rel")" = "$1" ] || fail "Update unconfirmed: installed app changed during staging ($rel)."
+    shift
+  done
+fi
+# END installed-update compare-and-swap guard
 
 COMMITTING=1
 : > "$JOURNAL"
@@ -801,6 +847,12 @@ rm -f "$STAGE/legacy.list"
 fail_at commit-aside
 mv "$STAGED_APP" "$TARGET_APP" || fail "Could not move Kingmaker.app into $APPS."; jot moved "$STAGED_APP" "$TARGET_APP"
 fail_at commit-app
+# A Ronin Launcher that came from the Mac App Store (Apple puts a receipt in every copy) is Apple's to update. It is
+# left exactly where it is; the verified copy from this release is not placed over it.
+if [ -n "$LAUNCHER_STAGED" ] && [ -f "$APPS/Ronin Launcher.app/Contents/_MASReceipt/receipt" ]; then
+  note "A Mac App Store copy of the Ronin Launcher is already here; leaving it in place."
+  LAUNCHER_STAGED=""
+fi
 if [ -n "$LAUNCHER_STAGED" ]; then
   L_TARGET="$APPS/Ronin Launcher.app"
   if [ -e "$L_TARGET" ]; then mv "$L_TARGET" "$STAGE/old/Ronin Launcher.app" || fail "Could not move the old Ronin Launcher.app aside."; jot moved "$L_TARGET" "$STAGE/old/Ronin Launcher.app"; fi
@@ -823,6 +875,22 @@ fi
 fail_at commit-config
 ALIAS="$H/Library/Application Support/Kingmaker"
 if [ ! -e "$ALIAS" ] && [ ! -L "$ALIAS" ]; then ln -s sol-ghost "$ALIAS" && jot created "$ALIAS"; fi
+# BEGIN installed-release receipt commit
+# Last journaled move: rollback restores the prior receipt together with the prior app.
+if [ -e "$DATA/installed-release.json" ]; then
+  if [ -f "$RECEIPT" ]; then
+    cp -p "$DATA/installed-release.json" "$STAGE/old/installed-release.json" || fail "Could not preserve release provenance."
+  else
+    mv "$DATA/installed-release.json" "$STAGE/old/installed-release.json" || fail "Could not invalidate unsigned release provenance."
+  fi
+  jot moved "$DATA/installed-release.json" "$STAGE/old/installed-release.json"
+fi
+if [ -f "$RECEIPT" ]; then
+  mv "$RECEIPT" "$DATA/installed-release.json" || fail "Could not commit release provenance."
+  jot moved "$RECEIPT" "$DATA/installed-release.json"
+fi
+fail_at commit-receipt
+# END installed-release receipt commit
 fail_at commit-done
 COMMITTING=0
 
@@ -834,16 +902,6 @@ rm -f "$JOURNAL"
 cleanup
 rm -rf "$CACHE/parts" "$DSTAGE"
 progress 1 "installed"
-# The pack becomes the Mac profile (calibration.json macProfile.profile, Customize → Mac profile): "auto" when it is this
-# Mac's own, else the class the owner picked. Other calibration is kept.
-if [ -n "$PACK" ]; then
-  want="$([ "$PACK" = "$REC_PACK" ] && echo auto || echo "$PACK")"; cal="$DATA/calibration.json"
-  if [ -s "$cal" ] && plutil -lint "$cal" >/dev/null 2>&1; then
-    plutil -extract macProfile json -o /dev/null "$cal" 2>/dev/null || plutil -insert macProfile -dictionary "$cal" 2>>"$LOG"
-    plutil -replace macProfile.profile -string "$want" "$cal" 2>>"$LOG" || note "Could not record the pack in $cal."
-  else ( umask 077; printf '{\n  "schema": 1,\n  "macProfile": { "profile": "%s" }\n}\n' "$want" > "$cal" ); fi
-  note "Mac profile: $want."
-fi
 note "Kingmaker.app is in $APPS; the wake word \"$WAKE\" is cemented in $DATA/install.json."
 # Where updates come from (kingmaker update reads it): written when the installer was given an update host and key.
 if [ -n "${KINGMAKER_UPDATE_URL:-}" ] && [ -n "${KINGMAKER_UPDATE_KEY:-}" ]; then

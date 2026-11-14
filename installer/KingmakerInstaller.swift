@@ -2,12 +2,12 @@
 // … with a download button — they can only download the entire thing, never just
 // some of it … after that there's no UI. Only installer UI exists").
 //
-// One field (the wake word: empty, "Give me a name", cemented at install), the profile packs, and one button (Download &
-// Install). The packs (owner 2026-10-15: "a launcher with profiles and recommended one for selections … like install
-// packs and dlc in a game") are lib/mac-profiles.mjs PACKS, carried in the release manifest: each is the model set and
-// limits for one Mac class, this Mac's own pre-selected and marked Recommended. Kingmaker itself is still everything or
-// nothing (no component checkboxes); the pack only picks the models. The engine (Resources/engine.sh --pack) installs
-// it, and this window shows its "@@km {json}" progress lines as one bar, then quits once Kingmaker has launched.
+// One field (the wake word: empty, "Give me a name", cemented at install) and one button (Download &
+// Install). Kingmaker is everything or nothing — no component checkboxes, and since the metered-doctrine
+// rework (2026-11-14) no model packs either: the installer pulls the same starter set on every Mac, and
+// the models a task needs beyond it are picked at runtime and metered in from the Brain Library. This
+// window shows the engine's (Resources/engine.sh) "@@km {json}" progress lines as one bar, then quits
+// once Kingmaker has launched.
 //
 // The look is Kingmaker's own (owner 2026-10-15: the installer gets "the same overhaul … the same customizability that
 // Kingmaker has"): black (or dark glass, or the Mac's), the Bodoni wordmark, Ronin gold, and the accent the owner picked
@@ -89,7 +89,6 @@ enum L {
   }
   static func t(_ en: String) -> String { code == "en" ? en : (table[en]?[code] ?? en) }
   static let table: [String: [String: String]] = [
-    "Choose your pack": ["es": "Elige tu paquete", "fr": "Choisissez votre pack", "de": "Paket wählen", "pt": "Escolha seu pacote", "it": "Scegli il pacchetto", "ja": "パックを選択", "zh": "选择你的套件", "ko": "팩 선택"],
     "This Mac": ["es": "Este Mac", "fr": "Ce Mac", "de": "Dieser Mac", "pt": "Este Mac", "it": "Questo Mac", "ja": "このMac", "zh": "这台 Mac", "ko": "이 Mac"],
     "GB of models": ["es": "GB de modelos", "fr": "Go de modèles", "de": "GB Modelle", "pt": "GB de modelos", "it": "GB di modelli", "ja": "GBのモデル", "zh": "GB 模型", "ko": "GB 모델"],
     "Voice": ["es": "Voz", "fr": "Voix", "de": "Stimme", "pt": "Voz", "it": "Voce", "ja": "音声", "zh": "语音", "ko": "음성"],
@@ -115,7 +114,6 @@ enum L {
     "Text size": ["es": "Tamaño del texto", "fr": "Taille du texte", "de": "Textgröße", "pt": "Tamanho do texto", "it": "Dimensione testo", "ja": "文字サイズ", "zh": "文字大小", "ko": "글자 크기"],
     "Opens at": ["es": "Se abre en", "fr": "S’ouvre en", "de": "Öffnet", "pt": "Abre em", "it": "Si apre", "ja": "表示位置", "zh": "打开位置", "ko": "열리는 위치"],
     "Language": ["es": "Idioma", "fr": "Langue", "de": "Sprache", "pt": "Idioma", "it": "Lingua", "ja": "言語", "zh": "语言", "ko": "언어"],
-    "Kingmaker, plus the pack you pick.": ["es": "Kingmaker, más el paquete que elijas.", "fr": "Kingmaker, plus le pack de votre choix.", "de": "Kingmaker, plus das Paket deiner Wahl.", "pt": "Kingmaker, mais o pacote que escolher.", "it": "Kingmaker, più il pacchetto che scegli.", "ja": "Kingmaker と、選んだパック。", "zh": "Kingmaker，加上你选的套件。", "ko": "Kingmaker와 선택한 팩."],
     "One download: everything, or nothing.": ["es": "Una descarga: todo o nada.", "fr": "Un seul téléchargement : tout ou rien.", "de": "Ein Download: alles oder nichts.", "pt": "Um download: tudo ou nada.", "it": "Un download: tutto o niente.", "ja": "ダウンロードは一度：すべてか、何もなしか。", "zh": "一次下载：全部，或什么都不装。", "ko": "한 번의 다운로드: 전부 아니면 아무것도."],
     "1 to 3 words, letters only. Cemented at install: to change it later, delete Kingmaker and install it again.": ["es": "De 1 a 3 palabras, solo letras. Queda fijada al instalar: para cambiarla, borra Kingmaker e instálalo de nuevo.", "fr": "1 à 3 mots, lettres seulement. Fixé à l’installation : pour le changer, supprimez Kingmaker et réinstallez-le.", "de": "1 bis 3 Wörter, nur Buchstaben. Wird bei der Installation festgelegt: zum Ändern Kingmaker löschen und neu installieren.", "pt": "De 1 a 3 palavras, só letras. Fica fixa na instalação: para mudar, apague o Kingmaker e instale de novo.", "it": "Da 1 a 3 parole, solo lettere. Fissata all’installazione: per cambiarla, elimina Kingmaker e reinstallalo.", "ja": "1〜3語、文字のみ。インストール時に固定されます。変えるには Kingmaker を削除して再インストールしてください。", "zh": "1 到 3 个词，仅限字母。安装时固定：要更改，请删除 Kingmaker 后重新安装。", "ko": "1~3단어, 글자만. 설치 시 고정됩니다. 바꾸려면 Kingmaker를 삭제하고 다시 설치하세요."],
   ]
@@ -163,27 +161,6 @@ enum TermsHook {
   }
 }
 
-// ── the profile packs (engine.sh --inspect → the manifest's packs) ──────────────────────────────────────────────────
-struct Pack: Identifiable, Equatable {
-  let id: String, name: String, label: String, downloadGb: Double
-  let voice: Bool, pictures: Bool, concurrent: Int, contextK: Int
-  let models: [(name: String, roles: String)]
-  static func == (a: Pack, b: Pack) -> Bool { a.id == b.id }
-  init?(_ d: [String: Any]) {
-    guard let id = d["id"] as? String, let name = d["name"] as? String else { return nil }
-    self.id = id; self.name = name; label = (d["label"] as? String) ?? ""
-    downloadGb = (d["downloadGb"] as? Double) ?? Double((d["downloadGb"] as? Int) ?? 0)
-    let f = (d["features"] as? [String: Any]) ?? [:]
-    voice = (f["voice"] as? Bool) ?? false; pictures = (f["pictures"] as? Bool) ?? false
-    concurrent = (f["concurrent"] as? Int) ?? 1; contextK = (f["contextK"] as? Int) ?? 4
-    models = ((d["models"] as? [[String: Any]]) ?? []).compactMap { m in
-      guard let n = m["name"] as? String else { return nil }
-      return (n.replacingOccurrences(of: "huihui_ai/", with: "").replacingOccurrences(of: "hf.co/", with: ""), ((m["roles"] as? [String]) ?? []).joined(separator: ", "))
-    }
-  }
-  var ram: Int { Int(id) ?? 8 }
-}
-
 // ── the engine ────────────────────────────────────────────────────────────────────────────────────────────────────
 final class Installer: ObservableObject {
   enum Phase: Equatable { case ready, installing, failed(String), done }
@@ -196,11 +173,6 @@ final class Installer: ObservableObject {
   @Published var release = ""
   @Published var hasManifest = true
   @Published var termsAccepted = false
-  @Published var packs: [Pack] = []
-  @Published var recommendedPack = ""
-  @Published var selectedPack = ""
-  @Published var memGb = 0
-  @Published var chip = ""
   @Published var showingTerms = false
   @Published var customizing = false   // the Customize popover
   /// What still stands between the person and the button (nil = it can be pressed).
@@ -237,12 +209,6 @@ final class Installer: ObservableObject {
       guard let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
       DispatchQueue.main.async {
         self?.release = (obj["release"] as? String) ?? ""
-        self?.packs = ((obj["packs"] as? [[String: Any]]) ?? []).compactMap(Pack.init)
-        self?.memGb = (obj["memGb"] as? Int) ?? 0
-        self?.chip = (obj["chip"] as? String) ?? ""
-        let rec = (obj["recommendedPack"] as? String) ?? ""
-        self?.recommendedPack = rec
-        if self?.selectedPack.isEmpty ?? false { self?.selectedPack = rec }
         if obj["cemented"] as? Bool == true, let word = obj["wakeWord"] as? String, !word.isEmpty {
           self?.cementedWord = word
           self?.wakeWord = word
@@ -262,8 +228,7 @@ final class Installer: ObservableObject {
     buffer = Data()
     let p = Process()
     p.executableURL = URL(fileURLWithPath: "/bin/bash")
-    let pack: [String] = packs.isEmpty || selectedPack.isEmpty ? [] : ["--pack", selectedPack]
-    p.arguments = [engine.path, "--wake-word", word] + terms + pack + Installer.devArgs
+    p.arguments = [engine.path, "--wake-word", word] + terms + Installer.devArgs
     let out = Pipe()
     p.standardOutput = out
     p.standardError = FileHandle.nullDevice
@@ -400,7 +365,7 @@ struct InstallerView: View {
             Text(line).font(Machine.mono(10)).foregroundColor(Machine.inkDim).padding(.top, 8)
               .accessibilityLabel(line)
           }
-          Text(L.t(installer.packs.isEmpty ? "One download: everything, or nothing." : "Kingmaker, plus the pack you pick."))
+          Text(L.t("One download: everything, or nothing."))
             .font(.system(size: 12 * look.scale)).foregroundColor(Machine.inkDim).padding(.top, 10)
           controls.padding(.horizontal, 40).padding(.top, 22)
           Rectangle().fill(Machine.lineFaint).frame(height: 1).padding(.top, 22)
@@ -412,7 +377,7 @@ struct InstallerView: View {
         .frame(maxWidth: 760).frame(maxWidth: .infinity)
       }
     }
-    .frame(minWidth: 520, idealWidth: installer.packs.isEmpty ? 560 : 680, minHeight: 560, idealHeight: installer.packs.isEmpty ? 720 : 880)
+    .frame(minWidth: 520, idealWidth: 560, minHeight: 560, idealHeight: 720)
     .background(WindowSetup(look: look))
     .onAppear {
       installer.inspect()
@@ -427,7 +392,7 @@ struct InstallerView: View {
   private var crest: some View {
     Group {
       if let url = Bundle.main.url(forResource: "RoninCrest", withExtension: "png"), let image = NSImage(contentsOf: url) {
-        Image(nsImage: image).resizable().interpolation(.high).aspectRatio(contentMode: .fit).frame(height: installer.packs.isEmpty ? 190 : 120)
+        Image(nsImage: image).resizable().interpolation(.high).aspectRatio(contentMode: .fit).frame(height: 190)
           .shadow(color: Machine.ink.opacity(0.18), radius: 18)
       } else {
         Image(systemName: "shield.lefthalf.filled").font(.system(size: 120)).foregroundColor(Machine.paper)
@@ -439,7 +404,6 @@ struct InstallerView: View {
     switch installer.phase {
     case .ready, .failed:
       VStack(alignment: .leading, spacing: 8) {
-        if !installer.packs.isEmpty { PackPicker(installer: installer).padding(.bottom, 10) }
         Caps(text: L.t("Wake word"), size: 10, color: Machine.inkDim)
         TextField(L.t("Give me a name"), text: $installer.wakeWord)
           .textFieldStyle(.plain)
@@ -520,56 +484,6 @@ struct InstallerView: View {
         }
       }
     }
-  }
-}
-
-/// The packs as cards, like a game's install packs: this Mac's own pre-selected and marked Recommended; a pack above
-/// this Mac's memory still selectable, marked "May swap".
-struct PackPicker: View {
-  @ObservedObject var installer: Installer
-  private let columns = [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)]
-  var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      HStack {
-        Caps(text: L.t("Choose your pack"), size: 10, color: Machine.inkDim)
-        Spacer()
-        Text(installer.memGb > 0 ? "\(L.t("This Mac")): \(installer.chip.replacingOccurrences(of: "Apple ", with: "")), \(installer.memGb) GB" : "")
-          .font(Machine.mono(10)).foregroundColor(Machine.inkFaint)
-      }
-      LazyVGrid(columns: columns, spacing: 8) {
-        ForEach(installer.packs) { pack in card(pack) }
-      }
-      if let p = installer.packs.first(where: { $0.id == installer.selectedPack }) {
-        VStack(alignment: .leading, spacing: 2) {
-          ForEach(Array(p.models.enumerated()), id: \.offset) { _, m in
-            Text("· \(m.name)  \(m.roles)").font(Machine.mono(9.5)).foregroundColor(Machine.inkDim).lineLimit(1)
-          }
-        }.padding(.top, 2)
-      }
-    }
-  }
-  private func card(_ p: Pack) -> some View {
-    let selected = installer.selectedPack == p.id
-    let recommended = installer.recommendedPack == p.id
-    let mine = Int(installer.recommendedPack) ?? 8
-    return Button(action: { installer.selectedPack = p.id }) {
-      VStack(alignment: .leading, spacing: 4) {
-        HStack(spacing: 4) {
-          Caps(text: p.name, size: 10, color: selected ? .black : Machine.ink)
-          Spacer(minLength: 0)
-        }
-        Text(String(format: "%.1f \(L.t("GB of models"))", p.downloadGb)).font(Machine.mono(9.5)).foregroundColor(selected ? .black.opacity(0.75) : Machine.inkDim)
-        Text("\(L.t(p.voice ? "Voice" : "Text only")) · \(L.t(p.pictures ? "pictures on" : "pictures off"))").font(Machine.mono(9.5)).foregroundColor(selected ? .black.opacity(0.75) : Machine.inkDim)
-        Text("\(p.concurrent) \(L.t("at once")) · \(p.contextK)k").font(Machine.mono(9.5)).foregroundColor(selected ? .black.opacity(0.75) : Machine.inkDim)
-        if recommended { Caps(text: L.t("Recommended"), size: 8.5, color: selected ? Color(red: 0.05, green: 0.4, blue: 0.12) : Machine.ok) }
-        else if p.ram > mine { Caps(text: L.t("May swap"), size: 8.5, color: Machine.amber) }
-        else { Caps(text: " ", size: 8.5) }
-      }
-      .padding(10).frame(maxWidth: .infinity, alignment: .leading)
-      .background(selected ? Machine.paper : Color.black)
-      .overlay(Rectangle().stroke(recommended ? Machine.ok : (selected ? Machine.paper : Machine.lineFaint), lineWidth: recommended || selected ? 1.5 : 1))
-    }
-    .buttonStyle(.plain)
   }
 }
 

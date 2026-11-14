@@ -1,0 +1,86 @@
+{
+ "tag": "zefancai/open-jev-2b:merged",
+ "slug": "zefancai-open-jev-2b-merged",
+ "from": "ZefanCai/Open-Jev-2B adapter package merged into Qwen/Qwen3.5-2B @ 15852e8c16360a2fea060d615a32b45270f8a8fc (housing build 2026-11-14)",
+ "base": "Qwen/Qwen3.5-2B",
+ "license": "apache-2.0",
+ "kind": "merged-model",
+ "redistributable": true,
+ "note": "Servable merged model, housed FORMAT-AGNOSTICALLY (owner correction 2026-11-14): base + rank-8 LoRA merged ONCE into a canonical bf16 checkpoint (work/merged/), then emitted per target. Supersedes the GGUF-only framing of the 03:05 adapter entry for serving. The fp32 scalar decision head is a separate artifact whose wiring rides every target identically.",
+ "capabilities": [
+  "scoring"
+ ],
+ "picks": [],
+ "status": "option",
+ "bench": [],
+ "weights": {
+  "format": "multi-target (see targets)",
+  "merge": "W' = W + 2.0 * (B @ A) in fp32 -> bf16, 60 target modules, 3 shards, receipts/merge-receipt.json",
+  "targets": {
+   "safetensors": {
+    "path": "work/merged/",
+    "grade": "DONE-PROVEN",
+    "shards": [
+     {
+      "path": "work/merged/model-00001-of-00003.safetensors",
+      "size": 2193257288,
+      "sha256": "bebbc8639bd97b684fd65ed49a3714aaa205c96cf3da387d5f7d901a12a6c3ef"
+     },
+     {
+      "path": "work/merged/model-00002-of-00003.safetensors",
+      "size": 2175098992,
+      "sha256": "916f94a490d551a31733935840317a81b62e5f16728bd316a5d0aad6c7a79577"
+     },
+     {
+      "path": "work/merged/model-00003-of-00003.safetensors",
+      "size": 179865008,
+      "sha256": "07d28bd9bd6b338411c43855ad4bda3315830ea7df9dd2bcbb000af9d30a5ea6"
+     }
+    ]
+   },
+   "mlx": {
+    "path": "work/mlx/",
+    "grade": "DONE-PROVEN (conversion + behavioral on this node's MLX CPU runtime; execution on Apple Silicon hardware unexercised)",
+    "weights": {
+     "path": "work/mlx/model.safetensors",
+     "size": 3763692325,
+     "sha256": "3d785b5c9bbdd8c2ee7d8f9c496bdc46c5dd8a567de3192008de5b260ba90ff2"
+    }
+   },
+   "gguf-f16": {
+    "path": "work/gguf/open-jev-2b-merged-f16.gguf",
+    "grade": "DONE-PROVEN at weight level; behavioral scoring WALL on this node (see BUILD-REPORT.md)",
+    "weights": {
+     "path": "work/gguf/open-jev-2b-merged-f16.gguf",
+     "size": 3897385504,
+     "sha256": "e96c586586c5014651d49ac5edee922234e7517bb0515eaa40a81b8679373ea5"
+    }
+   },
+   "gguf-q4_k_m": {
+    "path": "work/gguf/open-jev-2b-merged-q4_k_m.gguf",
+    "grade": "DONE-PROVEN at weight level; behavioral scoring WALL on this node (see BUILD-REPORT.md)",
+    "weights": {
+     "path": "work/gguf/open-jev-2b-merged-q4_k_m.gguf",
+     "size": 1322975776,
+     "sha256": "3fd8cc381e77cb3bf2722757825d1f46be6b689b45516796bee72f8a1eda336f"
+    }
+   }
+  }
+ },
+ "package": {
+  "type": "merged-model+scalar-head",
+  "head": {
+   "file": "package/checkpoint/head.pt",
+   "shape": [
+    1,
+    2048
+   ],
+   "dtype": "float32",
+   "sha256": "3532cd576c58d5ad5bf17c3e9f2df4be8c70e08c07fa6bb7fa673dcd7b401f2a",
+   "portableForm": "head_w.npy + head_b.npy (float64), extraction verified byte-identical"
+  },
+  "temperature": 1.518796342858676,
+  "maxLength": 4096,
+  "serving": "Score = head(last-token final hidden state of the chat-templated candidate prompt) on ANY target; probabilities = softmax over candidate logits at the package temperature (noul: logits [0, s]). Behavioral parity vs the unmerged reference path is receipted per target in housing-manifest.json; the one flip (phish near-tie) is shared by all targets and disclosed there."
+ }
+}
