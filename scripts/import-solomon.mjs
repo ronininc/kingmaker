@@ -99,6 +99,14 @@ writeFileSync(join(staging, 'IMPORTED_FROM.json'), `${JSON.stringify({
 const dest = join(root, 'solomon');
 rmSync(dest, { recursive: true, force: true });
 renameSync(staging, dest);
+
+// Kingmaker's own knowledge fields (catalog/corpora) are routed by an entry in the engine's field contract.
+// The import replaced that file, so the entry is put back here instead of being edited in by hand.
+const fieldContract = join(dest, 'contracts', 'knowledge-fields.json');
+if (existsSync(fieldContract)) {
+  const { applyFieldRoute } = await import('../lib/security-corpus.mjs');
+  if (applyFieldRoute(fieldContract)) console.log('contracts/knowledge-fields.json: added the security-diagnostics route (optional field)');
+}
 console.log(`solomon/ ← TSS ${sha.slice(0, 9)} (${ref}); removed ${removed.length} paths and ${removedTests.length} UI test suites; pruned ${prunedSuites.length} unrunnable entries from tests/run-all.ts`);
 if (dangling.length) {
   console.log(`dangling imports into stripped paths (${dangling.length}) — scripts that build the UI, not engines, unless listed under server/src:`);

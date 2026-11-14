@@ -75,24 +75,14 @@ public class ScriptureScan extends GhidraScript {
         return b.toString();
     }
 
-    private static String baseName(String n, String executableFormat) {
+    private static String baseName(String n) {
         if (n == null) return "";
+        int i = n.lastIndexOf('.');
         // Strip a trailing import-mangling suffix like "@GLIBC_2.2.5" or ordinal text.
         String s = n;
         int at = s.indexOf('@');
         if (at > 0) s = s.substring(0, at);
-        // Mach-O's C ABI adds ONE underscore, including to names already
-        // starting with one (_spawnv -> __spawnv). ELF/PE do not share this
-        // rule: preserving their _spawn* and __isoc99_* names is essential.
-        // Use the actual Ghidra loader name, not the host OS or filename.
-        if ("Mac OS X Mach-O".equals(executableFormat) && s.startsWith("_") && s.length() > 1) {
-            s = s.substring(1);
-        }
         return s;
-    }
-
-    private String baseName(String n) {
-        return baseName(n, currentProgram.getExecutableFormat());
     }
 
     @Override
@@ -139,22 +129,20 @@ public class ScriptureScan extends GhidraScript {
                 if (s.getParentNamespace() != null) lib = s.getParentNamespace().getName();
             } catch (Exception ignored) { }
             importsJson.append("{\"name\":\"").append(esc(baseName(s.getName())))
-                .append("\",\"raw_name\":\"").append(esc(s.getName()))
                 .append("\",\"library\":\"").append(esc(lib)).append("\"}");
         }
 
         // ---- entry points + input-touching functions ----
         Set<Function> roots = new HashSet<>();
         List<String> entryNames = new ArrayList<>();
-        List<String> entryRawNames = new ArrayList<>();
         for (Symbol s : st.getAllSymbols(true)) {
             if (!s.isExternalEntryPoint()) continue;
             Function f = fm.getFunctionAt(s.getAddress());
-            if (f != null) { roots.add(f); entryNames.add(baseName(f.getName())); entryRawNames.add(f.getName()); }
+            if (f != null) { roots.add(f); entryNames.add(f.getName()); }
         }
         for (String n : new String[] {"main", "_start", "mainCRTStartup", "WinMain", "wmain", "entry"}) {
             Function f = byName.get(n);
-            if (f != null && roots.add(f)) { entryNames.add(baseName(f.getName())); entryRawNames.add(f.getName()); }
+            if (f != null && roots.add(f)) entryNames.add(n);
         }
         // Functions nobody calls are candidate entry surfaces too.
         for (Function f : allFns) {
@@ -172,31 +160,26 @@ public class ScriptureScan extends GhidraScript {
         // Records the SHORTEST root for each (sink, sink-site) pair found.
         List<String> siteJson = new ArrayList<>();
         // Direct call sites: for every sink function, its calling references.
-        Map<String, List<Address>> sinkSites = new HashMap<>();
-        int sitesTotal = 0;
+        Map<String, Address> sinkSiteAddr = new HashMap<>();
         for (Function f : allFns) {
             String bn = baseName(f.getName());
             if (!SINKS.contains(bn)) continue;
             List<Reference> refs = new ArrayList<>();
             rm.getReferencesTo(f.getEntryPoint()).forEachRemaining(refs::add);
             for (Reference r : refs) {
-                if (!r.getReferenceType().isCall()) continue;
-                sitesTotal++;
+                if (siteJson.size() >= MAX_SITES) break;
                 Function caller = fm.getFunctionContaining(r.getFromAddress());
-                String callerRawName = caller != null ? caller.getName() : "(no-function)";
-                String callerName = caller != null ? baseName(callerRawName) : callerRawName;
-                if (siteJson.size() < MAX_SITES) siteJson.add("{\"func\":\"" + esc(callerName) + "\",\"func_raw\":\"" + esc(callerRawName)
-                    + "\",\"callee\":\"" + esc(bn) + "\",\"callee_raw\":\"" + esc(f.getName())
+                String callerName = caller != null ? caller.getName() : "(no-function)";
+                siteJson.add("{\"func\":\"" + esc(callerName) + "\",\"callee\":\"" + esc(bn)
                     + "\",\"addr\":\"" + esc(r.getFromAddress().toString()) + "\"}");
-                if (caller != null) sinkSites.computeIfAbsent(caller.getEntryPoint() + "@" + bn, k -> new ArrayList<>()).add(r.getFromAddress());
+                sinkSiteAddr.put(bn + "@" + r.getFromAddress(), r.getFromAddress());
             }
         }
         // ---- decompiler excerpts at exec/unbounded sink sites (capped) ----
         // Attempted/failed counts feed the confidence cap in scan.mjs.
         // BFS reachability with live objects: roots -> ... -> sink caller.
         int decAttempted = 0, decFailed = 0;
-        List<String> decErrors = new ArrayList<>();
-        Map<String, String> cByFunction = new HashMap<>();
+        Map<String, String> excerptBySinkCaller = new HashMap<>();
         DecompInterface decomp = new DecompInterface();
         decomp.openProgram(currentProgram);
         Set<String> decompiledCallers = new HashSet<>();
@@ -215,9 +198,7 @@ public class ScriptureScan extends GhidraScript {
                     // decompiling it yields garbage literalness verdicts.
                     if (SINKS.contains(cn) && inputTouching.contains(root)
                             && !cur.isThunk() && !baseName(cur.getName()).equals(cn)) {
-                        List<Address> addresses = sinkSites.getOrDefault(cur.getEntryPoint() + "@" + cn, List.of());
-                        if (addresses.isEmpty()) livePaths.add(new Object[] {root, cur, cn, callee.getName(), null});
-                        for (Address address : addresses) livePaths.add(new Object[] {root, cur, cn, callee.getName(), address});
+                        livePaths.add(new Object[] {root, cur, cn});
                     }
                     if (!parent.containsKey(callee)) { parent.put(callee, cur); q.add(callee); }
                 }
@@ -225,25 +206,43 @@ public class ScriptureScan extends GhidraScript {
         }
         for (Object[] lp : livePaths) {
             Function caller = (Function) lp[1];
-            String key = caller.getEntryPoint().toString();
-            if (decompiledCallers.contains(key)) continue;
-            if (decAttempted >= MAX_DECOMPILE) continue;
-            decompiledCallers.add(key);
+            String sink = (String) lp[2];
+            String key = sink + "@" + caller.getName();
+            if (excerptBySinkCaller.containsKey(key) || decompiledCallers.contains(caller.getName())) continue;
+            if (decAttempted >= MAX_DECOMPILE) break;
+            decompiledCallers.add(caller.getName());
             decAttempted++;
             try {
                 DecompileResults res = decomp.decompileFunction(caller, 30, monitor);
-                if (res == null || res.getDecompiledFunction() == null) {
-                    decFailed++;
-                    String error = res == null ? decomp.getLastMessage() : res.getErrorMessage();
-                    decErrors.add(error == null || error.isEmpty() ? "No decompiled function returned" : error);
-                    continue;
-                }
+                if (res == null || res.getDecompiledFunction() == null) { decFailed++; continue; }
                 String c = res.getDecompiledFunction().getC();
-                if (c == null) { decFailed++; decErrors.add("Decompiler returned no C text"); continue; }
-                cByFunction.put(key, c);
+                if (c == null) { decFailed++; continue; }
+                int idx = c.indexOf(sink + "(");
+                if (idx < 0) idx = Math.max(0, c.length() / 2);
+                int lo = Math.max(0, idx - 120);
+                int hi = Math.min(c.length(), idx + 220);
+                String excerpt = c.substring(lo, hi).replace('\n', ' ').trim();
+                excerptBySinkCaller.put(key, excerpt);
+                // Argument literalness: text between the sink's parens.
+                boolean literal = false;
+                int p = c.indexOf('(', idx);
+                if (p >= 0) {
+                    int depth = 0, end = -1;
+                    for (int i = p; i < c.length() && i < p + 300; i++) {
+                        char ch = c.charAt(i);
+                        if (ch == '(') depth++;
+                        if (ch == ')') { depth--; if (depth == 0) { end = i; break; } }
+                    }
+                    if (end > p) {
+                        String arg = c.substring(p + 1, end).trim();
+                        literal = arg.matches("^\"[^\"]*\"$") || arg.matches("^\\d+$")
+                            || arg.matches("^0x[0-9a-fA-F]+$") || arg.equals("NULL")
+                            || arg.matches("^\".*\"$");
+                    }
+                }
+                excerptBySinkCaller.put(key + "#literal", String.valueOf(literal));
             } catch (Exception e) {
                 decFailed++;
-                decErrors.add(e.getClass().getSimpleName() + ": " + String.valueOf(e.getMessage()));
             }
         }
         decomp.dispose();
@@ -254,36 +253,16 @@ public class ScriptureScan extends GhidraScript {
             Function root = (Function) lp[0];
             Function caller = (Function) lp[1];
             String sink = (String) lp[2];
-            String c = cByFunction.get(caller.getEntryPoint().toString());
-            String excerpt = "";
-            String lit = "null";
-            String evidence = "unknown";
-            // C text lacks stable instruction mapping. Only a unique textual AND actual
-            // call can be paired; repeated calls remain unknown, never borrow the first.
-            if (c != null) {
-                java.util.regex.Matcher m = java.util.regex.Pattern.compile("(?<![A-Za-z0-9_])" + (currentProgram.getExecutableFormat().contains("Mach-O") ? "_?" : "") + java.util.regex.Pattern.quote(sink) + "\\s*\\(").matcher(c);
-                int idx = m.find() ? m.start() : -1;
-                boolean unique = idx >= 0 && !m.find()
-                    && sinkSites.getOrDefault(caller.getEntryPoint() + "@" + sink, List.of()).size() == 1;
-                if (unique) {
-                    excerpt = c.substring(Math.max(0, idx - 120), Math.min(c.length(), idx + 220)).replace('\n', ' ').trim();
-                    // Only a single quoted first argument with no expression is a literal.
-                    String tail = c.substring(c.indexOf('(', idx) + 1);
-                    java.util.regex.Matcher arg = java.util.regex.Pattern.compile("^\\s*\"(?:[^\"\\\\]|\\\\.)*\"\\s*[,)]").matcher(tail);
-                    lit = arg.find() ? "true" : "false";
-                    evidence = "unique-call-text";
-                }
-            }
-            enrichedPaths.add("{\"from\":{\"name\":\"" + esc(baseName(root.getName()))
-                + "\",\"raw_name\":\"" + esc(root.getName())
+            String key = sink + "@" + caller.getName();
+            String excerpt = excerptBySinkCaller.getOrDefault(key, "");
+            String lit = excerptBySinkCaller.getOrDefault(key + "#literal", "false");
+            enrichedPaths.add("{\"from\":{\"name\":\"" + esc(root.getName())
                 + "\",\"addr\":\"" + esc(root.getEntryPoint().toString())
-                + "\"},\"via\":\"" + esc(baseName(caller.getName()))
-                + "\",\"via_raw\":\"" + esc(caller.getName())
+                + "\"},\"via\":\"" + esc(caller.getName())
                 + "\",\"sink\":\"" + esc(sink)
-                + "\",\"sink_raw\":\"" + esc((String) lp[3])
-                + "\",\"sink_addr\":\"" + esc(lp[4] == null ? "" : lp[4].toString())
+                + "\",\"sink_addr\":\"" + esc(caller.getEntryPoint().toString())
                 + "\",\"arg_literal\":" + lit
-                + ",\"argument_evidence\":\"" + evidence + "\",\"sink_site\":{\"addr\":\"" + esc(lp[4] == null ? "" : lp[4].toString())
+                + ",\"sink_site\":{\"addr\":\"" + esc(caller.getEntryPoint().toString())
                 + "\",\"excerpt\":\"" + esc(excerpt) + "\"}}");
         }
 
@@ -343,31 +322,13 @@ public class ScriptureScan extends GhidraScript {
             out.append("\"").append(esc(entryNames.get(i))).append("\"");
         }
         out.append("]");
-        out.append(",\"entry_points_raw\":[");
-        for (int i = 0; i < entryRawNames.size(); i++) {
-            if (i > 0) out.append(",");
-            out.append("\"").append(esc(entryRawNames.get(i))).append("\"");
-        }
-        out.append("]");
         out.append(",\"call_paths\":[").append(String.join(",", enrichedPaths)).append("]");
         out.append(",\"call_sites\":[").append(String.join(",", siteJson)).append("]");
         out.append(",\"strings\":[").append(stringsJson).append("]");
         out.append(",\"sections\":[").append(sectionsJson).append("]");
-        out.append(",\"fid_matches\":[],\"fid_status\":\"not-performed\"");
-        Set<String> eligibleFunctions = new HashSet<>();
-        for (Object[] lp : livePaths) eligibleFunctions.add(((Function) lp[1]).getEntryPoint().toString());
-        out.append(",\"coverage\":{\"paths_total\":").append(livePaths.size())
-            .append(",\"paths_omitted\":").append(Math.max(0, livePaths.size() - enrichedPaths.size()))
-            .append(",\"sites_total\":").append(sitesTotal).append(",\"sites_omitted\":").append(Math.max(0, sitesTotal - siteJson.size()))
-            .append(",\"decompile_eligible\":").append(eligibleFunctions.size()).append(",\"decompile_omitted\":").append(Math.max(0, eligibleFunctions.size() - decAttempted)).append("}");
+        out.append(",\"fid_matches\":[]");
         out.append(",\"decompile\":{\"attempted\":").append(decAttempted)
-            .append(",\"failed\":").append(decFailed).append(",\"errors\":[");
-        for (int i = 0; i < decErrors.size(); i++) {
-            if (i > 0) out.append(",");
-            String error = decErrors.get(i);
-            out.append("\"").append(esc(error.substring(0, Math.min(error.length(), 400)))).append("\"");
-        }
-        out.append("]}");
+            .append(",\"failed\":").append(decFailed).append("}");
         out.append("}");
         try (FileWriter w = new FileWriter(outPath)) {
             w.write(out.toString());

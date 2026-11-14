@@ -41,40 +41,35 @@ The local models [Kingmaker](https://github.com/ronininc/Kingmaker) suggests for
 benchmarks behind each pick, and the weights. Abliterated and uncensored builds are preferred wherever one measured
 well. Machine-readable: [\`library.json\`](library.json) (schema: [\`schema/library.schema.json\`](schema/library.schema.json)).
 
-The Brain Library is paid proprietary software available only to authorized customers under an active paid entitlement
-or separate written agreement. See [LICENSE](LICENSE). Third-party models, weights, and applications retain their own
-licenses as listed in [NOTICE.md](NOTICE.md).
-
 **Picks come from measurements, not claims.** Every Mac that runs \`kingmaker models bench\` adds its results to
-[\`bench/\`](bench/). A class is **measured** once its own results are in, and an **estimate** until then. So the more
-Macs that test, the more of this table is measured. A 30-day churn scan finds new builds, and a benchmark decides
-whether one replaces a pick.
+[\`bench/\`](bench/). The floor below is the smallest model measured adequate for each role; it installs on every
+Mac. Anything above the floor is picked per task at runtime — the smallest model sufficient for that task — and
+metered in over this library in verified 1 MiB portions. A 30-day churn scan finds new builds, and a benchmark
+decides whether one replaces a pick.
 
-## Picks per Mac class
+## The floor: the smallest sufficient model per role
 
-| Pack | Macs | Router | Writer | Coder | Vision | Reasoning | Per model | Context | At once | Voice | Pictures | Status |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Role | Model |
+|---|---|
 `;
-  for (const c of lib.classes) md += `| ${c.pack} | ${c.label} | ${['router', 'writer', 'coder', 'vision', 'reasoning'].map((r) => `\`${short(c.roles[r])}\``).join(' | ')} | ${c.maxResidentGb} GB | ${c.context / 1024}k | ${c.concurrent} | ${c.voice === 'on' ? 'on' : 'text only'} | ${c.pictures ? 'on' : 'off'} | ${c.status}${c.measuredOn.length ? ` (${c.measuredOn.join(', ')})` : ''} |\n`;
-  md += `\n## Every Mac\n\n| Chip | RAM | GB/s | Pack |\n|---|---|---|---|\n`;
-  for (const d of lib.devices) md += `| ${d.chip} | ${d.ramGb} GB | ${d.bandwidthGBs ?? '?'} | ${d.class} GB |\n`;
+  for (const [role, tag] of Object.entries(lib.floor.roles)) md += `| ${role} | \`${short(tag)}\` |\n`;
+  md += `\n## Every Mac\n\n| Chip | RAM | GB/s |\n|---|---|---|\n`;
+  for (const d of lib.devices) md += `| ${d.chip} | ${d.ramGb} GB | ${d.bandwidthGBs ?? '?'} |\n`;
   md += `\n## Models\n\n| Model | Kind | Licence | Status | Weights here | Best measured |\n|---|---|---|---|---|---|\n`;
   for (const m of lib.models) {
     const best = m.bench.filter((b) => !b.error).sort((a, b) => (b.tools ?? 0) - (a.tools ?? 0))[0];
-    md += `| \`${short(m.tag)}\` | ${m.kind} | ${m.license ?? 'none on its card'} | ${m.status}${m.picks.length ? ` (${m.picks.map((p) => `${p.class} GB ${p.role}`).join(', ')})` : ''} | ${m.weights ? `[${m.weights.release}](https://github.com/${LIBRARY_REPO}/releases/tag/${m.weights.release})` : m.redistributable ? 'not yet' : 'pointer only'} | ${best ? `${best.tokS} tok/s, holds ${best.holdsGb} GB, tools ${best.tools}%, route ${best.route}%, write ${best.write}% (${best.file})` : '—'} |\n`;
+    md += `| \`${short(m.tag)}\` | ${m.kind} | ${m.license ?? 'none on its card'} | ${m.status}${m.picks.length ? ` (${m.picks.map((p) => p.role).join(', ')})` : ''} | ${m.weights ? `[${m.weights.release}](https://github.com/${LIBRARY_REPO}/releases/tag/${m.weights.release})` : m.redistributable ? 'not yet' : 'pointer only'} | ${best ? `${best.tokS} tok/s, holds ${best.holdsGb} GB, tools ${best.tools}%, route ${best.route}%, write ${best.write}% (${best.file})` : '—'} |\n`;
   }
   md += `\n## For bigger Macs (options, not measured here)\n\nListed for when a bigger Mac arrives. Never picked automatically, not benchmarked here, and the weights are linked upstream, not republished. These do not run in Ollama.\n\n| Model | Licence | For | Files | Runtime |\n|---|---|---|---|---|\n`;
   for (const o of lib.bigOptions ?? []) md += `| [${o.tag}](${o.links[0]})${o.links[1] ? ` · [GGUF](${o.links[1]})` : ''}<br><small>${o.params}${o.context ? `, ${o.context} context` : ''}. ${o.note}</small> | ${o.license} | ${o.forRamGb.join(' / ')} GB Macs | ${o.files.map((f) => `${f.quant} ${f.gb} GB`).join(', ')} | ${o.runtime} |\n`;
-  md += `\n## Applications\n\nReviewed optional applications are version-pinned and published as immutable Brain Library release assets. Kingmaker verifies the asset SHA-256, installs it outside the signed base app, and gives it an isolated runtime.\n\n| Application | Version | Licence | Source | Install and use |\n|---|---|---|---|---|\n`;
-  for (const app of lib.applications ?? []) md += `| ${app.name}<br><small>${app.summary}</small> | ${app.version} | ${app.license} | [commit ${app.sourceCommit.slice(0, 8)}](${app.source}/commit/${app.sourceCommit}) | \`kingmaker models library pull ${app.id}\`<br>\`kingmaker models library use ${app.id}\` |\n`;
-  md += `\n## Install a pick with Kingmaker\n\n\`\`\`\nkingmaker models library pull <tag>      # downloads the parts, checks every SHA-256, loads it into Ollama\nkingmaker models setup --pack <class>    # a whole pack\nkingmaker models bench                   # measure this Mac; then: kingmaker models library submit\n\`\`\`\n\nSubmissions are scanned, then reviewed by the owner: see [CONTRIBUTING.md](CONTRIBUTING.md).\n\nEach model keeps its own licence: see [NOTICE.md](NOTICE.md). A model without a licence on its card is listed and\nmeasured here, but its weights are not republished.\n`;
+  md += `\n## Install a pick with Kingmaker\n\n\`\`\`\nkingmaker models library pull <tag>      # downloads the parts, checks every SHA-256, loads it into Ollama\nkingmaker models bench                   # measure this Mac; then: kingmaker models library submit\n\`\`\`\n\nSubmissions are scanned, then reviewed by the owner: see [CONTRIBUTING.md](CONTRIBUTING.md).\n\nEach model keeps its own licence: see [NOTICE.md](NOTICE.md). A model without a licence on its card is listed and\nmeasured here, but its weights are not republished.\n`;
   return md;
 }
 
 function notice(lib) {
   let md = '# Notices\n\nThe weights published in this repo\'s releases keep their own licences:\n\n';
   for (const m of lib.models.filter((x) => x.redistributable)) md += `- \`${m.tag}\`: ${m.license}. From ${m.from}${m.base ? `, based on ${m.base}` : ''}. Changes: abliteration or quantization by the builders named, not by Ronin Inc.\n`;
-  md += '\nApache-2.0: https://www.apache.org/licenses/LICENSE-2.0.\n\nThe Brain Library\'s own catalog, schema, benchmarks, documentation, and library tooling are Copyright (c) 2026 Ronin Inc., all rights reserved, and require a paid entitlement or separate written agreement under [LICENSE](LICENSE). Third-party models, weights, and applications retain their own licenses; inclusion does not relicense them.\n';
+  md += '\nApache-2.0: https://www.apache.org/licenses/LICENSE-2.0. The library\'s own files (library.json, the schema, the bench results) are published by Ronin Inc for anyone to use.\n';
   return md;
 }
 
@@ -125,7 +120,7 @@ the pull request. Then:
    \`bench/\`, each one a result \`kingmaker models bench\` writes: every field known, numbers in range, no links, keys,
    tokens, hidden characters or real contact details. Anything else fails it, with the reason on the pull request.
 2. **The owner reviews** what passed and merges it by hand. Nothing is merged automatically.
-3. **Picks** (the models each Mac class installs) change only through the owner's monthly rotation commit. A
+3. **Picks** (the floor and its measured replacements) change only through the owner's monthly rotation commit. A
    submission adds evidence; it never changes a pick by itself.
 
 Model weights, the catalog (\`library.json\`), the README and the scan itself are not open to submissions.
@@ -156,7 +151,7 @@ if (cmd === 'build') {
   writeFileSync(join(dir, 'README.md'), readme(lib));
   writeFileSync(join(dir, 'NOTICE.md'), notice(lib));
   writeGuard(dir);
-  console.log(`✓ ${dir}: ${lib.devices.length} Mac configurations, ${lib.classes.length} classes (${lib.classes.filter((c) => c.status === 'measured').length} measured), ${lib.models.length} models (${lib.models.filter((m) => m.status === 'pick').length} picks), ${(lib.applications ?? []).length} applications, ${lib.bench.length} bench files.`);
+  console.log(`✓ ${dir}: ${lib.devices.length} Mac configurations, floor of ${Object.keys(lib.floor.roles).length} roles, ${lib.models.length} models (${lib.models.filter((m) => m.status === 'pick').length} picks), ${lib.bench.length} bench files.`);
   void CHIP_BANDWIDTH;
 } else if (cmd === 'weights') {
   const lib = readJson(join(dir, 'library.json'), null);

@@ -1,0 +1,7 @@
+DRIVER: waiting for guest login prompt (TCG boot)...
+DRIVER: logged in
+DRIVER: guest network up (slirp DHCP)
+DRIVER: node v22.14.0 (musl) verified running in guest via 9p share
+DRIVER: bundle + engine block staged in guest from the share
+HOST-READY
+DRIVER: guest powered off

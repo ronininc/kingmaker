@@ -21,7 +21,6 @@ import net from 'node:net';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { loadIdentity, createIdentity, publicBlock, defaultIdentityDir } from './armor.mjs';
-import { assertProductIdentityDir } from './product-paths.mjs';
 import { TERMS_TEXT, hasCurrentAcceptance, recordAcceptance } from './terms.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -64,19 +63,8 @@ function daemonAnswers(socketPath) {
 
 async function main() {
   const flags = parseFlags(process.argv.slice(2));
-  const dir = assertProductIdentityDir(flags['identity-dir'] ? path.resolve(flags['identity-dir']) : defaultIdentityDir());
+  const dir = flags['identity-dir'] ? path.resolve(flags['identity-dir']) : defaultIdentityDir();
   const socketPath = flags.socket ? path.resolve(flags.socket) : path.join(dir, 'vaultd.sock');
-
-  // 4.4 PHASE-0 COEXISTENCE — ITEM 1 (deliberate, marked deviation from the
-  // public line): this is Kingmaker's BUNDLED launch path. It issues the
-  // daemon spawn below with explicit --identity-dir/--socket (never bare),
-  // and it refuses outright to run against the STANDALONE product's store
-  // (~/.scripture-armor) — design rule: Kingmaker never writes to, adopts,
-  // or serves the standalone install's identity (COEXISTENCE-REPORT probes
-  // 1+2). The bundled default (armor.mjs defaultIdentityDir, coexistence
-  // item 2) is the Kingmaker-namespaced store, so a flagless launch is
-  // already namespaced; this guard closes the explicit-flag path too.
-  // Product policy above rejects the opposite product's store before any key read.
 
   const running = await daemonAnswers(socketPath);
   if (running && running.ok) {

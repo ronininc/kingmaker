@@ -2,7 +2,7 @@
 
 **Seal any file — or an entire repository — inside a closed loop only its
 own machine can open, and know by hash if it ever comes back wrong.**
-Zero-dependency Node.js ≥ 24. No npm install, no network, no account.
+Zero-dependency Node.js ≥ 22. No npm install, no network, no account.
 `node:crypto`, `node:fs`, `node:net`, and nothing else.
 
 Scripture Armor began as a design for one person's key vault. It is
@@ -22,48 +22,6 @@ hashes that machine issued, and an owner who approves every opening.
 - `dns-profiles/` — configuration profiles that point a phone's or a
   computer's DNS lookups at a resolver inside your own loop (see
   *DNS: the agnostic-tracks surface for traffic*).
-- `dashboard.mjs` — the standalone Vanta-black owner UI: one governed
-  activation, the protection feed, Scan and reversible Clean. It binds only
-  to loopback and its API requires a fresh per-process token.
-- `credential-vault.mjs` — manifest-driven credential migration. Activation
-  imports only entries explicitly listed by the Launcher, seals them to this
-  device with the v4 hybrid X25519 + ML-KEM-768 package format, verifies a
-  complete round trip, and preserves the original files by default. A manifest
-  move request alone cannot move an original. Separate owner consent permits
-  moving it into a private plaintext rollback backup, retained until the owner
-  explicitly removes it; that backup is not encrypted or automatically erased.
-- `build-standalone.mjs` — the release assembler. A production bundle is
-  refused unless the Armor CLI, REA, exporter and real platform prerequisites
-  are present. It runs Java version, native-decompiler loading, headless-launcher
-  and Node post-quantum checks; fake text executables do not satisfy this gate.
-
-## Standalone owner UI
-
-```sh
-node dashboard.mjs
-```
-
-The first screen requires your account password and the eight-digit code sent
-to your registered email. A fresh server-verified entitlement precedes activation;
-returning from checkout does not authenticate or activate this installation.
-If the Ronin Launcher supplies a `scripture-armor.credential-migration/1`
-manifest, the UI previews its item count and imports those named credentials
-on activation. Originals stay in place unless you separately consent to the
-disclosed private plaintext backup move. Scripture Armor never sweeps the device for unrelated passwords
-or prints secret values. After activation, the app surface contains the
-post-quantum vault status, the event feed, **Scan**, and **Clean**. Clean means
-quarantine with a recorded destination and rollback path; it never means
-unlogged deletion.
-
-The malware-purge stack is a release requirement, not an optional download:
-
-- REA performs a pure source/repository inspection without executing targets.
-- `scan.mjs` performs the Armor policy scan and invokes Ghidra headless for the
-  binary lane.
-- `ghidra-scripts/ScriptureScan.java` is the deliberately dumb exporter; rules
-  and severity remain in the reviewed Node source.
-- `build-standalone.mjs` fails closed if REA, Ghidra, its JDK, the CLI, the
-  dashboard or the vault components are missing.
 
 ---
 
@@ -164,63 +122,18 @@ SCRIPTURE-ARMOR v1
   | `eph_pub`, `key_nonce`, `key_ct` | The sealed file key: ephemeral X25519 public key, nonce, and the AEAD-sealed file key. **Inside the signed canonical frame** — swapping the key block breaks the signature (proven under attack; see the test suite). |
   | `file_nonce` | The content AEAD nonce. |
   | `sig` | Ed25519 signature over the canonical frame + body hash. |
-  | `sig_pq` | **(v4)** ML-DSA-65 signature over the same data. A v4 frame verifies only when BOTH signatures verify. |
-  | `kem_alg`, `kem_ct` | **(v4)** `ML-KEM-768` and the 1088-byte KEM ciphertext of the hybrid key seal (below). Inside the signed canonical frame — stripping it breaks both signatures and the unseal. |
-  | `sender_mldsa_fp`, `sender_mldsa_pub` | **(v4)** The sender's ML-DSA-65 fingerprint and public key. |
-  | `recipient_kem_fp` | **(v4)** SHA-256 fingerprint of the recipient's ML-KEM-768 public key — the KEM half of the copy this package was sealed to. The daemon refuses a v4 package whose KEM half names a different copy. |
 
-  **The post-quantum closure (v4, shipped).** Earlier versions named
-  two classical parts and called them swappable: the Ed25519 frame
-  signature and the X25519 key seal. Naming a swap is not shipping
-  one, so v4 shipped both. The key seal is now **hybrid**: X25519 ECDH
-  *and* ML-KEM-768 encapsulation, the two shared secrets concatenated
-  into a single HKDF — an attacker must break both, so a future
-  quantum machine that shatters X25519 still faces the ML-KEM secret,
-  and harvest-now/decrypt-later is closed for every v4 package. The
-  frame is **dual-signed**: Ed25519 *and* ML-DSA-65 over the same
-  signed data; a v4 frame whose PQ signature or KEM block is stripped
-  does not verify and does not open — downgrade is a refusal, never a
-  fallback. Sealing to a pre-v4 identity (no ML-KEM key) is refused
-  for the same reason. Pre-v4 identities gain PQ keys automatically,
-  in place, the first time they are loaded — seal/sign fingerprints,
-  trust relationships, and registry entries are untouched. Legacy
-  v1–v3 packages still open, under exactly the cryptography they were
-  honestly sealed with; re-seal them to move them under v4. The
-  runtime requirement moved with the math: **Node ≥ 24** (ML-KEM /
-  ML-DSA in the standard library), and the armor fails closed on a
-  runtime that lacks them rather than sealing classical-only.
-
-## Also shipped with v4 (the register, closing)
-
-- **First contact (M.17).** `trust` now records an *introduction* —
-  who introduced the identity, when, and a pairing SAS (Short
-  Authentication String) computed over the peer's FULL key material,
-  classical and post-quantum — printed at pairing time for the two
-  humans to compare out-of-band. Re-trusting an existing label with
-  different key material is refused outright: an introduction is
-  replaced only by an explicit `untrust` first, never overwritten in
-  silence.
-- **Defenses that can't be fired at the owner (M.19).** The daemon
-  budgets its own surfaces: pendings per origin are capped at 32
-  (excess is shed and *counted* — the owner sees a count in the log,
-  not a flood of approvals) and registrations per sender are capped
-  per hour (registry bloat is a cost, so it is budgeted). Quarantine
-  and beacon decisions continue to require authenticated events;
-  unauthenticated noise dies at the signature gate before any state
-  is touched.
-- **The scanner's verdict is evidence, not a gate (M.11/M.12).** A
-  Ghidra verdict can refuse a wrap and can demand the owner's
-  override, but no verdict — clean or dirty — changes what an
-  activated program *is*: code runs inside cells under the cell
-  tiers' confinement, and content crossing inward arrives as data on
-  a channel that cannot command. A document that scans clean can
-  still be a lie; the armor governs crossings, not meanings, and
-  says so.
-- **No orphan packages (adoption).** `FORMAT.md` specifies the
-  package format (v1–v4) completely, and `open-standalone.mjs` — a
-  single file importing nothing from this codebase — opens every
-  version. If this project died tomorrow, your packages would not
-  die with it.
+  **Honest framing, again: Ed25519 is classical public-key
+  cryptography** — the same family whose long-term future is in
+  question. It is used here only for sender authentication and
+  tamper-evidence, never to protect content, and it is the designated
+  swappable part: if a post-quantum signature scheme needs to replace
+  it, the frame format is where that swap lands, and nothing else in
+  the design moves. Content confidentiality rests on symmetric AEAD and
+  the X25519-sealed key — and note the seal itself is classical ECDH; a
+  future hybrid (X25519 + ML-KEM) key-seal is the corresponding swap on
+  that side. Both swaps are named here, in the open, rather than
+  discovered later.
 
 ## The closed loop in operation
 
@@ -232,12 +145,8 @@ sealed for: `{canary, sha256, recipient_seal_fp, sender_sign_fp,
 expiry, issued_at}` per package (repo mode registers every part and the
 manifest). The daemon records it in its **issued-hash registry**
 (`registry.json` in its identity dir, mode 0600, rewritten atomically
-on every change and held in memory — re-read whenever the file
-changes on disk — so registrations survive daemon restarts). The
-registry, the address book's key material, and the identity itself
-carry HMAC integrity tags keyed from the identity: an outside edit
-to any of the three stores is detected on load and fails closed
-rather than passing in silence. Registration is bound to the daemon's own
+on every change and re-read on every operation, so registrations
+survive daemon restarts). Registration is bound to the daemon's own
 identity: an entry whose recipient is a different copy is refused, and
 re-registering a canary with a different hash or expiry is refused as a
 conflict.
@@ -254,19 +163,6 @@ node armor.mjs register somefile.scripture --socket <daemon-socket>
 Until an issuance syncs, the daemon refuses that package as
 *never-issued*. That is the doctrine working as designed: the loop only
 opens what it knows it sent out.
-
-The queue is not invisible while it waits: `armor.mjs identity` and
-the daemon's owner status report how many issuances sit unsynced and
-how old the oldest is, and a new wrap flushes the queue before it
-proceeds whenever the daemon is reachable. If the queue itself is
-ever lost, the refusal is no longer a dead end either: the package
-still beacons *never-issued* — the testimony never changes — but when
-its frame signature verifies and its sender is this copy or a trusted
-peer, the daemon also records a **recovery candidate**. Only the
-owner's explicit approval on the owner channel (`vaultd.mjs
-recovery`, then `vaultd.mjs approve --id …`) derives the issuance
-from the package itself, registers it, and opens it. A presentation
-alone never registers anything.
 
 ### Transit — containment
 
@@ -418,14 +314,9 @@ that, the restore path is hardened, in this order:
   presented, that scale travels with the request and appears in the
   pending entry the owner approves — a manifest that would restore
   20,000 files says so *before* the owner approves it. The sidecar is
-  **advisory and untrusted**: before the manifest's one-shot return is
-  spent, the manifest is opened verify-only — every gate and the
-  owner's approval, but no consumption — and the sidecar's declared
-  counts are cross-checked against the sealed manifest. Any
-  divergence aborts the restore with the manifest's return unburned:
-  fix the sidecar and re-run. (The cross-check once ran only after
-  the consuming open, so a corrupted sidecar burned the manifest
-  permanently; the verify-first order is the fix.) Trees
+  **advisory and untrusted**: after the manifest is opened, its
+  declared counts are cross-checked against the sealed manifest, and
+  any divergence aborts the restore before anything is written. Trees
   wrapped before the sidecar existed declare nothing in the prompt —
   their counts are still validated against themselves (next point) —
   and the prompt says exactly that.
@@ -452,125 +343,6 @@ On the loop's machine (the matching copy):
 node vaultd.mjs serve                     # socket: ~/.scripture-armor/vaultd.sock
 node vaultd.mjs serve --out-dir ~/vault-out --approval-window-ms 120000
 ```
-
-### Default install posture — always-on vaultd
-
-**The vault daemon is always on by default.** A daemon that only runs
-when somebody remembers to start it is not a boundary keeper, so the
-standard install registers `vaultd` as a boot-level service wherever
-the tree ships a service path:
-
-| Platform | Default service registration |
-|---|---|
-| **macOS** | **Implemented — the default.** `mac/install-armor.sh` installs vaultd as a system **LaunchDaemon** (`org.ronininc.scripture-vaultd`, `RunAtLoad` + `KeepAlive`): started by launchd at boot, **before any login**, running as the owner user, surviving logout. A pre-existing per-user LaunchAgent install is booted out and its plist is moved aside as a backup, never deleted. |
-| **Linux** | **Implemented — the default.** `linux/install-armor.sh` installs vaultd as a system **systemd service** (`scripture-vaultd.service`, enabled for `multi-user.target`, `Restart=always`): started by systemd at boot, **before any login**, running as the owner user, surviving logout. The unit is hardened and health-gated (its start completes only when vaultd's own status answer comes back), and refuses to restart-loop configuration-class exits (78) — corrected 2026-10-26 against the ecosystem's original pattern, Solomon's `solomon.service`; the per-user twin is `scripture-vaultd-user.service`. A pre-existing per-user unit install is disabled and its file moved aside as a backup, never deleted. |
-| **Windows** | **Implemented — the default; NOT YET RUN on a live Windows host.** `windows/install-armor.ps1` registers vaultd as a **Task Scheduler boot task** (`ScriptureArmorVaultd`, AtStartup trigger, S4U principal: runs as the owner, no stored password, before any login; restart-on-failure without limit). See the Windows hosting note below for why a boot task and not an SCM service, and for what is unverified. A pre-existing fallback logon task is exported to an XML backup, never silently deleted. |
-
-**Windows hosting note.** Stock Windows cannot run a Node script as a
-true Service Control Manager service without a service-host binary,
-and none (WinSW / NSSM / node-windows) ships anywhere in this
-ecosystem — so the Windows default is a Task Scheduler boot task,
-which delivers the same posture (boot, pre-login, owner identity,
-restart-on-failure) through the mechanism the platform actually
-provides. Two honesty labels, also printed by the installer itself:
-the Windows installer has been statically reviewed but **not run on
-Windows** (no Windows host was available), and vaultd's control
-channel is a Unix-domain socket path — `vaultd.mjs` carries no
-Windows named-pipe path — so the daemon's socket behavior on Windows
-is unverified. The installer's identity step is plain Node file I/O
-and cross-platform; the daemon's first live Windows run is the open
-item.
-
-**Designated hosts (macOS).** On a host designated as an always-on
-armor node, the standard install also sets the system sleep policy so
-sleep and lid-close cannot take the daemon down:
-
-```sh
-bash mac/install-armor.sh --designated-host
-# (or: SCRIPTURE_ARMOR_DESIGNATED_HOST=1 bash mac/install-armor.sh)
-```
-
-That runs `pmset -a disablesleep 1` — and the installer **prints**
-that it did, with the revert (`sudo pmset -a disablesleep 0`). No
-system change is made silently: the daemon install, the agent
-migration, and the sleep-policy change are each printed as they
-happen, and a non-designated install leaves sleep untouched and says
-so.
-
-**Designated hosts (Linux).** `bash linux/install-armor.sh
---designated-host` masks the systemd sleep targets — the standard
-systemd mechanism:
-
-```sh
-sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
-# revert: sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target
-```
-
-The installer prints the change and the revert as it makes it;
-without the flag, sleep is untouched and the installer says so. The
-per-user fallback cannot change system sleep.
-
-**Designated hosts (Windows).** `windows\install-armor.ps1
--DesignatedHost` sets the AC standby and hibernate timeouts to
-never:
-
-```powershell
-powercfg /change standby-timeout-ac 0
-powercfg /change hibernate-timeout-ac 0
-# revert: powercfg /change standby-timeout-ac <minutes> (and hibernate-timeout-ac likewise)
-```
-
-The installer prints the change as it makes it — including the
-previous standby value for the revert when it could be read — and
-leaves the power plan untouched, saying so, without the flag. The
-logon-task fallback cannot change the power plan.
-
-**Opting out (macOS).** The always-on daemon is the default, not a
-trap:
-
-- Lighter fallback (starts at login, can be stopped by logout/sleep):
-  `bash mac/install-armor.sh --user-agent` — a per-user LaunchAgent.
-- No service at all: `bash mac/install-armor.sh --no-daemon`
-  (or `SCRIPTURE_ARMOR_DAEMON=off`). vaultd then runs only when
-  started manually: `node vaultd.mjs serve`.
-- Removing the default daemon later:
-  `sudo launchctl bootout system /Library/LaunchDaemons/org.ronininc.scripture-vaultd.plist`
-  and delete that plist; restore sleep with
-  `sudo pmset -a disablesleep 0` if the designated-host policy was set.
-
-**Opting out (Linux).** The same three postures, same flag shapes:
-
-- Lighter fallback (starts with your systemd user session — at boot
-  only if you enable linger as root, `loginctl enable-linger
-  <user>`): `bash linux/install-armor.sh --user-service` — the
-  per-user twin unit (`scripture-vaultd-user.service`).
-- No service at all: `bash linux/install-armor.sh --no-daemon`
-  (or `SCRIPTURE_ARMOR_DAEMON=off`). Manual foreground:
-  `node vaultd.mjs serve`.
-- Removing the default service later:
-  `sudo systemctl disable --now scripture-vaultd`, delete
-  `/etc/systemd/system/scripture-vaultd.service`, then
-  `sudo systemctl daemon-reload`; restore sleep with
-  `sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target`
-  if the designated-host policy was set.
-
-**Opting out (Windows).** The same three postures:
-
-- Lighter fallback (starts at login, ends at logoff):
-  `windows\install-armor.ps1 -UserTask` — the
-  `ScriptureArmorVaultdLogon` task.
-- No task at all: `windows\install-armor.ps1 -NoDaemon`
-  (or `SCRIPTURE_ARMOR_DAEMON=off`). Manual foreground:
-  `node vaultd.mjs serve`.
-- Removing the default task later:
-  `Unregister-ScheduledTask -TaskName ScriptureArmorVaultd -Confirm:$false`;
-  restore the power plan with
-  `powercfg /change standby-timeout-ac <minutes>` (and
-  `hibernate-timeout-ac` likewise) if the designated-host policy
-  was set.
-
-The manual `serve` commands above remain the way to run the daemon in
-the foreground (development, or under Kingmaker's launcher).
 
 Request an unwrap (from the same host), then approve it as the owner:
 
@@ -663,17 +435,6 @@ recipient, signature validity — **without** unwrapping, and beacons
 | `<file>.scripture` | a wrapped package — inert anywhere else |
 | `<dir>.scripture-repo/` | a wrapped repo: `MANIFEST.scripture` + `RESTORE-INFO.json` + `files/…` |
 | `dns-profiles/` | DNS configuration profiles for phones and computers (below) |
-| `mac/install-armor.sh` | the standard Mac install — identity + the default always-on daemon (below, *Default install posture*) |
-| `mac/install-daemon.sh` | renders + installs the vaultd service (system LaunchDaemon by default; LaunchAgent only as explicit fallback) |
-| `mac/org.ronininc.scripture-vaultd.plist` | the launchd template the daemon installer renders with the owner's paths |
-| `/Library/LaunchDaemons/org.ronininc.scripture-vaultd.plist` | the installed default daemon (macOS, after install) |
-| `linux/install-armor.sh` | the standard Linux install — identity + the default always-on daemon |
-| `linux/install-daemon.sh` | renders + installs the vaultd service (system systemd service by default; per-user twin unit only as explicit fallback) and verifies the start against vaultd's own status answer |
-| `linux/scripture-vaultd.service` | the system systemd unit template the daemon installer renders with the owner's paths (hardened, health-gated; corrected against Solomon's `solomon.service`) |
-| `linux/scripture-vaultd-user.service` | the per-user twin unit template (fallback posture; same health gate + restart discipline, no hardening block) |
-| `/etc/systemd/system/scripture-vaultd.service` | the installed default service (Linux, after install) |
-| `windows/install-armor.ps1` | the standard Windows install — identity + the default always-on boot task (Task Scheduler; not yet run on a live Windows host) |
-| `ScriptureArmorVaultd` (Task Scheduler task) | the installed default boot task (Windows, after install) |
 
 ## DNS: the agnostic-tracks surface for traffic
 
@@ -748,12 +509,12 @@ content whose movement you must be able to *testify* about: what left,
 when, under which hash, and what came back. The attacker is assumed to
 hold the `.scripture` packages forever and to throw offline compute at
 them. Against that attacker, confidentiality rests on ChaCha20-Poly1305
-with a random per-package key, sealed by a hybrid X25519 + ML-KEM-768
-key seal (v4) — symmetric AEAD has the large margin cryptographers
-point to when they warn about the public-key side, which is why the
-design puts the content there and says so plainly; the frame's
-signatures (Ed25519, and ML-DSA-65 on v4) are authentication only and
-never carry confidentiality.
+with a random per-package key, sealed by X25519 ECDH — symmetric AEAD
+has the large margin cryptographers point to when they warn about the
+public-key side, which is why the design puts the content there and
+says so plainly (and why the two classical-public-key parts — the
+Ed25519 frame signature and the X25519 seal — are authentication and
+transport only, named as swappable).
 
 **What this is not.**
 - Not protection against compromise of the loop's own machine. Whoever
@@ -762,19 +523,13 @@ never carry confidentiality.
   issued. Guard both like the crown jewels; the identity needs its own
   cold, sealed backup, and a lost vault identity means every package
   sealed to it is gone forever, by design.
-- The loop's own records are local files — stated plainly, with one
-  part now closed. The **issued-hash registry** (`registry.json`) and
-  the **registration outbox** (`registry-outbox.jsonl`) carry no
-  signature or MAC: the daemon trusts them as written, and a forged
-  registry or outbox entry would be believed. The **testimony log**
-  (`vaultd.log`) is no longer in that class: every record is a link
-  in an HMAC-sealed hash chain keyed from the daemon's identity —
-  alter, insert, reorder, or truncate a line and
-  `vaultd.mjs log-verify` names the exact line where the chain
-  breaks — and on daemon start the closed log is rotated into
-  `log-segments/`, sealed as an ordinary v4 package to the same
-  identity, so history at rest is ciphertext. (`beacon.log`, the
-  CLI-side beacon record, remains a plain append-only file.) Their only protection is the store
+- The loop's own records are unauthenticated local files — stated
+  plainly. The **issued-hash registry** (`registry.json`), the
+  **registration outbox** (`registry-outbox.jsonl`), and the
+  **testimony logs** (`vaultd.log`, `beacon.log`) carry no signature,
+  MAC, or hash chain: the daemon trusts them as written, and a forged
+  registry or outbox entry would be believed, just as erased log
+  lines would not be missed. Their only protection is the store
   itself — identity directory mode 0700, files mode 0600, one owner's
   uid. This is a known limit, not an oversight that snuck in: an
   attacker who can write inside the store already holds the very
@@ -789,13 +544,12 @@ never carry confidentiality.
   ones recorded at egress. A package from outside the loop is refused
   as never-issued no matter how beautiful its signature is.
 - Not metadata privacy. Frames are cleartext by design
-  (inspect-without-unwrap): canary, dates, and sender and recipient
-  fingerprints are visible. (v1/v2 frames also carry the plaintext
-  SHA-256 — a guessing oracle, and the reason v3 replaced it with a
-  keyed commitment that only the recipient can compute; v3/v4 frames
-  expose no content-derived value at all.) In repo mode the wrapped
+  (inspect-without-unwrap): canary, dates, plaintext SHA-256, sender
+  and recipient fingerprints are visible. In repo mode the wrapped
   tree also preserves the source tree's relative paths. Content is
-  sealed; structure is visible.
+  sealed; structure and hashes are visible. If your hashes are
+  themselves sensitive (they can confirm a guessed plaintext), don't
+  publish the packages.
 - Not a phone-home. The canary is an identifier, not a transmitter.
   Nothing in this tool calls out. The beacon fires when the packet
   *wakes on an observed network*: when it is presented to a daemon of
@@ -847,23 +601,13 @@ prompt, a 20,000-zero-byte-file flood restored only under an informed
 approval); `trust` refusing garbage; store permissions; and the
 `dns-profiles/` templates parsing with their placeholders intact.
 
-The full battery across every suite — `run-tests.mjs`,
-`run-tests-v2-scan.mjs`, `run-tests-v2-cell.mjs`,
-`run-tests-v2-airlock.mjs`, `run-tests-v2-estate.mjs`,
-`run-tests-v2-phase4.mjs`, `run-tests-v4-pq.mjs`, and
-`run-tests-gemini-fix.mjs` — totals **431 checks** (53 + 83 + 94 +
-61 + 27 + 68 + 22 + 23; the scan suite additionally defers 4 checks
-to the cell suite).
-
 ## License
 
-**Proprietary — see `LICENSE`.** Scripture Armor is private,
-commercial software: not free, and not open source. Access is
-application-gated — membership is arranged in direct conversation
-with Ronin Inc ($99 per month), and there is no self-serve
-checkout. Membership covers improvements: if a membership lapses,
-the version you already hold keeps working in full; only future
-upgrades stop. What you wrap in the armor stays yours.
+**Undecided — see `LICENSE`.** This package is being prepared for
+public release; the license choice is the author's and is deliberately
+left open in this tree. Do not treat the absence of a license as a
+grant: until a license file replaces the placeholder, all rights are
+reserved by default operation of law.
 
 ## Origin
 
@@ -871,28 +615,3 @@ Designed by Robbie Glover (Ronin Inc) — Scripture Armor: a closed loop
 that generates a hash as information leaves, wraps it in unreadable,
 untranslatable glyphs under symmetric math, and waits for the return
 hash to match.
-
-## Product stores and release prerequisites
-
-The recovered source ships `product.json` with `product: kingmaker`; its default
-store and service labels are namespaced to Kingmaker. The standalone builder
-ships `product: standalone`, selecting `~/.scripture-armor` and its separate
-service identity. CLI, dashboard, launcher, daemon and generated Mac/Linux service
-files use this policy. Both modes reject the opposite product store, including
-directory aliases, before reading keys. Custom stores require explicit paths.
-The independent frozen opener always requires an explicit absolute
-`--identity-dir`; it never guesses an installation or starts a daemon.
-
-The bundle records prerequisite versions, native hash and executable modes.
-It still requires a supported installed Node runtime and does not claim signing,
-notarization or operating-system service installation. Use the real Ghidra bad/clean
-regressions in addition to prerequisite startup checks. Mac activation cells remain
-unavailable; static analysis and separate stores do not create an isolated VM
-or stop an unrestricted same-user process from reading owner-accessible files.
-
-Activation also reserves billing capacity at the fixed Ronin installation endpoint
-before creating an identity, accepting terms or moving credentials. A private
-256-bit installation identifier persists in a sibling `.installation` metadata
-directory outside the vault. A quota refusal leaves the vault uncreated. This
-is a billing reservation only, never a device certificate or TEST/CLEAN/SEAL
-admission receipt; copying metadata is not physical-device attestation.

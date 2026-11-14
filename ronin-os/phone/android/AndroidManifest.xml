@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ronin OS hosted mounting, Android (amendment §2). Honest platform facts baked into the manifest:
+     - The always-on presence is a FOREGROUND service with a persistent notification — Android has
+       no invisible daemon for user apps, and this design does not pretend otherwise.
+     - foregroundServiceType=dataSync; on Android 14+ the type is declared and permission-gated.
+     - Battery: OEM task killers (Samsung/Xiaomi et al.) can still kill the service; the mitigation
+       is the owner's own act (battery-optimization exemption, REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+       opens the system dialog — the app cannot grant it to itself), named in IOS-WALLS' sibling
+       notes and in the build report, not hidden. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.ronininc.ronin">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <application android:label="Ronin OS" android:usesCleartextTraffic="false">
+        <activity android:name=".RoninActivity" android:exported="true"
+                  android:launchMode="singleTask" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <service android:name=".RoninService" android:exported="false"
+                 android:foregroundServiceType="dataSync" />
+    </application>
+</manifest>

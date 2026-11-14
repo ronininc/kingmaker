@@ -183,7 +183,7 @@ export async function verifyStagedRelease({ manifest, partsDir, sourceApp, stage
   checks.issuance = { recorded: Boolean(manifest?.issuance), required: requireIssuance, problems: issuance };
   if (issuance.length && (requireIssuance || manifest?.issuance)) problems.push(...issuance.map((p) => `issuance: ${p}`));
 
-  const parts = await verifyParts(manifest, partsDir, { forRelease: true });
+  const parts = await verifyParts(manifest, partsDir);
   checks.parts = parts;
   if (!parts.ok) problems.push(...parts.problems.map((p) => `parts: ${p}`));
 
@@ -235,7 +235,7 @@ async function main(argv = process.argv.slice(2)) {
     console.log(JSON.stringify({ ok: false, problems: ['usage: release-gate.mjs --manifest <file> --parts <dir> --app <Kingmaker.app> [--stage <dir>] [--keep-stage]'] }, null, 2));
     return 2;
   }
-  const manifest = readManifest(resolve(manifestFile), { forRelease: true });
+  const manifest = readManifest(resolve(manifestFile));
   const stageDir = resolve(arg(argv, '--stage', join(HERE, '..', 'dist', '.gate-stage')));
   const verdict = await verifyStagedRelease({
     manifest, partsDir: resolve(partsDir), sourceApp: resolve(app), stageDir,

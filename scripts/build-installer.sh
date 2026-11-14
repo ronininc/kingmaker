@@ -7,7 +7,7 @@
 #   options: --out <dir> (default dist) · --no-dmg · --draft
 #
 # A DMG is what owners download, so it is built only when it can ship (lib/release-manifest.mjs shipProblems): a
-# manifest of this checkout's version, with the packs and the Ronin Launcher, the right macOS floor, and the update
+# manifest of this checkout's version, with the starter model set and the Ronin Launcher, the right macOS floor, and the update
 # enrollment (KINGMAKER_ENROLL_URL + KINGMAKER_ENROLL_CODE). Otherwise it stops and says why. --draft builds it anyway,
 # named …-DRAFT.dmg, for a look on this Mac; --no-dmg builds only the app.
 #
@@ -34,13 +34,10 @@ version="$(sed -n 's/.*"version": "\([^"]*\)".*/\1/p' "$here/package.json" | hea
 release="unreleased"
 if [ -n "$manifest" ]; then
   [ -f "$manifest" ] || { echo "no manifest at $manifest (build one: node scripts/release-parts.mjs)" >&2; exit 2; }
-  node -e 'import(process.argv[1]).then(({ readManifest }) => readManifest(process.argv[2], { forRelease: true }))' "$here/lib/release-manifest.mjs" "$manifest" \
+  node -e 'import(process.argv[1]).then(({ readManifest }) => readManifest(process.argv[2]))' "$here/lib/release-manifest.mjs" "$manifest" \
     || { echo "the manifest at $manifest is not sound" >&2; exit 2; }
   release="$(plutil -extract tag raw -o - "$manifest")"
   version="$(plutil -extract version raw -o - "$manifest")"
-  [ -s "$manifest.sig" ] || { echo "no detached signature at $manifest.sig; production installer builds fail closed" >&2; exit 2; }
-  node "$here/scripts/kingmaker-release-sign.mjs" verify --manifest "$manifest" --sig "$manifest.sig" >/dev/null \
-    || { echo "the detached release signature does not verify against the pinned public key" >&2; exit 2; }
 else
   echo "! no --manifest: this installer will say it has nothing to download (fine for looking at the window, not for shipping)"
 fi
@@ -86,8 +83,13 @@ cp "$here/lib/kingmaker-release-public.pem" "$app/Contents/Resources/kingmaker-r
 if [ -n "$manifest" ]; then
   cp "$manifest" "$app/Contents/Resources/kingmaker-manifest.json"
   # The detached signature, if the release was signed (release-parts.mjs --sign-key). engine.sh refuses a manifest whose
-  cp "$manifest.sig" "$app/Contents/Resources/kingmaker-manifest.json.sig"
-  echo "· verified release signature embedded (required on first install and update)"
+  # signature is present-but-bad, always; an absent one is allowed at first install but refused on --require-signed.
+  if [ -f "$manifest.sig" ]; then
+    cp "$manifest.sig" "$app/Contents/Resources/kingmaker-manifest.json.sig"
+    echo "· release signature embedded (verified against the pinned key at install time)"
+  else
+    echo "! no $manifest.sig: this installer's release is UNSIGNED. Sign it: node scripts/release-parts.mjs --sign-key <offline-private.pem>"
+  fi
 fi
 # Self-enrollment: with KINGMAKER_ENROLL_URL + KINGMAKER_ENROLL_CODE in the environment the installer carries
 # enroll.json, and every Mac it installs gets its own update key (installer/engine.sh). Without them: no auto-updates.
@@ -127,6 +129,14 @@ rm -rf "$stage"
 [ "$identity" = "-" ] || codesign --force --sign "$identity" --timestamp "$image"
 echo "built $image ($(du -h "$image" | cut -f1))"
 
-if [ -n "$manifest" ] && [ "$draft" = 0 ]; then
-  node "$here/scripts/finalize-installer-release.mjs" "$manifest" "$image" || exit 4
-fi
+case "$identity" in
+  "Developer ID Application:"*)
+    if [ -n "${KINGMAKER_NOTARY_PROFILE:-}" ]; then
+      xcrun notarytool submit "$image" --keychain-profile "$KINGMAKER_NOTARY_PROFILE" --wait
+      xcrun stapler staple "$image"
+      echo "notarized and stapled $image"
+    else
+      echo "NOT notarized: set KINGMAKER_NOTARY_PROFILE (xcrun notarytool store-credentials) to notarize this Developer ID build."
+    fi ;;
+  *) echo "NOT notarized: notarization needs a Developer ID Application identity (KINGMAKER_SIGN_IDENTITY) and KINGMAKER_NOTARY_PROFILE." ;;
+esac

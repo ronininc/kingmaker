@@ -1,0 +1,8 @@
+#!/bin/sh
+# ronin-frame — the thin native frame (Phase 1 bake-off decision): start the loopback surface
+# server, then present it in the system webview. No bundled engine, no Node in the renderer.
+set -eu
+node /usr/lib/ronin-os/server-main.mjs &
+SERVER_PID=$!
+trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
+exec /usr/libexec/ronin/ronin-webview --url http://127.0.0.1:8931/

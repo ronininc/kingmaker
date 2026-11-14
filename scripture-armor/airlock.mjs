@@ -28,7 +28,7 @@ import net from 'node:net';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { classifyBuffer, scanFile, loadPolicy } from './scan.mjs';
+import { classifyBuffer, scanFile } from './scan.mjs';
 
 function sha256Hex(buf) {
   return crypto.createHash('sha256').update(buf).digest('hex');
@@ -75,23 +75,6 @@ let messageCount = 0;
 let stagedSeq = 0;
 let idleTimer = null;
 
-// Custody bookkeeping: every staged item is UNSETTLED from the moment
-// its bytes land in the chamber until the daemon's disposition reply
-// (in-crossed / quarantined / drop) seals, quarantines, or refuses it
-// — or its own scan-error testimony records why it never crossed. A
-// session must never close over unsettled custody: a close requested
-// while items are unsettled is DEFERRED until the last disposition
-// lands, so a scan that outlives its session (a peer dying mid-scan
-// is the measured case) still produces its verdict, its quarantine,
-// and its beacon — never a silent drop. Custody still unsettled when
-// a close can no longer wait is testified to the daemon per item
-// (airlock-protocol) BEFORE any chamber wipe: sight, not strike, and
-// never silent loss.
-const unsettled = new Map(); // staged id -> { sha256, bytes }
-let pendingClose = null;
-let closeFailsafe = null;
-const CLOSE_FAILSAFE_MS = 10 * 60 * 1000;
-
 function ctrlSend(obj) {
   try { ctrl?.write(JSON.stringify(obj) + '\n'); } catch {}
 }
@@ -104,43 +87,9 @@ function wipeChamber() {
   } catch {}
 }
 
-function persistCustodyTestimony(reason) {
-  // F-06b: the control channel is best-effort — ctrlSend swallows
-  // write failures and the daemon may already be gone — so before
-  // the chamber is wiped, stranded-custody testimony is persisted
-  // LOCALLY, synchronously, in the session dir. The daemon
-  // reconciles the file before removing the dir (vaultd
-  // reconcileCustodyTestimony); if the daemon is gone too, the file
-  // remains as the durable record of what was destroyed unsealed.
-  if (unsettled.size === 0) return;
-  const lines = [...unsettled.values()].map((item) => JSON.stringify({
-    type: 'custody-unsettled', reason, sha256: item.sha256, bytes: item.bytes,
-    at: new Date().toISOString(),
-  }));
-  try {
-    const fd = fs.openSync(path.join(SDIR, 'custody-testimony.jsonl'), 'a', 0o600);
-    try { fs.writeSync(fd, lines.join('\n') + '\n'); fs.fsyncSync(fd); } finally { fs.closeSync(fd); }
-  } catch {}
-}
-
-function finalizeClose(reason) {
+function closeSession(reason) {
   if (closed) return;
   closed = true;
-  if (closeFailsafe) { clearTimeout(closeFailsafe); closeFailsafe = null; }
-  persistCustodyTestimony(reason);
-  // Testify any custody whose disposition never settled BEFORE the
-  // wipe: the daemon records a violation and a beacon per stranded
-  // item, naming its digest. The bytes are destroyed unsealed (this
-  // process holds no keys and cannot seal them itself) — but the
-  // loss is on the record, never silent.
-  for (const item of unsettled.values()) {
-    ctrlSend({
-      type: 'violation', reason_class: 'airlock-protocol',
-      sha256: item.sha256, bytes: item.bytes,
-      detail: `session closed (${reason}) with a custody disposition unsettled; staged bytes destroyed unsealed`,
-    });
-  }
-  unsettled.clear();
   wipeChamber();
   try { peerConn?.destroy(); } catch {}
   try { peerServer.close(); } catch {}
@@ -148,40 +97,6 @@ function finalizeClose(reason) {
   // Give the daemon a beat to record the close, then exit: a dead
   // airlock is the failure mode, by construction.
   setTimeout(() => process.exit(0), 150);
-}
-
-function closeSession(reason, { disposition = false, immediate = false } = {}) {
-  if (closed) return;
-  if (!immediate && !disposition && unsettled.size > 0) {
-    // DEFERRED close: custody is mid-disposition (typically a scan
-    // still running). Stop intake, keep the chamber, and hold the
-    // close until the last staged item settles (settleStaged). The
-    // first requested reason stands; a disposition close (the
-    // daemon's 'quarantined' reply) still takes precedence when it
-    // lands. The failsafe bounds the wait and testifies whatever is
-    // stranded (finalizeClose), so the session can never hang open
-    // over custody either.
-    if (!pendingClose) {
-      pendingClose = reason;
-      try { peerServer.close(); } catch {}
-      try { peerConn?.destroy(); } catch {}
-      closeFailsafe = setTimeout(() => finalizeClose(pendingClose || reason), CLOSE_FAILSAFE_MS);
-    }
-    return;
-  }
-  finalizeClose(reason);
-}
-
-// A staged item's disposition has landed (the daemon replied, or its
-// scan error testified it). If a close was deferred over custody and
-// this was the last unsettled item, the close now proceeds.
-function settleStaged(id) {
-  if (!unsettled.delete(id)) return;
-  if (pendingClose && unsettled.size === 0) {
-    const reason = pendingClose;
-    pendingClose = null;
-    finalizeClose(reason);
-  }
 }
 
 function bumpIdle() {
@@ -247,11 +162,6 @@ function classAdmitted(cls, payload) {
 
 async function handleInbound(payload) {
   if (closed) return;
-  // A close has been requested (and is deferred over unsettled
-  // custody): intake is stopped. Frames still sitting in the read
-  // buffer never enter custody — they reached no gate and cross
-  // nothing, the same status as a partial frame at peer death.
-  if (pendingClose) return;
   messageCount += 1;
   if (messageCount > LIMITS.max_messages) { closeSession('budget'); return; }
   // (1) SIZE gate — over the frame cap is a violation, dropped whole.
@@ -276,22 +186,15 @@ async function handleInbound(payload) {
   // scanned (and missed) as data.
   const stagedPath = path.join(CHAMBER_DIR, `in-${id}.${stagedExtFor(cls, payload)}`);
   fs.writeFileSync(stagedPath, payload, { mode: 0o600 });
-  // The bytes are in custody from this moment: the session cannot
-  // close over them until their disposition lands (see unsettled).
-  unsettled.set(id, { sha256: sha256Hex(payload), bytes: payload.length });
   let record = null;
   // (2) SCAN gate — executable-class content is scanned on the CHAMBER
   // copy (Closure 1's lanes) before anything crosses (SPEC §3.2, A.3).
   if (cls === 'binary' || cls === 'source') {
     try {
-      record = (await scanFile(stagedPath, { storeDir: SDIR, policy: loadPolicy(SDIR) })).record;
+      record = (await scanFile(stagedPath, { storeDir: SDIR })).record;
     } catch (e) {
       fs.rmSync(stagedPath, { force: true });
-      // The scan error IS this item's disposition — a violation on
-      // the record (testimony), then settled: the bytes were refused
-      // at the gate and destroyed, and the daemon's log says so.
       violation('airlock-protocol', { bytes: payload.length, detail: `scan failed: ${e.message}` });
-      settleStaged(id);
       return;
     }
     if (record.verdict === 'critical') {
@@ -306,7 +209,7 @@ async function handleInbound(payload) {
   } else {
     // Data-class: the canonical data record (digestible, tier 0) so the
     // crossing still carries a sealed scan block (SPEC §1.4).
-    record = (await scanFile(stagedPath, { storeDir: SDIR, policy: loadPolicy(SDIR) })).record;
+    record = (await scanFile(stagedPath, { storeDir: SDIR })).record;
   }
   // (3) WRAP-ON-ENTRY happens in the daemon (it holds the keys): hand
   // over the staged bytes; the daemon seals, registers, testifies, and
@@ -396,16 +299,7 @@ function handleCtrl(msg) {
         if (f.startsWith(`in-${msg.id}.`)) fs.rmSync(path.join(CHAMBER_DIR, f), { force: true });
       }
     } catch {}
-    if (msg.type === 'quarantined') {
-      // First strike is the disposition that ends the session: it
-      // takes precedence over any deferred close (e.g. the peer died
-      // mid-scan and 'peer-gone' is pending) — the record must say
-      // the session died of the strike, not of the peer's exit.
-      unsettled.delete(msg.id);
-      closeSession('violations-scan', { disposition: true });
-    } else {
-      settleStaged(msg.id);
-    }
+    if (msg.type === 'quarantined') closeSession('violations-scan');
     return;
   }
   if (msg.type === 'close') {
@@ -423,8 +317,5 @@ ctrlServer.listen(CTRL_SOCK, () => {
 bumpIdle();
 
 // The supervisor's hammer: if the daemon vanishes, do not linger.
-// Immediate even over unsettled custody — with the supervisor gone
-// there is no one left to seal or testify to, and the daemon's own
-// record of the session's fate is the testimony that remains.
-process.on('SIGTERM', () => closeSession('supervisor-gone', { immediate: true }));
-process.on('SIGINT', () => closeSession('supervisor-gone', { immediate: true }));
+process.on('SIGTERM', () => closeSession('supervisor-gone'));
+process.on('SIGINT', () => closeSession('supervisor-gone'));

@@ -22,7 +22,7 @@ import { buildPlan, loadCorpus, syntheticCorpus } from '../proof/workload.mjs';
 import { createCountingTransport, createOllamaTransport } from '../proof/transport.mjs';
 import { runProof, renderMarkdown } from '../proof/run-proof.mjs';
 import { TARGET_TOK_S, DEFAULT_TOTAL_TOKENS } from '../proof/report-schema.mjs';
-import { classRole } from '../lib/mac-profiles.mjs';
+import { floorRole } from '../lib/mac-profiles.mjs';
 import { prewarmModels, prewarmReflex } from '../lib/model-warm.mjs';
 
 const { values } = parseArgs({
@@ -74,7 +74,7 @@ if (values.resume) {
   console.log(`[proof] resuming: ${completedStages.length} stage(s) already done`);
 }
 
-const readModel = values['read-model'] ?? classRole('writer');
+const readModel = values['read-model'] ?? floorRole('writer');
 const writeModel = values['write-model'] ?? readModel;
 const transport = simulated ? createCountingTransport() : createOllamaTransport({ baseUrl });
 

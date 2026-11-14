@@ -1,0 +1,16 @@
+[Unit]
+Description=Ronin OS surface session (cage kiosk: the surface is the session, DESIGN §5.2)
+After=graphical-session.target ronin-vault.service ronin-attest.service
+Requires=ronin-attest.service
+
+[Service]
+ExecStart=/usr/bin/cage -- /usr/libexec/ronin/ronin-frame
+Restart=on-failure
+RestartSec=2
+# A frame crash-loop stops at a named threshold and leaves the console path available (§7.1:
+# a boot-looping face must degrade to the machine's other doors, never to a brick).
+StartLimitBurst=5
+StartLimitIntervalSec=120
+
+[Install]
+WantedBy=graphical-session.target

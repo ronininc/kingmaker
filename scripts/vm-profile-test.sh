@@ -1,15 +1,16 @@
 #!/bin/bash
-# Test a Kingmaker profile pack inside a macOS VM capped at that pack's memory (Apple Virtualization, via tart).
+# Test Kingmaker inside a macOS VM capped at a given memory size (Apple Virtualization, via tart).
 #
 #   scripts/vm-profile-test.sh <8|16|24> [--keep]
 #
 # What it does: clones the stock macOS VM (no Homebrew: cirruslabs/macos-tahoe-vanilla, cloned once as "km-base"),
-# sets its memory to the pack's class (8 GB → 8192 MB) and 8 CPU cores (a base M1–M4 has 8), shares this checkout
+# sets its memory to the given size (8 GB → 8192 MB) and 8 CPU cores (a base M1–M4 has 8), shares this checkout
 # (read-only) and this Mac's Ollama model store (read-only: the owner's models can't be changed or pruned) into it,
 # installs the official Node and Ollama builds in the VM user's home (no Homebrew), then runs
-#   kingmaker models setup --pack <class> --dry-run     (the pack's install plan on a Mac of that size)
-#   kingmaker models bench --set <class>                (the pack's models, measured inside the VM)
-# and writes the results to catalog/bench/vm/.
+#   kingmaker models setup --dry-run                    (the starter floor's install plan)
+#   kingmaker models bench --set <8|8-wide|24>          (a candidate set, measured inside the VM)
+# and writes the results to catalog/bench/vm/. The memory cap is a measurement condition, not a tier:
+# the floor and the runtime's per-task picks are the same at every size.
 #
 # What a VM can't prove (say it with every result): the VM's GPU is Apple's paravirtualized Metal device, not the chip's
 # own GPU, so tok/s and load times are not a real M1–M4's; there is no Neural Engine passthrough, so Kokoro on the ANE
@@ -18,7 +19,8 @@
 set -euo pipefail
 
 CLASS="${1:?usage: scripts/vm-profile-test.sh <8|16|24> [--keep]}"; KEEP=0; [ "${2:-}" = "--keep" ] && KEEP=1
-case "$CLASS" in 8|16|24) ;; *) echo "pack class must be 8, 16 or 24" >&2; exit 2 ;; esac
+case "$CLASS" in 8|16|24) ;; *) echo "VM memory must be 8, 16 or 24" >&2; exit 2 ;; esac
+case "$CLASS" in 8) SET=8 ;; 16) SET=8-wide ;; 24) SET=24 ;; esac
 TART="${TART:-$(command -v tart || echo "$HOME/Applications/tart.app/Contents/MacOS/tart")}"
 [ -x "$TART" ] || { echo "tart is not installed (https://github.com/cirruslabs/tart/releases, Developer ID signed)" >&2; exit 1; }
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -75,17 +77,17 @@ fi
 sysctl -n machdep.cpu.brand_string hw.memsize
 EOF
 
-say "the $CLASS GB pack: install plan, then the benchmark"
-"${SSH[@]}" bash -s "$CLASS" <<'EOF'
+say "the $CLASS GB VM: floor install plan, then the benchmark"
+"${SSH[@]}" bash -s "$CLASS" "$SET" <<'EOF'
 set -uo pipefail
-C="$1"; T="$HOME/km-tools"; S="/Volumes/My Shared Files"
+C="$1"; SET="$2"; T="$HOME/km-tools"; S="/Volumes/My Shared Files"
 export PATH="$T/node/bin:$PATH"
 pkill -f "ollama serve" 2>/dev/null || true
 OLLAMA_MODELS="$S/models" OLLAMA_NOPRUNE=1 OLLAMA_MAX_LOADED_MODELS=1 OLLAMA_NUM_PARALLEL=1 "$T/Ollama.app/Contents/Resources/ollama" serve > "$S/out/km-$C.ollama.log" 2>&1 &
 for _ in $(seq 60); do curl -fsS http://127.0.0.1:11434/api/version >/dev/null 2>&1 && break; sleep 1; done
 grep -E "inference compute|gpu memory" "$S/out/km-$C.ollama.log" | tail -2
 node "$S/repo/lib/cli.mjs" models profile
-node "$S/repo/lib/cli.mjs" models setup --pack "$C" --dry-run
-OLLAMA_BIN="$T/Ollama.app/Contents/Resources/ollama" node "$S/repo/lib/cli.mjs" models bench --set "$C" --out "$S/out" --cooldown 20
+node "$S/repo/lib/cli.mjs" models setup --dry-run
+OLLAMA_BIN="$T/Ollama.app/Contents/Resources/ollama" node "$S/repo/lib/cli.mjs" models bench --set "$SET" --out "$S/out" --cooldown 20
 EOF
 say "results in $OUT"

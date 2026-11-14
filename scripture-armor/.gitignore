@@ -1,0 +1,16 @@
+node_modules/
+*.log
+.DS_Store
+
+# wrapped output (user data, not source)
+*.scripture
+*.scripture-repo/
+out/
+
+# identity material must never be committed
+.scripture-armor/
+identity.json
+addressbook.json
+
+# test scratch
+test/.tmp/

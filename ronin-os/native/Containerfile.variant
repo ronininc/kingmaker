@@ -1,0 +1,19 @@
+# Ronin OS desktop variant — DESIGN §5.2. Same image lineage as the shielded kernel base
+# (shielded-kernel-build-2026-11-14/phase1-base/Containerfile, Fedora bootc 44, digest-pinned base),
+# ONE added layer: the session. The kernel image itself is a build ARG so this file never re-pins
+# what the kernel build owns.
+ARG RONIN_KERNEL_IMAGE=localhost/ronin-kernel:phase8
+FROM ${RONIN_KERNEL_IMAGE}
+
+# cage: wlroots kiosk compositor (MIT — license confirmed from the project LICENSE at Phase 0 pin
+# in the build report); webkitgtk: the system webview the thin frame presents (system component).
+RUN dnf -y install --setopt=install_weak_deps=False cage webkitgtk6.0 \
+    && dnf clean all
+
+# The surface + engine-side Ronin modules live in the DATA compartment's service area; the surface
+# keeps no state of its own (§3) — it renders the engine's records.
+COPY src/ /usr/lib/ronin-os/
+COPY phase6-native/ronin-frame /usr/libexec/ronin/ronin-frame
+COPY phase6-native/ronin-session.service /usr/lib/systemd/user/ronin-session.service
+RUN chmod 0755 /usr/libexec/ronin/ronin-frame \
+    && systemctl --global enable ronin-session.service

@@ -7,7 +7,7 @@ that ships through Kingmaker and starts with one copy-paste command.
 
 ## Listing copy (draft, for Robbie's approval in the batch)
 
-**Scripture Armor** — $99/month (membership; application-gated)
+**Scripture Armor**
 I created an unreadable coding language to wrap around programs so that AI
 can't just break into anything it wants anymore.
 

@@ -1,0 +1,186 @@
+{
+  "bundle": "ronin-os-work-stack",
+  "source": "fleet OSS audit 2026-11-14 OPEN set (36 rows) via DESIGN §9.3",
+  "exclusions": [
+    "Solomon — never in the bundle (closed, concierge, yin-yang)",
+    "Kingmaker itself — it is the claim the button sits on, not bundle content",
+    "fleet data (CRM records, private corpus, credentials) — never bundle content"
+  ],
+  "items": [
+    {
+      "name": "OpenCode",
+      "license": "MIT",
+      "bench": "harness seat"
+    },
+    {
+      "name": "Hermes Agent",
+      "license": "MIT",
+      "bench": "harness seat"
+    },
+    {
+      "name": "Ollama",
+      "license": "MIT",
+      "bench": "inference"
+    },
+    {
+      "name": "llama.cpp",
+      "license": "MIT",
+      "bench": "inference"
+    },
+    {
+      "name": "MLX",
+      "license": "MIT",
+      "bench": "inference (Apple-silicon lane)"
+    },
+    {
+      "name": "vLLM",
+      "license": "Apache-2.0",
+      "bench": "inference"
+    },
+    {
+      "name": "faster-whisper",
+      "license": "MIT",
+      "bench": "inference"
+    },
+    {
+      "name": "Kokoro-82M (weights)",
+      "license": "Apache-2.0",
+      "bench": "TTS"
+    },
+    {
+      "name": "Open-Jev-2B (weights/code/data)",
+      "license": "Apache-2.0 / MIT / CC0",
+      "bench": "reflex package"
+    },
+    {
+      "name": "Blender",
+      "license": "GPL-3.0-or-later",
+      "bench": "media & making"
+    },
+    {
+      "name": "FFmpeg",
+      "license": "LGPL-2.1-or-later (build posture pinned at staging)",
+      "bench": "media & making"
+    },
+    {
+      "name": "OBS Studio",
+      "license": "GPL-2.0",
+      "bench": "media & making"
+    },
+    {
+      "name": "OpenCut",
+      "license": "MIT",
+      "bench": "media & making"
+    },
+    {
+      "name": "GIMP",
+      "license": "GPL-3.0",
+      "bench": "media & making"
+    },
+    {
+      "name": "ComfyUI",
+      "license": "GPL-3.0 (checkpoints per-model, stated at pull)",
+      "bench": "media & making"
+    },
+    {
+      "name": "yt-dlp",
+      "license": "Unlicense",
+      "bench": "media & making"
+    },
+    {
+      "name": "delphitools-cli",
+      "license": "0BSD",
+      "bench": "media & making"
+    },
+    {
+      "name": "Godot",
+      "license": "MIT",
+      "bench": "media & making"
+    },
+    {
+      "name": "FreeCAD",
+      "license": "LGPL-2.1",
+      "bench": "media & making"
+    },
+    {
+      "name": "OpenSCAD",
+      "license": "GPL-2.0-or-later",
+      "bench": "media & making"
+    },
+    {
+      "name": "ZAP",
+      "license": "Apache-2.0",
+      "bench": "security & lab"
+    },
+    {
+      "name": "OWASP Nettacker",
+      "license": "Apache-2.0",
+      "bench": "security & lab"
+    },
+    {
+      "name": "Ghidra",
+      "license": "Apache-2.0",
+      "bench": "security & lab"
+    },
+    {
+      "name": "Strix",
+      "license": "Apache-2.0",
+      "bench": "security & lab"
+    },
+    {
+      "name": "OWASP Juice Shop",
+      "license": "MIT — a TARGET, labeled as one wherever it appears",
+      "bench": "security & lab"
+    },
+    {
+      "name": "Git",
+      "license": "GPL-2.0",
+      "bench": "plumbing"
+    },
+    {
+      "name": "Node.js",
+      "license": "MIT",
+      "bench": "plumbing"
+    },
+    {
+      "name": "PostgreSQL",
+      "license": "PostgreSQL License",
+      "bench": "plumbing"
+    },
+    {
+      "name": "Docker Engine + Compose",
+      "license": "Apache-2.0 (Mac seat: Podman/Colima-class hosting decided at pin)",
+      "bench": "plumbing"
+    },
+    {
+      "name": "Headscale client plumbing",
+      "license": "BSD-3-Clause",
+      "bench": "plumbing"
+    },
+    {
+      "name": "SearXNG",
+      "license": "AGPL-3.0 — network-use copyleft stated, not buried",
+      "bench": "plumbing"
+    },
+    {
+      "name": "Postiz",
+      "license": "AGPL-3.0 — network-use copyleft stated, not buried",
+      "bench": "plumbing"
+    },
+    {
+      "name": "Playwright",
+      "license": "Apache-2.0",
+      "bench": "plumbing"
+    },
+    {
+      "name": "Chromium",
+      "license": "BSD-3-Clause",
+      "bench": "plumbing"
+    },
+    {
+      "name": "RuFlow",
+      "license": "MIT",
+      "bench": "plumbing"
+    }
+  ]
+}

@@ -214,7 +214,7 @@ check('W4 wire bodies are glyph armor (PUA / Linear A / Cuneiform ranges)', [...
 }));
 const capFlow = (() => { try { return fs.readFileSync(join(here, 'capture-flow.c2s'), 'utf8') + fs.readFileSync(join(here, 'capture-flow.s2c'), 'utf8'); } catch { return ''; } })();
 check('W5 flow-leg capture carries sealed flow frames (hello + body_b64), no plaintext payload',
-  capFlow.includes('body_b64') && !capFlow.includes('vm-flow-payload-1') && !capFlow.includes('echo:'));
+  capFlow.includes('body_b64') && !capFlow.includes('vm-flow-payload-1') && !capFlow.includes('echo:'));  
 
 const failed = results.filter((r) => r.kind === 'proof' && !r.ok);
 fs.writeFileSync(join(here, 'results.json'), JSON.stringify({

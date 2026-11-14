@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "states": {
+    "OPS": {
+      "hue": "blue",
+      "hex": "#2e6bff",
+      "pattern": "segments-6",
+      "ownerNamed": true,
+      "kind": "declared"
+    },
+    "RED": {
+      "hue": "red",
+      "hex": "#ff2e2e",
+      "pattern": "segments-3-tri",
+      "ownerNamed": true,
+      "kind": "declared"
+    },
+    "CONTAINMENT": {
+      "hue": "red-violet",
+      "hex": "#c02eff",
+      "pattern": "segments-8-strobe-edge",
+      "ownerNamed": false,
+      "kind": "condition"
+    },
+    "SEALED": {
+      "hue": "indigo",
+      "hex": "#2a2a72",
+      "pattern": "segments-6-dim",
+      "ownerNamed": false,
+      "kind": "condition"
+    },
+    "FORGE": {
+      "hue": "green",
+      "hex": "#2eff7a",
+      "pattern": "segments-5",
+      "ownerNamed": false,
+      "kind": "declared"
+    },
+    "SETTLE": {
+      "hue": "gold",
+      "hex": "#ffb52e",
+      "pattern": "segments-4",
+      "ownerNamed": false,
+      "kind": "declared"
+    }
+  },
+  "lanes": [
+    "mesh",
+    "brains",
+    "library",
+    "money",
+    "security",
+    "media",
+    "system"
+  ],
+  "trust": [
+    "ATTESTED",
+    "SEALED-ENTRY",
+    "SEALED",
+    "UNVERIFIED"
+  ],
+  "densities": [
+    "HOME",
+    "WALL"
+  ],
+  "amber": "#f5c518",
+  "postureRecord": "ronin-state.json { schema, at, posture:{ state, density, trust, recordSeq, since, scopeId? }, lanes:{ <lane>:{ summary, at, source } }, approvals: [] }",
+  "surfaceWrites": [
+    "intent flags / job submissions",
+    "own session preferences"
+  ],
+  "surfaceNeverWrites": [
+    "state records",
+    "lane data",
+    "verdicts",
+    "approvals",
+    "keys",
+    "deployment state"
+  ]
+}

@@ -1,19 +1,20 @@
-Scripture Armor — Proprietary Commercial Software
+================================================================================
+LICENSE — PLACEHOLDER. NO LICENSE HAS BEEN CHOSEN FOR THIS PACKAGE YET.
+================================================================================
 
-Copyright © 2026 Robbie Glover / Ronin Inc. All rights reserved.
+This file is a placeholder, left deliberately by direction of the author,
+Robbie Glover (Ronin Inc), while Scripture Armor is prepared for public
+release. NO license terms are granted by this file.
 
-Scripture Armor is private, commercial software. It is not free and
-it is not open source, and no licence is granted by possession of
-this file or of any copy of the software.
+Until the author replaces this placeholder with an actual license, the
+default rules of copyright apply: all rights reserved; no permission to
+use, copy, modify, or redistribute is granted by possession of this code.
 
-Access is application-gated: Scripture Armor is provided only under
-a membership agreement with Ronin Inc, arranged in direct
-conversation with the owner. Membership is $1,500 per quarter.
-There is no self-serve checkout.
+The author will choose the license at release time. Candidate families
+under consideration (recorded here only so the decision is visible, NOT
+as a grant or a promise): permissive open source (MIT / Apache-2.0),
+copyleft (GPL family), or source-available (PolyForm family).
 
-A lapsed membership ends access to future improvements only — the
-version a member already holds keeps working in full.
-
-No part of this software may be copied, modified, distributed,
-sublicensed, or reverse-engineered for redistribution, except as a
-written agreement with Ronin Inc expressly permits.
+If you received this tree and need terms before the license lands, contact
+the author. Do not assume.
+================================================================================

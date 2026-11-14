@@ -1,7 +1,7 @@
 #!/bin/bash
 # Publish a Kingmaker release to the update host, so every installed Kingmaker picks it up at its next launch or wake.
 #
-#   node scripts/release-parts.mjs --app <Kingmaker.app> --part-size 100000000
+#   node scripts/release-parts.mjs --app <Kingmaker.app> --part-size 300000000   # R2 uploads stop at 315 MB a file
 #   scripts/publish-update.sh dist/release/<tag>
 #
 # Uploads the parts, the manifest, SHA256SUMS and this checkout's installer engine into kingmaker-releases/<tag>/,
@@ -18,39 +18,7 @@ VERSION="$(plutil -extract version raw -o - "$MANIFEST")"
 [ "$(plutil -extract tag raw -o - "$MANIFEST")" = "$TAG" ] || { echo "The manifest's tag is not $TAG"; exit 1; }
 WRANGLER="${WRANGLER:-npx wrangler}"
 BUCKET=kingmaker-releases
-# Wrangler sends R2 objects through Cloudflare's API gateway. 300 MB parts have
-# repeatedly spent about six minutes in that gateway and then returned 502. Keep
-# release parts at 100 MB so an individual retry is short and bounded.
-LIMIT=100000000
-MAX_ATTEMPTS="${KINGMAKER_UPLOAD_ATTEMPTS:-3}"
-STATE_DIR="$DIR/.publish-state"
-mkdir -p "$STATE_DIR"
-
-upload_object() {
-  local file="$1" key="$2" content_type="${3:-}" digest receipt attempt
-  digest="$(shasum -a 256 "$file" | cut -d' ' -f1)"
-  receipt="$STATE_DIR/$(basename "$file").sha256"
-  if [ -f "$receipt" ] && [ "$(cat "$receipt")" = "$digest  $key" ]; then
-    echo "  already uploaded (checkpoint verified)"
-    return 0
-  fi
-  attempt=1
-  while [ "$attempt" -le "$MAX_ATTEMPTS" ]; do
-    echo "  upload attempt $attempt/$MAX_ATTEMPTS"
-    if [ -n "$content_type" ]; then
-      if $WRANGLER r2 object put "$key" --file "$file" --content-type "$content_type" --remote >/dev/null; then
-        printf '%s  %s\n' "$digest" "$key" > "$receipt"
-        return 0
-      fi
-    elif $WRANGLER r2 object put "$key" --file "$file" --remote >/dev/null; then
-      printf '%s  %s\n' "$digest" "$key" > "$receipt"
-      return 0
-    fi
-    [ "$attempt" -lt "$MAX_ATTEMPTS" ] || return 1
-    sleep $((attempt * 5))
-    attempt=$((attempt + 1))
-  done
-}
+LIMIT=314572800
 
 cp "$HERE/installer/engine.sh" "$DIR/engine.sh"
 ENGINE_SHA="$(shasum -a 256 "$DIR/engine.sh" | cut -d' ' -f1)"
@@ -85,21 +53,14 @@ else echo "! No Kingmaker Release certificate pinned: installed Macs can't check
 if [ -f "$SIG" ]; then files+=(kingmaker-manifest.json.sig); else echo "! No $SIG: this release is UNSIGNED and installed Kingmakers will refuse to auto-update to it. Sign it: node scripts/release-parts.mjs --sign-key <offline-private.pem>"; fi
 for f in "${files[@]}"; do
   [ -f "$DIR/$f" ] || { echo "Missing $DIR/$f"; exit 1; }
-  [ "$(stat -f %z "$DIR/$f")" -le "$LIMIT" ] || { echo "$f is over 100 MB: re-split with --part-size 100000000"; exit 1; }
+  [ "$(stat -f %z "$DIR/$f")" -le "$LIMIT" ] || { echo "$f is over 300 MB: re-split with --part-size 300000000"; exit 1; }
 done
 for f in "${files[@]}"; do
   echo "· $TAG/$f"
-  upload_object "$DIR/$f" "$BUCKET/$TAG/$f"
+  $WRANGLER r2 object put "$BUCKET/$TAG/$f" --file "$DIR/$f" --remote >/dev/null
 done
-if [ -f "$DIR/NOTES.txt" ]; then
-  NOTES="$(tr '\n' ' ' < "$DIR/NOTES.txt" | sed 's/\\/\\\\/g; s/"/\\"/g; s/  */ /g; s/ *$//')"
-else
-  NOTES="Kingmaker $VERSION is the current governed runtime and Launcher release."
-  echo "! No NOTES.txt in $DIR: using a minimal release note."
-fi
+NOTES="$(tr '\n' ' ' < "$DIR/NOTES.txt" 2>/dev/null | sed 's/\\/\\\\/g; s/"/\\"/g; s/  */ /g; s/ *$//')"
+[ -n "$NOTES" ] || echo "! No NOTES.txt in $DIR: Kingmaker will have nothing to say when asked what's in this update."
 printf '{\n  "version": "%s",\n  "tag": "%s",\n  "engineSha256": "%s",\n  "notes": "%s",\n  "publishedAt": "%s"\n}\n' "$VERSION" "$TAG" "$ENGINE_SHA" "$NOTES" "$(date -u +%FT%TZ)" > "$DIR/latest.json"
-# Activation is intentionally not checkpointed: every completed publication
-# rewrites latest.json only after every immutable release object succeeded.
-rm -f "$STATE_DIR/latest.json.sha256"
-upload_object "$DIR/latest.json" "$BUCKET/latest.json" application/json
+$WRANGLER r2 object put "$BUCKET/latest.json" --file "$DIR/latest.json" --content-type application/json --remote >/dev/null
 echo "✓ Kingmaker $VERSION ($TAG) published. Installed Macs update at their next launch or wake."

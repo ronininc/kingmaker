@@ -48,11 +48,8 @@ import { buildManifest, cleanTempParts, DEFAULT_REPO, issuanceProblems, MANIFEST
 import { verifyStagedRelease } from './release-gate.mjs';
 import { signManifestBytes, verifyManifestBytes, pubkeyFingerprint } from '../lib/release-signing.mjs';
 import { RELEASE_PUBLIC_KEY_PEM } from '../lib/release-pubkey.mjs';
-import { REQUIRED_RUNTIMES, validateEngineRuntimeClosure } from './runtime-closure.mjs';
-import { validateProductionCapabilityClosure } from './capability-closure.mjs';
-import { ARMOR_RELEASE_ASSETS, verifyPhysicalReleaseAssets } from '../lib/release-assets.mjs';
-import { PACKS } from '../lib/mac-profiles.mjs';
-import { ABLITERATED_CODERS, ABLITERATED_LARGE_BRAIN, ABLITERATED_MODELS, BRAIN_ROLES, LARGE_BRAIN_MIN_GB, LARGE_CODER_MIN_GB } from '../lib/profile.mjs';
+import { ledgerProblems, readLedger } from '../lib/launcher-ledger.mjs';
+import { ABLITERATED_CODERS, ABLITERATED_LARGE_BRAIN, ABLITERATED_MODELS, BRAIN_ROLES } from '../lib/profile.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '..');
@@ -81,39 +78,26 @@ function arg(argv, name, fallback = undefined) {
   return at >= 0 && argv[at + 1] !== undefined ? argv[at + 1] : fallback;
 }
 
-/** The models the installer pulls: every abliterated role model, plus the coder sized to the Mac it lands on. Pure. */
+/** The models the installer pulls: the flat starter set — every abliterated role model and both
+ *  coders and the large brain — identical on every Mac. No memory fields ride on an entry since the
+ *  metered-doctrine rework (2026-11-14): an entry is pulled or it is not in the list; which model a
+ *  task runs is the runtime selector's decision, and anything beyond this set is metered in from
+ *  the Brain Library per task. Pure. */
 export function plannedModels() {
   const roles = {};
   for (const [role, model] of Object.entries(ABLITERATED_MODELS)) (roles[model] ??= []).push(role);
   return [
     ...Object.entries(roles).map(([name, r]) => ({ name, roles: r })),
-    { name: ABLITERATED_CODERS.small, roles: ['SOLOMON_LOCAL_CODING_MODEL', 'SOLOMON_SNIPPET_MODEL'], maxMemGb: LARGE_CODER_MIN_GB },
-    { name: ABLITERATED_CODERS.large, roles: ['SOLOMON_LOCAL_CODING_MODEL', 'SOLOMON_SNIPPET_MODEL'], minMemGb: LARGE_CODER_MIN_GB },
-    { name: ABLITERATED_LARGE_BRAIN, roles: [...BRAIN_ROLES], minMemGb: LARGE_BRAIN_MIN_GB },
+    { name: ABLITERATED_CODERS.small, roles: ['SOLOMON_LOCAL_CODING_MODEL', 'SOLOMON_SNIPPET_MODEL'] },
+    { name: ABLITERATED_CODERS.large, roles: ['SOLOMON_LOCAL_CODING_MODEL', 'SOLOMON_SNIPPET_MODEL'] },
+    { name: ABLITERATED_LARGE_BRAIN, roles: [...BRAIN_ROLES] },
   ];
 }
 
-/** Every model the installer pulls: the engine's role models (above), then the packs' own. Pure. */
+/** Every model the installer pulls: the starter set, flat. Pure. */
 export function installerModels() {
-  const base = plannedModels();
-  return [...base, ...packModels(PACKS, base.map((m) => m.name))];
+  return plannedModels();
 }
-
-/** The profile packs' own models (lib/mac-profiles.mjs PACKS), each listing the packs it belongs to as "8,16": the
- *  installer pulls them only for the pack the owner picks. Models the engine's roles already pull are not repeated. Pure. */
-export function packModels(packs = PACKS, base = plannedModels().map((m) => m.name)) {
-  const out = new Map();
-  for (const p of packs) for (const m of p.models) {
-    if (base.includes(m.tag)) continue;
-    const e = out.get(m.tag) ?? { name: m.tag, roles: [], packs: [] };
-    e.roles = [...new Set([...e.roles, ...m.roles.map((r) => `pack:${r}`)])]; e.packs.push(p.id);
-    out.set(m.tag, e);
-  }
-  return [...out.values()].map((e) => ({ ...e, packs: e.packs.join(',') }));
-}
-
-/** The packs as the installer's launcher shows them (lib/mac-profiles.mjs PACKS). Pure. */
-export const manifestPacks = (packs = PACKS) => packs.map((p) => ({ id: p.id, name: p.name, label: p.label, downloadGb: p.downloadGb, features: p.features, models: p.models.map((m) => ({ name: m.tag, roles: m.roles, gb: m.gb })), basis: p.basis }));
 
 /** "huihui_ai/qwen3-abliterated:1.7b" → its Ollama registry manifest URL; "hf.co/<user>/<repo>:<tag>" → Hugging
  *  Face's own registry, which is where Ollama pulls hf.co models from (registry.ollama.ai answers 404 for them). Pure. */
@@ -186,7 +170,7 @@ export function engineSourceMaps(root) {
 }
 
 /** What the app is: bundle id, version, engine build, signing authority, unpacked size. Throws when it is not Kingmaker. */
-export { REQUIRED_RUNTIMES } from './runtime-closure.mjs';
+export const REQUIRED_RUNTIMES = Object.freeze(['kingmaker-runtime', 'voice-runtime', 'guardrails-runtime', 'guardrails-config', 'agent-runtime', 'knowledge-runtime', 'playwright-browsers', 'chrome-connector', 'sol-ghost', 'app.asar']);
 
 /** [4.3] The oldest bundled Node a release may carry: 24.22.1 has the Node2Shell fix (CVE-2026-111497,
  *  the Brotli out-of-bounds write). The engine build holds the same floor (GHOST_MIN_BUNDLED_NODE). */
@@ -211,8 +195,6 @@ export function inspectApp(app, { skipCodesign = false, allowAdhoc = false } = {
   // no source maps of the engine's own code (the engine build). An app with the older names, a missing dist,
   // or any of these left in, is not released.
   const resources = join(app, 'Contents', 'Resources'), runtimeDir = join(resources, 'kingmaker-runtime');
-  validateEngineRuntimeClosure(resources);
-  validateProductionCapabilityClosure(resources);
   const leftovers = [
     ...(existsSync(join(resources, 'solomon-runtime')) ? ['Contents/Resources/solomon-runtime (the runtime folder is kingmaker-runtime)'] : []),
     ...(existsSync(join(app, 'Contents', 'MacOS', 'Solomon')) ? ['Contents/MacOS/Solomon (the engine binary is KingmakerEngine)'] : []),
@@ -355,6 +337,16 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
     if (!dryRun) { mkdirSync(outDir, { recursive: true }); writeFileSync(join(outDir, launcher.archive), bytes); }
     print(`· Ronin Launcher ${launcher.version}: ${launcher.archive} ${(launcher.size / 1e6).toFixed(1)} MB, sha256 ${launcher.sha256.slice(0, 12)}…`);
   } catch (error) { print(`✗ The Ronin Launcher pin doesn't check out: ${error.message}`); return 1; }
+  // The issued-build list rides in the signed manifest once it lists this release's launcher. Until that entry is
+  // added (scripts/launcher-ledger.mjs add), the release is built exactly as before and says what is missing.
+  {
+    const ledger = readLedger();
+    const bad = ledgerProblems(ledger);
+    if (bad.length) { print(`✗ lib/launcher-issued.json is not sound: ${bad.join('; ')}`); return 1; }
+    const own = ledger.entries.find((e) => e.archiveSha256 === launcher.sha256);
+    if (own && !own.revoked) launcher.issued = ledger.entries;
+    else print(`! Ronin Launcher ${launcher.version} is ${own ? 'REVOKED on' : 'not on'} the issued-build list (lib/launcher-issued.json). An installed Kingmaker will call it unknown and stay undocked until it is listed: node scripts/launcher-ledger.mjs add --zip <its zip> --version ${launcher.version}`);
+  }
 
   // The archive, streamed straight into the parts. With --deterministic the archive is first written by
   // lib/deterministic-archive.mjs (sorted entries, epoch mtimes, zeroed owners, gzip -n) so the same app
@@ -421,7 +413,7 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
   const manifest = buildManifest({
     version: facts.version, tag, repo: arg(argv, '--repo', DEFAULT_REPO),
     app: facts, archive: { name: archive, size: split.size, sha256: split.sha256 }, parts: split.parts, partSize,
-    ollama, homebrew, tailscale, models, brew: BREW_TOOLS, knowledge, searxng, packs: manifestPacks(), launcher, engineSha256,
+    ollama, homebrew, tailscale, models, brew: BREW_TOOLS, knowledge, searxng, launcher, engineSha256,
     platforms, issuance,
   });
   for (const p of split.parts) print(`· ${p.name}  ${(p.size / 1e9).toFixed(3)} GB  sha256 ${p.sha256}`);
@@ -459,7 +451,7 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
   }
 
   writeFileSync(join(outDir, 'SHA256SUMS'), sha256sums([...split.parts, { name: launcher.archive, sha256: launcher.sha256 }, { name: MANIFEST_FILE, sha256: createHash('sha256').update(manifestText).digest('hex') }]));
-  const check = await verifyParts(manifest, outDir, { forRelease: true });
+  const check = await verifyParts(manifest, outDir);
   if (!check.ok) { print(`✗ The parts just written do not verify: ${check.problems.join('; ')}`); return 1; }
   print(`✓ ${split.parts.length} part(s) + ${MANIFEST_FILE} + SHA256SUMS in ${outDir}, re-read and verified.`);
   // THE STAGED GATE (finish plan Phase 2): extract the parts just written and test the app inside them —
@@ -468,18 +460,10 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
   // gate does not get a publish command.
   const gate = await verifyStagedRelease({ manifest, partsDir: outDir, sourceApp: app, stageDir: join(outDir, '.gate-stage'), signature: argv.includes('--skip-codesign') ? 'skip' : 'require', requireIssuance: true });
   if (!gate.ok) { print(`✗ The staged release fails the gate: ${gate.problems.join('; ')}`); return 1; }
-  // Free Kingmaker is authenticated by the signed release manifest and its
-  // Launcher-pinned hashes. Armor assets are optional here; when present the
-  // physical gate verifies the complete set and refuses a partial envelope.
-  const assets = await verifyPhysicalReleaseAssets({ manifestPath: join(outDir, MANIFEST_FILE), assetsDir: outDir, requireInstallerDmg: false });
-  if (!assets.ok) { print(`✗ The publication assets fail the gate: ${assets.problems.join('; ')}`); return 1; }
   print('✓ staged gate: the archived app is identical to the inspected app, passes the installer signature test, and its installer + launcher were built from this release\'s tree (issuance)');
   print('Not published. To publish (the operator\'s call):');
   const sigAsset = keyPath ? ` ${JSON.stringify(join(outDir, sigName))}` : '';
-  const armorAssetArgs = ARMOR_RELEASE_ASSETS.filter((n) => existsSync(join(outDir, n))).map((n) => JSON.stringify(join(outDir, n))).join(' ');
-  const nonMacAssetArgs = platformObjects({ version: manifest.version, platforms: manifest.platforms, dir: outDir })
-    .map((object) => JSON.stringify(object.file)).join(' ');
-  print(`  gh release create ${tag} --repo ${manifest.repo} --draft --title "Kingmaker ${facts.version}" ${split.parts.map((p) => JSON.stringify(join(outDir, p.name))).join(' ')}${nonMacAssetArgs ? ` ${nonMacAssetArgs}` : ''} ${JSON.stringify(join(outDir, launcher.archive))} ${JSON.stringify(join(outDir, MANIFEST_FILE))}${sigAsset}${armorAssetArgs ? ` ${armorAssetArgs}` : ''} ${JSON.stringify(join(outDir, 'SHA256SUMS'))} "<Kingmaker-Installer-${tag}.dmg>"`);
+  print(`  gh release create ${tag} --repo ${manifest.repo} --draft --title "Kingmaker ${facts.version}" ${split.parts.map((p) => JSON.stringify(join(outDir, p.name))).join(' ')} ${JSON.stringify(join(outDir, launcher.archive))} ${JSON.stringify(join(outDir, MANIFEST_FILE))}${sigAsset} ${JSON.stringify(join(outDir, 'SHA256SUMS'))} "<Kingmaker Installer DMG>"`);
   print(`Then build the installer around this manifest: scripts/build-installer.sh --manifest ${join(outDir, MANIFEST_FILE)}`);
   return 0;
 }

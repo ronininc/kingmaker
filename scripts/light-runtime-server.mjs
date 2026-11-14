@@ -3,7 +3,7 @@
 //
 //   GET  /        the window (light-runtime/index.html)
 //   GET  /state   the canonical state (light-runtime/state-schema.mjs), assembled live from the tree's own
-//                 sources: lib/mac-profiles.mjs (this Mac's profile), lib/reflex-seat.mjs (the seat plan),
+//                 sources: lib/mac-profiles.mjs (this Mac's floor roles), lib/reflex-seat.mjs (the seat plan),
 //                 the token meter's own log (<state>/metrics/model-calls-YYYY-MM.jsonl, lib/token-meter.mjs's
 //                 file) when a Kingmaker state dir is given, and the light state dir's proof-report.json +
 //                 verdicts.json + control.json.
@@ -17,7 +17,8 @@ import { createServer } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { currentProfile } from '../lib/mac-profiles.mjs';
+import { freemem, totalmem } from 'node:os';
+import { FLOOR_ROLES, detectMac } from '../lib/mac-profiles.mjs';
 import { reflexSeatPlan, reflexPinEnabled } from '../lib/reflex-seat.mjs';
 import { reflexEnabled } from '../lib/reflex-layer.mjs';
 import { meterSnapshot } from '../lib/token-meter.mjs';
@@ -48,9 +49,17 @@ export function meterTotalsFromLog(stateDir, d = new Date()) {
 /** Assemble the live state from this machine's real sources. Every input is allowed to be absent; the
  *  schema renders an absent source as nulls and UNMEASURED, never as invented numbers. */
 export function assembleLiveState({ stateDir, profileDir = null, env = process.env, now = new Date() } = {}) {
-  let profile = null, seatPlan = null;
-  try { profile = currentProfile(profileDir); } catch { profile = null; }
-  if (profile) { try { seatPlan = reflexSeatPlan({ profile, env }); } catch { seatPlan = null; } }
+  // The machine block the state schema renders: this Mac's facts plus the floor roles (the smallest
+  // sufficient model per role — the same on every Mac since the metered-doctrine rework; there is no
+  // per-Mac profile anymore). Fields the floor does not carry render as nulls (UNMEASURED).
+  const mac = detectMac();
+  const profile = {
+    mac, ...FLOOR_ROLES, class: null, label: `${mac.chip ?? 'This Mac'}, ${mac.ramGb ?? '?'} GB`,
+    concurrent: null, context: null, maxResidentGb: null, gpuBudgetGb: null, voice: null, imageLane: true,
+    basis: 'the starter floor: the smallest sufficient model per role, identical on every Mac',
+  };
+  let seatPlan = null;
+  try { seatPlan = reflexSeatPlan({ measured: { freeGb: freemem() / 2 ** 30, totalGb: totalmem() / 2 ** 30 }, env }); } catch { seatPlan = null; }
   const control = readControl(stateDir);
   return assembleState({
     meter: meterTotalsFromLog(profileDir, now) ?? meterSnapshot(),
