@@ -1,0 +1,40 @@
+name: Deploy update host
+
+# Deploys the Kingmaker update host (update-host/worker.js → the "kingmaker-updates" Worker) to Cloudflare, and pushes
+# its CERT_SIGNING_KEY secret. Runs from GitHub so no one needs the right Cloudflare account logged in locally.
+#
+# Trigger it by hand from the Actions tab (workflow_dispatch), or automatically when update-host/ changes on main.
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   CLOUDFLARE_API_TOKEN   a token from the owner's Cloudflare account with Workers Scripts:Edit, Workers KV:Edit, R2:Edit
+#   CLOUDFLARE_ACCOUNT_ID  that account's id
+#   CERT_SIGNING_KEY       the ES256 install-cert signing key (contents of cert-private-pkcs8.pem), pushed to the Worker
+#
+# Note: GitHub Actions must be enabled/funded for this repo. If Actions is disabled here, deploy by hand instead
+# (update-host: wrangler secret put CERT_SIGNING_KEY && wrangler deploy).
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - update-host/**
+      - .github/workflows/deploy-update-host.yml
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy worker and push CERT_SIGNING_KEY
+        uses: cloudflare/wrangler-action@v3.14.1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: update-host
+          command: deploy
+          secrets: |
+            CERT_SIGNING_KEY
+        env:
+          CERT_SIGNING_KEY: ${{ secrets.CERT_SIGNING_KEY }}
