@@ -3,10 +3,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { checkPayload, ESSENTIAL, PAYLOAD_PARTS, payloadFiles, payloadProblem } from '../lib/payload.mjs';
 import { buildPayload, provePayload } from '../scripts/build-payload.mjs';
 import { FORK_DIR } from '../lib/fork.mjs';
@@ -25,6 +25,34 @@ test('the payload is every part of the free Kingmaker, in one file, and nothing 
   const p = payload();
   assert.match(readFileSync(`${p.tar}.sha256`, 'utf8'), /^[0-9a-f]{64} {2}kingmaker-payload\.tar\n$/);
   assert.equal(provePayload(p.tar).version, JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version);
+});
+
+test('the unpacked payload includes and loads the exact native armor runtime closure', { timeout: 120_000 }, () => {
+  const files = payloadFiles(ROOT).filter((f) => f.startsWith('scripture-armor/'));
+  assert.deepEqual(files, ['scripture-armor/LICENSE', 'scripture-armor/armor.mjs', 'scripture-armor/refit-net.mjs', 'scripture-armor/scan.mjs']);
+  const dir = unpack();
+  try {
+    const url = pathToFileURL(join(dir, 'lib/armor-native.mjs')).href;
+    const r = spawnSync(process.execPath, ['--input-type=module', '-e', `const m = await import(${JSON.stringify(url)}); if (typeof m.armor.createIdentity !== 'function' || typeof m.Flow !== 'function' || typeof m.openFlow !== 'function') process.exit(1);`], { encoding: 'utf8' });
+    assert.equal(r.status, 0, r.stderr);
+  } finally { rmSync(join(dir, '..'), { recursive: true, force: true }); }
+});
+
+test('armor vault, state, sealed bundles, app files and paid add-ons cannot enter through the runtime allowlist', () => {
+  const root = mkdtempSync(join(tmpdir(), 'km-payload-boundary-'));
+  try {
+    for (const part of PAYLOAD_PARTS) {
+      const target = join(root, part); mkdirSync(dirname(target), { recursive: true });
+      if (statSync(join(ROOT, part)).isDirectory()) mkdirSync(target, { recursive: true });
+      else writeFileSync(target, 'public fixture');
+    }
+    const excluded = ['scripture-armor/vault/owner-key.json', 'scripture-armor/state/identity.json', 'scripture-armor/sealed-bundle.json', 'scripture-armor/issuer.secret.json', 'scripture-armor/Scripture Armor.app/Contents/MacOS/armor', 'addons/paid-addon/index.mjs'];
+    for (const name of excluded) { const p = join(root, name); mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, 'excluded fixture'); }
+    const files = payloadFiles(root);
+    for (const name of excluded) assert.ok(!files.includes(name), name);
+    assert.equal(files.filter((f) => f.startsWith('scripture-armor/')).length, 4);
+    assert.ok(!PAYLOAD_PARTS.includes('scripture-armor'), 'the full tree must never become a payload part');
+  } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
 test('unpacked whole it starts; with a folder missing it refuses, names what is missing, and exits 78', { timeout: 120_000 }, () => {

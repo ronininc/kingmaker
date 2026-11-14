@@ -43,6 +43,15 @@ test('a public key is pinned in the repo and has a stable fingerprint', () => {
   assert.match(pubkeyFingerprint(RELEASE_PUBLIC_KEY_PEM), /^([0-9A-F]{4} )+[0-9A-F]{4}$/);
 });
 
+// The pin is Kingmaker's own: this repo names the one key it trusts and checks it here, with no lookup into any other
+// product. A stale or swapped PEM is still a valid PEM, so the shape check above cannot catch it; this one does.
+// Rotating the key on purpose means replacing the PEM AND this constant in the same change.
+const CURRENT_RELEASE_KEY_FINGERPRINT = '7EDC 06F8 D116 7C8A 2514 F7BA 5A06 6F7C A391 E9C9 FA78 8971 9FFD E2BD DD64 73B6';
+
+test('the pinned public key is the current release key, not an earlier generation', () => {
+  assert.equal(pubkeyFingerprint(RELEASE_PUBLIC_KEY_PEM), CURRENT_RELEASE_KEY_FINGERPRINT);
+});
+
 test('the keypair is RSA of the pinned modulus (so stock macOS openssl can verify it)', () => {
   const { publicKeyPem } = generateReleaseKeypair();
   assert.ok(publicKeyPem.includes('BEGIN PUBLIC KEY'));

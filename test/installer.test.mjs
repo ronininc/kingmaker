@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { buildFixtureRelease, fakeTools, isDir, isFile, runEngine, serveRelease } from './fixtures/installer-fixtures.mjs';
 import { spawnSync } from 'node:child_process';
 import { buildManifest, launcherProblems, macosBelow, MAX_PART_BYTES, manifestProblems, MIN_MACOS, partName, shipProblems, splitStream, verifyParts } from '../lib/release-manifest.mjs';
-import { installerModels, manifestPacks, plannedModels, registryManifestUrl, tailscalePin } from '../scripts/release-parts.mjs';
+import { installerModels, plannedModels, registryManifestUrl, tailscalePin } from '../scripts/release-parts.mjs';
 import { readInstallConfig } from '../lib/install-config.mjs';
 import { Readable } from 'node:stream';
 
@@ -76,22 +76,21 @@ test('manifest rules: 1.9 GB per part at most, the parts must add up, digests ar
   assert.throws(() => splitStream(Readable.from([]), { partSize: MAX_PART_BYTES + 1 }), /part size/);
 });
 
-test('release pins: the abliterated models plus the coder sized to the Mac; registry URLs', () => {
+test('release pins: the abliterated models plus both coders, flat — no memory fields size a model to a Mac; registry URLs', () => {
   const models = plannedModels();
   assert.ok(models.some((m) => m.name === 'huihui_ai/qwen3-abliterated:1.7b' && m.roles.includes('SOLOMON_OLLAMA_MODEL')));
-  assert.deepEqual(models.filter((m) => /coder/.test(m.name)).map((m) => [m.name, m.maxMemGb ?? null, m.minMemGb ?? null]), [['huihui_ai/qwen2.5-coder-abliterate:1.5b', 16, null], ['huihui_ai/qwen2.5-coder-abliterate:7b', null, 16]]);
+  assert.deepEqual(models.filter((m) => /coder/.test(m.name)).map((m) => m.name), ['huihui_ai/qwen2.5-coder-abliterate:1.5b', 'huihui_ai/qwen2.5-coder-abliterate:7b'], 'both coders ship on every Mac now');
+  for (const m of models) assert.deepEqual(Object.keys(m).sort(), ['name', 'roles'], `${m.name}: an entry is a name and its roles — no minMemGb, maxMemGb or packs gate it`);
   assert.equal(registryManifestUrl('huihui_ai/qwen3-abliterated:0.6b'), 'https://registry.ollama.ai/v2/huihui_ai/qwen3-abliterated/manifests/0.6b');
   assert.equal(registryManifestUrl('qwen3'), 'https://registry.ollama.ai/v2/library/qwen3/manifests/latest');
   assert.equal(registryManifestUrl('hf.co/mradermacher/Huihui-granite-4.1-3b-abliterated-i1-GGUF:i1-Q4_K_M'), 'https://hf.co/v2/mradermacher/Huihui-granite-4.1-3b-abliterated-i1-GGUF/manifests/i1-Q4_K_M', 'hf.co models pin from Hugging Face');
 });
 
-test('profile packs: each pack model is pulled only for its packs, never twice, and the manifest lists every pack', () => {
+test('the starter set is flat: the installer pulls the planned models, nothing pack-shaped rides along', () => {
   const all = installerModels();
+  assert.deepEqual(all, plannedModels(), 'the installer pulls exactly the planned set — no pack union on top');
   assert.equal(new Set(all.map((m) => m.name)).size, all.length, 'no model twice');
-  for (const m of all.filter((x) => x.packs)) assert.match(m.packs, /^(8|16|24|32|48|64)(,(8|16|24|32|48|64))*$/);
-  const packs = manifestPacks();
-  assert.deepEqual(packs.map((p) => p.id), ['8', '16', '24', '32', '48', '64']);
-  for (const p of packs) for (const m of p.models) assert.ok(all.some((x) => x.name === m.name), `${p.id}: ${m.name} is pulled`);
+  for (const m of all) assert.ok(!('packs' in m) && !('minMemGb' in m) && !('maxMemGb' in m), `${m.name}: nothing about it is conditional on a Mac`);
 });
 
 test('dry run into a temp prefix: downloads, verifies, unpacks, commits the app and the cemented wake word, touches nothing else', opts, async () => {
@@ -123,11 +122,11 @@ test('dry run into a temp prefix: downloads, verifies, unpacks, commits the app 
     assert.match(run.out, /Would fetch 2 confirmed corpora/, 'the knowledge bootstrap ran in dry-run mode');
     assert.equal(srv.seen.filter((s) => s.url.includes('.part')).length, r.manifest.parts.length, 'each part fetched once');
     const inspect = await runEngine(['--inspect', '--prefix', w.prefix, '--manifest', r.manifestFile], w.env);
-    const { memGb, chip, freeGb, recommendedPack, packs, ...facts } = JSON.parse(inspect.out);
+    const { memGb, chip, freeGb, ...facts } = JSON.parse(inspect.out);
     assert.deepEqual(facts, { installed: true, app: appIn(w), legacyApp: '', cemented: true, wakeWord: 'Kingmaker', release: 'v0.2.0', version: '0.2.0' });
-    // The launcher's facts for the profile packs: this Mac's memory and the pack it should take.
-    assert.ok(memGb >= 8 && typeof chip === 'string' && typeof freeGb === 'number' && Array.isArray(packs));
-    assert.match(recommendedPack, /^(8|16|24|32|48|64)$/);
+    // This Mac's facts ride along as information only: nothing is picked from them (no packs, no recommendation).
+    assert.ok(memGb >= 8 && typeof chip === 'string' && typeof freeGb === 'number');
+    assert.ok(!('packs' in JSON.parse(inspect.out)) && !('recommendedPack' in JSON.parse(inspect.out)), 'inspect offers no pack');
   } finally { await srv.close(); }
 });
 
@@ -290,13 +289,11 @@ test('with a Kingmaker Release certificate pinned, an app signed by anything els
   } finally { await srv.close(); }
 });
 
-test('an installer ships only when it can: packs, the launcher, the macOS floor, this version, and update enrollment', opts, async () => {
+test('an installer ships only when it can: the launcher, the macOS floor, this version, and update enrollment', opts, async () => {
   const r = await release(), m = r.manifest;
   const enroll = { url: 'https://updates.example.com', code: 'c0de' };
-  assert.deepEqual(shipProblems(m, { pkgVersion: m.version, enroll }), [], 'a release-parts.mjs manifest of this version, with enrollment, ships');
-  assert.equal(m.requires.macos, MIN_MACOS);
-  const why = (change, opts2 = {}) => shipProblems({ ...structuredClone(m), ...change }, { pkgVersion: m.version, enroll, ...opts2 }).join(' | ');
-  assert.match(why({ packs: [] }), /carries no packs/);
+  assert.ok(!('packs' in m), 'the manifest carries no capability-pack table (the metered-doctrine rework)');
+  assert.deepEqual(shipProblems(m, { pkgVersion: m.version, enroll }), [], 'a packless release-parts.mjs manifest of this version, with enrollment, ships');
   assert.match(why({ launcher: null }), /Ronin Launcher pin is not sound/);
   assert.match(why({ requires: { macos: '13.0', arch: 'arm64' } }), /declares macOS 13\.0, below Kingmaker's floor of 14\.0/);
   assert.match(why({ brew: [{ formula: 'openclaw/tap/peekaboo', bin: 'peekaboo' }] }), /no minMacos/);
@@ -323,7 +320,7 @@ test('a tool that needs a newer macOS than this Mac is left out, said plainly, a
   const installed = new Map(m.models.map((x) => [x.name, x.digest]));
   const ollama = (req, res) => {
     if (req.url === '/api/tags') { res.setHeader('content-type', 'application/json'); return res.end(JSON.stringify({ models: [...installed].map(([name, digest]) => ({ name, digest })) })); }
-    if (req.url === '/api/pull') {   // a pack's model this world hasn't got: pulled, unpinned
+    if (req.url === '/api/pull') {   // a manifest model this world hasn't got: pulled, unpinned
       let body = ''; req.on('data', (d) => { body += d; });
       req.on('end', () => { const { model } = JSON.parse(body); installed.set(model, 'c'.repeat(64)); res.end(`${JSON.stringify({ status: 'success' })}\n`); });
       return undefined;
@@ -446,6 +443,42 @@ test('the Ronin Launcher installs beside Kingmaker (required): placed after veri
   const { launcher: _l, ...withoutPin } = r.manifest;
   assert.deepEqual(manifestProblems(withoutPin), [], 'an older release (no pin) still reads');
   assert.throws(() => buildManifest({ ...withoutPin, app: { bundleId: r.manifest.app.bundleId }, archive: { name: r.manifest.app.archive, size: r.manifest.app.size, sha256: r.manifest.app.sha256 } }), /Ronin Launcher is a required part/);
+});
+
+test('Kingmaker installs undocked when the owner asks; a Mac App Store launcher already here is left alone', opts, async () => {
+  const r = await release();
+  // Undocked: nothing about the launcher is fetched — not even from a server whose launcher zip is corrupt — and
+  // nothing is placed. Kingmaker itself installs whole.
+  const bad = await serveRelease(r.out, { corrupt: { [r.manifest.launcher.archive]: true } });
+  const w = world();
+  try {
+    const run = await runEngine(['--wake-word', 'Kingmaker', '--prefix', w.prefix, '--base-url', bad.url, '--manifest', r.manifestFile, '--without-launcher'], w.env);
+    assert.equal(run.code, 0, run.out);
+    assert.ok(existsSync(appIn(w)), 'Kingmaker.app is installed');
+    assert.equal(existsSync(join(w.prefix, 'Applications', 'Ronin Launcher.app')), false, 'no launcher was placed');
+    assert.match(run.out, /Installing Kingmaker undocked/);
+    assert.equal(readFileSync(join(dataIn(w), 'launcher-choice'), 'utf8').trim(), 'without', 'the choice is written down for later updates');
+  } finally { await bad.close(); }
+  // The environment switch is the same choice.
+  const ok = await serveRelease(r.out);
+  const w2 = world();
+  try {
+    const run = await runEngine(['--wake-word', 'Kingmaker', '--prefix', w2.prefix, '--base-url', ok.url, '--manifest', r.manifestFile], { ...w2.env, KINGMAKER_WITHOUT_LAUNCHER: '1' });
+    assert.equal(run.code, 0, run.out);
+    assert.equal(existsSync(join(w2.prefix, 'Applications', 'Ronin Launcher.app')), false);
+  } finally { /* ok is reused below */ }
+  // A Mac App Store copy already in Applications: the release's launcher is still verified, but not placed over it.
+  const w3 = world();
+  try {
+    const mas = join(w3.prefix, 'Applications', 'Ronin Launcher.app');
+    mkdirSync(join(mas, 'Contents', '_MASReceipt'), { recursive: true });
+    writeFileSync(join(mas, 'Contents', '_MASReceipt', 'receipt'), 'receipt');
+    writeFileSync(join(mas, 'Contents', 'marker'), 'the app store copy');
+    const run = await runEngine(['--wake-word', 'Kingmaker', '--prefix', w3.prefix, '--base-url', ok.url, '--manifest', r.manifestFile], w3.env);
+    assert.equal(run.code, 0, run.out);
+    assert.equal(readFileSync(join(mas, 'Contents', 'marker'), 'utf8'), 'the app store copy', 'the App Store copy was not replaced');
+    assert.match(run.out, /Mac App Store copy of the Ronin Launcher is already here/);
+  } finally { await ok.close(); }
 });
 
 test('the installer shows the community download count from ronininc.org, and nothing when it cannot reach it', () => {

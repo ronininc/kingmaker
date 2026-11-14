@@ -1,0 +1,4 @@
+obscura/intake/*.tar.gz
+obscura/intake/linux/obscura
+obscura/intake/linux/obscura-worker
+*.tar.gz

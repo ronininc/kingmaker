@@ -1,0 +1,305 @@
+{
+  "components": [
+    {
+      "descriptor": "descriptor.json",
+      "entryModules": [],
+      "home": "~/workspace/kingmaker-v042/scrapling",
+      "id": "scrapling",
+      "licensePosture": {
+        "class": "clean",
+        "distribution": "governed connector — adapter code is Ronin Inc's; upstream library installed by the operator, never vendored",
+        "license": "BSD-3-Clause",
+        "solomon": "eligible (BSD-3) once REA review clears",
+        "tool": "D4Vinci/Scrapling"
+      },
+      "modules": [
+        {
+          "path": "lib/scrapling-adapter.mjs",
+          "mtime": "2026-10-20T08:55:07.757Z"
+        }
+      ],
+      "name": "Scrapling — governed intake scraper",
+      "role": "Intake/data lane adapter: Scrapling's fetcher interface (Fetcher / StealthyFetcher, CSS/XPath/Markdown) behind the host-side egress guard and the hash-chained audit log; transport injected, no live scraping in the fold-in",
+      "testSuites": [
+        {
+          "path": "tests/run-tests.mjs",
+          "mtime": "2026-10-20T08:56:57.950Z"
+        }
+      ]
+    },
+    {
+      "descriptor": "descriptor.json",
+      "entryModules": [],
+      "home": "~/workspace/kingmaker-v042/obscura",
+      "id": "obscura",
+      "licensePosture": {
+        "class": "clean",
+        "distribution": "binary installed by the operator from the pinned release; descriptor + contract are Ronin Inc code",
+        "license": "Apache-2.0",
+        "solomon": "eligible (Apache-2.0)",
+        "tool": "h4ckf0r0day/obscura"
+      },
+      "modules": [
+        {
+          "path": "lib/obscura-contract.mjs",
+          "mtime": "2026-10-21T06:59:41.511Z"
+        }
+      ],
+      "name": "Obscura — agent browser (MCP mode)",
+      "role": "Agent-browser registration: MCP connector descriptor (obscura mcp, stdio), the verified 37-tool surface risk-classed, the binary pin record (hash left empty for Cage intake), and the governed launch contract (stdio home, HTTP token-gated, private-network widening forbidden)",
+      "testSuites": [
+        {
+          "path": "tests/run-tests.mjs",
+          "mtime": "2026-10-21T06:59:50.905Z"
+        }
+      ]
+    },
+    {
+      "descriptor": "descriptor.json",
+      "entryModules": [],
+      "home": "~/workspace/kingmaker-v042/blender-mcp",
+      "id": "blender-mcp",
+      "licensePosture": {
+        "class": "clean",
+        "distribution": "operator-run connector via uvx; descriptor + contract are Ronin Inc code",
+        "license": "MIT",
+        "solomon": "eligible (MIT)",
+        "tool": "ahujasid/mcp-for-blender"
+      },
+      "modules": [
+        {
+          "path": "lib/blender-contract.mjs",
+          "mtime": "2026-10-20T08:57:34.538Z"
+        }
+      ],
+      "name": "Blender MCP — sovereign 3D pipeline connector",
+      "role": "3D pipeline registration: MCP server descriptor (uvx mcp-for-blender), governed start contract (telemetry pinned OFF, safe mode pinned ON, addon socket localhost-only), nine README-verified capabilities risk-classed (code-exec tap-gated, egress per-service declared)",
+      "testSuites": [
+        {
+          "path": "tests/run-tests.mjs",
+          "mtime": "2026-10-20T08:57:39.751Z"
+        }
+      ]
+    },
+    {
+      "descriptor": "descriptor.json",
+      "entryModules": [],
+      "home": "~/workspace/kingmaker-v042/whatsapp-mcp",
+      "id": "whatsapp-mcp",
+      "licensePosture": {
+        "class": "clean",
+        "distribution": "operator-run connector (Go bridge + Python MCP server); descriptor + gate are Ronin Inc code",
+        "license": "MIT",
+        "solomon": "eligible (MIT) under the same send law",
+        "tool": "lharries/whatsapp-mcp"
+      },
+      "modules": [
+        {
+          "path": "lib/whatsapp-gate.mjs",
+          "mtime": "2026-10-20T08:57:55.325Z"
+        }
+      ],
+      "name": "WhatsApp MCP Server — governed comms connector",
+      "role": "Comms registration with the founder's law in code: nine read tools ambient + audited; three send tools governed — known contacts only, per-batch founder tap with a hard allowance, TCPA attestation left to the founder alone; message store stays local",
+      "testSuites": [
+        {
+          "path": "tests/run-tests.mjs",
+          "mtime": "2026-10-20T08:58:02.160Z"
+        }
+      ]
+    },
+    {
+      "descriptor": "descriptor.json",
+      "entryModules": [],
+      "home": "~/workspace/kingmaker-v042/angelslim",
+      "id": "angelslim",
+      "licensePosture": {
+        "class": "clean",
+        "distribution": "toolkit run by the operator / in the cell; outputs governed by each source model's license",
+        "license": "Apache-2.0",
+        "solomon": "eligible (Apache-2.0)",
+        "tool": "Tencent/AngelSlim"
+      },
+      "modules": [
+        {
+          "path": "lib/angelslim-job.mjs",
+          "mtime": "2026-10-20T08:58:16.198Z"
+        }
+      ],
+      "name": "AngelSlim — condense-lane compression workload",
+      "role": "Condense lane as a SPACE-cell-style workload: compression-job descriptor (model hashed in, model hashed out, egress deny-all) plus a stub runner behind the founder tap — the LittleBrother methods-full pattern",
+      "testSuites": [
+        {
+          "path": "tests/run-tests.mjs",
+          "mtime": "2026-10-20T08:58:21.377Z"
+        }
+      ]
+    },
+    {
+      "descriptor": "descriptor.json",
+      "entryModules": [],
+      "home": "~/workspace/kingmaker-v042/freemocap",
+      "id": "freemocap",
+      "licensePosture": {
+        "class": "agpl-external",
+        "distribution": "EXTERNAL-ONLY — driven, never linked, never shipped",
+        "license": "AGPL-3.0",
+        "solomon": "EXCLUDED",
+        "tool": "freemocap/freemocap"
+      },
+      "modules": [
+        {
+          "path": "lib/freemocap-external.mjs",
+          "mtime": "2026-10-20T08:58:32.242Z"
+        }
+      ],
+      "name": "FreeMoCap — external motion capture",
+      "role": "External-only registration: operator-run mocap for the animation lane; Kingmaker consumes exported .blend/.csv files through the Cage and nothing else; guard tripwire + self-scan keep AGPL code out of the tree",
+      "testSuites": [
+        {
+          "path": "tests/run-tests.mjs",
+          "mtime": "2026-10-20T08:58:37.306Z"
+        }
+      ]
+    },
+    {
+      "entryModules": [],
+      "home": "~/workspace/kingmaker-v042/triage",
+      "id": "triage",
+      "licensePosture": {
+        "class": "unverified",
+        "distribution": "no artifact — records only; nothing to distribute",
+        "license": "UNVERIFIED (claims recorded per record)",
+        "solomon": "excluded until cleared",
+        "tool": "MiMo-V2.6-Distill-Qwen-9B (Xiaomi) / Hy-MT2 (Tencent)"
+      },
+      "modules": [
+        {
+          "path": "lib/triage.mjs",
+          "mtime": "2026-10-20T08:58:49.504Z"
+        }
+      ],
+      "name": "Triage records — unverified model candidates",
+      "records": [
+        "mimo-v26-distill-qwen-9b.json",
+        "hy-mt2.json"
+      ],
+      "role": "Cage/Housing Bay intake paper for two scan-surfaced models: license claim, source, empty hash field, verdict DO NOT USE until cleared; assertUsable() enforces the verdict in code; no weights downloaded",
+      "testSuites": [
+        {
+          "path": "tests/run-tests.mjs",
+          "mtime": "2026-10-20T08:58:55.279Z"
+        }
+      ]
+    },
+    {
+      "entryModules": [],
+      "home": "~/workspace/kingmaker-v042",
+      "id": "kingmaker-v042",
+      "licensePosture": {
+        "class": "clean",
+        "distribution": "Ronin Inc integration code",
+        "license": "Ronin Inc (integration layer)",
+        "solomon": "n/a",
+        "tool": "—"
+      },
+      "modules": [
+        {
+          "path": "census42.mjs",
+          "mtime": "2026-10-20T08:59:46.027Z"
+        },
+        {
+          "path": "lib/audit-chain.mjs",
+          "mtime": "2026-10-20T08:54:54.897Z"
+        },
+        {
+          "path": "lib/governance.mjs",
+          "mtime": "2026-10-20T08:54:54.938Z"
+        },
+        {
+          "path": "verify-42.mjs",
+          "mtime": "2026-10-20T09:00:18.232Z"
+        }
+      ],
+      "name": "4.2 integration layer",
+      "role": "This folder: the shared audit chain + governance primitives (lib/), the seam checks (seams42.test.mjs), the verifier (verify-42.mjs), the census (census42.mjs), this registry, and STACK42.md",
+      "testSuites": [
+        {
+          "path": "seams42.test.mjs",
+          "mtime": "2026-10-20T08:59:31.511Z"
+        }
+      ]
+    }
+  ],
+  "generatedAt": "2026-10-21T07:00:10.701Z",
+  "stack": "kingmaker-v042",
+  "verify": {
+    "checks": 145,
+    "command": "node ~/workspace/kingmaker-v042/verify-42.mjs",
+    "lastResult": "STACK42 GREEN — 8/8 suites passed; 145/145 checks counted (2026-10-20)",
+    "suites": 8
+  },
+  "versionStampSource": "file mtimes (no git metadata in component homes)",
+  "byteCensus": {
+    "generatedAt": "2026-10-21T07:00:10.701Z",
+    "methodology": "code = .mjs under each component's lib/ and tests/ plus the integration layer's root modules (verify-42, census42, seams42) and shared lib/; other = descriptor JSONs, triage records, STACK42.md, NOTICE, and this registry. Exact file bytes, no estimates.",
+    "scope": "The fold-in carries NO binaries, NO model weights, and NO vendored upstream code — by design (registrations, contracts, stubs, and paper only).",
+    "components": {
+      "scrapling": {
+        "codeBytes": 11871,
+        "codeFiles": 2,
+        "otherBytes": 1477,
+        "otherFiles": 1
+      },
+      "obscura": {
+        "codeBytes": 15913,
+        "codeFiles": 2,
+        "otherBytes": 296109296,
+        "otherFiles": 6
+      },
+      "blender-mcp": {
+        "codeBytes": 10879,
+        "codeFiles": 2,
+        "otherBytes": 2225,
+        "otherFiles": 1
+      },
+      "whatsapp-mcp": {
+        "codeBytes": 12544,
+        "codeFiles": 2,
+        "otherBytes": 1977,
+        "otherFiles": 1
+      },
+      "angelslim": {
+        "codeBytes": 10222,
+        "codeFiles": 2,
+        "otherBytes": 1813,
+        "otherFiles": 1
+      },
+      "freemocap": {
+        "codeBytes": 6998,
+        "codeFiles": 2,
+        "otherBytes": 1478,
+        "otherFiles": 1
+      },
+      "triage": {
+        "codeBytes": 6505,
+        "codeFiles": 2,
+        "otherBytes": 2756,
+        "otherFiles": 2
+      },
+      "kingmaker-v042": {
+        "codeBytes": 22310,
+        "codeFiles": 5,
+        "otherBytes": 164564,
+        "otherFiles": 9
+      }
+    },
+    "totals": {
+      "codeBytes": 97242,
+      "codeFiles": 19,
+      "otherBytes": 296285586,
+      "otherFiles": 22,
+      "allBytes": 296382828
+    }
+  }
+}

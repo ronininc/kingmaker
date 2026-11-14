@@ -1,0 +1,109 @@
+KINGMAKER 4.2 — THIRD-PARTY NOTICES AND LICENSE POSTURE
+
+The kingmaker-v042 tree itself — the integration layer, descriptors,
+contracts, gates, adapters, and tests — is Ronin Inc work. It contains
+NO upstream code: no vendored sources, no copied implementations, no
+binaries, no model weights. What follows is the license posture of
+every external project this stack REGISTERS or REFERENCES, and the
+terms on which each is allowed near the product.
+
+======================================================================
+CLEAN LICENSES — governed use permitted
+======================================================================
+
+Scrapling — BSD-3-Clause
+  Project: D4Vinci/Scrapling — https://github.com/D4Vinci/Scrapling
+  Posture: the governed adapter in scrapling/ mirrors the upstream
+  interface (Fetcher / StealthyFetcher shape, verified from the
+  project README on 2026-10-20). The upstream library is installed by
+  the operator; it is not vendored into this tree or the payload.
+
+Obscura — Apache-2.0
+  Project: h4ckf0r0day/obscura — https://github.com/h4ckf0r0day/obscura
+  Posture: connector registration only (MCP descriptor, pin record,
+  launch contract). The binary is obtained by the operator from the
+  project's releases and hash-pinned through Cage intake before first
+  launch; nothing of it is redistributed by this tree.
+
+Blender MCP (mcp-for-blender) — MIT
+  Project: ahujasid/mcp-for-blender —
+  https://github.com/ahujasid/mcp-for-blender (third-party integration;
+  not a Blender project)
+  Posture: connector registration only (descriptor, start contract,
+  capability classes from the project README, fetched 2026-10-20).
+  Run by the operator via uvx. Asset services it can reach (Poly
+  Haven, Sketchfab, Poly Pizza, and the 3D generators) carry their own
+  terms; Poly Pizza CC-BY assets require attribution, which upstream
+  writes onto imported objects.
+
+WhatsApp MCP Server — MIT
+  Project: lharries/whatsapp-mcp —
+  https://github.com/lharries/whatsapp-mcp
+  Posture: connector registration only (descriptor + send gate). The
+  bridge (Go, whatsmeow — a separate upstream project with its own
+  terms) holds the operator's own WhatsApp session; the message store
+  stays on the operator's machine.
+
+AngelSlim — Apache-2.0
+  Project: Tencent/AngelSlim — https://github.com/Tencent/AngelSlim
+  (License read from the project's LICENSE file; GitHub's API cannot
+  classify Tencent's license preamble, so the posture is recorded
+  explicitly here and in the registry.)
+  Posture: workload registration only (job descriptor + stub runner).
+  Compression OUTPUTS are model artifacts governed by each source
+  model's own license, not by AngelSlim's.
+
+======================================================================
+AGPL-3.0 — EXTERNAL ONLY. NEVER LINKED, NEVER SHIPPED.
+======================================================================
+
+FreeMoCap — AGPL-3.0
+  Project: freemocap/freemocap —
+  https://github.com/freemocap/freemocap
+  Posture: EXTERNAL-ONLY registration. FreeMoCap is run by an operator,
+  in their own session, on their own machine. Kingmaker does not
+  import, link, vendor, bundle, host, or redistribute it, and this
+  registration is EXCLUDED from Solomon entirely. The only contact
+  surface is FreeMoCap's exported files (.blend / .csv), which enter
+  Kingmaker through the Cage like any external artifact. The
+  freemocap/ component enforces this posture in code and by self-scan;
+  see freemocap/lib/freemocap-external.mjs.
+
+  The same rule governs every AGPL component in the wider stack
+  (heretic-llm, Voice Studio): external engines are driven, never
+  absorbed.
+
+======================================================================
+UNVERIFIED — NO LICENSE RELIED UPON
+======================================================================
+
+MiMo-V2.6-Distill-Qwen-9B (Xiaomi) and Hy-MT2 (Tencent) appear in this
+stack as TRIAGE RECORDS ONLY (triage/). A social-media caption claim
+("MIT", for MiMo) is recorded AS a claim and verified: false. No
+weights were downloaded, no license is relied upon, and both records
+carry the verdict DO NOT USE until cleared — license verified at
+source, hash recorded at Cage intake, Cage scan passed.
+
+======================================================================
+UPSTREAM POINTERS
+======================================================================
+
+- Scrapling:    https://github.com/D4Vinci/Scrapling (BSD-3-Clause)
+- Obscura:      https://github.com/h4ckf0r0day/obscura (Apache-2.0)
+- Blender MCP:  https://github.com/ahujasid/mcp-for-blender (MIT)
+- WhatsApp MCP: https://github.com/lharries/whatsapp-mcp (MIT)
+- AngelSlim:    https://github.com/Tencent/AngelSlim (Apache-2.0)
+- FreeMoCap:    https://github.com/freemocap/freemocap (AGPL-3.0 —
+                external only; see the AGPL section above)
+
+======================================================================
+CLEAN-ROOM NOTE
+======================================================================
+
+Every 4.2 component was written from upstream READMEs and
+documentation (behavior and interface facts) — never from upstream
+source. Interfaces were verified against the projects' own published
+docs on 2026-10-20 where the registration depends on them (Blender
+MCP capabilities, Obscura MCP tools, WhatsApp MCP tools, Scrapling
+fetcher shape, AngelSlim method families); anything not verified is
+labeled as such in the component's descriptor.

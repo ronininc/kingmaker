@@ -1,13 +1,13 @@
-// Per-Mac operating profiles (lib/mac-profiles.mjs), structured tool calls (lib/tool-call.mjs) and the benchmark's
-// pure parts (lib/model-bench.mjs): detection from sysctl, the class each Mac gets, the owner's override, and that every
-// committed profile pick is backed by a measured, fitting result in catalog/bench/.
+// The starter floor (lib/mac-profiles.mjs), structured tool calls (lib/tool-call.mjs) and the benchmark's
+// pure parts (lib/model-bench.mjs): detection from sysctl, the floor every Mac shares, and that every floor
+// pick is backed by a measured, fitting result in catalog/bench/. Since the metered-doctrine rework
+// (2026-11-14) there is no per-Mac class table: the floor is the smallest sufficient model per role, the
+// same on every device, and anything beyond it is picked per task and metered in.
 import assert from 'node:assert/strict';
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { defaultRouter, LANE_SCHEMA, LANES, ROUTER_CONTEXT, ROUTER_MODEL, WRITER_MODEL, writerModel } from '../lib/fast-route.mjs';
-import { BENCH_SETS, CLASSES, GRANITE_8GB, PACKS, packFor, recommendedPack, classFor, detectMac, normalizeOverride, parseChip, PROFILES, profileFor, profileLine, readProfileOverride, ROLES, roleModel, writeProfileOverride } from '../lib/mac-profiles.mjs';
+import { defaultRouter, LANE_SCHEMA, LANES, ROUTER_CONTEXT, writerModel } from '../lib/fast-route.mjs';
+import { BENCH_SETS, FLOOR_MODELS, FLOOR_ROLES, GRANITE_8GB, MODEL_GB, ROLES, detectMac, floorLine, floorRole, knownModelTags, parseChip } from '../lib/mac-profiles.mjs';
 import { benchProvenance, benchSlug, hasModel, mayStart, MIN_FREE_PCT, runnerRows, stepMatches, summarize, TOOL_CASES, verdict, WRITE_CASES } from '../lib/model-bench.mjs';
 import { fitsSchema, NO_TOOL, parseReply, pickSchema, twoStepCall } from '../lib/tool-call.mjs';
 import { benchOutDir, benchSet, brainLibraryScript } from '../lib/bench-cli.mjs';
@@ -29,81 +29,47 @@ test('detectMac reads hw.memsize and the chip from sysctl (the 8 GB M3 and this 
   assert.equal(m5.ramGb, 24); assert.equal(m5.bandwidth, 307);
 });
 
-test('every RAM size Apple sells gets the right class', () => {
-  const cases = { 8: 8, 16: 16, 18: 16, 24: 24, 32: 32, 36: 32, 48: 48, 64: 64, 96: 64, 128: 64, 192: 64, 4: 8 };
-  for (const [ram, cls] of Object.entries(cases)) assert.equal(classFor(Number(ram)), cls, `${ram} GB`);
-  for (const c of CLASSES) assert.ok(PROFILES[c], `profile ${c}`);
-});
-
-test('every profile names a model for every role and sane limits', () => {
-  for (const c of CLASSES) {
-    const p = PROFILES[c];
-    for (const r of ROLES) assert.match(p[r], /^[\w./:-]+$/, `${c} GB ${r}`);
-    assert.ok(p.maxResidentGb > 0 && p.maxResidentGb < c, `${c} GB leaves room for macOS`);
-    assert.ok(p.context >= 2048 && p.concurrent >= 1);
+test('the floor names the smallest sufficient model for every role — the same on every Mac', () => {
+  for (const r of ROLES) {
+    assert.equal(floorRole(r), FLOOR_ROLES[r], r);
+    assert.ok(knownModelTags().includes(FLOOR_ROLES[r]), `${r}: ${FLOOR_ROLES[r]} is a tabled model`);
+    assert.ok(MODEL_GB[FLOOR_ROLES[r]] > 0, `${r}: the floor pick has a measured size`);
   }
-  // The 8 GB standard: one small model at a time, text only, no picture engine, a 4k context.
-  assert.equal(PROFILES[8].concurrent, 1); assert.equal(PROFILES[8].voice, 'off'); assert.equal(PROFILES[8].imageLane, false);
-  assert.ok(PROFILES[8].maxResidentGb <= 3.5); assert.equal(PROFILES[8].context, 4096);
+  // Writer and reasoning share one model (a small Mac keeps one writing brain resident); the router is
+  // the smallest router-tabled model — routing does not need the writer's size.
+  assert.equal(FLOOR_ROLES.writer, GRANITE_8GB);
+  assert.equal(FLOOR_ROLES.reasoning, FLOOR_ROLES.writer);
+  assert.ok(MODEL_GB[FLOOR_ROLES.router] < MODEL_GB[FLOOR_ROLES.writer], 'the router is smaller than the writer');
+  assert.deepEqual([...FLOOR_MODELS].sort(), [...new Set(Object.values(FLOOR_ROLES))].sort(), 'the floor set is the floor roles, deduplicated');
+  assert.equal(floorRole('nope'), null);
 });
 
-test('the write lane and the router default to this Mac\'s profile: one model on 8 GB, the 8b and 1.7b above', () => {
-  const gb = (n) => n * 2 ** 30;
-  assert.equal(writerModel(null, { memBytes: gb(8) }), GRANITE_8GB);
-  assert.equal(defaultRouter(gb(8)), GRANITE_8GB, 'on 8 GB the writer routes too: no reload between routing and writing');
-  assert.equal(writerModel(null, { memBytes: gb(24) }), WRITER_MODEL);
-  assert.equal(writerModel(null, { memBytes: gb(16) }), WRITER_MODEL);
-  assert.equal(defaultRouter(gb(24)), ROUTER_MODEL);
-  assert.equal(writerModel('dolphin3:8b', { memBytes: gb(8) }), 'dolphin3:8b', 'a pin always wins');
+test('the write lane and the router default to the floor; a pin always wins', () => {
+  assert.equal(writerModel(null), GRANITE_8GB, 'the write lane defaults to the floor writer on every Mac');
+  assert.equal(defaultRouter(), FLOOR_ROLES.router, 'the router defaults to the floor router on every Mac');
+  assert.equal(writerModel('dolphin3:8b'), 'dolphin3:8b', 'a pin always wins');
 });
 
-test('packs: one per class, this Mac\'s recommended, each with its models, sizes and features', () => {
-  assert.deepEqual(PACKS.map((p) => p.id), CLASSES.map(String));
-  assert.equal(recommendedPack(8), '8'); assert.equal(recommendedPack(18), '16'); assert.equal(recommendedPack(24), '24'); assert.equal(recommendedPack(128), '64');
-  const lean = packFor(8);
-  assert.equal(lean.features.voice, false); assert.equal(lean.features.pictures, false); assert.equal(lean.features.concurrent, 1);
-  assert.deepEqual(lean.models.find((m) => m.tag === GRANITE_8GB).roles, ['router', 'writer', 'reasoning']);
-  for (const p of PACKS) { assert.ok(p.models.length >= 1); for (const m of p.models) assert.ok(m.gb > 0, `${p.id}: ${m.tag} has a size`); assert.ok(p.downloadGb > 0); }
+test('the floor line names this Mac and the floor it shares with every Mac', () => {
+  const line = floorLine({ chip: 'M3', ramGb: 8 });
+  assert.match(line, /M3 · 8 GB/);
+  assert.match(line, /starter floor \(the same on every Mac\)/);
+  assert.match(line, /picked per task and metered in/);
+  for (const r of ROLES) assert.ok(line.includes(FLOOR_ROLES[r]), `${r} named`);
 });
 
-test('the owner can override the profile; an override above this Mac is flagged', () => {
-  const mac = { ramGb: 8, chip: 'M3', bandwidth: 100 };
-  assert.equal(profileFor(mac).id, '8');
-  const up = profileFor(mac, { override: '24' });
-  assert.equal(up.id, '24'); assert.equal(up.overridden, true); assert.equal(up.aboveThisMac, true);
-  assert.match(profileLine(up), /above this Mac's 8 GB class/);
-  assert.equal(profileFor({ ramGb: 24 }, { override: '16' }).aboveThisMac, false);
-  assert.equal(normalizeOverride('banana'), 'auto'); assert.equal(normalizeOverride(' 16 '), '16');
-  const dir = mkdtempSync(join(tmpdir(), 'km-prof-'));
-  try {
-    assert.equal(readProfileOverride(dir), 'auto');
-    assert.equal(writeProfileOverride(dir, '16'), '16'); assert.equal(readProfileOverride(dir), '16');
-    assert.equal(writeProfileOverride(dir, 'nonsense'), 'auto');
-  } finally { rmSync(dir, { recursive: true, force: true }); }
-});
-
-test('a role falls back to a smaller class\'s pick when the profile\'s own model is not installed', () => {
-  const p = profileFor({ ramGb: 24 });
-  assert.equal(roleModel(p, 'writer', [p.writer]), p.writer);
-  assert.equal(roleModel(p, 'writer', [PROFILES[8].writer]), PROFILES[8].writer);
-  assert.equal(roleModel(p, 'writer', []), null);
-});
-
-test('the profiles are chosen from measured numbers: each 8 GB and 24 GB pick was benchmarked and fits', () => {
+test('the floor is chosen from measured numbers: each pick was benchmarked on the 8 GB simulation and fits that device', () => {
   const load = (f) => { const p = new URL(`../catalog/bench/${f}`, import.meta.url); return existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : null; };
-  const sim8 = load('m5-pro-24gb-as-8gb.json'), m5 = load('m5-pro-24gb.json');
-  assert.ok(sim8 && m5, 'the committed bench results');
-  const check = (bench, cls) => {
-    const p = PROFILES[cls];
-    for (const role of ROLES) {
-      const r = bench.results.find((x) => x.model === p[role]);
-      assert.ok(r, `${cls} GB ${role} ${p[role]} was measured`);
-      const v = verdict(r, { maxResidentGb: p.maxResidentGb });
-      assert.ok(v.fits, `${cls} GB ${role} ${p[role]} fits ${p.maxResidentGb} GB (${v.why})`);
-    }
-  };
-  check(sim8, 8); check(m5, 24);
-  // The real 8 GB set is the simulation's own measured models.
+  const sim8 = load('m5-pro-24gb-as-8gb.json');
+  assert.ok(sim8, 'the committed bench results');
+  for (const role of ROLES) {
+    const tag = FLOOR_ROLES[role];
+    const r = sim8.results.find((x) => x.model === tag);
+    assert.ok(r, `${role} ${tag} was measured`);
+    const v = verdict(r, { maxResidentGb: 8 });
+    assert.ok(v.fits, `${role} ${tag} fits the 8 GB device it was simulated as (${v.why})`);
+  }
+  // The real 8 GB candidate set is the simulation's own measured models.
   for (const m of BENCH_SETS[8]) assert.ok(sim8.results.some((r) => r.model === m.tag), `${m.tag} in the 8 GB set was measured`);
 });
 
@@ -195,12 +161,11 @@ test('a bench file says what made it: the version and the commit, read from .git
   assert.deepEqual(benchProvenance(root, files({ 'package.json': '{"version":"1"}' })), { version: '1', commit: null, branch: null }, 'no checkout (the app)');
 });
 
-test('a bench set is the class\'s candidates, else its own pack, never another class\'s (16 GB once benched the 8 GB set)', () => {
+test('a bench set is a named candidate list; there are no per-class sets anymore', () => {
   assert.deepEqual(benchSet('8'), BENCH_SETS[8].map((m) => m.tag));
   assert.deepEqual(benchSet(24), BENCH_SETS[24].map((m) => m.tag));
   assert.deepEqual(benchSet('8-wide'), BENCH_SETS['8-wide'].map((m) => m.tag));
-  for (const id of ['16', '32', '48', '64']) assert.deepEqual(benchSet(id), PACKS.find((p) => p.id === id).models.map((m) => m.tag), `${id} benches its pack`);
-  assert.ok(!benchSet(16).includes(GRANITE_8GB), 'the 8 GB writer is not a 16 GB candidate');
+  for (const id of ['16', '32', '48', '64']) assert.deepEqual(benchSet(id), [], `${id} is not a set (packs are retired)`);
   const all = benchSet('all'); assert.equal(new Set(all).size, all.length); assert.ok(BENCH_SETS[24].every((m) => all.includes(m.tag)));
   assert.deepEqual(benchSet('12'), []);
 });

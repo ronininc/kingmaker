@@ -1,0 +1,110 @@
+--- /tmp/KingmakerInstaller.swift	2026-10-20 02:38:41.169839011 -0700
++++ /tmp/KingmakerInstaller-v041.swift	2026-10-20 02:39:31.157562228 -0700
+@@ -199,6 +199,10 @@
+   @Published var packs: [Pack] = []
+   @Published var recommendedPack = ""
+   @Published var selectedPack = ""
++  @Published var libraryTotalMB = 0
++  @Published var libraryCorpora = 0
++  @Published var libraryDelivery = "stream"
++  @Published var freeGb: Double = 0
+   @Published var memGb = 0
+   @Published var chip = ""
+   @Published var showingTerms = false
+@@ -240,6 +244,10 @@
+         self?.packs = ((obj["packs"] as? [[String: Any]]) ?? []).compactMap(Pack.init)
+         self?.memGb = (obj["memGb"] as? Int) ?? 0
+         self?.chip = (obj["chip"] as? String) ?? ""
++        self?.libraryTotalMB = (obj["libraryTotalMB"] as? Int) ?? 0
++        self?.libraryCorpora = (obj["libraryCorpora"] as? Int) ?? 0
++        if let d = obj["libraryDelivery"] as? String, d == "full" || d == "stream" { self?.libraryDelivery = d }
++        self?.freeGb = (obj["freeGb"] as? Double) ?? Double((obj["freeGb"] as? Int) ?? 0)
+         let rec = (obj["recommendedPack"] as? String) ?? ""
+         self?.recommendedPack = rec
+         if self?.selectedPack.isEmpty ?? false { self?.selectedPack = rec }
+@@ -263,7 +271,8 @@
+     let p = Process()
+     p.executableURL = URL(fileURLWithPath: "/bin/bash")
+     let pack: [String] = packs.isEmpty || selectedPack.isEmpty ? [] : ["--pack", selectedPack]
+-    p.arguments = [engine.path, "--wake-word", word] + terms + pack + Installer.devArgs
++    let library: [String] = libraryTotalMB > 0 ? ["--library-delivery", libraryDelivery] : []
++    p.arguments = [engine.path, "--wake-word", word] + terms + pack + library + Installer.devArgs
+     let out = Pipe()
+     p.standardOutput = out
+     p.standardError = FileHandle.nullDevice
+@@ -440,6 +449,7 @@
+     case .ready, .failed:
+       VStack(alignment: .leading, spacing: 8) {
+         if !installer.packs.isEmpty { PackPicker(installer: installer).padding(.bottom, 10) }
++        if installer.libraryTotalMB > 0 { LibraryDeliveryPicker(installer: installer).padding(.bottom, 10) }
+         Caps(text: L.t("Wake word"), size: 10, color: Machine.inkDim)
+         TextField(L.t("Give me a name"), text: $installer.wakeWord)
+           .textFieldStyle(.plain)
+@@ -571,6 +581,67 @@
+     }
+     .buttonStyle(.plain)
+   }
++}
++
++// ── the knowledge library delivery choice (engine.sh --inspect -> libraryTotalMB / libraryCorpora /
++// libraryDelivery; CHANGES.md §4) ─────────────────────────────────────────────────────────────────────
++// Two cards above the one button, sizes stated plainly, riding the pack picker's rails. The engine's
++// persisted setting (or stream, first install) arrives pre-selected via inspect; start() passes the
++// pick as --library-delivery, and the engine re-records the effective value in calibration.json —
++// a preference the owner can change in Settings, never a cemented install fact.
++struct LibraryDeliveryPicker: View {
++  @ObservedObject var installer: Installer
++  private let columns = [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)]
++  private var libraryGb: Double { Double(installer.libraryTotalMB) / 1024 }
++  /// Kingmaker itself, for the card copy: the release archive in the bundled manifest plus the
++  /// selected pack's models. (The library is the only variable in the choice; this is the constant.)
++  private var kingmakerGb: Double {
++    var gb = installer.packs.first(where: { $0.id == installer.selectedPack })?.downloadGb ?? 0
++    if let url = Bundle.main.url(forResource: "kingmaker-manifest", withExtension: "json"),
++       let data = try? Data(contentsOf: url),
++       let m = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
++       let archive = m["archive"] as? [String: Any],
++       let size = (archive["size"] as? Double) ?? (archive["size"] as? Int).map(Double.init) {
++      gb += size / 1_000_000_000
++    }
++    return gb
++  }
++  var body: some View {
++    VStack(alignment: .leading, spacing: 8) {
++      HStack {
++        Caps(text: L.t("The knowledge library"), size: 10, color: Machine.inkDim)
++        Spacer()
++        Text("\(installer.libraryCorpora) \(L.t("corpora")) · \(String(format: "%.1f", libraryGb)) \(L.t("GB"))")
++          .font(Machine.mono(10)).foregroundColor(Machine.inkFaint)
++      }
++      LazyVGrid(columns: columns, spacing: 8) {
++        card(mode: "full",
++             title: L.t("Download everything"),
++             line: String(format: "\(L.t("Kingmaker")) %.1f \(L.t("GB")) + \(L.t("the knowledge library")) %.1f \(L.t("GB")), \(L.t("all of it with this install"))", kingmakerGb, libraryGb),
++             marker: installer.freeGb > 0 && installer.freeGb < libraryGb ? (L.t("Not enough room on this Mac"), Machine.amber) : nil)
++        card(mode: "stream",
++             title: L.t("Stream the library later"),
++             line: String(format: "\(L.t("Kingmaker")) %.1f \(L.t("GB")) \(L.t("now; the library")) %.1f \(L.t("GB")) \(L.t("streams in after, or in full whenever you say so in Settings"))", kingmakerGb, libraryGb),
++             marker: nil)
++      }
++    }
++  }
++  private func card(mode: String, title: String, line: String, marker: (String, Color)?) -> some View {
++    let selected = installer.libraryDelivery == mode
++    return Button(action: { installer.libraryDelivery = mode }) {
++      VStack(alignment: .leading, spacing: 4) {
++        Caps(text: title, size: 10, color: selected ? .black : Machine.ink)
++        Text(line).font(Machine.mono(9.5)).foregroundColor(selected ? .black.opacity(0.75) : Machine.inkDim)
++          .fixedSize(horizontal: false, vertical: true)
++        if let marker { Caps(text: marker.0, size: 8.5, color: selected ? .black.opacity(0.6) : marker.1) }
++        else { Caps(text: " ", size: 8.5) }
++      }
++      .padding(10).frame(maxWidth: .infinity, alignment: .leading)
++      .background(selected ? Machine.paper : Color.black)
++      .overlay(Rectangle().stroke(selected ? Machine.paper : Machine.lineFaint, lineWidth: selected ? 1.5 : 1))
++    }
++    .buttonStyle(.plain)
++  }
+ }
+ 
+ /// TERMS.md as the installer carries it, readable before the box is ticked.

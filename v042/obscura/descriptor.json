@@ -1,0 +1,62 @@
+{
+  "governance": {
+    "launch": "governed launch contract (lib/obscura-contract.mjs): stdio is the default and only ambient transport; HTTP requires OBSCURA_MCP_TOKEN >= 32 bytes; --allow-private-network / OBSCURA_ALLOW_PRIVATE_NETWORK are FORBIDDEN (upstream SSRF posture preserved); pin recorded by Cage intake 2026-10-20 (v0.2.5)",
+    "tokenCustody": "OBSCURA_MCP_TOKEN value never lives in the descriptor or the audit log — name only, delivered by the credential broker at launch"
+  },
+  "id": "obscura",
+  "kind": "connector-registration",
+  "lane": "agent browser / rendered-web lane",
+  "licensePosture": {
+    "class": "clean",
+    "distribution": "binary installed by the operator from the pinned release; connector descriptor + contract are Ronin Inc code",
+    "solomon": "eligible (Apache-2.0)"
+  },
+  "mcpServer": {
+    "args": [
+      "mcp"
+    ],
+    "command": "obscura",
+    "env": {
+      "OBSCURA_MCP_TOKEN": "<broker-delivered, >= 32 bytes, only when HTTP is used>"
+    },
+    "httpOption": {
+      "args": [
+        "mcp",
+        "--http",
+        "--port",
+        "3000"
+      ],
+      "bindDefault": "127.0.0.1",
+      "note": "HTTP exposes a privileged browser session upstream — Kingmaker default is stdio; HTTP is a deliberate, token-gated choice"
+    },
+    "tools": {
+      "count": 37,
+      "note": "full list in the contract module, grouped and risk-classed",
+      "verifiedFrom": "docs/Use-the-MCP-server.md (fetched 2026-10-20)"
+    },
+    "transport": "stdio"
+  },
+  "name": "Obscura — agent browser (MCP mode)",
+  "pin": {
+    "assetPattern": "obscura-{aarch64|x86_64}-{macos|linux}.tar.gz (+ -stealth / -no-render variants); archive carries obscura + obscura-worker side by side",
+    "expectedSha256": "fcca31eba4280cd67a2e226ef4b015e432d5c089f78cefd074ad12bbc8e23345",
+    "releaseTag": "v0.2.5",
+    "repo": "h4ckf0r0day/obscura",
+    "status": "PINNED — Cage intake 2026-10-20 (founder order): archive fetched twice from the official v0.2.5 release, sha256 identical both times; Linux x86_64 archive (2116764b...) behavior-tested at intake — see intake/INTAKE.md",
+    "asset": "obscura-aarch64-macos.tar.gz"
+  },
+  "status": "intake complete — pin recorded (v0.2.5), Tor profile governed; binary operator-installed from the pinned release",
+  "upstream": {
+    "interfaceVerified": "README + docs/Use-the-MCP-server.md fetched 2026-10-20: `obscura mcp` (stdio default, --http optional), `obscura serve --port 9222` CDP mode, `obscura fetch/scrape` CLI; private/internal IPs blocked by default (SSRF guard); ~30 MB RSS vendor claim (unverified)",
+    "license": "Apache-2.0",
+    "repo": "h4ckf0r0day/obscura",
+    "shape": "Rust headless browser engine (V8, native rendering, CDP-compatible) — no Chromium",
+    "starsAtScan": 29065,
+    "url": "https://github.com/h4ckf0r0day/obscura"
+  },
+  "torProfile": {
+    "default": "off",
+    "proxy": "socks5h://127.0.0.1:9050",
+    "note": "The only governed proxy. buildLaunchConfig tor mode injects this exact constant as a global arg ahead of mcp; caller-supplied --proxy is refused in every mode. socks5h keeps DNS inside Tor. Launcher must preflight that 127.0.0.1:9050 answers as a live Tor SOCKS port before spawn — fail closed."
+  }
+}

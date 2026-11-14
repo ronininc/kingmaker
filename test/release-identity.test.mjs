@@ -14,6 +14,7 @@ const { resolveKingmakerSigning } = await import('../scripts/kingmaker-mac-signi
 import { shipProblems } from '../lib/release-manifest.mjs';
 import { applyUpdate } from '../lib/update.mjs';
 import { generateReleaseKeypair, signManifestBytes } from '../lib/release-signing.mjs';
+import { manifest as releaseManifest, receipt } from './fixtures/update-provenance.mjs';
 
 const SHA1 = 'A1B2C3D4E5F60718293A4B5C6D7E8F9012345678';
 const FP = SHA1.match(/../g).join(':');
@@ -46,6 +47,15 @@ test('the pin is the public fingerprint only; none yet reads as none, and builds
   }
   assert.match(shipProblems({ packs: [1] }, { pin: null }).join(' '), /no Kingmaker Release certificate is pinned/);
   assert.doesNotMatch(shipProblems({ packs: [1] }, { pin: { sha1: SHA1 } }).join(' '), /pinned/);
+});
+
+test('the shipped pin is decoded JSON for the established Kingmaker release identity', () => {
+  const bytes = readFileSync(new URL('../lib/release-identity.json', import.meta.url), 'utf8');
+  const pin = JSON.parse(bytes);
+  assert.equal(pin.name, 'Kingmaker Release');
+  assert.equal(pin.sha1, 'D4D40C383400C2D62785FB1D60FB0C3AD69CC3C2');
+  assert.equal(readPin().sha1, pin.sha1, 'runtime and signing tooling must read the shipped pin');
+  assert.match(pin.sha256, /^[0-9A-F]{64}$/);
 });
 
 /** A stand-in for openssl and security that does what they would, on files, and records every call. */
@@ -122,17 +132,20 @@ test('an update runs only an installer script signed by the pinned certificate, 
   mkdirSync(join(home, 'logs'), { recursive: true });
   // The manifest is signed by the offline release key (main's layer); this test is about the engine's own signature.
   const { publicKeyPem, privateKeyPem } = generateReleaseKeypair();
-  const manifest = `${JSON.stringify({ schema: 'kingmaker.release/1', tag: 'v0.3.0', engine: { name: 'engine.sh', sha256: sha } })}\n`;
+  const manifest = `${JSON.stringify(releaseManifest('0.3.0', '2026-10-18T01:00:00.000Z', 'new app', engine))}\n`;
   const manifestSig = signManifestBytes(Buffer.from(manifest), privateKeyPem);
+  const appRoot = join(home, 'Kingmaker.app');
+  receipt(home, appRoot, releaseManifest('0.2.9'), privateKeyPem);
+  const installed = { appRoot, current: '0.2.9', verifyInstalledImpl: () => true };
   const files = (withSig) => async (url) => { const p = new URL(url).pathname; const body = { '/v0.3.0/engine.sh': engine, '/v0.3.0/kingmaker-manifest.json': manifest, '/v0.3.0/kingmaker-manifest.json.sig': manifestSig, ...(withSig ? { '/v0.3.0/engine.sh.sig': 'SIG' } : {}) }[p];
     return body == null ? { ok: false, status: 404, arrayBuffer: async () => new ArrayBuffer(0), text: async () => '' } : { ok: true, status: 200, arrayBuffer: async () => new TextEncoder().encode(body).buffer, text: async () => body, json: async () => JSON.parse(body) }; };
-  const cfg = { url: 'https://u', key: 'k' }, offer = { tag: 'v0.3.0', engineSha256: sha }, pin = { sha1: SHA1 };
+  const cfg = { url: 'https://u', key: 'k' }, offer = { tag: 'v0.3.0', engineSha256: sha, manifestSha256: createHash('sha256').update(manifest).digest('hex') }, pin = { sha1: SHA1 };
   let spawned = null; const spawnImpl = (cmd, args, o) => { spawned = o; return { unref() {} }; };
-  await assert.rejects(applyUpdate(cfg, offer, { dataDir: home, wakeWord: 'Nova', home, pin, publicKeyPem, fetchImpl: files(false), spawnImpl, verifyImpl: () => true }), /not signed by the Kingmaker Release/);
-  await assert.rejects(applyUpdate(cfg, offer, { dataDir: home, wakeWord: 'Nova', home, pin, publicKeyPem, fetchImpl: files(true), spawnImpl, verifyImpl: () => false }), /not signed by the Kingmaker Release/);
+  await assert.rejects(applyUpdate(cfg, offer, { ...installed, dataDir: home, wakeWord: 'Nova', home, pin, publicKeyPem, fetchImpl: files(false), spawnImpl, verifyImpl: () => true }), /not signed by the Kingmaker Release/);
+  await assert.rejects(applyUpdate(cfg, offer, { ...installed, dataDir: home, wakeWord: 'Nova', home, pin, publicKeyPem, fetchImpl: files(true), spawnImpl, verifyImpl: () => false }), /not signed by the Kingmaker Release/);
   assert.equal(spawned, null, 'nothing ran');
   let checked = null;
-  await applyUpdate(cfg, offer, { dataDir: home, wakeWord: 'Nova', home, pin, publicKeyPem, fetchImpl: files(true), spawnImpl, verifyImpl: (f, s, h) => { checked = [f.endsWith('engine.sh'), s.endsWith('engine.sh.sig'), h]; return true; } });
+  await applyUpdate(cfg, offer, { ...installed, dataDir: home, wakeWord: 'Nova', home, pin, publicKeyPem, fetchImpl: files(true), spawnImpl, verifyImpl: (f, s, h) => { checked = [f.endsWith('engine.sh'), s.endsWith('engine.sh.sig'), h]; return true; } });
   assert.deepEqual(checked, [true, true, SHA1]);
   assert.equal(spawned.env.KINGMAKER_EXPECT_LEAF, SHA1, 'the engine installs only an app signed by the pin THIS Kingmaker carries');
 });

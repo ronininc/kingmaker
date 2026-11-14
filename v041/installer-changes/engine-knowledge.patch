@@ -1,0 +1,195 @@
+--- a/installer/engine.sh
++++ b/installer/engine.sh
+@@ -16,7 +16,8 @@
+ #                  for your password once, in its own dialog)
+ #   4 tools        Ollama (official build, sha256-pinned) → the abliterated models (each checked against its pinned
+ #                  registry digest) → Hands of Horus (Peekaboo), sox and Python via Homebrew → SearXNG
+-#   5 knowledge    the knowledge library (every confirmed corpus) into a staging folder (reused when already complete)
++#   5 knowledge    the knowledge library (every confirmed corpus) into a staging folder (reused when already complete);
++#                  delivery full fetches it here, delivery stream (the default) leaves it to the app to stream later
+ #   6 commit       Kingmaker.app, the cemented wake word (install.json + wake-word.txt, read-only) and the knowledge
+ #                  library are MOVED into place, journaled; any failure here moves everything back
+ #   7 launch       Kingmaker opens; the installer quits
+@@ -39,7 +40,7 @@
+ HERE="$(cd "$(dirname "$0")" && pwd -P)"
+ if [ -n "${KINGMAKER_PATH:-}" ]; then export PATH="$KINGMAKER_PATH"; else export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin${PATH:+:$PATH}"; fi
+ 
+-WAKE=""; TERMS=""; MANIFEST="$HERE/kingmaker-manifest.json"; SOURCE=""; BASE_URL=""; PREFIX=""; WITH_TOOLS=0; NO_LAUNCH=0; INSPECT=0; PACK=""
++WAKE=""; TERMS=""; MANIFEST="$HERE/kingmaker-manifest.json"; SOURCE=""; BASE_URL=""; PREFIX=""; WITH_TOOLS=0; NO_LAUNCH=0; INSPECT=0; PACK=""; LIBRARY_DELIVERY="${KINGMAKER_LIBRARY_DELIVERY:-}"; LIBRARY_DELIVERY_SET=0
+ # The pinned release-signing public key (build-installer.sh ships it beside engine.sh) and whether an unsigned release
+ # is refused. The running app passes --require-signed for updates; first install may be transitional (see below).
+ RELEASE_PUBKEY="$HERE/kingmaker-release-public.pem"; REQUIRE_SIGNED="${KINGMAKER_REQUIRE_SIGNED:-0}"
+@@ -56,6 +57,7 @@
+     --no-launch) NO_LAUNCH=1; shift ;;
+     --inspect) INSPECT=1; shift ;;
+     --pack) PACK="${2:-}"; shift 2 ;; # the profile pack the owner picked (lib/mac-profiles.mjs PACKS; the manifest's packs)
++    --library-delivery) LIBRARY_DELIVERY="${2:-}"; LIBRARY_DELIVERY_SET=1; shift 2 ;; # v0.4.1: full|stream — the knowledge library arrives with this install, or streams in after it
+     --terms-accepted) TERMS="${2:-}"; shift 2 ;; # sha256 of the TERMS.md the install screen showed (the terms hook)
+     *) echo "engine.sh: unknown argument $1" >&2; exit 2 ;;
+   esac
+@@ -145,11 +147,13 @@
+   app="$(installed_app)"; word=""; [ -n "$app" ] && word="$(cemented_word)"
+   legacy="$(legacy_apps | head -1)"
+   packs="$(plutil -extract packs json -o - "$MANIFEST" 2>/dev/null || echo '[]')"
++  lib_mb="$(mfn knowledge.totalMB)"; lib_n="$(mfn knowledge.corpora)"
++  lib_saved="$(plutil -extract libraryDelivery raw -o - "$DATA/calibration.json" 2>/dev/null || true)"; case "$lib_saved" in full|stream) ;; *) lib_saved="stream" ;; esac
+   free_gb="$(df -k "$HOME" 2>/dev/null | awk 'NR==2 { printf "%.1f", $4 / 1000000 * 1.024 }')"
+-  printf '{"installed":%s,"app":%s,"legacyApp":%s,"cemented":%s,"wakeWord":%s,"release":%s,"version":%s,"memGb":%s,"chip":%s,"freeGb":%s,"recommendedPack":%s,"packs":%s}\n' \
++  printf '{"installed":%s,"app":%s,"legacyApp":%s,"cemented":%s,"wakeWord":%s,"release":%s,"version":%s,"memGb":%s,"chip":%s,"freeGb":%s,"recommendedPack":%s,"packs":%s,"libraryTotalMB":%s,"libraryCorpora":%s,"libraryDelivery":%s}\n' \
+     "$([ -n "$app" ] && echo true || echo false)" "$(json_str "$app")" "$(json_str "$legacy")" \
+     "$([ -n "$word" ] && echo true || echo false)" "$(json_str "$word")" "$(json_str "$(mf tag)")" "$(json_str "$(mf version)")" \
+-    "$MEM_GB" "$(json_str "$CHIP")" "${free_gb:-0}" "$(json_str "$REC_PACK")" "$packs"
++    "$MEM_GB" "$(json_str "$CHIP")" "${free_gb:-0}" "$(json_str "$REC_PACK")" "$packs" "$lib_mb" "$lib_n" "$(json_str "$lib_saved")"
+   exit 0
+ fi
+ 
+@@ -294,6 +298,18 @@
+ else PACK=""; fi
+ note "Release $TAG (Kingmaker $VERSION): $PART_COUNT part(s), $(gb "$ARCHIVE_SIZE") to download, $(gb "$UNPACKED") installed; this Mac has ${MEM_GB} GB of memory."
+ 
++# The library delivery choice (v0.4.1): what the owner picked on the install screen (--library-delivery), else the
++# setting already kept on this Mac (calibration.json libraryDelivery — the app owns it after install, so the owner's
++# later choice always wins over this installer's default), else stream. Stream is the default so the library's bytes
++# are never the price of installing: full asks for them now, stream brings them in afterwards, and neither is cemented.
++LIB_SAVED="$(plutil -extract libraryDelivery raw -o - "$DATA/calibration.json" 2>/dev/null || true)"
++if [ "$LIBRARY_DELIVERY_SET" = 1 ]; then EFFECTIVE_DELIVERY="$LIBRARY_DELIVERY"
++elif [ -n "$LIBRARY_DELIVERY" ]; then EFFECTIVE_DELIVERY="$LIBRARY_DELIVERY"
++elif [ "$LIB_SAVED" = "full" ] || [ "$LIB_SAVED" = "stream" ]; then EFFECTIVE_DELIVERY="$LIB_SAVED"
++else EFFECTIVE_DELIVERY="stream"; fi
++case "$EFFECTIVE_DELIVERY" in full|stream) ;; *) fail "Library delivery must be full or stream (got \"$EFFECTIVE_DELIVERY\")." ;; esac
++LIB_BYTES=$(( $(mfn knowledge.totalMB) * 1048576 ))
++
+ # Tool lookups (Ollama, brew, python, a formula's binary): PATH, then the usual app folders.
+ find_ollama() {
+   local p
+@@ -356,7 +372,8 @@
+ # Kingmaker's library is its own (operator 2026-10-13): a windowed desktop app's ~/.solomon library is never counted as Kingmaker's.
+ if receipts_complete "$KNOW_TARGET"; then KNOW_REUSE="$KNOW_TARGET"; fi
+ if [ -z "$KNOW_REUSE" ] && receipts_complete "$SYS_HOME/.solomon/knowledge/sources"; then note "A desktop app on the same engine keeps a knowledge library on this Mac (~/.solomon/knowledge). Kingmaker does not read it; Kingmaker keeps its own library under its data folder."; fi
+-if [ -z "$KNOW_REUSE" ] && [ "$TOOLS_LIVE" = 1 ]; then NEED=$((NEED + $(mfn knowledge.totalMB) * 1048576)); fi
++if [ -z "$KNOW_REUSE" ] && [ "$TOOLS_LIVE" = 1 ] && [ "$EFFECTIVE_DELIVERY" = "full" ]; then NEED=$((NEED + LIB_BYTES)); fi
++if [ -z "$KNOW_REUSE" ] && [ "$EFFECTIVE_DELIVERY" = "stream" ]; then note "Knowledge library: $(gb "$LIB_BYTES") streams in after install (delivery: stream), so it is not part of the room this install needs. It can be downloaded in full at any time in Kingmaker's Settings."; fi
+ if [ "$TOOLS_LIVE" = 1 ] && ! find_ollama >/dev/null; then NEED=$((NEED + 2 * $(mfn ollama.size))); fi
+ FREE=$(( $(df -k "$APPS" | awk 'NR==2 {print $4}') * 1024 ))
+ if [ "$FREE" -lt "$NEED" ]; then
+@@ -474,6 +491,70 @@
+   return 1
+ }
+ 
++# ── the signed library manifest (v0.4.1) ─────────────────────────────────────────────────────────────────────────
++# Corpora no longer ride the install: each confirmed corpus is an object set under library/ on the same source the
++# parts came from, listed file by file (path, size, sha256) in a library manifest whose detached signature is
++# checked against the same pinned release key as the release manifest. A release that carries no library manifest
++# keeps the 0.4.0 bootstrap path untouched; one that carries a manifest which does not verify ends the install.
++LIB_MANIFEST_FILE="$CACHE/kingmaker-library-manifest.json"
++LIB_MANIFEST_OK=0
++lmf() { plutil -extract "$1" raw -o - "$LIB_MANIFEST_FILE" 2>/dev/null; }
++lmfn() { local v; v="$(lmf "$1")" || { echo 0; return; }; case "$v" in ''|*[!0-9]*) echo 0 ;; *) echo "$v" ;; esac; }
++verify_detached() { # verify_detached <file> <base64 signature file>: 0 = verifies against the pinned release key
++  local bin="$CACHE/.detached.sig.bin" rc
++  [ -s "$RELEASE_PUBKEY" ] || return 1
++  command -v openssl >/dev/null 2>&1 || return 1
++  base64 -D -i "$2" -o "$bin" 2>>"$LOG" || base64 -d -i "$2" -o "$bin" 2>>"$LOG" || return 1
++  openssl dgst -sha256 -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:-1 -verify "$RELEASE_PUBKEY" -signature "$bin" "$1" >>"$LOG" 2>&1; rc=$?
++  rm -f "$bin"; return "$rc"
++}
++fetch_library_manifest() { # 0 = a signature-verified library manifest sits in $LIB_MANIFEST_FILE; 1 = none carried
++  local name src sigsrc sauth=0 id sid
++  name="$(mf knowledge.libraryManifest)"; case "$name" in ''|null) return 1 ;; esac
++  case "$name" in */*|.*) fail "The release manifest has a bad library manifest name." ;; esac
++  if [ -n "$SOURCE" ]; then src="$(cd "$SOURCE" && pwd -P)/$name"; sigsrc="$src.sig"
++  elif [ -n "$BASE_URL" ]; then src="${BASE_URL%/}/$name"; sigsrc="$src.sig"; [ -n "$AUTH_HEADER" ] && sauth=1
++  elif [ -n "$TOKEN" ]; then
++    id="$(asset_id "$name")" || return 1; sid="$(asset_id "$name.sig")" || return 1
++    src="$GITHUB_API/repos/$REPO/releases/assets/$id"; sigsrc="$GITHUB_API/repos/$REPO/releases/assets/$sid"; sauth=1
++  else src="https://github.com/$REPO/releases/download/$TAG/$name"; sigsrc="$src.sig"; fi
++  rm -f "$LIB_MANIFEST_FILE" "$LIB_MANIFEST_FILE.sig"
++  case "$src" in
++    /*) { cp "$src" "$LIB_MANIFEST_FILE" && cp "$sigsrc" "$LIB_MANIFEST_FILE.sig"; } 2>>"$LOG" || return 1 ;;
++    *) if [ "$sauth" = 1 ]; then
++         curl -fsSL --max-time 60 -H @"$AUTH_HEADER" -H "Accept: application/octet-stream" -o "$LIB_MANIFEST_FILE" "$src" 2>>"$LOG" || return 1
++         curl -fsSL --max-time 60 -H @"$AUTH_HEADER" -H "Accept: application/octet-stream" -o "$LIB_MANIFEST_FILE.sig" "$sigsrc" 2>>"$LOG" || return 1
++       else
++         curl -fsSL --max-time 60 -o "$LIB_MANIFEST_FILE" "$src" 2>>"$LOG" || return 1
++         curl -fsSL --max-time 60 -o "$LIB_MANIFEST_FILE.sig" "$sigsrc" 2>>"$LOG" || return 1
++       fi ;;
++  esac
++  [ "$(lmf schema)" = "kingmaker.library/1" ] || fail "The library manifest is not one this installer understands ($(lmf schema))."
++  verify_detached "$LIB_MANIFEST_FILE" "$LIB_MANIFEST_FILE.sig" || fail "The library manifest's signature does NOT match Ronin Inc.'s key. Refusing to trust the hashes in it."
++  LIB_MANIFEST_OK=1
++  note "The library manifest is signed by Ronin Inc.'s release key; every library file is checked against it."
++  return 0
++}
++verify_library_files() { # verify_library_files <sources dir>: every listed file present, right size, right sha256
++  local root="$1" n i id m j path sha size
++  n="$(lmfn corpora)"; [ "$n" -ge 1 ] || fail "The signed library manifest lists no corpora."
++  i=0
++  while [ "$i" -lt "$n" ]; do
++    id="$(lmf "corpora.$i.id")"
++    m="$(lmfn "corpora.$i.files")"
++    j=0
++    while [ "$j" -lt "$m" ]; do
++      path="$(lmf "corpora.$i.files.$j.path")"; sha="$(lmf "corpora.$i.files.$j.sha256")"; size="$(lmfn "corpora.$i.files.$j.size")"
++      case "$path" in ''|/*|*../*) fail "The signed library manifest has a bad file path for corpus $id." ;; esac
++      [ -f "$root/$path" ] || fail "The knowledge library is missing $path (corpus $id). What came down is kept: press Download & Install again to resume."
++      [ "$(fsize "$root/$path")" = "$size" ] || fail "$path has the wrong size against the signed library manifest. What came down is kept: press Download & Install again to resume."
++      [ "$(sha256 "$root/$path")" = "$sha" ] || fail "$path does not match the signed library manifest's sha256, so it did not come from Ronin Inc.'s library. Press Download & Install again to fetch it fresh."
++      j=$((j + 1))
++    done
++    i=$((i + 1))
++  done
++}
++
+ phase 1 46 "Downloading Kingmaker"
+ DONE_BYTES=0; i=0
+ while [ "$i" -lt "$PART_COUNT" ]; do
+@@ -740,13 +821,22 @@
+ KNOW_STAGED=0
+ [ -n "$(mf knowledge.script)" ] && [ -f "$KNOW_SCRIPT" ] || fail "This Kingmaker.app carries no knowledge library installer."
+ if [ -n "$KNOW_REUSE" ]; then note "The knowledge library is already complete ($KNOW_REUSE): every confirmed corpus has its receipt."
++elif [ "$EFFECTIVE_DELIVERY" = "stream" ]; then
++  # Stream: the library is not part of this install. Nothing is staged, nothing is owed, and the install cannot
++  # fail at this step: Kingmaker launches without the library and streams corpora in on demand afterwards — or
++  # all at once, when the owner flips Settings -> Knowledge library to Download everything (the app rewrites
++  # calibration.json libraryDelivery; a flip back to stream offers to reclaim the local copy).
++  note "Knowledge library delivery is stream: Kingmaker installs now and the library ($(gb "$LIB_BYTES")) streams in later. Nothing to download at this step."
+ elif [ "$TOOLS_LIVE" = 0 ]; then
+   out="$(SOLOMON_CORPUS_DIR="$KNOW_STAGE" HOME="$SYS_HOME" ELECTRON_RUN_AS_NODE=1 "$NODE_BIN" "$KNOW_SCRIPT" --dry-run 2>&1)" || fail "The knowledge library installer did not run under Kingmaker's own runtime."
+   note "Would fetch $(mfn knowledge.corpora) confirmed corpora ($(mfn knowledge.totalMB) MB): $(printf '%s' "$out" | grep -c '▸') planned by the bundled bootstrap (dry run)."
+   rm -rf "$DSTAGE/knowledge"
+ else
+   mkdir -p "$KNOW_STAGE"
+-  SOLOMON_CORPUS_DIR="$KNOW_STAGE" HOME="$SYS_HOME" ELECTRON_RUN_AS_NODE=1 "$NODE_BIN" "$KNOW_SCRIPT" >> "$LOG" 2>&1 &
++  LIB_BASE="$(mf knowledge.libraryBase)"; case "$LIB_BASE" in null) LIB_BASE="" ;; esac
++  if [ -z "$LIB_BASE" ] && [ -n "${KINGMAKER_UPDATE_URL:-}" ]; then LIB_BASE="${KINGMAKER_UPDATE_URL%/}/library"; fi
++  fetch_library_manifest || note "This release carries no signed library manifest; the library is fetched the 0.4.0 way."
++  SOLOMON_LIBRARY_MANIFEST="$([ "$LIB_MANIFEST_OK" = 1 ] && echo "$LIB_MANIFEST_FILE")" SOLOMON_LIBRARY_BASE="$LIB_BASE" SOLOMON_CORPUS_DIR="$KNOW_STAGE" HOME="$SYS_HOME" ELECTRON_RUN_AS_NODE=1 "$NODE_BIN" "$KNOW_SCRIPT" >> "$LOG" 2>&1 &
+   BG_PID=$!
+   total="$(mfn knowledge.corpora)"
+   while kill -0 "$BG_PID" 2>/dev/null; do
+@@ -756,6 +846,10 @@
+   done
+   wait "$BG_PID"; BG_PID=""
+   receipts_complete "$KNOW_STAGE" || fail "The knowledge library is not complete (a corpus failed to download). What came down is kept: press Download & Install again to resume."
++  if [ "$LIB_MANIFEST_OK" = 1 ]; then
++    verify_library_files "$KNOW_STAGE"
++    note "Every knowledge library file matches the signed library manifest."
++  fi
+   KNOW_STAGED=1
+   note "The knowledge library is complete in staging ($total corpora)."
+ fi
+@@ -845,6 +939,14 @@
+   else ( umask 077; printf '{\n  "schema": 1,\n  "macProfile": { "profile": "%s" }\n}\n' "$want" > "$cal" ); fi
+   note "Mac profile: $want."
+ fi
++# The library delivery setting: this install records what it did; the app owns the choice afterwards and can flip
++# it at any time (calibration.json libraryDelivery, beside macProfile). Deliberately NOT cemented like the wake
++# word: delivery is a preference, not an identity.
++cal="$DATA/calibration.json"
++if [ -s "$cal" ] && plutil -lint "$cal" >/dev/null 2>&1; then
++  plutil -replace libraryDelivery -string "$EFFECTIVE_DELIVERY" "$cal" 2>>"$LOG" || plutil -insert libraryDelivery -string "$EFFECTIVE_DELIVERY" "$cal" 2>>"$LOG" || note "Could not record the library delivery setting in $cal."
++else ( umask 077; printf '{\n  "schema": 1,\n  "libraryDelivery": "%s"\n}\n' "$EFFECTIVE_DELIVERY" > "$cal" ); fi
++note "Knowledge library delivery: $EFFECTIVE_DELIVERY (change it any time in Kingmaker's Settings)."
+ note "Kingmaker.app is in $APPS; the wake word \"$WAKE\" is cemented in $DATA/install.json."
+ # Where updates come from (kingmaker update reads it): written when the installer was given an update host and key.
+ if [ -n "${KINGMAKER_UPDATE_URL:-}" ] && [ -n "${KINGMAKER_UPDATE_KEY:-}" ]; then

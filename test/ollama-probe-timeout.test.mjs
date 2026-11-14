@@ -12,6 +12,8 @@ test('the doctor waits long enough for Ollama on a swapping 8 GB Mac, and no lon
 
 test('both Ollama probes use the named timeout', () => {
   const probes = readFileSync(new URL('../lib/cli.mjs', import.meta.url), 'utf8').split('\n').filter((l) => l.includes('11434/api/tags'));
-  assert.equal(probes.length, 3);
-  assert.ok(probes.every((l) => l.includes('AbortSignal.timeout(OLLAMA_PROBE_TIMEOUT_MS)')));
+  assert.ok(probes.length >= 2);
+  assert.ok(probes.every((l) => l.includes('timeoutMs: OLLAMA_PROBE_TIMEOUT_MS')));
+  const http = readFileSync(new URL('../lib/http-json.mjs', import.meta.url), 'utf8');
+  assert.match(http, /AbortSignal\.timeout\(timeoutMs\)/);
 });

@@ -210,11 +210,7 @@ test('the engine runs the companion: control line, remembered on/off, stop on sh
   assert.match(cli, /onTurn: async \(text, meta\) => \{ if \(!phoneTurn\) throw new Error\('Kingmaker runs without its bar'\); phoneTurn\(text, meta\); \}/);
   assert.match(cli, /phoneTurn = \(text, meta = \{\}\) => onControlLines\(`typed-turn \$\{Buffer\.from\(JSON\.stringify\(\{ text, model: 'auto', \.\.\.\(meta\?\.conversationId \? \{ conversationId: meta\.conversationId \} : \{\}\), \.\.\.\(meta\?\.image \? \{ image: meta\.image \} : \{\}\) \}\)/);
   assert.match(cli, /process\.stdin\.on\('data', onControlLines\)/);
-  // The negative assertion runs over code with line comments stripped: the
-  // legacy path is discussed in prose comments, and prose is not the engine
-  // building a link or reading a key.
-  const cliCode = cli.split('\n').map((l) => l.replace(/\/\/.*$/, '')).join('\n');
-  assert.ok(!/bar-link\.key|kingmaker:\/\/bar\?/.test(cliCode), 'the engine never builds a bar link or reads its key');
+  assert.ok(!/bar-link\.key|kingmaker:\/\/bar\?/.test(cli), 'the engine never builds a bar link or reads its key');
   // The companion line is the last branch, so no earlier control line (stop, pair…) can swallow it.
   const branch = cli.indexOf('else if (companionControl(said))');
   assert.ok(branch > cli.indexOf("else if (/^pair\\b/.test(said))") && branch > cli.indexOf("else if (/^stop\\b/.test(said))"));

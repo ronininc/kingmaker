@@ -1,0 +1,54 @@
+{
+  "pipeline": "kingmaker-model-ingestion v0.4.1",
+  "stage": "2-triage",
+  "candidate": {
+    "id": "hf:Edge0/Edge0-35B-A3B-preview",
+    "name": "Edge0-35B-A3B-preview",
+    "source": "huggingface",
+    "sourceUrl": "https://huggingface.co/Edge0/Edge0-35B-A3B-preview",
+    "publisher": "Edge0",
+    "publisherReputation": "first-time",
+    "license": "Apache-2.0",
+    "baseModel": "Qwen3.6-35B-A3B",
+    "method": "edge0-ssd-streaming-int4+recover-lora+prerouter",
+    "quant": "4-bit",
+    "claimedParamsB": 35,
+    "estimatedSizeBytes": 24696061952,
+    "publishedHash": "",
+    "discoveredAt": "2026-10-18T23:42:23.967Z",
+    "notes": "35B sparse MoE (40 layers, 256 experts, 4 active per token, K=4) running in phone-class memory via the edge0 streaming inference framework. Peak active memory 2.9 GiB (measured on Mac mini M4 Pro 24GB, short contexts; long contexts grow the KV cache). Decode 14.9-17.7 tok/s; prefill 113/140 tok/s cold/warm. Checkpoint: int4 base + lora_edge0_35b.safetensors + prerouter_edge0_35b.safetensors. Vendor-run OpenCompass benchmarks (identical settings): avg 79.2 vs 83.2 fp16 base (AIME 2026 86.6, HumanEval 90.9, GPQA-Diamond 79.8, MMLU-Pro 81.0, IFBench 57.9). Framework: edge0 repo, Apache-2.0, MLX backend; native engines for iOS/macOS/Android/Windows released 2026-09-30. One model directory runs unchanged on all four platforms. Preview limitations (their words): agentic/tool-use weak; platform tuning on iOS/Android/Windows still maturing. Paper: arXiv 2609.18063. Repo updated 2026-10-18."
+  },
+  "report": {
+    "candidateId": "hf:Edge0/Edge0-35B-A3B-preview",
+    "verdict": "flag",
+    "findings": [
+      {
+        "check": "license",
+        "verdict": "pass",
+        "reason": "permissive license Apache-2.0"
+      },
+      {
+        "check": "hash",
+        "verdict": "flag",
+        "reason": "no published hash — integrity cannot be verified"
+      },
+      {
+        "check": "size",
+        "verdict": "pass",
+        "reason": "fits the 32gb tier"
+      },
+      {
+        "check": "publisher",
+        "verdict": "flag",
+        "reason": "first-time publisher Edge0 — needs human eyes"
+      },
+      {
+        "check": "duplicate",
+        "verdict": "pass",
+        "reason": "not present in the library"
+      }
+    ],
+    "decidedAt": "2026-10-18T23:42:23.968Z"
+  },
+  "designNote": "size check grades WEIGHT bytes (23GB -> 32gb tier), but Edge0 is an SSD-streaming model whose runtime reality is 2.9 GiB active RAM -> 8gb tier. Recommend the pipeline track activeMemoryBytes + offloadKind for streaming models so tier reflects runtime, not disk."
+}

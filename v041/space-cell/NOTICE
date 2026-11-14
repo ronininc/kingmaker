@@ -1,0 +1,28 @@
+NOTICE — Kingmaker v0.4.1 space-cell
+
+The modules in this directory (lib/space-client.mjs, lib/cell-governor.mjs)
+form a client and governance layer for the SPACE sandbox platform:
+
+    SPACE — Sandboxed Platform for Agentic Code Execution
+    Copyright the SPACE authors (Perplexity)
+    https://github.com/perplexityai/SPACE
+    Licensed under the Apache License, Version 2.0
+
+SPACE itself is NOT vendored here and is never shipped in the Kingmaker
+payload: it runs as external infrastructure on the operator's Linux host,
+and this code speaks to it over its public HTTP API, whose shape was taken
+from SPACE's documentation and reference example. No SPACE code is copied
+into these modules.
+
+The audit-chain module (lib/audit-chain.mjs) is Kingmaker's own house
+pattern, copied from router-phase2/lib/audit-chain.mjs.
+
+One workload kind in the governor registry, 'kuroko-voice', fronts an
+external engine that is likewise never linked or shipped:
+
+    Voice Studio — Copyright DebPalash and contributors
+    https://github.com/debpalash/VoiceStudio
+    Licensed under the GNU Affero General Public License v3.0 (AGPL-3.0)
+
+Voice Studio is driven by subprocess/API from inside the cell only,
+under the AGPL external-tool rule recorded in the registry entry.

@@ -1,0 +1,22 @@
+{
+  "name": "turbovec",
+  "kind": "library-component",
+  "upstream": "https://github.com/RyanCodrai/turbovec",
+  "author": "Ryan Codrai",
+  "license": "MIT",
+  "licenseVerified": "LICENSE file at repo root: MIT License, Copyright (c) 2026 Ryan Codrai (fetched 2026-10-21)",
+  "paper": "TurboQuant, Google Research, arXiv 2504.19874",
+  "pin": {
+    "version": "1.1.2",
+    "gitCommit": "c3b043b992290ff223b903046af7f6683768241c",
+    "gitCommitDate": "2026-10-06",
+    "pypiWheelMacosArm64": "turbovec-1.1.2-cp39-abi3-macosx_11_0_arm64.whl",
+    "pypiWheelMacosArm64Sha256Prefix": "eacbb632cceb32e78ab56ebba38fdab3",
+    "pypiSdistSha256Prefix": "dee50114e3b22f5361513300498d9a3b",
+    "note": "Full sha256 values are recorded in the PyPI 1.1.2 release metadata; verify the complete digest at install time against PyPI before first use."
+  },
+  "form": "In-process library: Rust core, Python bindings (PyPI) and Rust crate (crates.io 1.1.2). Not a service; no network surface of its own.",
+  "solomonEligible": "YES in principle — MIT, neutral retrieval technology, no offensive capability. Earns a seat only through the same bench gate as every component.",
+  "kingmakerSeatsContested": ["knowledge-library retrieval", "skill-library semantic search", "corpus search (LittleBrother public-source corpora, CRM corpus)"],
+  "status": "INTAKE — candidate. Not installed, not benched, not shipped."
+}

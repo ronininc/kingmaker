@@ -363,12 +363,15 @@ test('models: abliterated by their real names, only when installed; the operator
   const env = ghostBackendEnv({ env: { SOLOMON_OLLAMA_MODEL: 'mine:7b' }, paths, port: 3001, secrets, ghostBin: null, installedModels: all, totalMemGb: 8 });
   assert.equal(env.SOLOMON_OLLAMA_MODEL, 'mine:7b', 'the operator\'s own pin wins');
   assert.equal(env.SOLOMON_AGENT_PLANNER_MODEL, 'huihui_ai/qwen3-abliterated:1.7b');
-  assert.equal(env.SOLOMON_OLLAMA_CLASSIFIER_MODEL, 'huihui_ai/qwen3-abliterated:0.6b');
+  // In the merged ghost env the classifier and the fast tier are Kingmaker's ONE router — the
+  // starter floor's 1.7b — whenever it is installed (profileRuntimeEnv's spread wins over the
+  // abliterated table's own entries; there is no per-class router anymore).
+  assert.equal(env.SOLOMON_OLLAMA_CLASSIFIER_MODEL, 'huihui_ai/qwen3-abliterated:1.7b');
   // Fully abliterated: every role that answers in words, not only chat (drafts, builds, vision, the reflex tier).
   assert.equal(env.SOLOMON_DRAFT_MODEL, 'huihui_ai/qwen3-abliterated:1.7b');
   assert.equal(env.SOLOMON_BUILD_MODEL, 'huihui_ai/qwen3.5-abliterated:2b');
   assert.equal(env.SOLOMON_VISION_MODEL, 'huihui_ai/qwen3.5-abliterated:2b');
-  assert.equal(env.SOLOMON_PINNED_FAST_MODEL, 'huihui_ai/qwen3-abliterated:0.6b');
+  assert.equal(env.SOLOMON_PINNED_FAST_MODEL, 'huihui_ai/qwen3-abliterated:1.7b');
   assert.ok(Object.values(ABLITERATED_MODELS).every((m) => /abliterated/.test(m)), 'never a stock tag name: the engine\'s integrity pins see the real weights');
   assert.match(modelsLine(abliteratedModelEnv(all, {}), {}), /^Models: abliterated/);
   assert.match(modelsLine({}, {}), /not installed: huihui_ai\/qwen3-abliterated:1\.7b/);
@@ -380,8 +383,12 @@ test('the engine shares Kingmaker\'s profile: one router, the profile\'s context
   const r24 = profileRuntimeEnv(['huihui_ai/qwen3-abliterated:1.7b', 'huihui_ai/qwen3-abliterated:0.6b'], 24, {});
   assert.equal(r24.SOLOMON_PINNED_FAST_MODEL, 'huihui_ai/qwen3-abliterated:1.7b', 'the 24 GB router is the reflex tier too: no second router');
   assert.equal(r24.SOLOMON_OLLAMA_CLASSIFIER_MODEL, 'huihui_ai/qwen3-abliterated:1.7b');
-  assert.equal(r24.SOLOMON_OLLAMA_NUM_CTX, '8192'); assert.equal(r24.OLLAMA_MAX_LOADED_MODELS, '2');
-  assert.equal(profileRuntimeEnv(['huihui_ai/qwen3-abliterated:0.6b'], 8, {}).SOLOMON_PINNED_FAST_MODEL, undefined, 'the 8 GB router not installed: the 0.6b stays');
+  assert.equal(r24.SOLOMON_OLLAMA_NUM_CTX, undefined, 'no class context is exported: context is a per-request num_ctx now');
+  assert.equal(r24.OLLAMA_MAX_LOADED_MODELS, '1', 'no decision model installed: no seat is pinned, so the strict single slot stands');
+  const seated = profileRuntimeEnv(['huihui_ai/qwen3-abliterated:1.7b', 'laya'], 24, {}, 12);
+  assert.equal(seated.OLLAMA_MAX_LOADED_MODELS, '2', 'the seat pinned beside the worker is the only second slot — measured free memory, not a class');
+  assert.equal(seated.KINGMAKER_REFLEX_PINNED_MODEL, 'laya', 'the pinned seat is named so the engine’s surplus-unloading spares it');
+  assert.equal(profileRuntimeEnv(['huihui_ai/qwen3-abliterated:0.6b'], 8, {}).SOLOMON_PINNED_FAST_MODEL, undefined, 'the floor router not installed: nothing is pinned over the engine’s own reflex tier');
   assert.equal(profileRuntimeEnv([], 8, {}).OLLAMA_MAX_LOADED_MODELS, '1');
   assert.deepEqual(profileRuntimeEnv([], 24, { SOL_GHOST_PROFILE_ENV: '0' }), {});
   const env = ghostBackendEnv({ env: { SOLOMON_OLLAMA_NUM_CTX: '4096' }, paths, port: 3001, secrets, ghostBin: null, installedModels: ['huihui_ai/qwen3-abliterated:1.7b'], totalMemGb: 24 });
@@ -396,7 +403,7 @@ test('coder: the abliterated 1.5b, stepping up to the abliterated 7b only on a 1
   assert.equal(abliteratedCoder([small, large], 32), large);
   assert.equal(abliteratedCoder([small], 32), small, 'a big machine without the 7b keeps the 1.5b');
   assert.equal(abliteratedCoder([large], 8), null, 'the 7b alone on 8 GB: nothing pinned, the engine keeps its own coder');
-  assert.equal(abliteratedCoder(['qwen2.5-coder:1.5b'], 32), 'qwen2.5-coder:1.5b', 'no abliterated coder installed: the stock provisioned coder is the documented fallback (lib/profile.mjs)');
+  assert.equal(abliteratedCoder(['qwen2.5-coder:1.5b'], 32), null);
   const pins = abliteratedModelEnv([small, large], {}, 32);
   assert.equal(pins.SOLOMON_LOCAL_CODING_MODEL, large);
   assert.equal(pins.SOLOMON_SNIPPET_MODEL, large);
