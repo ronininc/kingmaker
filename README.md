@@ -17,7 +17,7 @@ The public release is **4.4.4**, published 2026-11-07 as a full GitHub release (
 
 `7EDC 06F8 D116 7C8A 2514 F7BA 5A06 6F7C A391 E9C9 FA78 8971 9FFD E2BD DD64 73B6`
 
-The macOS installer (`Kingmaker-Installer-v4.4.4.dmg`) is Developer ID signed, Apple-notarized (Accepted), stapled, and Gatekeeper-verified (`spctl`: accepted, source = Notarized Developer ID). ronininc.org/download/kingmaker serves the Ronin Launcher 0.3.15 DMG (7,832,010 bytes) from this release; the Launcher is the front door — one download, Start opens it — and Kingmaker is free inside it. The 4.4.4 cut's suite ran 176/176 at the release staging tree, with the G7 guarded transport and the Brain Library machinery in the build.
+The macOS installer (`Kingmaker-Installer-v4.4.4.dmg`) is Developer ID signed, Apple-notarized (Accepted), stapled, and Gatekeeper-verified (`spctl`: accepted, source = Notarized Developer ID). ronininc.org/download/kingmaker serves the Ronin Launcher 0.3.17 DMG (7,836,235 bytes) from this release; the Launcher is the front door — one download, Start opens it — and Kingmaker is free inside it. The 4.4.4 cut's suite ran 176/176 at the release staging tree, with the G7 guarded transport and the Brain Library machinery in the build.
 
 Still open, stated plainly:
 
