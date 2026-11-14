@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the Kingmaker fleet churn cycle daily
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+Unit=kingmaker-fleet-churn.service
+
+[Install]
+WantedBy=timers.target

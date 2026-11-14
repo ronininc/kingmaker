@@ -16,10 +16,17 @@ file changes — the framework description lives in the library, not only in cod
    reason — details are never fabricated. No GitHub API is used on this leg.
 2. **Picks** — the correct method file is picked from the MemPalace architecture in the brain
    repo: conductor library discovery, ranked with the module reader's quality-selection
-   discipline (relevance first, quality as boost). The correct weights are picked hunter-style:
-   bench records (`catalog/bench/`) screened by the machine's RAM budget, judged adequate by
-   eval share, fastest measured generation rate wins. Both picks, with reasons and every
-   rejected candidate's reason, land in the trace.
+   discipline (relevance first, quality as boost). The correct weights are picked by the
+   smallest-sufficient rule (the metered doctrine): bench records (`catalog/bench/`) screened
+   against the task's declared requirement — the role from the task (or this method's declared
+   `weights`), its capabilities, and the eval-share floor — and the SMALLEST model meeting it
+   wins. The machine's memory never screens a candidate out: it shapes the pick's delivery plan
+   in lane order (resident; metered-stream in verified 1 MiB portions; or the sandbox lane —
+   containerized, paged execution under Kingmaker's own Docker control — for a model past the
+   device's whole memory when the sandbox is in the device's posture), and only when the sandbox
+   lane is absent or declined does a smallest-sufficient model escalate through the existing
+   lanes instead of being refused — a policy routing, never a size refusal.
+   Both picks, with reasons and every considered candidate's verdict, land in the trace.
 3. **Prep, parallel or scoped down** — the prep sections (governing-context module read via the
    module reader, method pick, weights pick) run in parallel if the machine can handle it —
    decided from free memory and core count against the thresholds carried in this file's
@@ -49,7 +56,7 @@ file changes — the framework description lives in the library, not only in cod
     { "n": 1, "id": "state-intake-and-fetch", "type": "note",
       "text": "Phase 1 — intake + detail fetch: the request names or implies a source, it is fetched over HTTP(S) and its details (title, text facts) extracted into the run context; no source or a failed fetch is declared/failed in the trace with its reason, never fabricated." },
     { "n": 2, "id": "state-picks", "type": "note",
-      "text": "Phase 2 — picks: method file picked from the brain repo's MemPalace architecture (conductor discovery, reader quality discipline); weights picked hunter-style from catalog/bench (RAM screen, eval adequacy, fastest measured gen rate). Both picks traced with reasons." },
+      "text": "Phase 2 — picks: method file picked from the brain repo's MemPalace architecture (conductor discovery, reader quality discipline); weights picked from catalog/bench by the smallest-sufficient rule (the task's declared requirement: role, capabilities, eval floor — the smallest model meeting it wins; device memory shapes only the delivery plan, in lane order: resident, metered-stream in verified portions, or the sandbox lane — containerized, paged execution under Kingmaker's Docker control — past the device's whole memory when the sandbox is in the device's posture; only with the sandbox lane absent or declined does a model escalate through the existing lanes instead of being refused, as a policy routing and never a size refusal). Both picks traced with reasons." },
     { "n": 3, "id": "state-prep-modes", "type": "note",
       "text": "Phase 3 — prep sections (context read, method pick, weights pick) run in parallel when the machine meets the thresholds in this file's inputs (>= {{inputs.parallelMinCores}} cores, >= {{inputs.parallelMinFreeMemMb}} MB free), otherwise scoped down to one at a time; the mode and why are traced." },
     { "n": 4, "id": "write-framework-record", "type": "write-json", "path": "execution-loop/framework.json",

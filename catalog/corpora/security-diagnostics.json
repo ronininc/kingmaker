@@ -1,0 +1,45 @@
+{
+  "schema": "kingmaker.corpus/1",
+  "id": "vyber07-cyber-security",
+  "field": "security-diagnostics",
+  "title": "Cyber-security knowledge base (defensive folders)",
+  "source": {
+    "kind": "huggingface-dataset",
+    "repo": "Vyber07/cyber-security",
+    "revision": "bc7a780571cb67d482250649ab573908b9557873",
+    "gated": true
+  },
+  "license": {
+    "tagged": "apache-2.0",
+    "note": "The dataset card is tagged apache-2.0, but its LICENSE file says the material was gathered from many platforms and scraped documents under a fair-use claim. The upstream rights are not confirmed.",
+    "confirmed": false,
+    "use": "Internal diagnostic reference on the owner's own machine. Not redistributed, not bundled in an installer, not served from the site."
+  },
+  "include": [
+    "blue-team",
+    "defensive-security",
+    "digital-forensics",
+    "compliance",
+    "devsecops",
+    "identity-access-management",
+    "cloud-security",
+    "container-security",
+    "cryptography",
+    "network-security",
+    "supply-chain-security",
+    "api-security",
+    "vulnerability-intelligence"
+  ],
+  "excludeNote": "Every folder not listed in include is left out. That covers the attack-side folders (offensive-security, red-team, penetration-testing, malware, ransomware, botnet-ddos, social-engineering, phishing and the rest) and the loose files at the top of the dataset. Add a folder name to include to bring it in.",
+  "extensions": [
+    ".json",
+    ".jsonl"
+  ],
+  "maxFileMB": 64,
+  "skipNamePattern": "__dup\\d*\\.",
+  "route": {
+    "triggers": "\\b(security|vulnerab\\w*|cve|exploit\\w*|malware|ransomware|phishing|intrusion|incident response|forensic\\w*|hardening|firewall|siem|mitre|owasp|zero[- ]trust|least privilege|privilege escalation|access control|authenticat\\w*|mfa)\\b",
+    "description": "Security diagnostics: detection, hardening, incident response, forensics, identity and access, cloud and container security, compliance and vulnerability reference. Added by Kingmaker from catalog/corpora/security-diagnostics.json; the shard exists only after the owner fetches the corpus.",
+    "authorityBias": "REFERENCE"
+  }
+}

@@ -1,0 +1,7 @@
+[Unit]
+Description=Kingmaker fleet Brain Library — daily churn cycle over held portions
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/env node __KINGMAKER_DIR__/scripts/fleet-churn-run.mjs --root __KINGMAKER_STATE_DIR__ --max-bytes 2147483648

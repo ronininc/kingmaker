@@ -1,0 +1,20 @@
+{
+  "schema": "ronin.addon/1",
+  "id": "ronin-office",
+  "name": "Ronin office",
+  "summary": "Ronin CRM pairing and desks, delegated approvals, the DM bridge, CRM jobs and skills, the overnight CRM loop, owner calls and the one-company CRM lock.",
+  "paid": true,
+  "sku": "addon.ronin-office",
+  "license": "Ronin commercial add-on licence",
+  "requires": { "kingmaker": ">=0.2.6", "launcher": ">=0.3.0", "arch": "arm64" },
+  "entry": "index.mjs",
+  "leaveOut": ["test", "docs", "scripts", "README.md", "addon.json"],
+  "commands": [
+    { "name": "pair", "summary": "Pair this Mac with Ronin CRM" },
+    { "name": "office", "summary": "The Ronin desk and the Muse office" },
+    { "name": "owner-call", "summary": "FaceTime Audio calls to the owner" },
+    { "name": "text-watch", "summary": "A call when a watched client's text waits an hour unanswered" },
+    { "name": "crm-lock", "summary": "One Kingmaker, one company's CRM" }
+  ],
+  "permissions": ["network:crm", "keychain"]
+}

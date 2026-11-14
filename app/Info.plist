@@ -15,7 +15,7 @@
   <key>CFBundleVersion</key><string>@VERSION@</string>
   <key>KingmakerEngineBuild</key><string>@SOLOMON_BUILD@</string>
   <key>LSMinimumSystemVersion</key><string>14.0</string>
-  <key>LSUIElement</key><true/>
+  <key>LSUIElement</key><false/>
   <key>NSHumanReadableCopyright</key><string>Ronin Inc. Free for personal and noncommercial use (PolyForm Noncommercial 1.0.0).</string>
   <!-- kingmaker://wake: what Siri's "Wake Kingmaker" shortcut and `kingmaker wake` open. Launches the app if needed,
        else wakes it, so the next words are a command with no wake word. solghost://wake stays as an alias, so a

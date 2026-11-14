@@ -2,9 +2,9 @@
 // and eye, app/Resources/MenuBarLogo.png, a template image), which says what Kingmaker is doing (operator
 // 2026-10-08: "a tiny Ronin Inc logo that glows when awake, pulses while speaking to the user, and shows an RGB
 // outline while listening; no windows"). It starts its engine headless (lib/cli.mjs start --agent) on the runtime this
-// bundle carries (Contents/MacOS/KingmakerEngine, from the engine build), reads its "@@ghost {json}" state lines,
-// and stops it on quit. It never borrows an engine from another app or an environment-selected path.
-// Approvals are never a click: they are your word.
+// bundle carries (Contents/MacOS/KingmakerEngine, from the engine build; an older name in an app built before 0.3.0), reads its "@@ghost {json}" state
+// lines, and stops it on quit. A thin dev build (scripts/build-app.sh) carries no runtime and borrows the installed
+// Kingmaker.app's (KINGMAKER_RUNTIME_APP). Approvals are never a click: they are your word.
 //
 // The logo, by state (all drawn by Core Animation in the render server; asleep there is no animation at all):
 //   starting   dimmed while the engine boots
@@ -34,6 +34,17 @@ import Darwin
 import Carbon.HIToolbox
 import Contacts
 import AVFoundation
+
+// UI-only state/geometry: no engine, approvals, or routing decisions.
+func barActivityText(_ state: String, busy: Bool) -> String {
+  if state == "thinking" && !busy { return "" }
+  return ["thinking": "Working…", "speaking": "Speaking…", "hearing": "Listening…", "waiting": "Waiting for your word", "down": "Not running", "starting": "Starting…"][state] ?? ""
+}
+func approvalViewportFrame(composer: NSRect, bounds: NSRect, document: NSSize) -> NSRect {
+  let y = composer.maxY + 12
+  return NSRect(x: composer.minX, y: y, width: max(0, min(composer.width, document.width)),
+                height: max(0, min(document.height, bounds.maxY - y - 38)))
+}
 
 // ── The menu bar logo ─────────────────────────────────────────────────────────────────────────────────
 
@@ -489,14 +500,14 @@ final class KeyPanel: NSPanel {
     return super.performKeyEquivalent(with: e)
   }
   override var canBecomeKey: Bool { true }
-  override var canBecomeMain: Bool { false }
+  override var canBecomeMain: Bool { kingmakerWindowMode() != "bar" }
 }
 
 final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTextViewDelegate {
   struct Pick { let kind: String; let title: String; let detail: String; let value: String; var path: String? = nil }
   static let width: CGFloat = 680
   // Resizable from any edge or corner, from a small corner bar up to the whole screen; the size and place the owner picks are kept.
-  let panel = KeyPanel(contentRect: NSRect(x: 0, y: 0, width: KingmakerBar.width, height: 120), styleMask: [.borderless, .nonactivatingPanel, .resizable], backing: .buffered, defer: false)
+  let panel = KeyPanel(contentRect: NSRect(x: 0, y: 0, width: KingmakerBar.width, height: 120), styleMask: kingmakerWindowMode() == "bar" ? [.borderless, .nonactivatingPanel, .resizable] : [.borderless, .resizable], backing: .buffered, defer: false)
   static let minSize = NSSize(width: 420, height: 170)
   private let backdrop = DropBackdrop(frame: .zero)
   private let composer = NSView()
@@ -582,7 +593,11 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
   private var selected = -1
   private var searchWork: DispatchWorkItem?
   private var queued: [String] = []
-  private var busy = false
+  private var transportReady = true
+  private var activeRequestId: String?
+  private var requestChats: [String: String] = [:]
+  private var engineState = "starting"
+  private var busy = false { didSet { refreshActivity() } }
   private(set) var muted = UserDefaults.standard.bool(forKey: "km.muted")
   private(set) var on = true
   private var folder: URL? = UserDefaults.standard.string(forKey: "km.folder").map { URL(fileURLWithPath: $0) }
@@ -612,8 +627,9 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
     super.init()
     if wasNever { muted = true }
     panel.isOpaque = false; panel.backgroundColor = .clear; panel.hasShadow = true
-    panel.level = .floating; panel.hidesOnDeactivate = false; panel.isReleasedWhenClosed = false
-    panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .ignoresCycle]
+    let asWindow = kingmakerWindowMode() != "bar"
+    panel.level = asWindow ? .normal : .floating; panel.hidesOnDeactivate = false; panel.isReleasedWhenClosed = false
+    panel.collectionBehavior = asWindow ? [.fullScreenPrimary] : [.canJoinAllSpaces, .fullScreenAuxiliary, .ignoresCycle]   // window: one Space + Cmd-Tab; bar: floats on all Spaces
     panel.isMovableByWindowBackground = true
     panel.minSize = KingmakerBar.minSize
     panel.delegate = self
@@ -1085,7 +1101,7 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
     let stack = NSStackView(views: [skillName, skillWhat, hint, scroll, buttons]); stack.orientation = .vertical; stack.alignment = .leading; stack.spacing = 10
     stack.edgeInsets = NSEdgeInsets(top: 18, left: 20, bottom: 18, right: 20)
     let p = skillPanel ?? NSPanel(contentRect: NSRect(x: 0, y: 0, width: 560, height: 430), styleMask: [.titled, .closable, .utilityWindow], backing: .buffered, defer: false)
-    p.title = "New skill"; p.isReleasedWhenClosed = false; p.level = .floating + 1; p.appearance = NSAppearance(named: .darkAqua); p.contentView = stack
+    p.title = "New skill"; p.isReleasedWhenClosed = false; p.level = kingmakerWindowMode() == "bar" ? .floating + 1 : .normal; p.appearance = NSAppearance(named: .darkAqua); p.contentView = stack
     skillPanel = p; p.center(); NSApp.activate(ignoringOtherApps: true); p.makeKeyAndOrderFront(nil); p.makeFirstResponder(skillName)
   }
   @objc private func closeSkillPanel() { skillPanel?.orderOut(nil) }
@@ -1367,7 +1383,7 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
   @discardableResult private func ensureCustomizePanel() -> NSTabView {
     if customizePanel == nil {
       let p = NSPanel(contentRect: NSRect(x: 0, y: 0, width: 620, height: 680), styleMask: [.titled, .closable, .resizable, .utilityWindow], backing: .buffered, defer: false)
-      p.title = "Customize Kingmaker"; p.isReleasedWhenClosed = false; p.level = .floating + 1; p.appearance = NSAppearance(named: .darkAqua)
+      p.title = "Customize Kingmaker"; p.isReleasedWhenClosed = false; p.level = kingmakerWindowMode() == "bar" ? .floating + 1 : .normal; p.appearance = NSAppearance(named: .darkAqua)
       p.minSize = NSSize(width: 520, height: 420)
       for (i, t) in ["Interaction", "Functions", "Behavior"].enumerated() { let item = NSTabViewItem(identifier: i); item.label = UI.t(t); customizeTabs.addTabViewItem(item) }
       p.contentView = customizeTabs; customizePanel = p
@@ -1472,7 +1488,7 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
       let vf = (NSScreen.main ?? NSScreen.screens[0]).visibleFrame
       let w = (vf.width * 0.58).rounded(), h = min(560, (vf.height * 0.6).rounded())
       sized = NSSize(width: w, height: h)
-      panel.hidesOnDeactivate = false; panel.level = .floating
+      panel.hidesOnDeactivate = false; panel.level = kingmakerPanelLevel(mode: kingmakerWindowMode(), maximized: false)
       panel.setFrame(NSRect(x: vf.midX - w / 2, y: vf.midY - h / 2, width: w, height: h), display: true)
       layout()   // keeps the top edge, so centre it again after
       panel.setFrameOrigin(NSPoint(x: (vf.midX - panel.frame.width / 2).rounded(), y: (vf.midY - panel.frame.height / 2).rounded()))
@@ -1598,8 +1614,13 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
       l.frame = NSRect(x: inset, y: y, width: tw, height: h); y += h + (l === title ? 0 : 10)
     }
     card.frame = NSRect(x: 0, y: 0, width: cw, height: y + inset)
-    backdrop.addSubview(card)
-    shareCard = card; shareYes = yes
+    // Keep every action reachable in a resized window, including large text.
+    let viewport = NSScrollView()
+    viewport.drawsBackground = false
+    viewport.hasVerticalScroller = true; viewport.hasHorizontalScroller = true
+    viewport.autohidesScrollers = true; viewport.documentView = card
+    backdrop.addSubview(viewport)
+    shareCard = viewport; shareYes = yes
     layout()
     // It never takes the keyboard: Return/Esc answer it only when the owner is already in the bar and not typing;
     // otherwise it's click-only.
@@ -1617,9 +1638,8 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
   @objc private func shareNo() { onCommand(shareCommands.no); if shareIsSharing { sharingOn = false }; closeShareBox() }
   @objc private func shareSee() { onCommand(shareCommands.see) }
   private func positionShareCard() {
-    guard let card = shareCard else { return }
-    let x = composer.frame.minX + (composer.frame.width - card.frame.width) / 2
-    card.setFrameOrigin(NSPoint(x: max(composer.frame.minX, x.rounded()), y: composer.frame.maxY + 12))
+    guard let viewport = shareCard as? NSScrollView, let document = viewport.documentView else { return }
+    viewport.frame = approvalViewportFrame(composer: composer.frame, bounds: backdrop.bounds, document: document.frame.size)
   }
 
   // ── EXTENSIONS (lib/extensions.mjs): the directory and each extension's page, in the bar's own look (the owner pointed at
@@ -1828,7 +1848,7 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
   }
   /// Full screen covers the whole display, menu bar included (owner 2026-10-15: "full screen should actually mean full screen,
   /// not with the top of the screen still showing the desktop"): the bar sits above the menu bar while it fills the screen.
-  private func fullScreenLevel(_ on: Bool) { panel.level = on ? NSWindow.Level(rawValue: NSWindow.Level.mainMenu.rawValue + 1) : .floating }
+  private func fullScreenLevel(_ on: Bool) { panel.level = kingmakerPanelLevel(mode: kingmakerWindowMode(), maximized: on) }
   private var resizingByButton = false
   @objc private func fillTapped() {
     let screen = panel.screen ?? NSScreen.main ?? NSScreen.screens[0], vf = screen.visibleFrame, full = screen.frame
@@ -1865,16 +1885,64 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
   func windowDidMove(_ notification: Notification) { if panel.isVisible { keepFrame() } }
 
   // ── what Kingmaker says, and its state ──
-  func said(_ line: String) {
-    if lastHeardNoise && line.hasPrefix("I didn't catch that") { lastHeardNoise = false; busy = false; return } // its answer to room noise
+  func said(_ line: String, requestId: String? = nil) {
+    if let id = requestId {
+      guard id == activeRequestId, let chat = requestChats[id],
+            let i = chats.firstIndex(where: { $0.id == chat }) else { return }
+      if chatIndex.flatMap({ $0 < chats.count ? chats[$0].id : nil }) == chat {
+        append(who: "Kingmaker", line)
+      } else {
+        chats[i].lines.append(["Kingmaker", String(line.prefix(8000))]); saveChats(); drawChats()
+      }
+      lastAsked = line.trimmingCharacters(in: .whitespacesAndNewlines).hasSuffix("?") || line.range(of: #"\b[Ss]ay (“|"|')"#, options: .regularExpression) != nil
+      // Only turnComplete advances the queue; a turn can emit several lines.
+      return
+    }
+    if activeRequestId != nil {
+      record("Background", line); return
+    }
+    if lastHeardNoise && line.hasPrefix("I didn't catch that") { lastHeardNoise = false; busy = false; return }
     append(who: "Kingmaker", line); busy = false
     lastAsked = line.trimmingCharacters(in: .whitespacesAndNewlines).hasSuffix("?") || line.range(of: #"\b[Ss]ay (“|"|')"#, options: .regularExpression) != nil
     sendQueued()
   }
+  // A stopped transport is failure, never a successful completion or permission to replay.
+  func transportStopped(_ reason: String) {
+    transportReady = false
+    failForeground(reason)
+  }
+  func transportStarted() { transportReady = true }
+  private func failForeground(_ reason: String) {
+    for (id, chat) in requestChats {
+      let line = id == activeRequestId ? "Interrupted: \(reason) Completion is not confirmed." : "Not sent: \(reason) Queued request was not replayed."
+      guard let i = chats.firstIndex(where: { $0.id == chat }) else { continue }
+      if chatIndex.flatMap({ $0 < chats.count ? chats[$0].id : nil }) == chat { append(who: "Kingmaker", line) }
+      else { chats[i].lines.append(["Kingmaker", line]); saveChats() }
+    }
+    activeRequestId = nil; requestChats.removeAll(); queued.removeAll(); busy = false
+    drawChats()
+  }
+  func completeTurn(_ requestId: String) {
+    guard requestId == activeRequestId else { return }
+    requestChats.removeValue(forKey: requestId); activeRequestId = nil; busy = false; sendQueued()
+  }
+  private func dispatchTurn(_ line: String) {
+    if let data = Data(base64Encoded: line),
+       let payload = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+      activeRequestId = payload["requestId"] as? String
+    }
+    busy = true; onTurn(line)
+  }
+  private func refreshActivity() {
+    statusLabel.stringValue = UI.t(barActivityText(engineState, busy: busy))
+    let hidden = !busy && !["speaking", "hearing"].contains(engineState)
+    if stop.isHidden != hidden { stop.isHidden = hidden; layout() }
+  }
   func setState(_ s: String) {
+    engineState = s
     tourCtl?.state(s)
-    statusLabel.stringValue = (["thinking": "Working…", "speaking": "Speaking…", "hearing": "Listening…", "waiting": "Waiting for your word", "down": "Not running", "starting": "Starting…"][s]).map(UI.t) ?? ""
-    if ["asleep", "awake", "text"].contains(s) { busy = false; sendQueued() }
+    refreshActivity()
+    if activeRequestId == nil && ["asleep", "awake", "text"].contains(s) { busy = false; sendQueued() }
   }
   /// The first-run tour (@@ghost tour: lib/first-run.mjs): the bar opens, everything but one control dims, and a card
   /// beside it says what to do. Finished or skipped, the engine is told (tour-done) and it doesn't show by itself again.
@@ -2016,11 +2084,16 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
   }
   /// One typed turn to Kingmaker (base64 JSON for `typed-turn`), shown as the owner's line; queued while it's busy.
   private func sendTurn(_ payload: [String: Any], shown: String, queue: Bool) {
-    guard let json = try? JSONSerialization.data(withJSONObject: payload) else { return }
+    var correlated = payload
+    let id = UUID().uuidString
+    correlated["requestId"] = id
+    guard let json = try? JSONSerialization.data(withJSONObject: correlated) else { return }
     let line = json.base64EncodedString()
     append(who: "You", shown)
-    if queue && busy { queued.append(line); append(who: "", "Queued — it goes after the current answer."); return }
-    busy = true; onTurn(line)
+    guard transportReady else { append(who: "Kingmaker", "Not sent: the engine is unavailable. Try again after it restarts."); return }
+    if let i = chatIndex, i < chats.count { requestChats[id] = chats[i].id }
+    if busy { queued.append(line); append(who: "", "Queued — it goes after the current answer."); return }
+    dispatchTurn(line)
   }
 
   /// Everyday wording → the phrases Kingmaker knows ("dock with crm.example.com" → "connect my CRM at crm.example.com").
@@ -2240,7 +2313,7 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
       .filter { !$0.contains("/Library/") && !$0.contains("/.") }.prefix(limit))
   }
 
-  private func sendQueued() { guard !busy, !queued.isEmpty else { return }; busy = true; onTurn(queued.removeFirst()) }
+  private func sendQueued() { guard !busy, !queued.isEmpty else { return }; dispatchTurn(queued.removeFirst()) }
 
   // ── typing: / programs, or search the Mac ──
   func controlTextDidChange(_ obj: Notification) {
@@ -2454,7 +2527,7 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
       for (name, id) in KingmakerBar.automationTargets where KingmakerBar.automationAllowed(id, ask: false) != true {
         guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: id) else { continue }
         pending = true
-        let ask = { [weak self] in DispatchQueue.global().async { [weak self] in if KingmakerBar.automationAllowed(id, ask: true) == false { DispatchQueue.main.async { [weak self] in self?.append(who: "", "Automation for \(name) is off: System Settings → Privacy & Security → Automation → Kingmaker → \(name).") } }; refresh() } }
+        let ask = { DispatchQueue.global().async { if KingmakerBar.automationAllowed(id, ask: true) == false { DispatchQueue.main.async { [weak self] in self?.append(who: "", "Automation for \(name) is off: System Settings → Privacy & Security → Automation → Kingmaker → \(name).") } }; refresh() } }
         if NSRunningApplication.runningApplications(withBundleIdentifier: id).isEmpty {
           let cfg = NSWorkspace.OpenConfiguration(); cfg.activates = false; cfg.hides = true
           NSWorkspace.shared.openApplication(at: url, configuration: cfg) { _, _ in DispatchQueue.global().asyncAfter(deadline: .now() + 1.5) { ask() } }
@@ -2733,7 +2806,7 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
       NSApp.activate(ignoringOtherApps: true); p.makeKeyAndOrderFront(nil); return
     }
     let p = KeyPanel(contentRect: NSRect(x: 0, y: 0, width: 560, height: 520), styleMask: [.titled, .closable, .resizable, .utilityWindow], backing: .buffered, defer: false)
-    p.title = "Connectors"; p.appearance = NSAppearance(named: .darkAqua); p.level = .floating; p.isReleasedWhenClosed = false; p.hidesOnDeactivate = false
+    p.title = "Connectors"; p.appearance = NSAppearance(named: .darkAqua); p.level = kingmakerWindowMode() == "bar" ? .floating : .normal; p.isReleasedWhenClosed = false; p.hidesOnDeactivate = false
     p.minSize = NSSize(width: 460, height: 400)
     let head = NSTextField(wrappingLabelWithString: "Connect anything: any CLI, a CLI from the Kingmaker CLI Hub (Ronin's copy of CLI-Anything), an MCP server, a skill or a repo. Kingmaker's local models use it from the bar (/its name). REA reads its code first: clean runs as itself; code that phones home, reads keys or installs itself runs sandboxed with those parts blocked; code that downloads-and-runs or hides what it runs is rejected.")
     head.font = .systemFont(ofSize: 12); head.textColor = .secondaryLabelColor
@@ -2890,7 +2963,7 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
     sendButton.isEnabled = has
     sendButton.contentTintColor = has ? NSColor.white.withAlphaComponent(0.92) : NSColor.white.withAlphaComponent(0.28)
   }
-  @objc private func stopTapped() { onCommand("stop"); busy = false }
+  @objc private func stopTapped() { onCommand("stop"); failForeground("Stopped waiting; engine cancellation is not confirmed.") }
   /// The mic dictates into the box (macOS dictation, like a phone keyboard): voice to type. ⌥-click talks to Kingmaker
   /// directly (its own ears; what it heard shows here).
   @objc private func micTapped() {
@@ -3754,30 +3827,6 @@ final class TranscriptPanel {
   }
 }
 
-// BEGIN NATIVE_RUNTIME_PROFILE
-struct NativeRuntimeProfile {
-  let state: String
-  let runtimeHome: String
-  let port: Int
-}
-enum NativeRuntimeProfileError: Error {
-  case incomplete, invalidPath, invalidPort
-}
-func nativeRuntimeProfile(_ environment: [String: String]) throws -> NativeRuntimeProfile? {
-  let names = ["SOL_GHOST_HOME", "SOL_GHOST_RUNTIME_HOME", "SOL_GHOST_PORT"]
-  if !names.contains(where: { environment[$0] != nil }) { return nil }
-  guard let state = environment[names[0]], let runtime = environment[names[1]], let rawPort = environment[names[2]],
-        !state.isEmpty, !runtime.isEmpty, !rawPort.isEmpty else { throw NativeRuntimeProfileError.incomplete }
-  let paths = [state, runtime]
-  guard paths.allSatisfy({ $0.hasPrefix("/") && !$0.contains(where: { $0.isNewline || $0.asciiValue == 0 }) }) else { throw NativeRuntimeProfileError.invalidPath }
-  let statePath = URL(fileURLWithPath: state, isDirectory: true).standardizedFileURL.path
-  let runtimePath = URL(fileURLWithPath: runtime, isDirectory: true).standardizedFileURL.path
-  guard statePath != "/", runtimePath != "/", statePath != runtimePath else { throw NativeRuntimeProfileError.invalidPath }
-  guard let port = Int(rawPort), (1024...65535).contains(port), String(port) == rawPort else { throw NativeRuntimeProfileError.invalidPort }
-  return NativeRuntimeProfile(state: statePath, runtimeHome: runtimePath, port: port)
-}
-// END NATIVE_RUNTIME_PROFILE
-
 final class GhostApp: NSObject, NSApplicationDelegate {
   private struct ActiveProfile: Decodable {
     let schema: Int
@@ -3829,29 +3878,33 @@ final class GhostApp: NSObject, NSApplicationDelegate {
     return b
   }()
   /// Typed turns echo back as "heard": the bar already shows those, so only spoken words are added there.
+  private var transportGeneration = UUID()
+  // Process lifetime survives early pipe teardown until its termination is handled once.
+  private var pendingTermination: UUID?
   private var barTyped: [String: Date] = [:]   // typed turns, for 2 minutes: their echoes are never shown a second time
   private var appliedPrefs = false
   @discardableResult private func toCli(_ line: String) -> Bool {
-    guard let pipe = stdinPipe, proc?.isRunning == true else { bar.said("Kingmaker is still starting; try again in a moment."); return false }
+    guard let pipe = stdinPipe, proc?.isRunning == true else { transportDidStop("The engine is unavailable."); return false }
     pipe.fileHandleForWriting.write("\(line)\n".data(using: .utf8)!)
     return true
   }
 
   private var headlessHostMode: Bool { SMAppService.mainApp.status == .enabled }
 
-  /// The Node runtime to run the CLI with. Production bundles are self-contained: never execute a binary selected
-  /// from an environment variable or a second app, because path + executable mode do not establish its signer.
+  private let runtimeApp = ProcessInfo.processInfo.environment["KINGMAKER_RUNTIME_APP"] ?? "/Applications/Kingmaker.app"
+  /// The Node runtime to run the CLI with: this bundle's own (no Solomon.app needed), else the installed app's.
   private var runtimeBinary: (path: String, bundled: Bool) {
+    // The engine's names inside the app (0.3.0 on), then the older ones (an app built before 0.3.0).
     let fm = FileManager.default
+    let firstExecutable = { (app: String) -> String? in
+      ["KingmakerEngine", "Solomon"].map { "\(app)/Contents/MacOS/\($0)" }.first { fm.isExecutableFile(atPath: $0) }
+    }
     let ownApp = Bundle.main.bundleURL.path
-    let hasRuntime = fm.fileExists(atPath: "\(ownApp)/Contents/Resources/sol-ghost/lib/kingmaker.mjs")
-    let own = "\(ownApp)/Contents/MacOS/KingmakerEngine"
-    return (hasRuntime && fm.isExecutableFile(atPath: own) ? own : "", true)
+    let hasRuntime = ["kingmaker-runtime", "solomon-runtime"].contains { fm.fileExists(atPath: "\(ownApp)/Contents/Resources/\($0)") }
+    if let own = firstExecutable(ownApp), hasRuntime { return (own, true) }
+    return (firstExecutable(runtimeApp) ?? "\(runtimeApp)/Contents/MacOS/KingmakerEngine", false)
   }
   private lazy var activeProfile: ActiveProfile? = {
-    if let explicit = try? nativeRuntimeProfile(ProcessInfo.processInfo.environment) {
-      return ActiveProfile(schema: 1, profile: "explicit", state: explicit.state, runtime_home: explicit.runtimeHome, port: explicit.port)
-    }
     let home = URL(fileURLWithPath: NSHomeDirectory(), isDirectory: true)
     let support = home.appendingPathComponent("Library/Application Support", isDirectory: true).standardizedFileURL
     let pointer = support.appendingPathComponent("Kingmaker/active-profile.json")
@@ -3868,15 +3921,15 @@ final class GhostApp: NSObject, NSApplicationDelegate {
     return URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Library/Application Support/sol-ghost", isDirectory: true)
   }
 
+  /// An explicit reopen (including the launcher's Open button) must surface the composer in either mode.
+  /// Another visible window, such as Customize, does not mean the composer is reachable. Show, never toggle:
+  /// repeated Open actions must not hide it. This does not change background launch or start another engine.
+  func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+    bar.show()
+    return true
+  }
+
   func applicationDidFinishLaunching(_ notification: Notification) {
-    do { _ = try nativeRuntimeProfile(ProcessInfo.processInfo.environment) } catch {
-      let alert = NSAlert()
-      alert.messageText = "Kingmaker runtime profile is invalid"
-      alert.informativeText = "Set SOL_GHOST_HOME and SOL_GHOST_RUNTIME_HOME to separate absolute directories and SOL_GHOST_PORT to a port from 1024 to 65535. Kingmaker has not opened the saved profile."
-      alert.runModal()
-      NSApp.terminate(nil)
-      return
-    }
     buildEditMenu()
     watchFnKey()
     buildMenuBar()
@@ -4084,9 +4137,10 @@ final class GhostApp: NSObject, NSApplicationDelegate {
 
   private func launch() {
     appliedPrefs = false // a fresh engine gets the owner's off/mute again
-    let (binary, _) = runtimeBinary
+    let (binary, bundled) = runtimeBinary
     guard FileManager.default.isExecutableFile(atPath: binary), let resources = Bundle.main.resourceURL else {
-      lastLine = "This Kingmaker.app is missing its signed, bundled runtime. Reinstall it with Kingmaker Installer."
+      transportDidStop("The installed runtime is unavailable.")
+      lastLine = bundled ? "This Kingmaker.app is missing its runtime. Reinstall it (Kingmaker Installer), or rebuild it (the engine build)." : "No engine runtime: this build carries none and there is none at \(runtimeApp)."
       log(lastLine)
       transition(to: "down"); render(); return
     }
@@ -4095,6 +4149,7 @@ final class GhostApp: NSObject, NSApplicationDelegate {
     let cli = FileManager.default.fileExists(atPath: entry) ? entry : resources.appendingPathComponent("sol-ghost/lib/cli.mjs").path
     let extra = (ProcessInfo.processInfo.environment["SOL_GHOST_ARGS"] ?? "").split(separator: " ").map(String.init)
     let p = Process()
+    let generation = UUID(); transportGeneration = generation; pendingTermination = generation; buffer.removeAll()
     p.executableURL = URL(fileURLWithPath: binary)
     // Customize → Voice: auto (text only on an 8 GB Mac, voice above), voice or text. The engine decides (lib/ring.mjs).
     let voiceMode = UserDefaults.standard.string(forKey: "km.voiceMode") ?? "auto"
@@ -4121,11 +4176,11 @@ final class GhostApp: NSObject, NSApplicationDelegate {
       // Empty = end of file (the CLI exited). Detach, or macOS calls this again at once, forever: measured
       // 2026-10-07 at ~95% of a core for over an hour after the backend died, with nothing left to read.
       if chunk.isEmpty { handle.readabilityHandler = nil; return }
-      DispatchQueue.main.async { self?.consume(chunk) }
+      DispatchQueue.main.async { self?.consume(chunk, generation: generation) }
     }
     p.terminationHandler = { [weak self] proc in
       DispatchQueue.main.async {
-        guard let self else { return }
+        guard let self, self.claimTermination(generation, reason: "The engine stopped (exit \(proc.terminationStatus)).") else { return }
         if self.quitting { return }
         if self.lastLine.isEmpty || proc.terminationStatus != 0 { self.lastLine = "The engine stopped (exit \(proc.terminationStatus)). Log: ~/Library/Application Support/sol-ghost/logs" }
         self.log(self.lastLine)
@@ -4145,14 +4200,30 @@ final class GhostApp: NSObject, NSApplicationDelegate {
         }
       }
     }
-    do { try p.run(); proc = p; stdinPipe = input; sendInteractionOwner(force: true); if restartAttempts > 0 { log("Engine process relaunched (attempt \(restartAttempts))") } } catch {
+    do { try p.run(); proc = p; stdinPipe = input; bar.transportStarted(); sendInteractionOwner(force: true); if restartAttempts > 0 { log("Engine process relaunched (attempt \(restartAttempts))") } } catch {
+      transportDidStop("The engine could not start.")
       lastLine = "Couldn't start the engine: \(error.localizedDescription)"
       log(lastLine)
       transition(to: "down"); render()
     }
   }
 
-  private func consume(_ chunk: Data) {
+  private func claimTermination(_ generation: UUID, reason: String) -> Bool {
+    guard pendingTermination == generation else { return false }
+    pendingTermination = nil
+    transportDidStop(reason)
+    return true
+  }
+
+  private func transportDidStop(_ reason: String) {
+    transportGeneration = UUID()
+    buffer.removeAll(); stdinPipe = nil
+    bar.transportStopped(reason)
+  }
+
+  private func consume(_ chunk: Data, generation: UUID? = nil) {
+    if let generation, generation != transportGeneration { return }
+
     buffer.append(chunk)
     while let nl = buffer.firstIndex(of: 0x0A) {
       let lineData = buffer.subdata(in: buffer.startIndex..<nl)
@@ -4161,7 +4232,8 @@ final class GhostApp: NSObject, NSApplicationDelegate {
       if line.hasPrefix("@@ghost "), let json = line.dropFirst(8).data(using: .utf8),
          let obj = try? JSONSerialization.jsonObject(with: json) as? [String: Any] {
         if let spoken = obj["line"] as? String { lastLine = spoken }
-        if let line = obj["said"] as? String { bar.said(line) }
+        if let line = obj["said"] as? String { bar.said(line, requestId: obj["requestId"] as? String) }
+        if obj["turnComplete"] as? Bool == true, let id = obj["requestId"] as? String { bar.completeTurn(id) }
         if let next = obj["suggest"] as? String { bar.suggest(next) }
         if let src = obj["sources"] as? [[String: Any]] { bar.showSources(src) }
         if let cmds = obj["commands"] as? [[String: Any]] { bar.setCommands(cmds) }
@@ -4646,10 +4718,25 @@ func backgroundCommand() -> Int32? {
 
 if let code = backgroundCommand() { exit(code) }
 
+/// The window mode — an owner option, never hard-coded. "window" (default): a normal app window (Dock icon, in the
+/// Cmd-Tab cycle, one Space, not pinned above other apps). "bar": the original floating menu-bar bar (all Spaces,
+/// above everything, no Dock icon). Switch any time: `defaults write com.ronininc.solghost km.windowMode bar` (or window).
+func kingmakerPanelLevel(mode: String, maximized: Bool) -> NSWindow.Level {
+  guard mode == "bar" else { return .normal }
+  return maximized ? NSWindow.Level(rawValue: NSWindow.Level.mainMenu.rawValue + 1) : .floating
+}
+
+func kingmakerWindowMode() -> String { (UserDefaults.standard.string(forKey: "km.windowMode") ?? "window") == "bar" ? "bar" : "window" }
+
 let app = NSApplication.shared
 let delegate = GhostApp()
 app.delegate = delegate
-app.setActivationPolicy(.accessory)
+// The glow-attach indicator (CLI-started), the glow demo and the tour demo only ever show the menu-bar logo or a lone
+// bar, never a main window, so they stay accessory apps whatever the owner's window preference is — no stray Dock entry.
+let kmHelperMode = ProcessInfo.processInfo.environment["SOL_GHOST_GLOW_ATTACH"] == "1"
+  || ProcessInfo.processInfo.environment["SOL_GHOST_GLOW_DEMO"] == "1"
+  || ProcessInfo.processInfo.environment["KINGMAKER_TOUR_DEMO"] != nil
+app.setActivationPolicy(kmHelperMode || kingmakerWindowMode() == "bar" ? .accessory : .regular)
 app.run()
 
 extension NSView {
