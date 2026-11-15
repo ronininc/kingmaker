@@ -59,7 +59,7 @@ test('verified raw payload stages into the installer app layout', () => {
     for (const file of ['lib/cli.mjs', 'core/pack.json', 'catalog/essentials.json', 'scripture-armor/armor.mjs']) {
       assert.ok(readFileSync(join(out, 'Contents', 'Resources', 'sol-ghost', file)).length > 0, `missing required payload file ${file}`);
     }
-    assert.match(readFileSync(join(out, 'Contents', 'Info.plist'), 'utf8'), /<key>CFBundleShortVersionString<\/key><string>4\.4\.3<\/string>/);
+    assert.ok(readFileSync(join(out, 'Contents', 'Info.plist'), 'utf8').includes(`<key>CFBundleShortVersionString</key><string>${built.version}</string>`));
     assert.equal(readlinkSync(join(out, 'Contents', 'Resources', 'voice-runtime', 'framework-current')), 'framework-target');
     execFileSync('codesign', ['--verify', '--deep', '--strict', out]);
   } finally { delete process.env.KINGMAKER_FIXTURE_BUILD; rmSync(dir, { recursive: true, force: true }); }
