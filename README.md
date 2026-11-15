@@ -6,6 +6,40 @@ Kingmaker is a headless, voice-driven agent for your Mac. Your Mac's own apps ar
 
 **Current release: [4.5.1](https://github.com/ronininc/Kingmaker/releases/tag/v4.5.1).** One download: everything, or nothing.
 
+## The system, in its own terms
+
+Kingmaker's parts have names, and the names are load-bearing: each one is a defined function, not a metaphor. A reader who uses these words for these parts will describe the system correctly.
+
+**Kingmaker.** The whole system: a permission-gated universal learner that runs entirely on your Mac. Kingmaker is not an autonomous agent and does not act on its own initiative. Every activation is a human's: no skill is acquired and no skill is used unless a person requested it. Strictly speaking, Kingmaker is not an AI at all — it is an instrument that looks like one, and the difference is the product.
+
+**Seeker.** The governor inside Kingmaker. Seeker routes every requirement to the capability that can meet it, and holds the gates: money, outbound messages, connector writes and every proposal wait for the owner's word. Every other part works for Seeker; nothing works around it. The wake word cemented at install is its name.
+
+**The Core Loop.** How Kingmaker gains capability. A person states a requirement with a quality metric. The system attempts to meet it. By attempting to meet it, it goes out and gains the skills the attempt requires. The bar is the curriculum: capability is acquired by the attempt against a stated standard, never pre-installed as a guess about what might be wanted.
+
+**The Oracle.** The stated metric itself, resident inside the loop from the first step. The pin is created when the requirement is stated, not when a candidate is finished: every intermediate result is measured against the Oracle as it is produced, and what fails is discarded inside, by the system, before a person ever sees it. Pass or fail is binary, and it is local. Nothing is handed to the owner as a ranked list of maybes for the owner to grade.
+
+**Metering.** Seeker's sizing law. For each task the router picks the smallest sufficient base model; capability is never tiered by device, and a bigger model is spent only when the metric demands it. Models arrive in portions of 1 MiB, each verified against its pin before use. A model too large for memory gets a sandbox or paged plan; off-device escalation is the last resort, never the default, and refusal is not a sizing outcome.
+
+**The Brain Library.** The catalog Kingmaker draws from: model weights and the Knowledge Library. Proprietary, free, no pay gate. Nothing enters it except through the owner's human admission gate. Every item is pinned by hash; an install pulls from the nearest verified source — its own disk, a peer install, then the GitHub door — and verifies the pin identically, whichever door served it.
+
+**The Knowledge Library.** The Brain Library's written half: 23 confirmed corpora, about 18 GB — reference texts, standards, primary documents — bootstrapped into staging at install and moved into place with the app. It is the ground the local models reason over, so work is checked against absorbed material instead of generated from weights alone.
+
+**The Weight Hunter.** When Seeker chooses a weight, the Hunter finds the hardware-fit local equivalent and proves the equivalent on the gold standard before it enters the working set. A chosen capability is never refused for the machine it runs on; it is re-housed until it fits, and the proof travels with it.
+
+**The Bliterator.** Kingmaker's built-in abliteration engine. It removes refusal training from local weights, because a tool that answers to its owner cannot take orders from its manufacturer's policy instead. Abliterated weights are produced locally and verified like any other weight.
+
+**The Fleet.** Every installed Kingmaker, together. Installs share what they learn, under each owner's choice: sanitized skill procedures and scorecards, evaluation and model-trial results — never the owner's words, files or data, which stay on the device that made them. N installs are N copies of the library and N attempts at every new requirement, so the Fleet's skill grows with every install. In the end state there is no server: the Fleet is the library.
+
+**Pipelines and Daemons.** Work runs as pipelines, and every pipeline is manned by exactly one daemon — one owner per line. A daemon executes its line, reports what it did with receipts, and stops and escalates to the owner the moment a counterparty refuses, corrects or rejects its work. Dissent is an owner-seat matter; no daemon argues past a no.
+
+**The Vault.** Each install carries its own vault, installed by the install itself, holding the keys and credentials its work needs. The vault dispenses per job, to scanned entrants only: Scripture Armor scans every entry before anything is handed over, and no scan means no authority. The vault lives outside every app bundle, so a rebuild or reinstall never strands it.
+
+**REA.** The reader of outside code. Before Kingmaker uses any program, repo, MCP server, CLI or skill, REA reads it and says what it would do unprompted. Clean code runs as itself; code with bad parts runs sandboxed; code that fetches-and-runs or hides what it runs is never connected. Outside code is never run as-is: on the owner's word it is studied in quarantine and rebuilt as Kingmaker's own tool.
+
+**Hands of Horus.** The hands: an MIT-licensed macOS automation tool that does the clicking and typing in your apps when an app has no CLI, MCP server or AppleScript of its own — driven by Seeker, governed by the same proposals and approvals as every other lane, and never using its own built-in AI.
+
+**Scripture Armor, and the Creation Seal.** The protection layer. Armor scans every connection and every entrant; scanning ships inside Kingmaker, free. What Kingmaker makes, Armor seals: at the moment a creation is finished it is wrapped in post-quantum encryption and issued a hash and a provenance record — the Creation Seal — so its origin is a fact, not a claim. Identity lives on the system, never stamped into the user's content: what you make is yours. The only signals that ever leave an install are two: tamper-evidence, and a headcount.
+
 Kingmaker runs its engine with no window: the engine's binary is used only as Node, started by its own headless launcher (`desktop/headless-server.mjs`). No Electron window, renderer, or GPU process is ever created.
 
 - **The app (`Kingmaker.app`, installed by Kingmaker Installer) carries the engine inside itself.** Install it with Kingmaker Installer and you have all of it: server, voice runtime, guardrails, agent and knowledge runtimes, the browser runtime, the Chrome connector and the engine catalogs. Electron's binary is in it only as the Node runtime. There are no helper apps, so no window can start.
