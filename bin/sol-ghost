@@ -1,1 +1,5 @@
-kingmaker
+#!/bin/sh
+# Compatibility alias kept as a regular file: release payloads reject symlinks.
+# Resolve only the sibling CLI so relocation never embeds a build-machine path.
+here="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)" || exit 78
+exec "$here/kingmaker" "$@"

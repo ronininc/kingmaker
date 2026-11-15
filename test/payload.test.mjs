@@ -91,15 +91,26 @@ test('inside an app, a missing or broken payload list is never taken for a check
   assert.ok(PAYLOAD_PARTS.includes('assets'), 'the release packager needs assets/ in the app');
 });
 
-test('the payload keeps relative symlinks relative (an absolute one breaks the signed app on every other Mac)', async () => {
-  const { execFileSync } = await import('node:child_process');
-  const { mkdtempSync, readlinkSync } = await import('node:fs');
+test('the payload alias remains relocatable without symlinks or build-machine paths', async () => {
+  const { execFileSync, spawnSync } = await import('node:child_process');
+  const { mkdtempSync, lstatSync, writeFileSync, chmodSync, rmSync } = await import('node:fs');
   const { tmpdir } = await import('node:os');
   const { join } = await import('node:path');
   const { buildPayload, PAYLOAD_TAR } = await import('../scripts/build-payload.mjs');
-  const out = mkdtempSync(join(tmpdir(), 'km-payload-sym-'));
-  buildPayload({ out });
-  const x = mkdtempSync(join(tmpdir(), 'km-payload-x-'));
-  execFileSync('tar', ['-xf', join(out, PAYLOAD_TAR), '-C', x]);
-  assert.equal(readlinkSync(join(x, 'sol-ghost', 'bin', 'sol-ghost')), 'kingmaker');
+  const out = mkdtempSync(join(tmpdir(), 'km-payload-alias-'));
+  const x = mkdtempSync(join(tmpdir(), 'km payload relocated '));
+  try {
+    buildPayload({ out });
+    execFileSync('tar', ['-xf', join(out, PAYLOAD_TAR), '-C', x]);
+    const bin = join(x, 'sol-ghost', 'bin');
+    const alias = join(bin, 'sol-ghost');
+    assert.ok(lstatSync(alias).isFile());
+    // A sibling fixture proves argument boundaries, sibling resolution and exit
+    // status without invoking a saved profile or an installed engine.
+    writeFileSync(join(bin, 'kingmaker'), '#!/bin/sh\nprintf "<%s>\\n" "$@"\nexit 37\n');
+    chmodSync(join(bin, 'kingmaker'), 0o755);
+    const r = spawnSync(alias, ['with spaces', '', '*'], { encoding: 'utf8', cwd: tmpdir() });
+    assert.equal(r.status, 37);
+    assert.equal(r.stdout, '<with spaces>\n<>\n<*>\n');
+  } finally { rmSync(out, { recursive: true, force: true }); rmSync(x, { recursive: true, force: true }); }
 });
