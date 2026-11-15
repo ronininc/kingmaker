@@ -1109,6 +1109,46 @@
       "rights": "see-preserved-provenance-not-recertified"
     },
     {
+      "id": "prose:dsh-superagent-feishu",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/dsh-superagent-feishu/SKILL.md",
+        "sha256": "5cd538eef17f39d3a7c8beb0ff12ab2fff6e405139e59e8667009fd16ebd23c8",
+        "bytes": 2376
+      },
+      "provenance": [
+        {
+          "path": "core/skills/dsh-superagent-feishu/LICENSE",
+          "sha256": "6d66f91815b720e18cfb2b3552043a0359236aec9a1a6917787900546f6ce550",
+          "bytes": 1078
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:dsh-superagent-github",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/dsh-superagent-github/SKILL.md",
+        "sha256": "5081401e53813652f0afa3d73651147e0e7620577360f57cc43dd1c74fb41507",
+        "bytes": 2949
+      },
+      "provenance": [
+        {
+          "path": "core/skills/dsh-superagent-github/LICENSE",
+          "sha256": "6d66f91815b720e18cfb2b3552043a0359236aec9a1a6917787900546f6ce550",
+          "bytes": 1078
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
       "id": "prose:emails",
       "kind": "prose-core",
       "descriptor": {
@@ -4614,8 +4654,8 @@
     },
     {
       "path": "lib/core-pack.mjs",
-      "sha256": "4585c5ed4777f917208cb78280515529d236bd6010df102c4974b3fe551aae83",
-      "bytes": 7943
+      "sha256": "f54d63d49882c271a428544743fb388894495b5345da1a62935bb05a792a51ae",
+      "bytes": 10621
     },
     {
       "path": "lib/rea.mjs",
@@ -4624,7 +4664,7 @@
     }
   ],
   "counts": {
-    "prose-core": 106,
+    "prose-core": 108,
     "nested-prose": 63,
     "native-candidate": 7,
     "reference-only": 35
