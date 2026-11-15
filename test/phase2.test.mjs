@@ -24,7 +24,7 @@ const ok = (name, cond) => { assert.ok(cond, name); passed += 1; console.log(`  
     for (const name of order) writeFileSync(join(app, 'Contents', name), `content-${name}`);
     // wildly different mtimes per build
     const t = sub === 'a' ? new Date('2020-01-01') : new Date('2026-06-06');
-    spawnSync('touch', ['-d', t.toISOString(), join(app, 'Contents', 'one.txt'), join(app, 'Contents', 'two.txt')]);
+    for (const name of ['one.txt', 'two.txt']) utimesSync(join(app, 'Contents', name), t, t);
     return app;
   };
   const appA = mk('a', ['one.txt', 'two.txt']);
