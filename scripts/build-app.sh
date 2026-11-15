@@ -8,9 +8,20 @@
 #   scripts/build-app.sh --install  → also copies it to ~/Applications (replacing an old Sol Ghost.app there)
 set -eu
 here="$(cd "$(dirname "$0")/.." && pwd -P)"
-app="$here/dist/Kingmaker.app"
+app="${KINGMAKER_APP_OUT:-$here/dist/Kingmaker.app}"
+payload="${KINGMAKER_PAYLOAD_OUT:-$here/dist/payload}"
+# Candidate outputs are exclusive destinations, never replacement targets.
+if [ -n "${KINGMAKER_APP_OUT:-}${KINGMAKER_PAYLOAD_OUT:-}" ]; then
+  node --input-type=module - "$app" "$payload" <<'CHECK'
+import { existsSync, lstatSync } from 'node:fs';
+import { isAbsolute, resolve, basename } from 'node:path';
+const [app, payload] = process.argv.slice(2);
+const bad = resolve(app) === resolve(payload) || !isAbsolute(app) || !isAbsolute(payload) || basename(app) !== 'Kingmaker.app' || [app,payload].some(p => resolve(p) === '/' || existsSync(p) || (() => { try { lstatSync(p); return true; } catch { return false; } })()) || resolve(app).startsWith(resolve(payload) + '/') || resolve(payload).startsWith(resolve(app) + '/');
+if (bad) { console.error('candidate app/payload output must be new, absolute, separate destinations'); process.exit(2); }
+CHECK
+fi
 version="$(sed -n 's/.*"version": "\([^"]*\)".*/\1/p' "$here/package.json" | head -1)"
-rm -rf "$app"
+if [ -z "${KINGMAKER_APP_OUT:-}${KINGMAKER_PAYLOAD_OUT:-}" ]; then rm -rf "$app"; fi
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources/sol-ghost"
 swiftc -O -o "$app/Contents/MacOS/Kingmaker" "$here/app/Kingmaker.swift" -framework AppKit -framework ApplicationServices -framework QuartzCore -framework ServiceManagement
 # Kingmaker's own ffmpeg (LGPL, VideoToolbox): "make an ad" needs it, and a stock Mac has none.
@@ -21,9 +32,9 @@ cp -R "$here/app/Resources/." "$app/Contents/Resources/"
 # Kingmaker itself goes in as ONE file, never folder by folder (lib/payload.mjs): the payload holds the code, the CLI
 # Hub, the catalogs, the built-in skills and the licences with the list of every file, checked before it is handed on.
 # Never addons/: paid add-ons arrive signed, through Ronin Launcher.
-node "$here/scripts/build-payload.mjs" --out "$here/dist/payload"
+node "$here/scripts/build-payload.mjs" --out "$payload"
 rm -rf "$app/Contents/Resources/sol-ghost"
-tar -xf "$here/dist/payload/kingmaker-payload.tar" -C "$app/Contents/Resources"
+tar -xf "$payload/kingmaker-payload.tar" -C "$app/Contents/Resources"
 sed -e "s/@VERSION@/$version/g" -e "s/@SOLOMON_BUILD@/borrowed (installed Kingmaker.app)/g" "$here/app/Info.plist" > "$app/Contents/Info.plist"
 printf 'APPL????' > "$app/Contents/PkgInfo"
 [ -f "$here/scripts/kingmaker-mac-signing.mjs" ] || { echo "Signing Kingmaker.app needs Ronin's own signing tooling, which is not in the public repo: use the released app." >&2; exit 2; }
