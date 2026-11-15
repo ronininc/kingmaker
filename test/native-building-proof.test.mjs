@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {createBuildingProof} from '../lib/native-building-proof.mjs';
+test('original building is deterministic, bounded and independent of camera input',()=>{const b=createBuildingProof();assert.equal(b.parts.length,19);assert.deepEqual(b,createBuildingProof());for(const p of b.parts){assert.equal(p.center.length,3);assert.ok(p.size.every(v=>v>0&&v<3));assert.ok(p.color.every(v=>v>=0&&v<=1));}});
+import {createNeoOutlawBar} from '../lib/native-building-proof.mjs';
+test('Western and cyber components compose into original bounded bar',()=>{const b=createNeoOutlawBar();assert.ok(b.parts.length<64);assert.ok(b.components.includes('swing doors'));assert.ok(b.components.includes('data panel'));assert.equal(b.parts.filter(p=>p.type==='wheel').length,4);assert.equal(b.parts.filter(p=>p.type==='text')[0].name,'NEO OUTLAW');assert.deepEqual(b,createNeoOutlawBar());});

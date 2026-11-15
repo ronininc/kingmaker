@@ -1,0 +1,17 @@
+{
+  "id": "condensed-movies",
+  "sourceUrl": "https://github.com/m-bain/CondensedMovies",
+  "licenseEvidenceUrl": "https://www.robots.ox.ac.uk/~vgg/data/condensed-movies/assets/license.txt",
+  "datasetLicense": "CC-BY-4.0",
+  "codeLicense": "unverified-no-root-license-visible",
+  "rightsNote": "Oxford explicitly allows commercial/research dataset use and retains original video-owner copyrights. Dataset license covers listed URLs, descriptions, features, tracks and metadata; do not infer Hollywood footage redistribution clearance. Preserve attribution and paper citation; check intended media rights separately.",
+  "techniqueReferences": [
+    "Story-context retrieval using neighboring scenes",
+    "Multimodal visual/speech/text context fusion"
+  ],
+  "implementationNote": "Use independently authored algorithms with owner-cleared media; no dataset downloaded, embeddings trained or source video ingested.",
+  "schema": "kingmaker.technique-reference/1",
+  "checkedAt": "2026-11-15",
+  "status": "reference-only-not-installed",
+  "executionAuthorization": false
+}

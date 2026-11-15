@@ -1,0 +1,15 @@
+{
+  "schema": "kingmaker.technique-reference/1",
+  "id": "moviepy",
+  "sourceUrl": "https://github.com/Zulko/moviepy",
+  "codeLicense": "MIT",
+  "licenseEvidenceUrl": "https://github.com/Zulko/moviepy/blob/master/LICENCE.txt",
+  "checkedAt": "2026-11-15",
+  "status": "reference-only-not-installed",
+  "techniqueReferences": [
+    "Trim, concatenation, compositing, titles and audio envelopes"
+  ],
+  "implementationNote": "Reference for original editing graph; no MoviePy installed or code copied. Existing bounded FFmpeg encoding is not a full editor.",
+  "executionAuthorization": false,
+  "rightsNote": "Tool code licensing does not clear external assets or media. No source implementation copied."
+}

@@ -1,0 +1,52 @@
+{
+  "id": "hf:thinkingmachines/Inkling-2-Small",
+  "name": "Inkling 2 Small",
+  "source": "huggingface",
+  "sourceUrl": "https://huggingface.co/thinkingmachines/Inkling-2-Small",
+  "publisher": "thinkingmachines",
+  "publisherReputation": "first-time",
+  "license": "Apache-2.0",
+  "baseModel": "Inkling-2-Small",
+  "method": "upstream-checkpoint",
+  "quant": "NVFP4",
+  "claimedParamsB": 594,
+  "estimatedSizeBytes": 394000000000,
+  "publishedHash": "",
+  "discoveredAt": "2026-11-15T00:00:00.000Z",
+  "notes": "User-requested candidate only. Upstream rounded tree size, not measured bytes. No weight bytes acquired or admitted.",
+  "status": "pending-runtime-and-resource-validation",
+  "architecture": "Inkling2ForConditionalGeneration",
+  "format": "safetensors",
+  "inputModalities": [
+    "text",
+    "image"
+  ],
+  "outputModalities": [
+    "text"
+  ],
+  "upstreamHardware": {
+    "minimumAggregatedVramBytes": 500000000000,
+    "source": "model-card"
+  },
+  "provenance": {
+    "checkedDate": "2026-11-15",
+    "modelCard": "https://huggingface.co/thinkingmachines/Inkling-2-Small",
+    "tree": "https://huggingface.co/thinkingmachines/Inkling-2-Small/tree/main",
+    "config": "https://huggingface.co/thinkingmachines/Inkling-2-Small/blob/main/config.json",
+    "licenseEvidence": "Apache-2.0 label on official model card; complete license and applicable notices must be retained when copying upstream artifacts",
+    "revision": null,
+    "artifactHashesVerified": false
+  },
+  "admission": {
+    "enabled": false,
+    "weightsDownloaded": false,
+    "inferenceVerified": false,
+    "blockers": [
+      "No immutable upstream revision and artifact digest manifest acquired",
+      "Current model transport materializes full GGUF for Ollama; upstream checkpoint is safetensors Inkling2",
+      "394 GB upstream rounded size exceeds supported local tiers; upstream recommends 500 GB aggregated VRAM",
+      "Preserve upstream license and applicable notices before redistribution; do not relabel third-party weights as Ronin-authored",
+      "No resource-qualified inference host selected or smoke test passed"
+    ]
+  }
+}

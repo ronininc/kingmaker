@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtempSync,mkdirSync,writeFileSync,rmSync,symlinkSync,readFileSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {buildCoreSkillRegistry,verifyCoreSkillRegistry} from '../lib/core-skill-registry.mjs';
+const fixture = () => {const r=mkdtempSync(join(tmpdir(),'registry-'));for(const p of ['core/skills/a','core/skills/a/nested/b','catalog/native-creation-skills','catalog/native-asset-methods'])mkdirSync(join(r,p),{recursive:true});writeFileSync(join(r,'core/skills/a/SKILL.md'),'a');writeFileSync(join(r,'core/skills/a/nested/b/SKILL.md'),'b');for(const lane of ['native-creation-skills','native-asset-methods'])writeFileSync(join(r,'catalog',lane,'index.json'),JSON.stringify({methods:[]}));return r;};
+test('inventory is deterministic and distinguishes nested prose',()=>{const r=fixture();try{const m=buildCoreSkillRegistry(r);assert.equal(m.counts['prose-core'],1);assert.equal(m.counts['nested-prose'],1);assert.ok(verifyCoreSkillRegistry(r,m).ok);assert.ok(m.entries.every(e=>!e.nativeExecution));}finally{rmSync(r,{recursive:true});}});
+test('changed descriptor invalidates registry',()=>{const r=fixture();try{const m=buildCoreSkillRegistry(r);writeFileSync(join(r,'core/skills/a/SKILL.md'),'changed');assert.equal(verifyCoreSkillRegistry(r,m).ok,false);}finally{rmSync(r,{recursive:true});}});
+test('reference metadata cannot promote itself to native',()=>{const r=fixture();try{writeFileSync(join(r,'catalog/native-asset-methods/x.md'),'x');writeFileSync(join(r,'catalog/native-asset-methods/index.json'),JSON.stringify({methods:[{id:'x',file:'x.md',nativeExecution:true}]}));const e=buildCoreSkillRegistry(r).entries.find(e=>e.kind==='reference-only');assert.equal(e.nativeExecution,false);assert.equal(e.admission,'not-granted-by-registry');}finally{rmSync(r,{recursive:true});}});
+test('method path traversal rejected',()=>{const r=fixture();try{writeFileSync(join(r,'catalog/native-asset-methods/index.json'),JSON.stringify({methods:[{id:'x',file:'../../../../etc/passwd'}]}));assert.throws(()=>buildCoreSkillRegistry(r));}finally{rmSync(r,{recursive:true});}});
+test('symlink descriptor rejected',()=>{const r=fixture();try{symlinkSync('/etc/hosts',join(r,'core/skills/a/LICENSE'));assert.throws(()=>buildCoreSkillRegistry(r));}finally{rmSync(r,{recursive:true});}});
+test('checked-in inventory matches checkout',()=>{const root=new URL('../',import.meta.url);assert.ok(verifyCoreSkillRegistry(root.pathname,JSON.parse(readFileSync(new URL('../catalog/core-skill-registry.json',import.meta.url)))).ok);});

@@ -1,0 +1,31 @@
+{
+  "schema": "kingmaker.asset-source-reference/1",
+  "id": "cgbookcase",
+  "title": "cgbookcase PBR textures",
+  "sourceUrl": "https://www.cgbookcase.com/",
+  "licenseEvidenceUrl": "https://www.cgbookcase.com/textures",
+  "license": "CC0-1.0",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "checkedAt": "2026-11-15",
+  "assetScope": "Texture files published on cgbookcase; not website code, linked software or arbitrary third-party assets.",
+  "attributionRequired": false,
+  "retainProvenance": true,
+  "commercialUseUnderStatedLicense": true,
+  "redistributionUnderStatedLicense": true,
+  "admission": "reference-only-no-assets-acquired",
+  "executionAuthorization": false,
+  "approvedTransferOrigins": [],
+  "technicalEvidenceUrl": "https://www.cgbookcase.com/textures/basic-carpet-01",
+  "technicalNotes": [
+    "Example asset provides Base Color, Height, DirectX Normal and Roughness maps; exact roles must be read per asset.",
+    "Channel-packed presets may use NormHeight or NormRough, not glTF metallic-roughness packing. Never infer packing from the presence of a packed map.",
+    "Record normal orientation explicitly. Native Kingmaker generated normals are OpenGL; imported DirectX maps need tested conversion or compatible shader handling.",
+    "Select individual resolution variants against transfer, storage and decoded texture-memory budgets. Streaming bytes does not make a large texture cheap to decode."
+  ],
+  "requiredBeforeDelivery": [
+    "Select exact asset and resolution; retain source author, URL, reviewed license and download date.",
+    "Record hashes, byte sizes, map roles, color spaces and normal convention for all dependencies.",
+    "Obtain scoped source/transfer approval and independently bind rights evidence to the library entry.",
+    "Validate maps and target renderer before publishing or claiming compatibility."
+  ]
+}

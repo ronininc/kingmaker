@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {synthesizeEditTimeline} from '../lib/native-timeline-skill.mjs';
+import {executeNativeAssetSkill} from '../lib/native-asset-skills.mjs';
+import {mkdtemp,readFile,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+const clip={type:'clip',assetId:'owner-shot-a',sourceStartFrame:12,sourceTotalFrames:100,durationFrames:48};
+const decode=p=>JSON.parse(synthesizeEditTimeline(p).files['edit-timeline.json']);
+test('frame exact sequence and rational duration',()=>{const r=decode({rateNumerator:30000,rateDenominator:1001,items:[clip,{type:'gap',durationFrames:12},clip]});assert.deepEqual(r.track.items.map(v=>v.timelineStartFrame),[0,48,60]);assert.equal(r.durationFrames,108);assert.equal(r.durationSeconds,108*1001/30000);assert.equal(r.mediaValidated,false);});
+test('reject invalid ranges, unsupported edits, injection-like types and resource overflow',()=>{for(const p of [{items:[]},{items:[{...clip,durationFrames:100}]},{items:[{...clip,type:'exec'}]},{items:[clip],rateDenominator:0},{items:Array(257).fill(clip)},{items:[{type:'gap',durationFrames:1000001}]},{items:[{...clip,assetId:'x\nrun'}]}])assert.throws(()=>decode(p));});
+test('same input yields same artifact bytes',()=>assert.deepEqual(synthesizeEditTimeline({items:[clip]}).files,synthesizeEditTimeline({items:[clip]}).files));
+test('native dispatch writes edit artifact without media access',async()=>{const root=await mkdtemp(join(tmpdir(),'km-timeline-'));try{const r=await executeNativeAssetSkill({skill:'edit-timeline',parameters:{items:[clip]},workDir:root});assert.equal(r.record.status,'completed');assert.equal(JSON.parse(await readFile(r.record.artifacts[0].path)).durationFrames,48);}finally{await rm(root,{recursive:true,force:true});}});

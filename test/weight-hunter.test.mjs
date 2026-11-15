@@ -80,7 +80,7 @@ test('the calibration switch defaults off, and Kingmaker x Heretic enables the h
   assert.equal(skipped.hunted, false);
   assert.equal(skipped.model, 'profile-writer');
   assert.equal(ensured, 0);
-  const fetched = await beforeModelSelection({ text: 'draft a note', calibration: on, profileModel: 'profile-writer', library: library(), ensure: async () => { ensured += 1; } });
+  const fetched = await beforeModelSelection({ text: 'draft a note', allowDownload: true, calibration: on, profileModel: 'profile-writer', library: library(), ensure: async () => { ensured += 1; } });
   assert.equal(fetched.hunted, true);
   assert.equal(fetched.model, 'fast-writer');
   assert.equal(fetched.swap, false);

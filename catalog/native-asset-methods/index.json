@@ -1,0 +1,1325 @@
+{
+  "schema": "kingmaker.methods/1",
+  "status": "reference-only-not-native-skills",
+  "coverage": "Capability-level coverage of named sources; not exhaustive individual assets or all UI operations.",
+  "sources": [
+    {
+      "id": "blender-base",
+      "name": "Blender Human Base Meshes",
+      "kind": "asset-library",
+      "url": "https://www.blender.org/download/demo-files/",
+      "checkedAt": "2026-11-15",
+      "licensePolicy": "CC0 for identified Human Base Meshes bundle; preserve exact version/license.",
+      "verification": "official source retrieved or indexed; no binary/assets downloaded"
+    },
+    {
+      "id": "mpfb",
+      "name": "MPFB / MakeHuman",
+      "kind": "generator",
+      "url": "https://static.makehumancommunity.org/mpfb/docs.html",
+      "checkedAt": "2026-11-15",
+      "licensePolicy": "MPFB code GPLv3; bundled assets CC0; inspect separately obtained assets.",
+      "verification": "official source retrieved or indexed; no binary/assets downloaded"
+    },
+    {
+      "id": "mixamo",
+      "name": "Mixamo",
+      "kind": "hosted-service",
+      "url": "https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html",
+      "checkedAt": "2026-11-15",
+      "licensePolicy": "Commercial film/game use supported; do not assume raw-library redistribution or training rights.",
+      "verification": "official source retrieved or indexed; no binary/assets downloaded"
+    },
+    {
+      "id": "polyhaven",
+      "name": "Poly Haven",
+      "kind": "asset-library",
+      "url": "https://polyhaven.com/license",
+      "checkedAt": "2026-11-15",
+      "licensePolicy": "Assets CC0; service/API terms separate.",
+      "verification": "official source retrieved or indexed; no binary/assets downloaded"
+    },
+    {
+      "id": "ambientcg",
+      "name": "ambientCG",
+      "kind": "asset-library",
+      "url": "https://docs.ambientcg.com/license/",
+      "checkedAt": "2026-11-15",
+      "licensePolicy": "Assets CC0; retain asset record.",
+      "verification": "official source retrieved or indexed; no binary/assets downloaded"
+    },
+    {
+      "id": "3dtextures",
+      "name": "3DTextures.me",
+      "kind": "asset-library",
+      "url": "https://3dtextures.me/about/",
+      "checkedAt": "2026-11-15",
+      "licensePolicy": "Site textures CC0; inspect exact downloaded package.",
+      "verification": "official source retrieved or indexed; no binary/assets downloaded"
+    },
+    {
+      "id": "blendkit",
+      "name": "BlenderKit / Blendkit",
+      "kind": "asset-library",
+      "url": "https://www.blendkit.com/docs/licenses/",
+      "checkedAt": "2026-11-15",
+      "licensePolicy": "Per-asset CC0 or royalty-free; restricted raw redistribution must not be laundered.",
+      "verification": "official source retrieved or indexed; no binary/assets downloaded"
+    },
+    {
+      "id": "smithsonian",
+      "name": "Smithsonian 3D",
+      "kind": "asset-library",
+      "url": "https://3d.si.edu/collections/openaccesshighlights",
+      "checkedAt": "2026-11-15",
+      "licensePolicy": "Only items explicitly marked CC0 admitted automatically; other rights may remain.",
+      "verification": "official source retrieved or indexed; no binary/assets downloaded"
+    },
+    {
+      "id": "sketchfab",
+      "name": "Sketchfab",
+      "kind": "asset-library",
+      "url": "https://sketchfab.com/developers/download-api/guidelines",
+      "checkedAt": "2026-11-15",
+      "licensePolicy": "Per-model license; only CC0/CC-BY admitted by initial validator; account/API terms separate.",
+      "verification": "official source retrieved or indexed; no binary/assets downloaded"
+    },
+    {
+      "id": "looptools",
+      "name": "LoopTools",
+      "kind": "modeling-tool",
+      "url": "https://extensions.blender.org/add-ons/looptools/",
+      "checkedAt": "2026-11-15",
+      "licensePolicy": "Official GPL-compliant extension; pin a compatible release.",
+      "verification": "official source retrieved or indexed; no binary/assets downloaded"
+    },
+    {
+      "id": "booltool",
+      "name": "Bool Tool",
+      "kind": "modeling-tool",
+      "url": "https://extensions.blender.org/add-ons/bool-tool/",
+      "checkedAt": "2026-11-15",
+      "licensePolicy": "Official GPL-compliant extension; current release needs4.5+, local binary4.2.3.",
+      "verification": "official source retrieved or indexed; no binary/assets downloaded"
+    },
+    {
+      "id": "rigify",
+      "name": "Rigify",
+      "kind": "rigging-tool",
+      "url": "https://docs.blender.org/manual/en/latest/addons/rigging/rigify/introduction.html",
+      "checkedAt": "2026-11-15",
+      "licensePolicy": "Bundled GPL tool; licenses of input character assets remain separate.",
+      "verification": "official source retrieved or indexed; no binary/assets downloaded"
+    },
+    {
+      "id": "nodewrangler",
+      "name": "Node Wrangler",
+      "kind": "material-tool",
+      "url": "https://docs.blender.org/manual/en/latest/addons/node/node_wrangler.html",
+      "checkedAt": "2026-11-15",
+      "licensePolicy": "Bundled GPL tool; licenses of input textures remain separate.",
+      "verification": "official source retrieved or indexed; no binary/assets downloaded"
+    },
+    {
+      "id": "sanctus",
+      "name": "Sanctus Lite",
+      "kind": "material-tool",
+      "url": "https://sanctusnodes.com/documentation/main/en/",
+      "checkedAt": "2026-11-15",
+      "licensePolicy": "Exact Lite availability/license not verified. Block until version and asset grant reviewed; do not assume CC0.",
+      "verification": "official source retrieved or indexed; no binary/assets downloaded"
+    }
+  ],
+  "methods": [
+    {
+      "id": "native-blender-base-human-mesh-import",
+      "title": "Import approved human base mesh",
+      "domain": "media",
+      "file": "native-blender-base-human-mesh-import.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "blender-base",
+      "requiredAdapter": "mesh-import",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-blender-base-human-mesh-shape",
+      "title": "Shape a base mesh from an approved brief",
+      "domain": "media",
+      "file": "native-blender-base-human-mesh-shape.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "blender-base",
+      "requiredAdapter": "mesh-shaping",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-mpfb-character-create",
+      "title": "Create a neutral adult character",
+      "domain": "media",
+      "file": "native-mpfb-character-create.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "mpfb",
+      "requiredAdapter": "mpfb-rigify",
+      "preparationSupported": true,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-mpfb-character-targets",
+      "title": "Apply bounded character shape targets",
+      "domain": "media",
+      "file": "native-mpfb-character-targets.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "mpfb",
+      "requiredAdapter": "mpfb-targets",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-mpfb-character-materials",
+      "title": "Prepare character skin and eye materials",
+      "domain": "media",
+      "file": "native-mpfb-character-materials.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "mpfb",
+      "requiredAdapter": "character-materials",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-mpfb-character-clothing",
+      "title": "Fit approved clothing and hair assets",
+      "domain": "media",
+      "file": "native-mpfb-character-clothing.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "mpfb",
+      "requiredAdapter": "character-fitting",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-mpfb-character-rig",
+      "title": "Generate character rig",
+      "domain": "media",
+      "file": "native-mpfb-character-rig.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "mpfb",
+      "requiredAdapter": "mpfb-rig",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-mpfb-character-pose",
+      "title": "Pose and animate a character",
+      "domain": "media",
+      "file": "native-mpfb-character-pose.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "mpfb",
+      "requiredAdapter": "character-animation",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-mpfb-character-lipsync",
+      "title": "Plan character lip synchronization",
+      "domain": "media",
+      "file": "native-mpfb-character-lipsync.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "mpfb",
+      "requiredAdapter": "character-lipsync",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-mpfb-character-export",
+      "title": "Export character with dependencies",
+      "domain": "media",
+      "file": "native-mpfb-character-export.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "mpfb",
+      "requiredAdapter": "character-export",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-mpfb-makehuman-import",
+      "title": "Import an approved MakeHuman character",
+      "domain": "media",
+      "file": "native-mpfb-makehuman-import.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "mpfb",
+      "requiredAdapter": "makehuman-import",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-mixamo-humanoid-rig",
+      "title": "Request authorized humanoid auto-rigging",
+      "domain": "media",
+      "file": "native-mixamo-humanoid-rig.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "mixamo",
+      "requiredAdapter": "mixamo-rig",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-mixamo-body-motion",
+      "title": "Retarget an approved body motion clip",
+      "domain": "media",
+      "file": "native-mixamo-body-motion.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "mixamo",
+      "requiredAdapter": "motion-retarget",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-polyhaven-environment-model",
+      "title": "Import approved environment props",
+      "domain": "media",
+      "file": "native-polyhaven-environment-model.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "polyhaven",
+      "requiredAdapter": "mesh-import",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-polyhaven-hdri-lighting",
+      "title": "Configure approved HDRI lighting",
+      "domain": "media",
+      "file": "native-polyhaven-hdri-lighting.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "polyhaven",
+      "requiredAdapter": "hdri-lighting",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-polyhaven-pbr-material",
+      "title": "Prepare licensed PBR material maps",
+      "domain": "media",
+      "file": "native-polyhaven-pbr-material.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "polyhaven",
+      "requiredAdapter": "pbr-material",
+      "preparationSupported": true,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-ambientcg-pbr-material",
+      "title": "Prepare ambientCG PBR materials",
+      "domain": "media",
+      "file": "native-ambientcg-pbr-material.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "ambientcg",
+      "requiredAdapter": "pbr-material",
+      "preparationSupported": true,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-ambientcg-hdri-lighting",
+      "title": "Prepare ambientCG environment lighting",
+      "domain": "media",
+      "file": "native-ambientcg-hdri-lighting.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "ambientcg",
+      "requiredAdapter": "hdri-lighting",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-3dtextures-pbr-material",
+      "title": "Prepare 3DTextures PBR maps",
+      "domain": "media",
+      "file": "native-3dtextures-pbr-material.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "3dtextures",
+      "requiredAdapter": "pbr-material",
+      "preparationSupported": true,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-blendkit-model-import",
+      "title": "Import a license-reviewed catalog model",
+      "domain": "media",
+      "file": "native-blendkit-model-import.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "blendkit",
+      "requiredAdapter": "mesh-import",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-blendkit-material-import",
+      "title": "Prepare a license-reviewed catalog material",
+      "domain": "media",
+      "file": "native-blendkit-material-import.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "blendkit",
+      "requiredAdapter": "pbr-material",
+      "preparationSupported": true,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-blendkit-scene-import",
+      "title": "Review an approved scene package",
+      "domain": "media",
+      "file": "native-blendkit-scene-import.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "blendkit",
+      "requiredAdapter": "scene-import",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-smithsonian-scan-import",
+      "title": "Import an approved CC0 scan",
+      "domain": "media",
+      "file": "native-smithsonian-scan-import.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "smithsonian",
+      "requiredAdapter": "scan-import",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-smithsonian-scan-optimize",
+      "title": "Create a bounded scan derivative",
+      "domain": "media",
+      "file": "native-smithsonian-scan-optimize.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "smithsonian",
+      "requiredAdapter": "mesh-optimize",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-sketchfab-model-import",
+      "title": "Import a license-reviewed downloadable model",
+      "domain": "media",
+      "file": "native-sketchfab-model-import.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "sketchfab",
+      "requiredAdapter": "mesh-import",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-sketchfab-animation-import",
+      "title": "Inspect approved downloaded animation",
+      "domain": "media",
+      "file": "native-sketchfab-animation-import.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "sketchfab",
+      "requiredAdapter": "motion-retarget",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-looptools-mesh-reshape",
+      "title": "Reshape approved mesh loops",
+      "domain": "media",
+      "file": "native-looptools-mesh-reshape.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "looptools",
+      "requiredAdapter": "looptools-modeling",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-booltool-hard-surface",
+      "title": "Perform bounded Boolean modeling",
+      "domain": "media",
+      "file": "native-booltool-hard-surface.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "booltool",
+      "requiredAdapter": "boolean-modeling",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-rigify-control-rig",
+      "title": "Generate control rig from metarig",
+      "domain": "media",
+      "file": "native-rigify-control-rig.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "rigify",
+      "requiredAdapter": "rigify-generation",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-rigify-animation-bake",
+      "title": "Bake rig motion to exportable bones",
+      "domain": "media",
+      "file": "native-rigify-animation-bake.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "rigify",
+      "requiredAdapter": "rig-bake",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-nodewrangler-pbr-nodes",
+      "title": "Prepare PBR node connections",
+      "domain": "media",
+      "file": "native-nodewrangler-pbr-nodes.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "nodewrangler",
+      "requiredAdapter": "pbr-material",
+      "preparationSupported": true,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-nodewrangler-shader-review",
+      "title": "Review shader graph and previews",
+      "domain": "media",
+      "file": "native-nodewrangler-shader-review.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "nodewrangler",
+      "requiredAdapter": "shader-review",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-sanctus-material-preset",
+      "title": "Review and apply licensed material preset",
+      "domain": "media",
+      "file": "native-sanctus-material-preset.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "sanctus",
+      "requiredAdapter": "sanctus-material",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-sanctus-geometry-preset",
+      "title": "Review licensed procedural geometry",
+      "domain": "media",
+      "file": "native-sanctus-geometry-preset.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "sanctus",
+      "requiredAdapter": "sanctus-geometry",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "native-sanctus-decal",
+      "title": "Prepare an approved decal workflow",
+      "domain": "media",
+      "file": "native-sanctus-decal.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      },
+      "source": "sanctus",
+      "requiredAdapter": "sanctus-decal",
+      "preparationSupported": false,
+      "nativeExecution": false,
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "request",
+          "manifest"
+        ],
+        "properties": {
+          "request": {
+            "type": "object"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "qualityTarget": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  ]
+}

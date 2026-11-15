@@ -1,0 +1,4632 @@
+{
+  "schema": "kingmaker.core-skill-registry/1",
+  "scope": "this-checkout-only",
+  "authority": "inventory-only-no-admission-no-license-grant",
+  "entries": [
+    {
+      "id": "prose:aaa-modeling",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/aaa-modeling/SKILL.md",
+        "sha256": "709861dfe10d9c0badf1be1412902dd916d57995e011ba3cbeb06fc929868352",
+        "bytes": 12746
+      },
+      "provenance": [
+        {
+          "path": "core/skills/aaa-modeling/SOURCE.md",
+          "sha256": "647965de02cad07949c022e01be2f6f8d339214045d14866605ad8b8666c379a",
+          "bytes": 176
+        },
+        {
+          "path": "core/skills/aaa-modeling/VENDORED.md",
+          "sha256": "f3d126deb99f018a90a2a44f98ea5f24846c4e72bf6194a88a11840370c0ac70",
+          "bytes": 738
+        },
+        {
+          "path": "core/skills/aaa-modeling/LICENSE",
+          "sha256": "30a840bb1fda29073c626c68b62467dab1119fc5d57c3015a97cb88235a397a0",
+          "bytes": 1072
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:agent-self-scheduling",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/agent-self-scheduling/SKILL.md",
+        "sha256": "07f094bb99bced1ed68bc9acc02eff010107a034335c39a19aab58203dde448c",
+        "bytes": 4137
+      },
+      "provenance": [
+        {
+          "path": "core/skills/agent-self-scheduling/SOURCE.md",
+          "sha256": "e30b0f2ec179a7d7c95cb94f8e117bf931f100f50b1ef90c44bf2077eae9e331",
+          "bytes": 185
+        },
+        {
+          "path": "core/skills/agent-self-scheduling/VENDORED.md",
+          "sha256": "4418a35131754ba9338560d59a927203f09daa42ceb0b64d758b7e4387dd0f00",
+          "bytes": 561
+        },
+        {
+          "path": "core/skills/agent-self-scheduling/LICENSE",
+          "sha256": "1bd321a3b9cfa8d4af2105e20edd69d830df0b28e83a1b0255558f888e493981",
+          "bytes": 1069
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:ai-search-ranking",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/ai-search-ranking/SKILL.md",
+        "sha256": "c0a67d401d728e8adabe6b3c7fb25231ba53fabff096d436fe09f9c654f84493",
+        "bytes": 4584
+      },
+      "provenance": [
+        {
+          "path": "core/skills/ai-search-ranking/SOURCE.md",
+          "sha256": "0448ae38251cd840e7fa8858b36190ed8e6380b0e093a4fcdd6c70fac6886221",
+          "bytes": 143
+        },
+        {
+          "path": "core/skills/ai-search-ranking/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:algo-trading",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/algo-trading/SKILL.md",
+        "sha256": "88a18be3eee475294a9558de92be4eac03de69b2f021a14f117bf029d4eda2a2",
+        "bytes": 7278
+      },
+      "provenance": [
+        {
+          "path": "core/skills/algo-trading/SOURCE.md",
+          "sha256": "7b2cd58c49006cbb13dccf487ceeee1fd123960856a55db393c6cb62d4453649",
+          "bytes": 183
+        },
+        {
+          "path": "core/skills/algo-trading/VENDORED.md",
+          "sha256": "0787d32579a89e0107054b170c4d77ace4eea7fd498bb9728ebf091d441504f4",
+          "bytes": 722
+        },
+        {
+          "path": "core/skills/algo-trading/LICENSE",
+          "sha256": "e4d43109bf742885e5080b7008c8acbb19ef7f156938f08e3eaede4ed093e1a2",
+          "bytes": 10766
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:algorithmic-art",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/algorithmic-art/SKILL.md",
+        "sha256": "b1023b4da18068bf17124dfa5f1510899e3e048bdf3aa3734198bf5aaca635f9",
+        "bytes": 19774
+      },
+      "provenance": [
+        {
+          "path": "core/skills/algorithmic-art/SOURCE.md",
+          "sha256": "b543a3064420301e21e3416264bb7e1cdad41338a88075b13d66319265434fc3",
+          "bytes": 481
+        },
+        {
+          "path": "core/skills/algorithmic-art/LICENSE",
+          "sha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362",
+          "bytes": 11345
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:app-remake-belt",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/app-remake-belt/SKILL.md",
+        "sha256": "3f2460979535f4f22a68a04466ed4eb0e76c5b142c43ad922b1d44cb7a87b2ba",
+        "bytes": 4906
+      },
+      "provenance": [
+        {
+          "path": "core/skills/app-remake-belt/SOURCE.md",
+          "sha256": "e86e43632e3a0199ba15f870e808c44fbec2a320a189340d8e90026d926b82aa",
+          "bytes": 141
+        },
+        {
+          "path": "core/skills/app-remake-belt/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:axis-projection",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/axis-projection/SKILL.md",
+        "sha256": "20fb64e6e8a4e276c177384118c7b340b143c22ac2b7f94ee0b6041fc5a57195",
+        "bytes": 8404
+      },
+      "provenance": [
+        {
+          "path": "core/skills/axis-projection/SOURCE.md",
+          "sha256": "c4dd5641ee7a7043ba3d5a9b5c66d6cc538627fa2660e7e0c0bfdc9060e68251",
+          "bytes": 141
+        },
+        {
+          "path": "core/skills/axis-projection/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:big-box-store",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/big-box-store/SKILL.md",
+        "sha256": "55ae525a3fb5d72edfe19f5b300ead439f4259dd653a9f13476122c7421a6c1a",
+        "bytes": 8111
+      },
+      "provenance": [
+        {
+          "path": "core/skills/big-box-store/SOURCE.md",
+          "sha256": "f05b8cd9b33056fb0fca99e3208557117cd9ecbdb57d7bc596c9f6aed18967b7",
+          "bytes": 160
+        },
+        {
+          "path": "core/skills/big-box-store/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:blender-3d-asset-generation",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/blender-3d-asset-generation/SKILL.md",
+        "sha256": "329825526622cc51e9f8428434bd7bfd981bf33e3b4ea798095f2a82712dc3ad",
+        "bytes": 6162
+      },
+      "provenance": [
+        {
+          "path": "core/skills/blender-3d-asset-generation/SOURCE.md",
+          "sha256": "0e05ea00598bb5d25d8976e9673a0e07487855822f4f120d61baee37a2a3c881",
+          "bytes": 191
+        },
+        {
+          "path": "core/skills/blender-3d-asset-generation/VENDORED.md",
+          "sha256": "2a4cc428f01f326609b596bb62a8348559e5c487bb18098e8281cb2e074a7ec9",
+          "bytes": 731
+        },
+        {
+          "path": "core/skills/blender-3d-asset-generation/LICENSE",
+          "sha256": "9f91d52a762cabe2a697fa60b0f4ee2bc5d2ec4f5e0c4193ded193b1058964a2",
+          "bytes": 1081
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:business-name-fit",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/business-name-fit/SKILL.md",
+        "sha256": "5024e239fcccfd5cd32b2278aaee87731c57a48cb820d00a0917e99f2cfbc703",
+        "bytes": 11186
+      },
+      "provenance": [
+        {
+          "path": "core/skills/business-name-fit/SOURCE.md",
+          "sha256": "342c5245ed286bac62e2079f5776448eed217187e3b1917de04416a651192ea6",
+          "bytes": 325
+        },
+        {
+          "path": "core/skills/business-name-fit/LICENSE",
+          "sha256": "a20126646f93d32a8989c3cf4772d59194f405034f7babe7daebeac22b8ab151",
+          "bytes": 1072
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:business-profile-recon",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/business-profile-recon/SKILL.md",
+        "sha256": "ea30de2b3ef2e33a9b2864e6913c918b54c3357df17d7967d60a685dfdfb1f0e",
+        "bytes": 8299
+      },
+      "provenance": [
+        {
+          "path": "core/skills/business-profile-recon/SOURCE.md",
+          "sha256": "44859ef9be5c9f102c922b0060b98a863f896a96aea4ddfebc92c129dbec52bf",
+          "bytes": 169
+        },
+        {
+          "path": "core/skills/business-profile-recon/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:claude-code-skillforge",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/claude-code-skillforge/SKILL.md",
+        "sha256": "4915b9db0cc42481850f88548099bb86e449046ef5ec241301825ce6f1e4e9b3",
+        "bytes": 14100
+      },
+      "provenance": [
+        {
+          "path": "core/skills/claude-code-skillforge/SOURCE.md",
+          "sha256": "b93e90fa413b56dfb9a53961808eb5f62c854896de05d4742d728fafa5dfe784",
+          "bytes": 186
+        },
+        {
+          "path": "core/skills/claude-code-skillforge/VENDORED.md",
+          "sha256": "49623379dcce01bf6cee8468af7d35823197f7c7b19affa0b92e009338cd60c3",
+          "bytes": 692
+        },
+        {
+          "path": "core/skills/claude-code-skillforge/LICENSE",
+          "sha256": "755cb97d18c4edaa5434f182596df19d0f21392679b5f28c8e966c4ee0c6d223",
+          "bytes": 1067
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:cli-anything",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/cli-anything/SKILL.md",
+        "sha256": "a52f071d030b3cc0f4b74630157575691b43f439d126c51f0d52730b5b8042dc",
+        "bytes": 7045
+      },
+      "provenance": [
+        {
+          "path": "core/skills/cli-anything/SOURCE.md",
+          "sha256": "5f461cbb521a7a7017772c7e3aa0cea98de7626681139ac7060831121381c261",
+          "bytes": 969
+        },
+        {
+          "path": "core/skills/cli-anything/LICENSE",
+          "sha256": "0cff1a8ac2a381870a2c57cbe9b25f95bea0925b39b7fbf6a04ec23df7c77760",
+          "bytes": 11357
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:cli-anything-blender",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/cli-anything-blender/SKILL.md",
+        "sha256": "8ece3655afd1cfb1c727cfa8155a05a66cd0c19bc8b4aefa8b7c47f0cd8965cf",
+        "bytes": 8201
+      },
+      "provenance": [
+        {
+          "path": "core/skills/cli-anything-blender/SOURCE.md",
+          "sha256": "517fd68a516755458b619b9eeddc81366f7970a26de02315a5fbc04fa5003deb",
+          "bytes": 191
+        },
+        {
+          "path": "core/skills/cli-anything-blender/VENDORED.md",
+          "sha256": "fbe3942eb320dff7ef0dc98343e145c2033f1e26963b751d67becc8d263a5bfa",
+          "bytes": 637
+        },
+        {
+          "path": "core/skills/cli-anything-blender/LICENSE",
+          "sha256": "0cff1a8ac2a381870a2c57cbe9b25f95bea0925b39b7fbf6a04ec23df7c77760",
+          "bytes": 11357
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:cli-anything-comfyui",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/cli-anything-comfyui/SKILL.md",
+        "sha256": "1d1320399bff46164b7ac698fc250b7a8c1fdaeb338d867eb09c44db7a4d2a3d",
+        "bytes": 4550
+      },
+      "provenance": [
+        {
+          "path": "core/skills/cli-anything-comfyui/SOURCE.md",
+          "sha256": "7b330a48414aa4c3c1c101d74eb22316f80e3f8d0b95b4669ae8192940966701",
+          "bytes": 191
+        },
+        {
+          "path": "core/skills/cli-anything-comfyui/VENDORED.md",
+          "sha256": "83068ed8fa292f687b5290eaf1e211011eff221e2e8d6ea95eee9fd72f73774e",
+          "bytes": 637
+        },
+        {
+          "path": "core/skills/cli-anything-comfyui/LICENSE",
+          "sha256": "0cff1a8ac2a381870a2c57cbe9b25f95bea0925b39b7fbf6a04ec23df7c77760",
+          "bytes": 11357
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:cli-anything-freecad",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/cli-anything-freecad/SKILL.md",
+        "sha256": "f72199cdf744786e6f1cf0008826443fd4099727c461299ddabe6713c24ba42d",
+        "bytes": 14908
+      },
+      "provenance": [
+        {
+          "path": "core/skills/cli-anything-freecad/SOURCE.md",
+          "sha256": "99644d37bc9bdc119f3ca72a6d1fda2300e668dc89df3dee3df2362482641c42",
+          "bytes": 191
+        },
+        {
+          "path": "core/skills/cli-anything-freecad/VENDORED.md",
+          "sha256": "8d8c593f837f54f949b348db2b33b7c819a8dbe695932cf002103d2546a47bbc",
+          "bytes": 637
+        },
+        {
+          "path": "core/skills/cli-anything-freecad/LICENSE",
+          "sha256": "0cff1a8ac2a381870a2c57cbe9b25f95bea0925b39b7fbf6a04ec23df7c77760",
+          "bytes": 11357
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:cli-anything-godot",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/cli-anything-godot/SKILL.md",
+        "sha256": "b3ad25db9140e6b9931d3f8513af5d6d141c7b4919c53e74fe99f1a7fc3f9390",
+        "bytes": 2540
+      },
+      "provenance": [
+        {
+          "path": "core/skills/cli-anything-godot/SOURCE.md",
+          "sha256": "e773daf16448344a4d11d4eedaf4b661098c066f2eb3738a1bad8db92d7b9dcf",
+          "bytes": 189
+        },
+        {
+          "path": "core/skills/cli-anything-godot/VENDORED.md",
+          "sha256": "60da6155ba57b03f982faa68ea77a1e5c5d0662520ac6e8d5f7c4c54e70774f4",
+          "bytes": 631
+        },
+        {
+          "path": "core/skills/cli-anything-godot/LICENSE",
+          "sha256": "0cff1a8ac2a381870a2c57cbe9b25f95bea0925b39b7fbf6a04ec23df7c77760",
+          "bytes": 11357
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:cli-anything-hermes",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/cli-anything-hermes/SKILL.md",
+        "sha256": "04579318cfae579c1bbb07cf41e2b5316a7dcda668859f757e4c0ee722993b31",
+        "bytes": 4562
+      },
+      "provenance": [
+        {
+          "path": "core/skills/cli-anything-hermes/SOURCE.md",
+          "sha256": "aee9814437eeb6c64a10f492be8bd8bf22b9ccb695f68eef14d75041f98f753c",
+          "bytes": 190
+        },
+        {
+          "path": "core/skills/cli-anything-hermes/VENDORED.md",
+          "sha256": "02aa8c626dde3d131b3bdd78a6a719517f1c149710e60947df64325b46327dbf",
+          "bytes": 677
+        },
+        {
+          "path": "core/skills/cli-anything-hermes/LICENSE",
+          "sha256": "0cff1a8ac2a381870a2c57cbe9b25f95bea0925b39b7fbf6a04ec23df7c77760",
+          "bytes": 11357
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:cli-hub-meta-skill",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/cli-hub-meta-skill/SKILL.md",
+        "sha256": "50c3cd3c839aff628a028f0d15931f2dcb91a8cf784ab5da3088351299cd3dd1",
+        "bytes": 4447
+      },
+      "provenance": [
+        {
+          "path": "core/skills/cli-hub-meta-skill/SOURCE.md",
+          "sha256": "3d6a45e64c11270acae4d7e4ecd26b63ac281f367559fb79546fa2815d06816e",
+          "bytes": 189
+        },
+        {
+          "path": "core/skills/cli-hub-meta-skill/VENDORED.md",
+          "sha256": "3e9965b9124d8721683c60ddd6b42225dade139ca259c4e9b1f6305d9cb377b3",
+          "bytes": 721
+        },
+        {
+          "path": "core/skills/cli-hub-meta-skill/LICENSE",
+          "sha256": "0cff1a8ac2a381870a2c57cbe9b25f95bea0925b39b7fbf6a04ec23df7c77760",
+          "bytes": 11357
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:clone",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/clone/SKILL.md",
+        "sha256": "ee5e59db6a52de851a8ffec80d827c4d7c512e7a357e708b528c35391b239d34",
+        "bytes": 4386
+      },
+      "provenance": [
+        {
+          "path": "core/skills/clone/SOURCE.md",
+          "sha256": "c8279ebfa041a5795c3676122d808a83748caa484c7327ae7de26558944c77be",
+          "bytes": 882
+        },
+        {
+          "path": "core/skills/clone/LICENSE",
+          "sha256": "798f9e4d18e49b30bf2f12696c8ced73dc4e1413da375a333d01281543a1ea8b",
+          "bytes": 1064
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:cloudflare-ordering-worker",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/cloudflare-ordering-worker/SKILL.md",
+        "sha256": "81a39494c3bd8c28e4983464dc13e7d97068d0ec87ee2dbee31f28cd34186e6d",
+        "bytes": 6415
+      },
+      "provenance": [
+        {
+          "path": "core/skills/cloudflare-ordering-worker/SOURCE.md",
+          "sha256": "72d27618d85f6c594b738cb1bfebf3005599dee25e9f244502b9bcb4cef4ac23",
+          "bytes": 173
+        },
+        {
+          "path": "core/skills/cloudflare-ordering-worker/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:clover-operations-command",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/clover-operations-command/SKILL.md",
+        "sha256": "0eba31d5db32d3895829074ee30ad712dc4c78c906c07b31c8719a050d958210",
+        "bytes": 7526
+      },
+      "provenance": [
+        {
+          "path": "core/skills/clover-operations-command/SOURCE.md",
+          "sha256": "162f9f3f79b0206c13da42b6b9d44bfdd0d314fe5b4c4ebc7dd72ed50bc6721b",
+          "bytes": 172
+        },
+        {
+          "path": "core/skills/clover-operations-command/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:codex-handoff",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/codex-handoff/SKILL.md",
+        "sha256": "0f16d5d32b5fbbdf3f30e4851426ab4498cae4b7ffabd2697d38ceeaa507be87",
+        "bytes": 8677
+      },
+      "provenance": [
+        {
+          "path": "core/skills/codex-handoff/SOURCE.md",
+          "sha256": "6746da172bc79b902f0d4cf669069985e9b85bf6487411a1aacb4ee0bd0c4d49",
+          "bytes": 139
+        },
+        {
+          "path": "core/skills/codex-handoff/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:coding-gen",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/coding-gen/SKILL.md",
+        "sha256": "545702e641732419e63332337350138ede604d51af9d14cad336ac9efdc0f38d",
+        "bytes": 12260
+      },
+      "provenance": [
+        {
+          "path": "core/skills/coding-gen/SOURCE.md",
+          "sha256": "98822c284be377c12cd67a156de3f11c927b2b08c42ce5cb9b099a6a223bf857",
+          "bytes": 136
+        },
+        {
+          "path": "core/skills/coding-gen/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:comfyui",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/comfyui/SKILL.md",
+        "sha256": "babac7457753392b562d78744f5a64c8cade84eaea59c6ef5aa3b8f91d30b7c3",
+        "bytes": 24053
+      },
+      "provenance": [
+        {
+          "path": "core/skills/comfyui/SOURCE.md",
+          "sha256": "9c95213bb75b832a6f6284428853896a0c7a96f5478313e87a0b23b280d7fc9f",
+          "bytes": 334
+        },
+        {
+          "path": "core/skills/comfyui/VENDORED.md",
+          "sha256": "86b2890cc721c203cfb3c89b92b626729614472db951c18da11013a61c17dbdf",
+          "bytes": 552
+        },
+        {
+          "path": "core/skills/comfyui/LICENSE",
+          "sha256": "821556e6336796450ab852d375117b48a4887e71d255794fd6318d99982a5ab6",
+          "bytes": 1070
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:contract-and-proposal-writer",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/contract-and-proposal-writer/SKILL.md",
+        "sha256": "c8f37eb9ff135c72fad773a6cbf371c412be95d01b81d64de814ce2d7a40c601",
+        "bytes": 13939
+      },
+      "provenance": [
+        {
+          "path": "core/skills/contract-and-proposal-writer/SOURCE.md",
+          "sha256": "2903f4e325812dacf0060e934cdcc598989bbf2857f2eb8ea1b02f66349942b5",
+          "bytes": 405
+        },
+        {
+          "path": "core/skills/contract-and-proposal-writer/LICENSE",
+          "sha256": "a20126646f93d32a8989c3cf4772d59194f405034f7babe7daebeac22b8ab151",
+          "bytes": 1072
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:copy-editing",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/copy-editing/SKILL.md",
+        "sha256": "d23184ad62cbe29f64684b934c99d4ae8c7f03dec9c5a5d6bd492d645f5b9719",
+        "bytes": 17894
+      },
+      "provenance": [
+        {
+          "path": "core/skills/copy-editing/SOURCE.md",
+          "sha256": "c683d2c741b103e5e0590a9de4c2f4f465632380ecc63733bf236d63252390aa",
+          "bytes": 305
+        },
+        {
+          "path": "core/skills/copy-editing/LICENSE",
+          "sha256": "b70d71e24e40fce5da8f4b6f9cd862096a048e433db7f3c8cac5e348e6d34591",
+          "bytes": 1069
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:copywriting",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/copywriting/SKILL.md",
+        "sha256": "ecb4693fba9cc4f8841ec20f179574f04f69cbb1fb4cc66c59d955a22eccea6f",
+        "bytes": 11515
+      },
+      "provenance": [
+        {
+          "path": "core/skills/copywriting/SOURCE.md",
+          "sha256": "bcc50cb29a52c13989866e3e02ef3d9793ed6a641cbc30bce6be6c6690aa834f",
+          "bytes": 304
+        },
+        {
+          "path": "core/skills/copywriting/LICENSE",
+          "sha256": "b70d71e24e40fce5da8f4b6f9cd862096a048e433db7f3c8cac5e348e6d34591",
+          "bytes": 1069
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:create-skill-gen",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/create-skill-gen/SKILL.md",
+        "sha256": "64524ec3553f9b57b1fa97c0681a0e1673b39251f9a68523af1bdceeb32b75ba",
+        "bytes": 15024
+      },
+      "provenance": [
+        {
+          "path": "core/skills/create-skill-gen/SOURCE.md",
+          "sha256": "981ad60da4904f84dfcaf16492b13e9706ca8494a7f8068dc89a62c4d77c9656",
+          "bytes": 142
+        },
+        {
+          "path": "core/skills/create-skill-gen/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:custom-tool-builder",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/custom-tool-builder/SKILL.md",
+        "sha256": "39a4193cc9bb01a13b1ce402455867d75e55228770aa58c2bea6ef191f751f04",
+        "bytes": 14758
+      },
+      "provenance": [
+        {
+          "path": "core/skills/custom-tool-builder/SOURCE.md",
+          "sha256": "b2d9c13fd7217a3d3765f3cda35407e80501f6473b45f7c0d222c666191840ba",
+          "bytes": 145
+        },
+        {
+          "path": "core/skills/custom-tool-builder/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:customer-research",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/customer-research/SKILL.md",
+        "sha256": "905e65e67268448d88b3b96cf045c6b3615cdd87c1060e129b148a31aa627669",
+        "bytes": 15166
+      },
+      "provenance": [
+        {
+          "path": "core/skills/customer-research/SOURCE.md",
+          "sha256": "9f4125ff916fc37f3db443892952e54adae5656b85b4ee7f6a96a2f3f4ecbf98",
+          "bytes": 310
+        },
+        {
+          "path": "core/skills/customer-research/LICENSE",
+          "sha256": "b70d71e24e40fce5da8f4b6f9cd862096a048e433db7f3c8cac5e348e6d34591",
+          "bytes": 1069
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:dagster-expert",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/dagster-expert/SKILL.md",
+        "sha256": "63c489ee9c0f584f5fe0486f0be58cd3a13e94f8d2801bb6de231690c6539d00",
+        "bytes": 8212
+      },
+      "provenance": [
+        {
+          "path": "core/skills/dagster-expert/SOURCE.md",
+          "sha256": "d987a32a098bb36aa4933b934dcd5615355706662243bb42fb95c38685b53920",
+          "bytes": 185
+        },
+        {
+          "path": "core/skills/dagster-expert/VENDORED.md",
+          "sha256": "d7a62098b7d163f1a9a001acc101a8e0b2843f0418d8f31ed46cf25c96bdbe48",
+          "bytes": 628
+        },
+        {
+          "path": "core/skills/dagster-expert/LICENSE",
+          "sha256": "e25b0c5be442bdf543e3f179ef0ae6a5edef5f5c70524fce00a2a657f5d3ed9d",
+          "bytes": 11348
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:data-visualization",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/data-visualization/SKILL.md",
+        "sha256": "5811e8b3547cda6bc8af118aaf0d7589e8861cdc9facce6372dc78aea99ab87d",
+        "bytes": 11051
+      },
+      "provenance": [
+        {
+          "path": "core/skills/data-visualization/SOURCE.md",
+          "sha256": "da458bd6df83cd7951404dcec3ae4fbd8f3177de2baae00928d99b37743b6a8d",
+          "bytes": 189
+        },
+        {
+          "path": "core/skills/data-visualization/VENDORED.md",
+          "sha256": "abeab7dca6f7a7586eed608508e28272d9e9ad4a5b71ec2097d425e4a18bbfc9",
+          "bytes": 577
+        },
+        {
+          "path": "core/skills/data-visualization/LICENSE",
+          "sha256": "a6946284993aeec75c7d75906064b66210c46051e562077efb30eb6dcfe72e26",
+          "bytes": 11607
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:debugging-and-error-recovery",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/debugging-and-error-recovery/SKILL.md",
+        "sha256": "21f3960f5d7ae2cc95c40896545004dbbcbbd752ea65fc2d53962554d4174220",
+        "bytes": 10913
+      },
+      "provenance": [
+        {
+          "path": "core/skills/debugging-and-error-recovery/SOURCE.md",
+          "sha256": "e90a735d0219398f2e76d22d6acd597307e39967be4980bce5983ac10fd2cc3a",
+          "bytes": 192
+        },
+        {
+          "path": "core/skills/debugging-and-error-recovery/VENDORED.md",
+          "sha256": "f20c5539cf8c1bd5f52623be3845dd21c0058ce3f7d1c7a9a6314ee22d9d52cc",
+          "bytes": 570
+        },
+        {
+          "path": "core/skills/debugging-and-error-recovery/LICENSE",
+          "sha256": "6f202f8bd568cd730dbb2b0d1f8e243bc74c2fa1f64dbce9b2c7ea08bd5c9fd7",
+          "bytes": 1068
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:deep-research",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/deep-research/SKILL.md",
+        "sha256": "5a7a520d6daddc1eeaf93f619f264b4fca5a23df05a9c1fb10a2460fe9df5e1f",
+        "bytes": 30095
+      },
+      "provenance": [
+        {
+          "path": "core/skills/deep-research/SOURCE.md",
+          "sha256": "ea8d24b3d43889e1bb58319fcd88a3c7fedf563c25e710d9de88efd80cf8b314",
+          "bytes": 177
+        },
+        {
+          "path": "core/skills/deep-research/VENDORED.md",
+          "sha256": "691ffdf55c3da79a0596c714b45d5f2927c879b4c98aed2f30600c014c1c0ffb",
+          "bytes": 651
+        },
+        {
+          "path": "core/skills/deep-research/LICENSE",
+          "sha256": "d91b6ed990401b54f572b97b02c4bbc3e78e86441fd060f363d054bc73754d64",
+          "bytes": 1076
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:deepcamera",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/deepcamera/SKILL.md",
+        "sha256": "204bbd19415894abebd482b4c122f38fb077a343d00446a71e174523ed6eaefe",
+        "bytes": 4071
+      },
+      "provenance": [
+        {
+          "path": "core/skills/deepcamera/SOURCE.md",
+          "sha256": "0016864985d0436bd1bbf8f39fb473408bd9c9b0dbf1549d68c20955309163a8",
+          "bytes": 174
+        },
+        {
+          "path": "core/skills/deepcamera/VENDORED.md",
+          "sha256": "2eac460688712650b53f9dc6146132df7328b5ace4ef8af8615ff17381fc4a6d",
+          "bytes": 936
+        },
+        {
+          "path": "core/skills/deepcamera/LICENSE",
+          "sha256": "b8caae4fea228345b3eaf19d0677e5cdeb36326f731913060b31087ba429911c",
+          "bytes": 1073
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:docker-build-strategies",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/docker-build-strategies/SKILL.md",
+        "sha256": "7ff24758ebacdf2b3010f75ec3fe4b6692661ca6202e813520b37d3975392b1c",
+        "bytes": 12171
+      },
+      "provenance": [
+        {
+          "path": "core/skills/docker-build-strategies/SOURCE.md",
+          "sha256": "235c6c6d0dbb5f69bd6add5d4ca43f9c020fee3cd148c0614ee7a72fe15cbf04",
+          "bytes": 194
+        },
+        {
+          "path": "core/skills/docker-build-strategies/VENDORED.md",
+          "sha256": "39c5b9071ea4424befef8ab89e9d99415cf5f237558dc9058981782ca3327201",
+          "bytes": 562
+        },
+        {
+          "path": "core/skills/docker-build-strategies/LICENSE",
+          "sha256": "3bb33f65872155f0801efc9f6732e2868eb338c5ed6a81eec5c775c1382761cb",
+          "bytes": 11343
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:docker-compose-patterns",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/docker-compose-patterns/SKILL.md",
+        "sha256": "b43f4d71a18159de5868e0f1a352f0dd091bb81fe3ad29b24d79cffce6adfc4c",
+        "bytes": 9739
+      },
+      "provenance": [
+        {
+          "path": "core/skills/docker-compose-patterns/SOURCE.md",
+          "sha256": "004d33b864fa33fdb3aa126449d5c8ba30c382a5dc86fe0d25821333d6d09e08",
+          "bytes": 194
+        },
+        {
+          "path": "core/skills/docker-compose-patterns/VENDORED.md",
+          "sha256": "7ce8d0c9edc39f2c6e74dacdabdea7ac200051128e45b5bd4fab749df8b34a65",
+          "bytes": 562
+        },
+        {
+          "path": "core/skills/docker-compose-patterns/LICENSE",
+          "sha256": "3bb33f65872155f0801efc9f6732e2868eb338c5ed6a81eec5c775c1382761cb",
+          "bytes": 11343
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:docker-destructive-guardrails",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/docker-destructive-guardrails/SKILL.md",
+        "sha256": "d64c2b7a497aff8b48e4e70432e274267cc201be67c3be8e2852f506d02f68de",
+        "bytes": 10291
+      },
+      "provenance": [
+        {
+          "path": "core/skills/docker-destructive-guardrails/SOURCE.md",
+          "sha256": "504220c27a21dc9bd7f7cd608ba93ceb15cf7eaf8d6186eb1a32b088a87444cf",
+          "bytes": 200
+        },
+        {
+          "path": "core/skills/docker-destructive-guardrails/VENDORED.md",
+          "sha256": "deddffc0e8f1e48ad56fd9f4cd239154f013ed32a5ce89e5e551657c6d556df3",
+          "bytes": 568
+        },
+        {
+          "path": "core/skills/docker-destructive-guardrails/LICENSE",
+          "sha256": "3bb33f65872155f0801efc9f6732e2868eb338c5ed6a81eec5c775c1382761cb",
+          "bytes": 11343
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:docker-project-foundations",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/docker-project-foundations/SKILL.md",
+        "sha256": "7868b8c28106f9dab4e6b29c964c684e5797647d71da455cf8e966186cbbc279",
+        "bytes": 7463
+      },
+      "provenance": [
+        {
+          "path": "core/skills/docker-project-foundations/SOURCE.md",
+          "sha256": "c04f5b2d59a549af67fd9a0e1b79b02d2cdcc9368e472afbc083318582b36404",
+          "bytes": 197
+        },
+        {
+          "path": "core/skills/docker-project-foundations/VENDORED.md",
+          "sha256": "b6f7af0f67863449c4589cc245fcc309959795f5e1ce3971bacb55b1cb831c94",
+          "bytes": 565
+        },
+        {
+          "path": "core/skills/docker-project-foundations/LICENSE",
+          "sha256": "3bb33f65872155f0801efc9f6732e2868eb338c5ed6a81eec5c775c1382761cb",
+          "bytes": 11343
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:emails",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/emails/SKILL.md",
+        "sha256": "0d27de40c2eb32eb2425a48805dc1bf0210d64d0ce384cd48860697020f5a573",
+        "bytes": 11353
+      },
+      "provenance": [
+        {
+          "path": "core/skills/emails/SOURCE.md",
+          "sha256": "8a94645787209ee9d576aac19e16d47d8c07c1e861ddd28fde8427dcfb010b9d",
+          "bytes": 299
+        },
+        {
+          "path": "core/skills/emails/LICENSE",
+          "sha256": "b70d71e24e40fce5da8f4b6f9cd862096a048e433db7f3c8cac5e348e6d34591",
+          "bytes": 1069
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:fastmcp",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/fastmcp/SKILL.md",
+        "sha256": "e4c91adcd58e02a1c408ffefe9e9912b4a184d995cf38be43fc383c2f97165e8",
+        "bytes": 8183
+      },
+      "provenance": [
+        {
+          "path": "core/skills/fastmcp/SOURCE.md",
+          "sha256": "0128087df31697834be3f48d324e763ab7a325ea6ba9298a2d21cb85db679e4f",
+          "bytes": 171
+        },
+        {
+          "path": "core/skills/fastmcp/VENDORED.md",
+          "sha256": "f69413872bbf133d34636dc0b123fbd949bed3ac3e312fc5a2fc33926aedb514",
+          "bytes": 549
+        },
+        {
+          "path": "core/skills/fastmcp/LICENSE",
+          "sha256": "6912cbf80f09d30bfd0973d659db2167799933d53f885c0337c90396963b7cf9",
+          "bytes": 1148
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:ffmpeg-skill",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/ffmpeg-skill/SKILL.md",
+        "sha256": "ad414b10efcd39a17021cfad12d3a29513b4bc1f1a887a517183baf1039406b4",
+        "bytes": 29995
+      },
+      "provenance": [
+        {
+          "path": "core/skills/ffmpeg-skill/SOURCE.md",
+          "sha256": "168679bb4dd6023b7c067966cf41428b8a87a26ceaaa99692044c5f5c67b14f2",
+          "bytes": 176
+        },
+        {
+          "path": "core/skills/ffmpeg-skill/VENDORED.md",
+          "sha256": "9f8a1aa6b870a64952126352e2c2ebf06cd04a8d77206dac7317bf1dda5002ea",
+          "bytes": 675
+        },
+        {
+          "path": "core/skills/ffmpeg-skill/LICENSE",
+          "sha256": "7522b29e4d6e90f2a8fab15f07d224b1064c70692a872be9996ac1a88cf474e9",
+          "bytes": 1065
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:founder-metric-reel",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/founder-metric-reel/SKILL.md",
+        "sha256": "79b71c907503f5ff33d9c4e233514ce65efe37aff3117d167314291a671e4281",
+        "bytes": 4812
+      },
+      "provenance": [
+        {
+          "path": "core/skills/founder-metric-reel/SOURCE.md",
+          "sha256": "53e22455798d6ad5a194e2717f5ffd1befac9c02d46f432ec811b963a243b925",
+          "bytes": 145
+        },
+        {
+          "path": "core/skills/founder-metric-reel/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:gcode",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/gcode/SKILL.md",
+        "sha256": "abef30775a9d612af6cfe9dc55498b4fa08b3ae57030d08980dc8efa449e6019",
+        "bytes": 3953
+      },
+      "provenance": [
+        {
+          "path": "core/skills/gcode/SOURCE.md",
+          "sha256": "e36146054e83cc39374aced0001a683da410a7ba9917bf9fb3d29cf02c8cc66e",
+          "bytes": 169
+        },
+        {
+          "path": "core/skills/gcode/VENDORED.md",
+          "sha256": "405a3b63dc320a783ba1ed209cf9e9543ae0e7f34f448a8dd6af772d18613938",
+          "bytes": 618
+        },
+        {
+          "path": "core/skills/gcode/LICENSE",
+          "sha256": "c11168234f932c4a39bb640571079e73b178b4459682a5507e5944ad723058b3",
+          "bytes": 1074
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:get-available-resources",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/get-available-resources/SKILL.md",
+        "sha256": "54044d598fce28fca2ce50e7895f44423b070493db2f9c96ff0445bee4d3689d",
+        "bytes": 11697
+      },
+      "provenance": [
+        {
+          "path": "core/skills/get-available-resources/SOURCE.md",
+          "sha256": "c04e32fa95deb38de6a7d020c67b4371657c73aa639933394fd7152583898a68",
+          "bytes": 187
+        },
+        {
+          "path": "core/skills/get-available-resources/VENDORED.md",
+          "sha256": "ae1ed4f38534ba6b475bda1d600bab8fcab04f36e6ab314dfab76beca4d8a335",
+          "bytes": 577
+        },
+        {
+          "path": "core/skills/get-available-resources/LICENSE",
+          "sha256": "09b02a3c9df3053c55531d503357a9c7cde275970e6c3ceaa1ddf5f0e90b40c1",
+          "bytes": 1068
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:gh-fix-ci",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/gh-fix-ci/SKILL.md",
+        "sha256": "7b326b4a2f0f5f85122144628ec02077e48841e0e0e82efce88b3415bcfb7c26",
+        "bytes": 3651
+      },
+      "provenance": [
+        {
+          "path": "core/skills/gh-fix-ci/SOURCE.md",
+          "sha256": "d48435a89ac7c2c3227ea329a60a35b0007ab7d58a50a670c971dbbaaf65b6e7",
+          "bytes": 180
+        },
+        {
+          "path": "core/skills/gh-fix-ci/VENDORED.md",
+          "sha256": "5947400a00db709b19a288509e386ed7cfe2ae531f417ce05cebbf2ac0f4c6c1",
+          "bytes": 548
+        },
+        {
+          "path": "core/skills/gh-fix-ci/LICENSE.txt",
+          "sha256": "4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9",
+          "bytes": 10776
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:godot-prompter",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/SKILL.md",
+        "sha256": "24b4ce1434e0b64476c799ec31c5e2b095ad731a23419d53474c2ffdce4ad7f6",
+        "bytes": 5200
+      },
+      "provenance": [
+        {
+          "path": "core/skills/godot-prompter/SOURCE.md",
+          "sha256": "b3cc170ec69e69ec4b65a08159ac8ab436ec8cf57859775be40e438b3aeb32eb",
+          "bytes": 178
+        },
+        {
+          "path": "core/skills/godot-prompter/VENDORED.md",
+          "sha256": "836e15920735101f6a0e5c08463748d902ebd6e51e1b84dfcae57192cd5930f2",
+          "bytes": 756
+        },
+        {
+          "path": "core/skills/godot-prompter/LICENSE",
+          "sha256": "075667c180b39c81507891dd1411f3861b7da6b860d9b912841ed9f949c66277",
+          "bytes": 1083
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:graphite",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/graphite/SKILL.md",
+        "sha256": "b037228306a5d546c3881ac58f790234594f7f27a9b0c45542befdf88eb16de4",
+        "bytes": 2618
+      },
+      "provenance": [
+        {
+          "path": "core/skills/graphite/SOURCE.md",
+          "sha256": "67069f130aeb7b2ca138de91141cf24698e53ea2b6936ad6a05e7b3cc5c71960",
+          "bytes": 500
+        },
+        {
+          "path": "core/skills/graphite/LICENSE",
+          "sha256": "0cff1a8ac2a381870a2c57cbe9b25f95bea0925b39b7fbf6a04ec23df7c77760",
+          "bytes": 11357
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:gsap-core",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/gsap-core/SKILL.md",
+        "sha256": "3887b47e050ab5afbe2a9a820f23d39fa02ab785e06a343be44c6f91d84d12b3",
+        "bytes": 14792
+      },
+      "provenance": [
+        {
+          "path": "core/skills/gsap-core/SOURCE.md",
+          "sha256": "6a9646a4e9103317bb340d7270afe209b4d6e7f3a20530f51afd929dba21c80c",
+          "bytes": 173
+        },
+        {
+          "path": "core/skills/gsap-core/VENDORED.md",
+          "sha256": "9fb844c998b8a2c1d26056371400333e9df65f517e2ba3d4993c527f4d87c873",
+          "bytes": 549
+        },
+        {
+          "path": "core/skills/gsap-core/LICENSE",
+          "sha256": "51b04b06556662dd817e8f4aa6d06bc7139dc73739e1319a7233cfde3e147b90",
+          "bytes": 1066
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:gsap-scrolltrigger",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/gsap-scrolltrigger/SKILL.md",
+        "sha256": "9351b6666a4749c0740406ea363aaccb99a087ff45cc5e8b99a0f367facf3ef4",
+        "bytes": 18390
+      },
+      "provenance": [
+        {
+          "path": "core/skills/gsap-scrolltrigger/SOURCE.md",
+          "sha256": "77fa2aa2edcefef876a47c180d38d03be16869fba76d0a1139f2909c84c14d23",
+          "bytes": 182
+        },
+        {
+          "path": "core/skills/gsap-scrolltrigger/VENDORED.md",
+          "sha256": "d61d336888a476aa9a7e3750397dd176124a2ae73e5d4549a6f858be7df17cdb",
+          "bytes": 558
+        },
+        {
+          "path": "core/skills/gsap-scrolltrigger/LICENSE",
+          "sha256": "51b04b06556662dd817e8f4aa6d06bc7139dc73739e1319a7233cfde3e147b90",
+          "bytes": 1066
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:gsap-timeline",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/gsap-timeline/SKILL.md",
+        "sha256": "1a8b0f39cc4be3ed3d834b89672e4ae2f151b901dc3450bebf10bbc45379fe02",
+        "bytes": 4394
+      },
+      "provenance": [
+        {
+          "path": "core/skills/gsap-timeline/SOURCE.md",
+          "sha256": "d184d2709bb61bdeb3f5306585bba14c97872647f16cc905daa866423b423129",
+          "bytes": 177
+        },
+        {
+          "path": "core/skills/gsap-timeline/VENDORED.md",
+          "sha256": "4907617c47897dd100053a625d9568c6b4a99d2ed14fbc49a6593955145573ec",
+          "bytes": 553
+        },
+        {
+          "path": "core/skills/gsap-timeline/LICENSE",
+          "sha256": "51b04b06556662dd817e8f4aa6d06bc7139dc73739e1319a7233cfde3e147b90",
+          "bytes": 1066
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:humanizer",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/humanizer/SKILL.md",
+        "sha256": "0612f1dfb1672b0ea9b97e139bf1f06cabe98d8b27424fe8ff01e1fb4cc99cad",
+        "bytes": 32348
+      },
+      "provenance": [
+        {
+          "path": "core/skills/humanizer/SOURCE.md",
+          "sha256": "2b2edbe43d2a70fd63af1754131cac014cd17991e4365e03b47a22ed899bc07b",
+          "bytes": 274
+        },
+        {
+          "path": "core/skills/humanizer/LICENSE",
+          "sha256": "4ac4810254ab36d45419141aeb8e69bf50652cfafe5b2dab947d06d44e5cbf96",
+          "bytes": 1066
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:immersive-evidence-workspace",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/immersive-evidence-workspace/SKILL.md",
+        "sha256": "37cadb627a39168289834a525d5303fffa8fefbb898d42a3fea0ebb1eefadca4",
+        "bytes": 4136
+      },
+      "provenance": [
+        {
+          "path": "core/skills/immersive-evidence-workspace/SOURCE.md",
+          "sha256": "83158577f03316386745354f3f26771d8b4483b25d3d2e82d3d9f059aff4b701",
+          "bytes": 175
+        },
+        {
+          "path": "core/skills/immersive-evidence-workspace/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:internal-comms",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/internal-comms/SKILL.md",
+        "sha256": "067b7587a344a928fc6534ef66b1bcd591fc7c26d207ea7ca3334aeb678d6475",
+        "bytes": 1511
+      },
+      "provenance": [
+        {
+          "path": "core/skills/internal-comms/SOURCE.md",
+          "sha256": "70f9ab2d6711c2d16fbbf64bbfa63df7abe5ae37c3be58f0179a148732a92816",
+          "bytes": 302
+        },
+        {
+          "path": "core/skills/internal-comms/LICENSE",
+          "sha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362",
+          "bytes": 11345
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:kingmaker-cloudflare-release",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/kingmaker-cloudflare-release/SKILL.md",
+        "sha256": "f59f73f45c577ca223d9b56fc003f0bca7d102d34784fd9ca5acd22c9861859a",
+        "bytes": 5214
+      },
+      "provenance": [
+        {
+          "path": "core/skills/kingmaker-cloudflare-release/SOURCE.md",
+          "sha256": "13261e943ae87c3557afe7d18899d473af522aec0b0b2cab12a3d3a3a82ac0dc",
+          "bytes": 198
+        },
+        {
+          "path": "core/skills/kingmaker-cloudflare-release/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:kingmaker-doc-author",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/kingmaker-doc-author/SKILL.md",
+        "sha256": "dd637add4160bc900bbfe76b8c4b7dbe460376ceb0c9c450698a3e6f96d37c68",
+        "bytes": 4261
+      },
+      "provenance": [
+        {
+          "path": "core/skills/kingmaker-doc-author/SOURCE.md",
+          "sha256": "7ecef82535d66c6cb4358554022d41722ca413a559a9aec36efca38616a9048f",
+          "bytes": 190
+        },
+        {
+          "path": "core/skills/kingmaker-doc-author/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:kingmaker-engine-verifier",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/kingmaker-engine-verifier/SKILL.md",
+        "sha256": "2b2113ab1e4e95e38c6b53d6ebf950094a01f5268199ff131df7b7d423e16301",
+        "bytes": 4471
+      },
+      "provenance": [
+        {
+          "path": "core/skills/kingmaker-engine-verifier/SOURCE.md",
+          "sha256": "a2dbb81163a2558729040773bf092838f75cc929444825eec6417e092032d4ac",
+          "bytes": 195
+        },
+        {
+          "path": "core/skills/kingmaker-engine-verifier/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:kingmaker-flagship-driver",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/kingmaker-flagship-driver/SKILL.md",
+        "sha256": "786c3ec919a234f81f74f64f073a981e68be243d2f271f903ef3a45a21e47d51",
+        "bytes": 4521
+      },
+      "provenance": [
+        {
+          "path": "core/skills/kingmaker-flagship-driver/SOURCE.md",
+          "sha256": "13e0f80ac918f51b00239275af40c04de1115e2032e0af45c4e47baa8da3914b",
+          "bytes": 194
+        },
+        {
+          "path": "core/skills/kingmaker-flagship-driver/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:kingmaker-native-internet",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/kingmaker-native-internet/SKILL.md",
+        "sha256": "85786962f8a3e12df3164c3f88798ab903f40833d308f6d598ac5c15cc21dabf",
+        "bytes": 4306
+      },
+      "provenance": [
+        {
+          "path": "core/skills/kingmaker-native-internet/SOURCE.md",
+          "sha256": "aa37f2a75e332629fc289ed3084bf27c7158586da8370adbb703182d4b78beb3",
+          "bytes": 195
+        },
+        {
+          "path": "core/skills/kingmaker-native-internet/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:kingmaker-proof-authoring",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/kingmaker-proof-authoring/SKILL.md",
+        "sha256": "29037a4857c6c00c3fb6345d67a48f68f8601c72cc5c23a890d9ef2a8072f97c",
+        "bytes": 4366
+      },
+      "provenance": [
+        {
+          "path": "core/skills/kingmaker-proof-authoring/SOURCE.md",
+          "sha256": "2cb619929474deba16c7a9215cbff5caa66118ec1a11821416b4cbf0bc0c921f",
+          "bytes": 195
+        },
+        {
+          "path": "core/skills/kingmaker-proof-authoring/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:kingmaker-proof-runner",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/kingmaker-proof-runner/SKILL.md",
+        "sha256": "9f6f0617656d9976703afd1f632df1404f551542cf94d5f4c44e96d5503db025",
+        "bytes": 4808
+      },
+      "provenance": [
+        {
+          "path": "core/skills/kingmaker-proof-runner/SOURCE.md",
+          "sha256": "1815598700d87861d38aa2d9a62d12000edefd60caa4b848b7b5161bc0d52986",
+          "bytes": 192
+        },
+        {
+          "path": "core/skills/kingmaker-proof-runner/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:kingmaker-readme-sync",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/kingmaker-readme-sync/SKILL.md",
+        "sha256": "dad6772c34549314e7a7ee0157bcebfd7aea2e48028d6192082f089d5e3e291d",
+        "bytes": 4040
+      },
+      "provenance": [
+        {
+          "path": "core/skills/kingmaker-readme-sync/SOURCE.md",
+          "sha256": "00d549cbeb85b78ae88afe7011e6d97f06d62d265be100ea548c48145ec0257b",
+          "bytes": 191
+        },
+        {
+          "path": "core/skills/kingmaker-readme-sync/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:kingmaker-repo-hygiene",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/kingmaker-repo-hygiene/SKILL.md",
+        "sha256": "ee797efb13df3b72d3d45c2ebb2e2e00a68210634830fca9b88fc9603c6fa2bc",
+        "bytes": 3949
+      },
+      "provenance": [
+        {
+          "path": "core/skills/kingmaker-repo-hygiene/SOURCE.md",
+          "sha256": "fff4691b30d4cc82f53b45ecd7d46ec70db71b85b33ab95ceea6bf11e2170374",
+          "bytes": 192
+        },
+        {
+          "path": "core/skills/kingmaker-repo-hygiene/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:kingmaker-voice-runtime",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/kingmaker-voice-runtime/SKILL.md",
+        "sha256": "463ac382253740ec26eb3edc2667e36aa60c1a9ed741273dd66247716d2fa996",
+        "bytes": 5764
+      },
+      "provenance": [
+        {
+          "path": "core/skills/kingmaker-voice-runtime/SOURCE.md",
+          "sha256": "a9e883541e2ea9f4607da7a44139d16adecfb8e7d3c374f2990687b50c0de696",
+          "bytes": 193
+        },
+        {
+          "path": "core/skills/kingmaker-voice-runtime/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:kingmaker-voice-verification",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/kingmaker-voice-verification/SKILL.md",
+        "sha256": "cbb3b02fb710b65528020b2230daedfd7359fdaef8dcc8c95294a9eaf61f8bfa",
+        "bytes": 4964
+      },
+      "provenance": [
+        {
+          "path": "core/skills/kingmaker-voice-verification/SOURCE.md",
+          "sha256": "1d0708b6f208c14a29a4e998d8f9771d0845ace425f05b53f58c20561c05fe88",
+          "bytes": 198
+        },
+        {
+          "path": "core/skills/kingmaker-voice-verification/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:lead-magnets",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/lead-magnets/SKILL.md",
+        "sha256": "190a64c72a9a36fdde3a6b0888798e1bb9dd4e7406b00a6bbf90dba5e64c047b",
+        "bytes": 11274
+      },
+      "provenance": [
+        {
+          "path": "core/skills/lead-magnets/SOURCE.md",
+          "sha256": "b437d4dc883e0a74775cec05088921591ce2634a0248e61141fb4eb2c985ea08",
+          "bytes": 305
+        },
+        {
+          "path": "core/skills/lead-magnets/LICENSE",
+          "sha256": "b70d71e24e40fce5da8f4b6f9cd862096a048e433db7f3c8cac5e348e6d34591",
+          "bytes": 1069
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:local-seo-manager",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/local-seo-manager/SKILL.md",
+        "sha256": "3cea780d47d0a8e8d39df7ac630a5df31b96e2e54156b2f568179869655c04f1",
+        "bytes": 13620
+      },
+      "provenance": [
+        {
+          "path": "core/skills/local-seo-manager/SOURCE.md",
+          "sha256": "0c993cd4cefe203e37e2feebcb17dc594601b6e13a37823c3a5793afc3f4f47a",
+          "bytes": 455
+        },
+        {
+          "path": "core/skills/local-seo-manager/LICENSE",
+          "sha256": "a20126646f93d32a8989c3cf4772d59194f405034f7babe7daebeac22b8ab151",
+          "bytes": 1072
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:marketing-ideas",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/marketing-ideas/SKILL.md",
+        "sha256": "d5ea46d2d2eb2fb039494e8b545550a6bd5b5b9aedc5e65a228ac514deb018ff",
+        "bytes": 5789
+      },
+      "provenance": [
+        {
+          "path": "core/skills/marketing-ideas/SOURCE.md",
+          "sha256": "72d88fc5a4fd8b93d518439d77a26974a110dfcbaca145a59f8260115916b41c",
+          "bytes": 308
+        },
+        {
+          "path": "core/skills/marketing-ideas/LICENSE",
+          "sha256": "b70d71e24e40fce5da8f4b6f9cd862096a048e433db7f3c8cac5e348e6d34591",
+          "bytes": 1069
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:mcp-server-builder",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/mcp-server-builder/SKILL.md",
+        "sha256": "a97a46452637439a38676e4eb4377960c2b861a3eace54ed0181b1ffc4119e2f",
+        "bytes": 7255
+      },
+      "provenance": [
+        {
+          "path": "core/skills/mcp-server-builder/SOURCE.md",
+          "sha256": "487585acd9bb47f073446d8120e8dd7c4f845dbf8970989c07551478dd9556a5",
+          "bytes": 189
+        },
+        {
+          "path": "core/skills/mcp-server-builder/VENDORED.md",
+          "sha256": "78b0327e9545164e0dc113601f47f4f3d349286c927e85ee0517637afe06105b",
+          "bytes": 578
+        },
+        {
+          "path": "core/skills/mcp-server-builder/LICENSE",
+          "sha256": "5810409f7392a1898ac63919fb068ed7f394e9a9ff5e6fd2876dd03341be6d1c",
+          "bytes": 11347
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:movie-gen",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/movie-gen/SKILL.md",
+        "sha256": "c91c20d7f1da60ced8c8f4a476b7125368c86538d69041b67bebe948a3c1a3dc",
+        "bytes": 17690
+      },
+      "provenance": [
+        {
+          "path": "core/skills/movie-gen/SOURCE.md",
+          "sha256": "d462b7cf2c2124dc244e8cda7142b94b6808c811fa5decc061ca7ceb05b529fc",
+          "bytes": 135
+        },
+        {
+          "path": "core/skills/movie-gen/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:native-capability-extraction",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/native-capability-extraction/SKILL.md",
+        "sha256": "859ae1cc9ebfdfd96021cbe33c72ccf6c1db3db64646bd2fa4f18d2da142ee6f",
+        "bytes": 6349
+      },
+      "provenance": [
+        {
+          "path": "core/skills/native-capability-extraction/SOURCE.md",
+          "sha256": "2d82d5057ec2a92ceacfa02f525362606577401ad2c04d241e27c894031dbf93",
+          "bytes": 154
+        },
+        {
+          "path": "core/skills/native-capability-extraction/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:observability-and-instrumentation",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/observability-and-instrumentation/SKILL.md",
+        "sha256": "e7fcb0820306d46268de9594d676ad98e35040858926c412b7000faa52a61f87",
+        "bytes": 13948
+      },
+      "provenance": [
+        {
+          "path": "core/skills/observability-and-instrumentation/SOURCE.md",
+          "sha256": "54a05cdde87674fd62417788a9f5f157bb326784296e52c3b7f59bc3e7bb3c4a",
+          "bytes": 197
+        },
+        {
+          "path": "core/skills/observability-and-instrumentation/VENDORED.md",
+          "sha256": "1e834d838d3f8457729e2d9af575460c30b6080baf96943490f57ab32d4754eb",
+          "bytes": 575
+        },
+        {
+          "path": "core/skills/observability-and-instrumentation/LICENSE",
+          "sha256": "6f202f8bd568cd730dbb2b0d1f8e243bc74c2fa1f64dbce9b2c7ea08bd5c9fd7",
+          "bytes": 1068
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:offers",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/offers/SKILL.md",
+        "sha256": "40f4fa702b982dbda83c2592e2546afe6d919e95384eedc0ac8b211c728e05b2",
+        "bytes": 10141
+      },
+      "provenance": [
+        {
+          "path": "core/skills/offers/SOURCE.md",
+          "sha256": "57f9051a0bd61c28c142ac93b0a6d84f21258015dda73845c22688a21c94a715",
+          "bytes": 299
+        },
+        {
+          "path": "core/skills/offers/LICENSE",
+          "sha256": "b70d71e24e40fce5da8f4b6f9cd862096a048e433db7f3c8cac5e348e6d34591",
+          "bytes": 1069
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:office",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/office/SKILL.md",
+        "sha256": "21637b0203bf3033809853aa1dd3de3a93b1c4c421730e43ab5da8acc213bbc6",
+        "bytes": 2308
+      },
+      "provenance": [
+        {
+          "path": "core/skills/office/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:open-harness",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/open-harness/SKILL.md",
+        "sha256": "6e31326c3b931e27bff926cc70ba2f8e66fa1e92bdc23ed8d0f2935efafc0006",
+        "bytes": 5423
+      },
+      "provenance": [
+        {
+          "path": "core/skills/open-harness/SOURCE.md",
+          "sha256": "c4c3b69abf6d845c13b9deb3e6c5ebf8beaa31b943b0327b775f7e2f4d4c99b5",
+          "bytes": 138
+        },
+        {
+          "path": "core/skills/open-harness/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:paper-search-pro",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/paper-search-pro/SKILL.md",
+        "sha256": "4beffeed7910d21c30c2d7275c275c8c09a094afcb86a796a6b13e7af74e0b44",
+        "bytes": 67069
+      },
+      "provenance": [
+        {
+          "path": "core/skills/paper-search-pro/SOURCE.md",
+          "sha256": "4454b7aad928a1047ed5b6d90765ad74a0e16de4d2ff90774057ff86574a5b5b",
+          "bytes": 187
+        },
+        {
+          "path": "core/skills/paper-search-pro/VENDORED.md",
+          "sha256": "236c0bacec97c6f1e97346c5e387acfa3be3055c5e766291939d7e7103861dbf",
+          "bytes": 609
+        },
+        {
+          "path": "core/skills/paper-search-pro/LICENSE.txt",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "bytes": 11358
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:parametric-cad-verify",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/parametric-cad-verify/SKILL.md",
+        "sha256": "36b9e2a4d8d101e1246f23183d7270e34a72aef1b887c876b1bac4c3cb427272",
+        "bytes": 7547
+      },
+      "provenance": [
+        {
+          "path": "core/skills/parametric-cad-verify/SOURCE.md",
+          "sha256": "e06576804c6d76dd38922d3366989d4170c66a1e8d6b02ec1e59dae55ef6aff7",
+          "bytes": 192
+        },
+        {
+          "path": "core/skills/parametric-cad-verify/VENDORED.md",
+          "sha256": "d35ffe1f3a88f246addd1e421929892245b4b4b88301c861937c71a1f75c19fd",
+          "bytes": 748
+        },
+        {
+          "path": "core/skills/parametric-cad-verify/LICENSE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "bytes": 11358
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:penetration-testing",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/penetration-testing/SKILL.md",
+        "sha256": "163e1cbcbc7ed639dbef8712601edf69459393c694c156bd7428a8fc7562c1f6",
+        "bytes": 14495
+      },
+      "provenance": [
+        {
+          "path": "core/skills/penetration-testing/SOURCE.md",
+          "sha256": "b6868cb8404de34fbe230feacda7e9775d184df87cbf23c98ba761f8170c566b",
+          "bytes": 145
+        },
+        {
+          "path": "core/skills/penetration-testing/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:playwright-cli",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/playwright-cli/SKILL.md",
+        "sha256": "49bebc4b652d58860e91d6478fa446645e349ba8556667cc02702645d7ffde0b",
+        "bytes": 15662
+      },
+      "provenance": [
+        {
+          "path": "core/skills/playwright-cli/SOURCE.md",
+          "sha256": "532e8f4c3d4087f33a290e4eb8b82d4cff70b6f1898b77685e4ce290a5770013",
+          "bytes": 185
+        },
+        {
+          "path": "core/skills/playwright-cli/VENDORED.md",
+          "sha256": "0c8d9da8124ac09b00308f0d7f14a172628b8dfd95ea2185e5c897f49ea35cf7",
+          "bytes": 575
+        },
+        {
+          "path": "core/skills/playwright-cli/LICENSE",
+          "sha256": "7fab1461b41970ff376f1c9303a637076bfaaeb71cd12dd3a1c44aaf59a1a2b9",
+          "bytes": 11399
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:pricing",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/pricing/SKILL.md",
+        "sha256": "b0318f64140e60a28d0cf71b1a6bf2aa214b96ef2bc3253c60d16ae480367d25",
+        "bytes": 13479
+      },
+      "provenance": [
+        {
+          "path": "core/skills/pricing/SOURCE.md",
+          "sha256": "9a6e5f37f20aacc5fca68be944d4a2f48eeb98bceca19c519b8490d0df90c1c5",
+          "bytes": 300
+        },
+        {
+          "path": "core/skills/pricing/LICENSE",
+          "sha256": "b70d71e24e40fce5da8f4b6f9cd862096a048e433db7f3c8cac5e348e6d34591",
+          "bytes": 1069
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:rea",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/rea/SKILL.md",
+        "sha256": "9b712dd5a9fa312944274788a28a00b3476e754b8220b931bd1a9ce90e182b9b",
+        "bytes": 2365
+      },
+      "provenance": [
+        {
+          "path": "core/skills/rea/SOURCE.md",
+          "sha256": "93e83fac126367975a1e28c83a02dd89eced1193e12de34716894699321a7ada",
+          "bytes": 370
+        },
+        {
+          "path": "core/skills/rea/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:referrals",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/referrals/SKILL.md",
+        "sha256": "d1b9e0840b0bc788b51decd5283fba505be29ae22ec8d92e912ebee36020d7fb",
+        "bytes": 10393
+      },
+      "provenance": [
+        {
+          "path": "core/skills/referrals/SOURCE.md",
+          "sha256": "26580d0ac784cc3b53473bf4553a190a3cf729c5223ffe9f57ff39e6e93aed3e",
+          "bytes": 302
+        },
+        {
+          "path": "core/skills/referrals/LICENSE",
+          "sha256": "b70d71e24e40fce5da8f4b6f9cd862096a048e433db7f3c8cac5e348e6d34591",
+          "bytes": 1069
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:research",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/research/SKILL.md",
+        "sha256": "e9945e874a9f02fd701ac84710ae7c1f1c0374a2043e3d791952912c85fd969d",
+        "bytes": 8935
+      },
+      "provenance": [
+        {
+          "path": "core/skills/research/SOURCE.md",
+          "sha256": "e8eaf4bf07c3af63d8dd2748b4cdd7816732f40dd3fc1f2759e05d8ee46e484c",
+          "bytes": 172
+        },
+        {
+          "path": "core/skills/research/VENDORED.md",
+          "sha256": "589dc0f40fefa9e5925387f70f3a20679da59487ced0c4c64307a3a502bee69e",
+          "bytes": 641
+        },
+        {
+          "path": "core/skills/research/LICENSE",
+          "sha256": "faf08635cd95be3d83743b57ee5d63b7bc0e6c68afe612b56a9a99be0a6d153a",
+          "bytes": 1065
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:scheduler",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/scheduler/SKILL.md",
+        "sha256": "c5940b79686b0d9fbf8c64f12e0a5e7ccf54d11a5af4ad9cd22c14b9e2771886",
+        "bytes": 5338
+      },
+      "provenance": [
+        {
+          "path": "core/skills/scheduler/SOURCE.md",
+          "sha256": "a3be05641d25fbe806a05ba4ea13bb18a59b8003eabd3d71cc31caefead766b6",
+          "bytes": 173
+        },
+        {
+          "path": "core/skills/scheduler/VENDORED.md",
+          "sha256": "158e971d2bea0277bd2530a8d7f193cb523eaee9b921861ffc6d7482df7e824d",
+          "bytes": 729
+        },
+        {
+          "path": "core/skills/scheduler/LICENSE",
+          "sha256": "06dcddbb6908a0c6dd4a9e8ec822eea41d5a460a53089fecccc8a68049e99241",
+          "bytes": 1056
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:security-and-hardening",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/security-and-hardening/SKILL.md",
+        "sha256": "b202f0d0292a65c247953b6dfd432d723264ed07b051a0fd41e0721d8ead9f5d",
+        "bytes": 17579
+      },
+      "provenance": [
+        {
+          "path": "core/skills/security-and-hardening/SOURCE.md",
+          "sha256": "be22ecd5e92f0e42308f1a6de573a9cf12e4cb94ea9d513590b3296654569fab",
+          "bytes": 325
+        },
+        {
+          "path": "core/skills/security-and-hardening/VENDORED.md",
+          "sha256": "5f527652f8b189d2c5dab5d2298632b93f1009cef04ed9d837220afbcd74e84a",
+          "bytes": 564
+        },
+        {
+          "path": "core/skills/security-and-hardening/LICENSE",
+          "sha256": "6f202f8bd568cd730dbb2b0d1f8e243bc74c2fa1f64dbce9b2c7ea08bd5c9fd7",
+          "bytes": 1068
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:security-audit",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/security-audit/SKILL.md",
+        "sha256": "5e3e96a1e438d8f35fef0a1e38f02d4f00e2bdf910401b7dfe00e6779c6dac85",
+        "bytes": 22026
+      },
+      "provenance": [
+        {
+          "path": "core/skills/security-audit/SOURCE.md",
+          "sha256": "b3b07042ab18420964a95d00951f7972784d45150554c138d032610aca43939a",
+          "bytes": 828
+        },
+        {
+          "path": "core/skills/security-audit/LICENSE",
+          "sha256": "e598e694aa506650c7192d5ea3be0e50aca0d356ea00551c53429f0b01eb6391",
+          "bytes": 1078
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:service-business-website",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/service-business-website/SKILL.md",
+        "sha256": "bc4388a2013cc66b170e944291b59ea467064b8e015382a23e9c3c691b488e19",
+        "bytes": 5058
+      },
+      "provenance": [
+        {
+          "path": "core/skills/service-business-website/SOURCE.md",
+          "sha256": "7fac050a1a3d3d1023bdd45e70e94f6d097b8730918f8da3e3526caa78c2e76e",
+          "bytes": 171
+        },
+        {
+          "path": "core/skills/service-business-website/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:site-media-fetch",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/site-media-fetch/SKILL.md",
+        "sha256": "5192c97c12d7f65436cbffad30cef18ee0396a569eb0851ed1a5ad8168d821e3",
+        "bytes": 8685
+      },
+      "provenance": [
+        {
+          "path": "core/skills/site-media-fetch/SOURCE.md",
+          "sha256": "fe1286777c39b44e9fb2f452b04216d8fbd31940f17b5b406b67d0b4b64a26f9",
+          "bytes": 163
+        },
+        {
+          "path": "core/skills/site-media-fetch/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:skill-creator",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/skill-creator/SKILL.md",
+        "sha256": "42765c880e446a83c85f7852fc77b43ecd46c76ca219d68051799ac7425e6943",
+        "bytes": 33351
+      },
+      "provenance": [
+        {
+          "path": "core/skills/skill-creator/SOURCE.md",
+          "sha256": "2897a675826d7146062be83cb6de2de4dda23b456cccf681d8617ede4ec30f40",
+          "bytes": 160
+        },
+        {
+          "path": "core/skills/skill-creator/LICENSE.txt",
+          "sha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
+          "bytes": 11357
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:skill-kokoro-tts-tool",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/skill-kokoro-tts-tool/SKILL.md",
+        "sha256": "9ef0153b1c437039aca68411871a10c746211d3a306690a4a962d441edc94ea7",
+        "bytes": 9493
+      },
+      "provenance": [
+        {
+          "path": "core/skills/skill-kokoro-tts-tool/SOURCE.md",
+          "sha256": "8830c1ee1754d81bf2047bddf6e27ee94a61ea5a11b8871461861bf481bdbe11",
+          "bytes": 185
+        },
+        {
+          "path": "core/skills/skill-kokoro-tts-tool/VENDORED.md",
+          "sha256": "fa6336d0e933aa34ff21da3a840d327ac3f3df0f75db569d9d22a4f6d892bcdf",
+          "bytes": 718
+        },
+        {
+          "path": "core/skills/skill-kokoro-tts-tool/LICENSE",
+          "sha256": "a7a774f8ce30e3a2633893bdee1a021cf8093492f8256f2292b6693a9f1c76ce",
+          "bytes": 1070
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:skill-matchmaker",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/skill-matchmaker/SKILL.md",
+        "sha256": "01ba4efe6e7381453b37664c1a48779500469fc240b272e0626eafc0d51751f2",
+        "bytes": 3289
+      },
+      "provenance": [
+        {
+          "path": "core/skills/skill-matchmaker/SOURCE.md",
+          "sha256": "a0fa5b5a3e730c7cafd24ce49d9598b73a63f31cfcd01c71529d0f01a41affc1",
+          "bytes": 142
+        },
+        {
+          "path": "core/skills/skill-matchmaker/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:social",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/social/SKILL.md",
+        "sha256": "dd4c01d0925f571562d4e8dea4af6b60bd9d491149187d94927e65280fad1bee",
+        "bytes": 18313
+      },
+      "provenance": [
+        {
+          "path": "core/skills/social/SOURCE.md",
+          "sha256": "b79505aa04d59361379777fb9810a77c3c3a1423978d3a292474ba94562b6956",
+          "bytes": 299
+        },
+        {
+          "path": "core/skills/social/LICENSE",
+          "sha256": "b70d71e24e40fce5da8f4b6f9cd862096a048e433db7f3c8cac5e348e6d34591",
+          "bytes": 1069
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:social-media-gen",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/social-media-gen/SKILL.md",
+        "sha256": "ae006c66dd161249b99f865fb938a2cf1d1c0abbd250c3722bd43e5a76e93045",
+        "bytes": 15588
+      },
+      "provenance": [
+        {
+          "path": "core/skills/social-media-gen/SOURCE.md",
+          "sha256": "78610e6b238c2d23dde9c5020abd84023bb832c41021f7864a1f79078eb1f234",
+          "bytes": 142
+        },
+        {
+          "path": "core/skills/social-media-gen/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:spanish-regional-localization",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/spanish-regional-localization/SKILL.md",
+        "sha256": "18e8abe40d58c0da1999e8e20c06d9a7f41abceacd5fd4d6422fbe9a99e3b7ab",
+        "bytes": 7974
+      },
+      "provenance": [
+        {
+          "path": "core/skills/spanish-regional-localization/SOURCE.md",
+          "sha256": "48161f04d52f9958f791373127c352d3f474ee63124967a0d81c52afc4644265",
+          "bytes": 176
+        },
+        {
+          "path": "core/skills/spanish-regional-localization/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:theme-factory",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/theme-factory/SKILL.md",
+        "sha256": "c35893e221e28895c52143cc11bf30e41a44817796b39d4b15727dadc9796552",
+        "bytes": 3124
+      },
+      "provenance": [
+        {
+          "path": "core/skills/theme-factory/SOURCE.md",
+          "sha256": "eb1008d8947b51317c163a60912d08eb9ec48ecc9ce0530112702a49adc910df",
+          "bytes": 301
+        },
+        {
+          "path": "core/skills/theme-factory/LICENSE",
+          "sha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362",
+          "bytes": 11345
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:trading-agents",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/trading-agents/SKILL.md",
+        "sha256": "a041f10771bbd0c6d25f51c51db586a48e2a3ed8f989f7543de0818e71bd55f5",
+        "bytes": 2173
+      },
+      "provenance": [
+        {
+          "path": "core/skills/trading-agents/SOURCE.md",
+          "sha256": "6c817d98561eb8e5ddbd18350de6068daa183c9b1d75de2c928d58b50595289f",
+          "bytes": 646
+        },
+        {
+          "path": "core/skills/trading-agents/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:universal-modder",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/universal-modder/SKILL.md",
+        "sha256": "d08be52dda78fda92ef4ec1e917b8c4541345d113f215806d3098aba1c7d5f68",
+        "bytes": 4248
+      },
+      "provenance": [
+        {
+          "path": "core/skills/universal-modder/SOURCE.md",
+          "sha256": "7dea995b444a41ce6f224b29c278e2012d56215806a089ade0b5231c50198454",
+          "bytes": 180
+        },
+        {
+          "path": "core/skills/universal-modder/VENDORED.md",
+          "sha256": "8dd8320699f91f61dd399d0d20a46af98fd30feca9c5c0378b06eb5bf6761e22",
+          "bytes": 1496
+        },
+        {
+          "path": "core/skills/universal-modder/LICENSE",
+          "sha256": "db6cfa2ad2c44f73080440c866c4a3a078749d84ba40b4dfa27d50f18a525543",
+          "bytes": 1096
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:verify-claims",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/verify-claims/SKILL.md",
+        "sha256": "de0af2716ea0ec1c45b2895ee69166ac3c42a8bbca0c7ee9135f2c77f6a10692",
+        "bytes": 9001
+      },
+      "provenance": [
+        {
+          "path": "core/skills/verify-claims/SOURCE.md",
+          "sha256": "9e45146f77507e20886a5d0e87cc74af36d73225b49bc3e8a28214efde4334bf",
+          "bytes": 177
+        },
+        {
+          "path": "core/skills/verify-claims/VENDORED.md",
+          "sha256": "cf7b18ffdd6d408c7407cf9e2e8b20dd965fcf849c556200e007661686b7f0b6",
+          "bytes": 642
+        },
+        {
+          "path": "core/skills/verify-claims/LICENSE",
+          "sha256": "2c4d743f95b94dcd4bddebede230035f61bd399754e36d1fc09f2630a592cbaf",
+          "bytes": 1078
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:voice-operations-command",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/voice-operations-command/SKILL.md",
+        "sha256": "3ac18bc7926f35101b31e087771259cc9f287ab6205deb8f6070b21e6c47382e",
+        "bytes": 10548
+      },
+      "provenance": [
+        {
+          "path": "core/skills/voice-operations-command/SOURCE.md",
+          "sha256": "0a6fe5f535dd47d47ead93a083b2b9b958b10b794fedaa048d38b98563b9de04",
+          "bytes": 171
+        },
+        {
+          "path": "core/skills/voice-operations-command/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:wake-word-detection",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/wake-word-detection/SKILL.md",
+        "sha256": "f9b7f978ddeb88d9040b83a8f844ac90d90c878b1f108d4a6c7bd1d5e52639c0",
+        "bytes": 13828
+      },
+      "provenance": [
+        {
+          "path": "core/skills/wake-word-detection/SOURCE.md",
+          "sha256": "1104ec568dd2b84217823d7f9cc0e48e7e93e571d5869cfc5c9ff85e1e615a99",
+          "bytes": 189
+        },
+        {
+          "path": "core/skills/wake-word-detection/VENDORED.md",
+          "sha256": "f2be3e5a598d1f2205f760d4188dbacf74eebd81c48dbd73634b1040a59e62fd",
+          "bytes": 598
+        },
+        {
+          "path": "core/skills/wake-word-detection/LICENSE",
+          "sha256": "6b0382b16279f26ff69014300541967a356a666eb0b91b422f6862f6b7dad17e",
+          "bytes": 1211
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:web-artifacts-builder",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/web-artifacts-builder/SKILL.md",
+        "sha256": "81c5002c6643b0de7b8710b00e7a9038daa6fb9b68d59870ee6adb12da8d10f8",
+        "bytes": 3087
+      },
+      "provenance": [
+        {
+          "path": "core/skills/web-artifacts-builder/SOURCE.md",
+          "sha256": "a66d573419791e8868663c582aab9212af594e7ca5f8b5bacca36d5f073df9b5",
+          "bytes": 168
+        },
+        {
+          "path": "core/skills/web-artifacts-builder/LICENSE.txt",
+          "sha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
+          "bytes": 11357
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:webapp-testing",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/webapp-testing/SKILL.md",
+        "sha256": "51b7349e77ec63b7744a6f63647e7566a0b4d2e301121cc10e8c2113af6556a2",
+        "bytes": 3913
+      },
+      "provenance": [
+        {
+          "path": "core/skills/webapp-testing/SOURCE.md",
+          "sha256": "26e9dcf00b009531e45e05fc7f8f83a5ba52d453a6b91d8f8bb9d339ee81e61b",
+          "bytes": 185
+        },
+        {
+          "path": "core/skills/webapp-testing/VENDORED.md",
+          "sha256": "4ddd2923e981cd1d70d0f480e4755d7d26ac5cdc792cfd9e6f1808439fec4550",
+          "bytes": 557
+        },
+        {
+          "path": "core/skills/webapp-testing/LICENSE.txt",
+          "sha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362",
+          "bytes": 11345
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:website-build-standard",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/website-build-standard/SKILL.md",
+        "sha256": "f295a60fbab5bdcea273f9b83cb2d185428d2af9e4398b2734caade888b2e2f4",
+        "bytes": 10004
+      },
+      "provenance": [
+        {
+          "path": "core/skills/website-build-standard/SOURCE.md",
+          "sha256": "ca1610d258b5207b81930a5038e3460342942982838fcd35460b42c1f18a3b0f",
+          "bytes": 169
+        },
+        {
+          "path": "core/skills/website-build-standard/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:wholesale-real-estate",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/wholesale-real-estate/SKILL.md",
+        "sha256": "fee402f9e5f5df7754103de7749c3aa2c8011b047e031bf68b6e781e958ec9d6",
+        "bytes": 11409
+      },
+      "provenance": [
+        {
+          "path": "core/skills/wholesale-real-estate/SOURCE.md",
+          "sha256": "bbb5bc33273f2e7d3f1f2caafd5432589e37dc44020f488e1150ad7d10f994e9",
+          "bytes": 168
+        },
+        {
+          "path": "core/skills/wholesale-real-estate/LICENSE",
+          "sha256": "39ca7efb15f5bbdfaec4e8c9357f9cc96db995b0fe46fe8678351095d726e1a6",
+          "bytes": 102
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "prose:workflows",
+      "kind": "prose-core",
+      "descriptor": {
+        "path": "core/skills/workflows/SKILL.md",
+        "sha256": "2baec42119d41cf295a7557ac328dbd53ce555d23199f618bfc9400f72c44951",
+        "bytes": 3203
+      },
+      "provenance": [
+        {
+          "path": "core/skills/workflows/SOURCE.md",
+          "sha256": "5718fddcbc9498343b7a3df9778f3b24fd51f982464aef9f88da455986aa54c8",
+          "bytes": 173
+        },
+        {
+          "path": "core/skills/workflows/VENDORED.md",
+          "sha256": "5fba9232da2eca018e44a7eb913f2200b64c84d348f8e372cb930d4a80eac6ec",
+          "bytes": 629
+        },
+        {
+          "path": "core/skills/workflows/LICENSE",
+          "sha256": "a94bb959c019300d59f97d948705d17b1cc0cd137e50364a2b93ed06e4453a4a",
+          "bytes": 1083
+        }
+      ],
+      "status": "existing-core-rea-gated",
+      "nativeExecution": false,
+      "admission": "unchanged",
+      "rights": "see-preserved-provenance-not-recertified"
+    },
+    {
+      "id": "nested:core/skills/claude-code-skillforge/examples/auditing-seo/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/claude-code-skillforge/examples/auditing-seo/SKILL.md",
+        "sha256": "108bff463104c09917283460ef297245b39b942f8d216b611c82dfacf290f349",
+        "bytes": 1702
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/claude-code-skillforge/examples/formatting-commits/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/claude-code-skillforge/examples/formatting-commits/SKILL.md",
+        "sha256": "e413718271f08855f2282b74597f6eff6f58513c43e65c6c895a7fd5ae8009cb",
+        "bytes": 2098
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/clone/references/cli-anything/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/clone/references/cli-anything/SKILL.md",
+        "sha256": "fb650312aed69b5a9d307a35f6630634affba1b1ffb2f35c216e017c26158cee",
+        "bytes": 6077
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/clone/references/graphify/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/clone/references/graphify/SKILL.md",
+        "sha256": "3965a1a065c06328c7e565da1a383e8bf8afefe129ce7668507fc878be01491e",
+        "bytes": 43654
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/clone/references/reverse-engineer-anything/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/clone/references/reverse-engineer-anything/SKILL.md",
+        "sha256": "976e400f028618926c0b658ee50df79996f5f32402d33b49a23bfdbc232b45e6",
+        "bytes": 23510
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/analysis/cloud-provider-regression/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/analysis/cloud-provider-regression/SKILL.md",
+        "sha256": "9318f320ab150feb5807047a8f4d07491e316e75a67f56b2d6d5604bdc22c4f4",
+        "bytes": 1236
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/analysis/home-security-benchmark/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/analysis/home-security-benchmark/SKILL.md",
+        "sha256": "6a5d5a16849546c991c210e4638e6fb134bc5e085bc8f07ea6dbb69076e19651",
+        "bytes": 5974
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/analysis/homesafe-bench/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/analysis/homesafe-bench/SKILL.md",
+        "sha256": "39c331770b45a7afafa30dcdc600819a03f8d9392465165da60c2d22146223b1",
+        "bytes": 4528
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/analysis/smarthome-bench/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/analysis/smarthome-bench/SKILL.md",
+        "sha256": "b5de7095d58a36ffeb1cdb878c4ab993841b61aa68c6e8e0acf7bea295858ee1",
+        "bytes": 6199
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/annotation/dataset-annotation/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/annotation/dataset-annotation/SKILL.md",
+        "sha256": "e7f0b3094aa7f292322bd1b448300cd862c53817de0743af0a9ea4044b0e4806",
+        "bytes": 2842
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/annotation/dataset-management/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/annotation/dataset-management/SKILL.md",
+        "sha256": "c9d454dd5d488f54dba750cf12642110ffc58165dceab44b8d46da94f5e4ca3c",
+        "bytes": 1986
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/automation/ha-trigger/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/automation/ha-trigger/SKILL.md",
+        "sha256": "7a1a4263c778f1cf16b9110e77c824131fc58bacc496ae53e9d1f143d1cc9e97",
+        "bytes": 1123
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/automation/mqtt/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/automation/mqtt/SKILL.md",
+        "sha256": "d5d7b8adfc1ba5ca9a2b84373b1939af1d837becd8fa394a0078d280ebe82513",
+        "bytes": 1535
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/automation/webhook/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/automation/webhook/SKILL.md",
+        "sha256": "0b434c7e80cf8b14b2c90ad624e4810126fbada8ab09e4cbe4a6d126a9747094",
+        "bytes": 831
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/camera-providers/eufy/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/camera-providers/eufy/SKILL.md",
+        "sha256": "5925ac02e85c9f7c1a51d109a74e56b6196ee8874d4a43aa464368e0e4493fee",
+        "bytes": 1069
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/camera-providers/reolink/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/camera-providers/reolink/SKILL.md",
+        "sha256": "f2a53d3b9db35cdf34e9333307313e8dce591b7a5019d22ab498b9019fb4a158",
+        "bytes": 1316
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/camera-providers/tapo/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/camera-providers/tapo/SKILL.md",
+        "sha256": "7ca70ccf50c5d8f9ce75d22205ff90352359e35d8b69c453ef9e46c7ec6fdc28",
+        "bytes": 985
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/channels/line/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/channels/line/SKILL.md",
+        "sha256": "f69193af6d26dff4e1bc0194dc32131750a7a72852e1172525eff8b0e0dac936",
+        "bytes": 760
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/channels/matrix/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/channels/matrix/SKILL.md",
+        "sha256": "9d3aa0ce60560dc4570ba2a89a1bca6df9d2cf0905d4d2b3d45245b539de1ac4",
+        "bytes": 1038
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/channels/signal/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/channels/signal/SKILL.md",
+        "sha256": "e8062a34ad83e51950c1ce41386319082855cb13a1b78193fa5cd39a40e56694",
+        "bytes": 889
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/detection/yolo-detection-2026/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/detection/yolo-detection-2026/SKILL.md",
+        "sha256": "3e074ce90a54fb68faff32f4bc96e510e94a7e32412b1f76590d67e8c1cef7e1",
+        "bytes": 6127
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/SKILL.md",
+        "sha256": "1c8a75987b75af0ff4a79d530e97b4508b2fb4aceb5c0df6509093cf5adb4514",
+        "bytes": 5459
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/SKILL.md",
+        "sha256": "3fc7cb30459b04d455dc6a04c8e6838606a7ede6c6ca59259dea9d76f7e042a9",
+        "bytes": 4764
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/detection/yolo-detection-2026-openvino/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/detection/yolo-detection-2026-openvino/SKILL.md",
+        "sha256": "975970dab60eb6f33252adef21f48aee5a27331e7b927dfc12e5dcfd48b54ecb",
+        "bytes": 5769
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/integrations/homeassistant-bridge/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/integrations/homeassistant-bridge/SKILL.md",
+        "sha256": "69c25ce5b8c0cee2f82c132f9697e38ee32eae22929bdf329e50b5e466b65031",
+        "bytes": 1866
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/segmentation/sam2-segmentation/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/segmentation/sam2-segmentation/SKILL.md",
+        "sha256": "09c85923eeecc69d92751b51280e9ec0c82c419c2221c84307861a58afd1042d",
+        "bytes": 2392
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/streaming/go2rtc-cameras/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/streaming/go2rtc-cameras/SKILL.md",
+        "sha256": "2bb54f3e0bcef1b23e11cd4c068f6116b87429c45c780a99689e7fd4deb1839f",
+        "bytes": 1950
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/training/model-training/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/training/model-training/SKILL.md",
+        "sha256": "d950785312b079add27b364dd62e98b7a03117557e7545bd8ba65519ddc317ae",
+        "bytes": 4358
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/deepcamera/skills/transformation/depth-estimation/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/deepcamera/skills/transformation/depth-estimation/SKILL.md",
+        "sha256": "184048cf9a89c3dbdd9defcde1b1ce167318f2a432e3d29a6c8c84657cfe51fe",
+        "bytes": 3790
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/2d-essentials/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/2d-essentials/SKILL.md",
+        "sha256": "914980c73d93d571b97c980aafb3baa95c3cc721c88ede6011e7d7c5300fe50b",
+        "bytes": 9278
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/3d-essentials/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/3d-essentials/SKILL.md",
+        "sha256": "a649e01225f1787bead3eeb05e33f7a1c105c24a635a14da6d2962ea08f5e21e",
+        "bytes": 14955
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/animation-system/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/animation-system/SKILL.md",
+        "sha256": "0902a99b5b025e576534e681d4bf64c6767cfc7d0345e1b88819ef6871e76187",
+        "bytes": 15294
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/audio-system/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/audio-system/SKILL.md",
+        "sha256": "c3c1cad4d873877eab78bf9be037d2d0050a8f8f47e0164a77b4f1a7a4dd3f01",
+        "bytes": 14894
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/camera-system/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/camera-system/SKILL.md",
+        "sha256": "268fff13449da6ec34076a1ff0f45289069c99ca32d9e676698aff94a76fc422",
+        "bytes": 10921
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/component-system/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/component-system/SKILL.md",
+        "sha256": "8e18caadb17505dde47d4d0c7ffd38b62c28e2da42bb147d18fc13865bdec020",
+        "bytes": 13935
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/dependency-injection/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/dependency-injection/SKILL.md",
+        "sha256": "da5bfb0b507cb5809ba01ef4dea736c52d91b67f4268b7fbc4f7ca8c90459685",
+        "bytes": 11334
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/event-bus/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/event-bus/SKILL.md",
+        "sha256": "e7a9f2cf4a3d834cf804d99d52392ea82fada6a5e5ac5a3b9644d8937e6d7f9c",
+        "bytes": 11577
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/gdscript-patterns/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/gdscript-patterns/SKILL.md",
+        "sha256": "f0ec7303f166c5637ef744752b39d18dcf11dd0c729f6dca33c0ae986c28e41d",
+        "bytes": 15114
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/godot-debugging/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/godot-debugging/SKILL.md",
+        "sha256": "6e77705c91eff91debe0b05a42b69aefdf543748e5910b571aabac355689f89b",
+        "bytes": 12206
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/godot-mentor/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/godot-mentor/SKILL.md",
+        "sha256": "282f91efeaf5ac9be62be62ecfe3d809712385541294b6cdeb7b74c6b05696d6",
+        "bytes": 9319
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/godot-optimization/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/godot-optimization/SKILL.md",
+        "sha256": "fb6765e15e0cb9972f7aa565c08c4d8d17728c149344e7f0f4a00380ed39330a",
+        "bytes": 11692
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/godot-project-setup/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/godot-project-setup/SKILL.md",
+        "sha256": "946d0c3f2eb398392b5d4a5c3facf5611d4d358b5195a3f04bc45f3276c80057",
+        "bytes": 13303
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/godot-testing/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/godot-testing/SKILL.md",
+        "sha256": "ef4477259a7fc11c0614ae99a96f872b81b6c11f18c64212daf24bf92cf21de6",
+        "bytes": 9517
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/godot-ui/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/godot-ui/SKILL.md",
+        "sha256": "07039257fbc60b7a0a1364d84c2f4999140599bb1a6e1d1e4b2cc26715da6c89",
+        "bytes": 12815
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/input-handling/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/input-handling/SKILL.md",
+        "sha256": "440a430c50cc0901ac4d7557564bbafa526925fac0410ea885e4ba300a5a9212",
+        "bytes": 15090
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/math-essentials/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/math-essentials/SKILL.md",
+        "sha256": "3aa7952deec578a91f06a10c0f253ab5e7578368b77a120d8e77d84749e670f4",
+        "bytes": 13347
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/physics-system/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/physics-system/SKILL.md",
+        "sha256": "6335bd3751eb402c6ee35bf4a0a6966e0e773040f7489fa99defa270806331e9",
+        "bytes": 14634
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/resource-pattern/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/resource-pattern/SKILL.md",
+        "sha256": "321c455a9c50cf50455f01527efbd6f710185e1a5c913ecc48ff29e9cfa5ae1f",
+        "bytes": 12462
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/save-load/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/save-load/SKILL.md",
+        "sha256": "5207be97e3286245fed67681451a3c8320a230efd3a86a345cb9a7180815a1e1",
+        "bytes": 5199
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/scene-organization/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/scene-organization/SKILL.md",
+        "sha256": "7780f14e4cb2672cb36f84a1c532a88fd3765117759b670b83860b4783edf5f2",
+        "bytes": 10464
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/state-machine/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/state-machine/SKILL.md",
+        "sha256": "5d04122c39bbf4c80f740a20d10962c7f86e7d239a967a8a61f81c4b5805d9c8",
+        "bytes": 14297
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/godot-prompter/skills/using-godot-prompter/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/godot-prompter/skills/using-godot-prompter/SKILL.md",
+        "sha256": "3ae477146637ec21ae8aa932d157b2d471d37bd01c6e0de3b3fcdaa88c24fe8d",
+        "bytes": 9368
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/universal-modder/skills/asset-pipeline/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/universal-modder/skills/asset-pipeline/SKILL.md",
+        "sha256": "e62b4f4e5c6ea9641947a8b0fecdb3936a5fc2b6f6406ebc77e1d9193a77f4a9",
+        "bytes": 7987
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/universal-modder/skills/fal-assets/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/universal-modder/skills/fal-assets/SKILL.md",
+        "sha256": "942164d91ece8bcc899c96eb64ea61e194a91c38439f032424a4c82aed04de33",
+        "bytes": 8112
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/universal-modder/skills/game-automation/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/universal-modder/skills/game-automation/SKILL.md",
+        "sha256": "7f682fbbccb2bcb5d3ddc11c80e650b94eda48bde9bc9f43fb3b4c3bbe45b506",
+        "bytes": 7444
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/universal-modder/skills/game-recon/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/universal-modder/skills/game-recon/SKILL.md",
+        "sha256": "77a7c20e74e5add09824433d8181d30e9dbca2c96c2c271e22afdadc7af0adca",
+        "bytes": 4011
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/universal-modder/skills/game-research-websearch/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/universal-modder/skills/game-research-websearch/SKILL.md",
+        "sha256": "2259f0f516d79fa300893f2cc41c34a2350460948664d6f60ae3c5a88905f8a3",
+        "bytes": 8459
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/universal-modder/skills/mashup-mods/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/universal-modder/skills/mashup-mods/SKILL.md",
+        "sha256": "13c74bb1452b57b603166c9fcda2c955a931cad0d27f574b5270e27e7988d175",
+        "bytes": 9189
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/universal-modder/skills/mod-any-game/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/universal-modder/skills/mod-any-game/SKILL.md",
+        "sha256": "4e53b628886c80e11e3f2780556d6ddb402cfa8fa174855f1617991108957e5e",
+        "bytes": 11616
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/universal-modder/skills/publish-mod/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/universal-modder/skills/publish-mod/SKILL.md",
+        "sha256": "4e37f1a26c77e12a39a6b510439641bbd5024bb7cdf67cc82357a6442f973971",
+        "bytes": 3248
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/universal-modder/skills/reverse-engineering/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/universal-modder/skills/reverse-engineering/SKILL.md",
+        "sha256": "ee4676a07db88604d68efca628dbdde950c330c2929d80995ced216d98199ea5",
+        "bytes": 6252
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/universal-modder/skills/share-field-notes/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/universal-modder/skills/share-field-notes/SKILL.md",
+        "sha256": "0550908d37a819944fb4bdcc82ebf93292280376f95e8efdb0916e6e2765afd9",
+        "bytes": 4150
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "nested:core/skills/universal-modder/skills/showcase-video/SKILL.md",
+      "kind": "nested-prose",
+      "descriptor": {
+        "path": "core/skills/universal-modder/skills/showcase-video/SKILL.md",
+        "sha256": "c90b3ff5e8359c2ccaab8fb24256382ed4d30398cc42ed407d389883740bbbbf",
+        "bytes": 5131
+      },
+      "nativeExecution": false,
+      "admission": "not-registered-individually",
+      "status": "bundled-reference-only"
+    },
+    {
+      "id": "native-candidate:create-native-pbr-synthesis",
+      "kind": "native-candidate",
+      "descriptor": {
+        "path": "catalog/native-creation-skills/create-native-pbr-synthesis.method.md",
+        "sha256": "e106a07026894f887eb7e19b969cf815918fdce6691a0c509a152331b0723adb",
+        "bytes": 2385
+      },
+      "sourceIndex": {
+        "path": "catalog/native-creation-skills/index.json",
+        "sha256": "16d0a4b373f2a259951bd5af15a8169cbe30a2a3a42557ee5de9ffe6a5b558e5",
+        "bytes": 3287
+      },
+      "requiredBuiltin": "pbr-synthesis",
+      "nativeExecution": true,
+      "admission": "not-granted-by-registry",
+      "status": "implementation-present-requires-existing-admission",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Original built-in procedural implementation; bounded artifact and import tests, no cinematic quality certification."
+      }
+    },
+    {
+      "id": "native-candidate:create-native-lathe-mesh",
+      "kind": "native-candidate",
+      "descriptor": {
+        "path": "catalog/native-creation-skills/create-native-lathe-mesh.method.md",
+        "sha256": "aff4a5dee3f017a1745a371633ad57d705dd697201de2b56a37342978398283a",
+        "bytes": 2148
+      },
+      "sourceIndex": {
+        "path": "catalog/native-creation-skills/index.json",
+        "sha256": "16d0a4b373f2a259951bd5af15a8169cbe30a2a3a42557ee5de9ffe6a5b558e5",
+        "bytes": 3287
+      },
+      "requiredBuiltin": "lathe-mesh",
+      "nativeExecution": true,
+      "admission": "not-granted-by-registry",
+      "status": "implementation-present-requires-existing-admission",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Original built-in procedural implementation; bounded artifact and import tests, no cinematic quality certification."
+      }
+    },
+    {
+      "id": "native-candidate:create-native-textured-lathe",
+      "kind": "native-candidate",
+      "descriptor": {
+        "path": "catalog/native-creation-skills/create-native-textured-lathe.method.md",
+        "sha256": "71cd8956bfa746f6e9536b26539c37ca5b4dfb50ec3d42c4da68a93a511c4519",
+        "bytes": 3852
+      },
+      "sourceIndex": {
+        "path": "catalog/native-creation-skills/index.json",
+        "sha256": "16d0a4b373f2a259951bd5af15a8169cbe30a2a3a42557ee5de9ffe6a5b558e5",
+        "bytes": 3287
+      },
+      "requiredBuiltin": "textured-lathe",
+      "nativeExecution": true,
+      "admission": "not-granted-by-registry",
+      "status": "implementation-present-requires-existing-admission",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Original built-in procedural implementation; bounded artifact and import tests, no cinematic quality certification."
+      }
+    },
+    {
+      "id": "native-candidate:create-native-usd-lathe",
+      "kind": "native-candidate",
+      "descriptor": {
+        "path": "catalog/native-creation-skills/create-native-usd-lathe.method.md",
+        "sha256": "304836037d984b6cd86a9aed00a894448c4d2738962d7d62eb35727fb9d968c1",
+        "bytes": 3223
+      },
+      "sourceIndex": {
+        "path": "catalog/native-creation-skills/index.json",
+        "sha256": "16d0a4b373f2a259951bd5af15a8169cbe30a2a3a42557ee5de9ffe6a5b558e5",
+        "bytes": 3287
+      },
+      "requiredBuiltin": "usd-lathe",
+      "nativeExecution": true,
+      "admission": "not-granted-by-registry",
+      "status": "implementation-present-requires-existing-admission",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Original bounded USD authoring; import validation separate from aesthetic quality."
+      }
+    },
+    {
+      "id": "native-candidate:create-native-camera-orbit",
+      "kind": "native-candidate",
+      "descriptor": {
+        "path": "catalog/native-creation-skills/create-native-camera-orbit.method.md",
+        "sha256": "25205b8118a72e6ed6494de25f37751b569a8ef1f87f672475369ecaea081900",
+        "bytes": 1993
+      },
+      "sourceIndex": {
+        "path": "catalog/native-creation-skills/index.json",
+        "sha256": "16d0a4b373f2a259951bd5af15a8169cbe30a2a3a42557ee5de9ffe6a5b558e5",
+        "bytes": 3287
+      },
+      "requiredBuiltin": "camera-orbit",
+      "nativeExecution": true,
+      "admission": "not-granted-by-registry",
+      "status": "implementation-present-requires-existing-admission",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Mathematical projection tests; no renderer parity validation."
+      }
+    },
+    {
+      "id": "native-candidate:create-native-edit-timeline",
+      "kind": "native-candidate",
+      "descriptor": {
+        "path": "catalog/native-creation-skills/create-native-edit-timeline.method.md",
+        "sha256": "4d9e24859c2217aaa24123174f5c93ce3022de5d23d2b645d28d900ff5416878",
+        "bytes": 2599
+      },
+      "sourceIndex": {
+        "path": "catalog/native-creation-skills/index.json",
+        "sha256": "16d0a4b373f2a259951bd5af15a8169cbe30a2a3a42557ee5de9ffe6a5b558e5",
+        "bytes": 3287
+      },
+      "requiredBuiltin": "edit-timeline",
+      "nativeExecution": true,
+      "admission": "not-granted-by-registry",
+      "status": "implementation-present-requires-existing-admission",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Frame arithmetic and bounded artifact tests only; media render not implemented."
+      }
+    },
+    {
+      "id": "native-candidate:create-native-surface-condition",
+      "kind": "native-candidate",
+      "descriptor": {
+        "path": "catalog/native-creation-skills/create-native-surface-condition.method.md",
+        "sha256": "499e13665c24bf2764394427db9fb4391dfca1364b19d88bb1c0ab8ab78cd14d",
+        "bytes": 2608
+      },
+      "sourceIndex": {
+        "path": "catalog/native-creation-skills/index.json",
+        "sha256": "16d0a4b373f2a259951bd5af15a8169cbe30a2a3a42557ee5de9ffe6a5b558e5",
+        "bytes": 3287
+      },
+      "requiredBuiltin": "surface-condition",
+      "nativeExecution": true,
+      "admission": "not-granted-by-registry",
+      "status": "implementation-present-requires-existing-admission",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Bounded shared field and controlled patch tests, not generalized realism."
+      }
+    },
+    {
+      "id": "reference-only:native-blender-base-human-mesh-import",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-blender-base-human-mesh-import.method.md",
+        "sha256": "8c13062dba1d02f4a89131d2b47247eb10225608a93835ef3bee4f97df0f6f62",
+        "bytes": 2605
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-blender-base-human-mesh-shape",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-blender-base-human-mesh-shape.method.md",
+        "sha256": "1d854c446de18ecaf600449511ce7c119e19d13226ceb7c2e80ba2e755222585",
+        "bytes": 2651
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-mpfb-character-create",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-mpfb-character-create.method.md",
+        "sha256": "777b25f95d45fb4cf94036b5a4bab84e0d6e7cb889c3324424cd0df058de34ca",
+        "bytes": 2638
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-mpfb-character-targets",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-mpfb-character-targets.method.md",
+        "sha256": "7ce24aea09a80c85ac376ea09bd559be10ad3191c7766361c1a832cf69f24ea5",
+        "bytes": 2618
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-mpfb-character-materials",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-mpfb-character-materials.method.md",
+        "sha256": "ac85356e6f74e1504c1b1a97138c7ce84eba3b62d34d435b7e8b4fcd9878bbe9",
+        "bytes": 2641
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-mpfb-character-clothing",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-mpfb-character-clothing.method.md",
+        "sha256": "6ad0ea9b079f10dbed8fc690349beecaed40feb56025c19f08c637f44a378e87",
+        "bytes": 2617
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-mpfb-character-rig",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-mpfb-character-rig.method.md",
+        "sha256": "d8b95160d08904c0e35641416f3e0688a35874039e232c70022fef1a5f4c175f",
+        "bytes": 2549
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-mpfb-character-pose",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-mpfb-character-pose.method.md",
+        "sha256": "b13ba99dc61341ebf06728a10ea63fcadd7aaf21aae889a0cb19d33b9a8b5c9d",
+        "bytes": 2600
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-mpfb-character-lipsync",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-mpfb-character-lipsync.method.md",
+        "sha256": "2e3bae73bb8585d192bef97f78eb2b9de78c73b611a4c2abf77d11b30637b5bd",
+        "bytes": 2631
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-mpfb-character-export",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-mpfb-character-export.method.md",
+        "sha256": "fe6155deccfe72dbd3b82baa02141766d78910dc3fa33e67ad8fcc7bfd5a99f1",
+        "bytes": 2642
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-mpfb-makehuman-import",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-mpfb-makehuman-import.method.md",
+        "sha256": "a021ad37b4978b9b575ef1f71d02f0e9269b42a575a09107cbd34860cf2dd25d",
+        "bytes": 2646
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-mixamo-humanoid-rig",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-mixamo-humanoid-rig.method.md",
+        "sha256": "8bb2d463973ba5f815166fbf49773f1d2f2561898604d4e2ae2af96bb485df57",
+        "bytes": 2692
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-mixamo-body-motion",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-mixamo-body-motion.method.md",
+        "sha256": "ed68e5846077e1e456745d5aa6e2c6f3fcdc5fcace462957be3464678424a385",
+        "bytes": 2634
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-polyhaven-environment-model",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-polyhaven-environment-model.method.md",
+        "sha256": "c30e989a24a708135edc839f214124fe0ba60c391680dfaff76ea26f8739df01",
+        "bytes": 2535
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-polyhaven-hdri-lighting",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-polyhaven-hdri-lighting.method.md",
+        "sha256": "f5ef5c0d2c9c2af9a62e087fc31c1fa9420b489a69a588260e6a4f6f0716e3c3",
+        "bytes": 2536
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-polyhaven-pbr-material",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-polyhaven-pbr-material.method.md",
+        "sha256": "d8143edcd491a59c99d46bcae71f45f4943895ea49aea78b48f388ff87cef261",
+        "bytes": 2583
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-ambientcg-pbr-material",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-ambientcg-pbr-material.method.md",
+        "sha256": "7410565b23e3de75cb2218db6e761aaa12573a83bbb19362d51c9f5e6e24ad59",
+        "bytes": 2568
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-ambientcg-hdri-lighting",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-ambientcg-hdri-lighting.method.md",
+        "sha256": "7a2462221e3263d458c1af5a3010b0feca8c94a3caf47d21e82ad691da572f51",
+        "bytes": 2550
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-3dtextures-pbr-material",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-3dtextures-pbr-material.method.md",
+        "sha256": "f955a4b889f8d7e393b2bc581aed5e005dd80b8281467a8e153d771f603d49ed",
+        "bytes": 2562
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-blendkit-model-import",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-blendkit-model-import.method.md",
+        "sha256": "c9811087a0051919c52c8f531e705f693c3e1fc68a4a111358e09f826666d6cf",
+        "bytes": 2612
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-blendkit-material-import",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-blendkit-material-import.method.md",
+        "sha256": "9acc80ba3df3277691b06f9135c0d0ea65067542a3db211d97a81a14d814ce93",
+        "bytes": 2715
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-blendkit-scene-import",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-blendkit-scene-import.method.md",
+        "sha256": "665e0dd2917563e22c3af2e5d36b75d8397b27fc196e50129dc44f534cde5b2f",
+        "bytes": 2627
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-smithsonian-scan-import",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-smithsonian-scan-import.method.md",
+        "sha256": "2b2e17d14a3dfbd6fb4633897f7b1e4492ab9b15fb229e878ee17bcf8eef1acc",
+        "bytes": 2590
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-smithsonian-scan-optimize",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-smithsonian-scan-optimize.method.md",
+        "sha256": "c5b2e9e5a550b17adcfb0193ce5403406429f9b591bed26ac3edeeba4115a0fa",
+        "bytes": 2617
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-sketchfab-model-import",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-sketchfab-model-import.method.md",
+        "sha256": "b5c431347631da433902fcdfa52bb9056e2714a669f460c6ef122a5f6bf4ab4a",
+        "bytes": 2668
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-sketchfab-animation-import",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-sketchfab-animation-import.method.md",
+        "sha256": "58ad5de4af6cee40e6c6e4e605652968504a573afd39f38b253c129f6be996ca",
+        "bytes": 2651
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-looptools-mesh-reshape",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-looptools-mesh-reshape.method.md",
+        "sha256": "c15f76bbab9021ecb060ddff5816c0ceb4775c4e804985773a0559e8f095c8e7",
+        "bytes": 2601
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-booltool-hard-surface",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-booltool-hard-surface.method.md",
+        "sha256": "564a5e6029500302bf88c59a864151717fd5086084cde077e734243de03789b0",
+        "bytes": 2607
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-rigify-control-rig",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-rigify-control-rig.method.md",
+        "sha256": "6384a205dca889d31ffddf5ab56a1f47117a8f1d4c241fa01c5ef288249fec61",
+        "bytes": 2614
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-rigify-animation-bake",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-rigify-animation-bake.method.md",
+        "sha256": "033c9b661d21d92832993fde106022c328df23ed7b56cfd33f00c86a8f94eba0",
+        "bytes": 2611
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-nodewrangler-pbr-nodes",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-nodewrangler-pbr-nodes.method.md",
+        "sha256": "694a0a51eb9df6cf4bfedce141ca48e49876f84244730e967d6774b083e29c6d",
+        "bytes": 2619
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-nodewrangler-shader-review",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-nodewrangler-shader-review.method.md",
+        "sha256": "4d8f1a093ab7fa42062238c76c9d6f093b87a8c26b850fc89bb52b59d850f667",
+        "bytes": 2649
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-sanctus-material-preset",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-sanctus-material-preset.method.md",
+        "sha256": "2de1d7ed5c0c01e1fd1325e042548bc869ebdfafe4b597eadebef03e08020503",
+        "bytes": 2670
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-sanctus-geometry-preset",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-sanctus-geometry-preset.method.md",
+        "sha256": "d167b9f15b451b644ec08492e7d27c7c44197af372af554e19b501fb587bb133",
+        "bytes": 2684
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    },
+    {
+      "id": "reference-only:native-sanctus-decal",
+      "kind": "reference-only",
+      "descriptor": {
+        "path": "catalog/native-asset-methods/native-sanctus-decal.method.md",
+        "sha256": "d8cf46b58a24700b9be60253516c15d5ce1732fd302a947c83da57b9ab7b993c",
+        "bytes": 2665
+      },
+      "sourceIndex": {
+        "path": "catalog/native-asset-methods/index.json",
+        "sha256": "94a15d201ca465bde69b7a8605f4aa8f84b6b42b0f2afeeb30377b0e82bb5348",
+        "bytes": 37269
+      },
+      "requiredBuiltin": null,
+      "nativeExecution": false,
+      "admission": "not-granted-by-registry",
+      "status": "reference-not-executable",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Authored capability contract; not native-execution or quality validated."
+      }
+    }
+  ],
+  "implementationFiles": [
+    {
+      "path": "lib/native-asset-skills.mjs",
+      "sha256": "3029a813dc2ea163acc5a99dc260abbe25825f18281a1fb81412d2dd79f4f416",
+      "bytes": 12994
+    },
+    {
+      "path": "lib/native-camera-skill.mjs",
+      "sha256": "708329a8cbf43a58027ca09a69e1e08d6899552e74a5e442251727b3af5488a6",
+      "bytes": 2546
+    },
+    {
+      "path": "lib/native-timeline-skill.mjs",
+      "sha256": "78073dad05b8db6d57420069cda2cf0342a5e83d7382ec72892b0d2230781817",
+      "bytes": 2155
+    },
+    {
+      "path": "lib/native-surface-condition.mjs",
+      "sha256": "861ef83f78274b1522ed309a0e5d44b7dab193385b48c9e7ce94b55467534b50",
+      "bytes": 4129
+    },
+    {
+      "path": "lib/core-pack.mjs",
+      "sha256": "4585c5ed4777f917208cb78280515529d236bd6010df102c4974b3fe551aae83",
+      "bytes": 7943
+    },
+    {
+      "path": "lib/rea.mjs",
+      "sha256": "f1dc25dc59faa3c8aa5bf9168d78d58dd555b0c6697406e0ea5149933f2cc8b9",
+      "bytes": 21221
+    }
+  ],
+  "counts": {
+    "prose-core": 106,
+    "nested-prose": 63,
+    "native-candidate": 7,
+    "reference-only": 35
+  }
+}

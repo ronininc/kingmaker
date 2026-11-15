@@ -1,0 +1,25 @@
+{
+  "schema": "kingmaker.technique-reference/1",
+  "id": "blenderproc",
+  "sourceUrl": "https://github.com/DLR-RM/BlenderProc",
+  "licenseEvidenceUrl": "https://github.com/DLR-RM/BlenderProc/blob/main/LICENSE",
+  "codeLicense": "GPL-3.0",
+  "checkedAt": "2026-11-15",
+  "scope": "Procedural Blender synthetic-data pipeline; not an asset license or native Kingmaker implementation.",
+  "status": "reference-only-not-installed",
+  "implementationPolicy": "Implement techniques independently from documented concepts; do not copy GPL implementation into differently licensed code without a deliberate compatible licensing decision.",
+  "techniqueReferences": [
+    "Deterministic scene, camera, material and lighting variation",
+    "RGB, depth, normals and segmentation passes",
+    "Camera calibration and structured annotation export",
+    "Collision-aware scene generation and repeatable dataset jobs"
+  ],
+  "nativeNextSteps": [
+    "Add original seeded camera-orbit sampling and calibrated projection records with mathematical tests.",
+    "Extend trusted render script to explicit bounded render passes; verify each real output separately.",
+    "Create original annotation writer and coordinate-system roundtrip tests.",
+    "Keep simulation and collision correctness unclaimed until measured tests exist."
+  ],
+  "notPerformed": ["installation", "source-code copying", "dataset download", "external asset admission", "pipeline execution"],
+  "rightsNote": "Loaded assets and datasets retain their own licenses. A tool code license does not clear dataset rights or guarantee render quality."
+}

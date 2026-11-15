@@ -1,0 +1,22 @@
+{
+  "id": "blender-studio-films",
+  "sourceUrl": "https://studio.blender.org/films/",
+  "licenseEvidenceUrl": "https://studio.blender.org/terms-and-conditions/",
+  "contentLicense": "CC-BY-4.0 default subject to specific content exceptions",
+  "evidenceStatus": "Official search-index terms/remixing excerpts available; direct pages returned HTTP402. Per-film asset clearance still required.",
+  "rightsNote": "Not CC0. Preserve film/artist attribution and modification notes; logos/trademarks excluded. Historical films may use different CC-BY versions, e.g. Tears of Steel CC-BY3.0. Subscription/access entitlement is separate.",
+  "additionalEvidence": [
+    "https://studio.blender.org/remixing/",
+    "https://mango.blender.org/about/"
+  ],
+  "techniqueReferences": [
+    "Shot breakdown and production provenance",
+    "Layout-to-animation-to-lighting-to-compositing stage separation",
+    "Render-layer and continuity review"
+  ],
+  "implementationNote": "Production references only; no film files downloaded or source rigs imported; cinematic quality not inferred.",
+  "schema": "kingmaker.technique-reference/1",
+  "checkedAt": "2026-11-15",
+  "status": "reference-only-not-installed",
+  "executionAuthorization": false
+}

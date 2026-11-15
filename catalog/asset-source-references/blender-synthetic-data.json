@@ -1,0 +1,16 @@
+{
+  "schema": "kingmaker.technique-reference/1",
+  "id": "blender-synthetic-data",
+  "sourceUrl": "https://github.com/LukasDb/BlenderSyntheticData",
+  "codeLicense": "unverified-no-license-visible",
+  "licenseEvidenceUrl": null,
+  "checkedAt": "2026-11-15",
+  "status": "reference-only-not-installed",
+  "techniqueReferences": [
+    "RGB/depth/class segmentation",
+    "Camera intrinsics, poses and stereo baseline"
+  ],
+  "implementationNote": "Do not copy source without license clearance. README targets Blender 3.3 and SciPy; do not follow permanent script-execution setting instruction.",
+  "executionAuthorization": false,
+  "rightsNote": "Tool code licensing does not clear external assets or media. No source implementation copied."
+}

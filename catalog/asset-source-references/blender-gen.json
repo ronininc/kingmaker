@@ -1,0 +1,16 @@
+{
+  "schema": "kingmaker.technique-reference/1",
+  "id": "blender-gen",
+  "sourceUrl": "https://github.com/ignc-research/blender-gen",
+  "codeLicense": "MIT",
+  "licenseEvidenceUrl": "https://github.com/ignc-research/blender-gen/blob/master/LICENSE",
+  "checkedAt": "2026-11-15",
+  "status": "reference-only-not-installed",
+  "techniqueReferences": [
+    "Domain randomization of camera, poses, lights and backgrounds",
+    "COCO bounding box output"
+  ],
+  "implementationNote": "Original camera-orbit records implemented; occlusion-aware labels and rendered datasets not implemented.",
+  "executionAuthorization": false,
+  "rightsNote": "Tool code licensing does not clear external assets or media. No source implementation copied."
+}

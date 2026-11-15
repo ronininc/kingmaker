@@ -1,0 +1,16 @@
+{
+  "schema": "kingmaker.technique-reference/1",
+  "id": "opentimelineio",
+  "sourceUrl": "https://github.com/AcademySoftwareFoundation/OpenTimelineIO",
+  "codeLicense": "Apache-2.0",
+  "licenseEvidenceUrl": "https://github.com/AcademySoftwareFoundation/OpenTimelineIO/blob/main/LICENSE.txt",
+  "checkedAt": "2026-11-15",
+  "status": "reference-only-not-installed",
+  "techniqueReferences": [
+    "Timeline clips, tracks, source ranges and rational frame time",
+    "Editorial interchange separate from media rendering"
+  ],
+  "implementationNote": "No OTIO parser/exporter implemented; official docs recommend their library and adapter compatibility validation.",
+  "executionAuthorization": false,
+  "rightsNote": "Tool code licensing does not clear external assets or media. No source implementation copied."
+}

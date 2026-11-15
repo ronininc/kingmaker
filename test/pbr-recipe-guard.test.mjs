@@ -1,0 +1,6 @@
+import test from'node:test';import assert from'node:assert/strict';import{validatePBRRecipe}from'../lib/pbr-recipe-guard.mjs';
+const digest='a'.repeat(64),manifest={assets:[{id:'a',sha256:digest},{id:'n',sha256:digest}]};
+const semantics=[{id:'a',sha256:digest,role:'baseColor'},{id:'n',sha256:digest,role:'normal',convention:'DirectX'}];
+const recipe={status:'ready',maps:{baseColor:'a',normal:'n'},colorSpaces:{baseColor:'sRGB',normal:'Non-Color'},normalConvention:'DirectX',normalGreenFlip:true};
+test('reviewed semantics yield reusable exact native PBR recipe',()=>{assert.deepEqual(validatePBRRecipe({manifest,semantics,recipe}),{maps:{baseColor:'a',normal:'n'},normalConvention:'DirectX'});});
+test('actual observed model errors and changed semantic bytes fail before import',()=>{assert.throws(()=>validatePBRRecipe({manifest,semantics,recipe:{...recipe,maps:{...recipe.maps,metallic:''}}}),/assignment/);assert.throws(()=>validatePBRRecipe({manifest,semantics,recipe:{...recipe,normalGreenFlip:false}}),/green/);assert.throws(()=>validatePBRRecipe({manifest,semantics:[...semantics,{id:'a',sha256:digest,role:'glossiness'}],recipe}),/unsupported/);assert.throws(()=>validatePBRRecipe({manifest,semantics:[{...semantics[0],sha256:'b'.repeat(64)}],recipe}),/digest/);});

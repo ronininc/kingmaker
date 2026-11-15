@@ -34,6 +34,47 @@ import Darwin
 import Carbon.HIToolbox
 import Contacts
 import AVFoundation
+import AVKit
+import CryptoKit
+
+final class CreationVideoController: NSViewController {
+  override func viewDidDisappear() {
+    super.viewDidDisappear()
+    (view as? AVPlayerView)?.player?.pause()
+  }
+}
+// Native creation links never execute arbitrary files or load remote resources.
+struct CreationArtifact {
+  let url: URL
+  let root: URL
+  let sha256: String
+  let bytes: Int
+  let kind: String
+  func verifiedURL() -> URL? {
+    guard url.isFileURL, url.host == nil || url.host == "" || url.host == "localhost",
+          bytes > 0, bytes <= 256 * 1024 * 1024,
+          sha256.range(of: "^[a-f0-9]{64}$", options: .regularExpression) != nil else { return nil }
+    let base = root.standardizedFileURL.resolvingSymlinksInPath()
+    let file = url.standardizedFileURL.resolvingSymlinksInPath()
+    guard file.path.hasPrefix(base.path + "/"), file.path != base.path,
+          let values = try? file.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey]),
+          values.isRegularFile == true, values.fileSize == bytes,
+          let handle = try? FileHandle(forReadingFrom: file) else { return nil }
+    defer { try? handle.close() }
+    var hash = SHA256()
+    do {
+      var count = 0
+      while let chunk = try handle.read(upToCount: 1024 * 1024), !chunk.isEmpty {
+        count += chunk.count
+        guard count <= bytes else { return nil }
+        hash.update(data: chunk)
+      }
+      guard count == bytes, hash.finalize().map({ String(format: "%02x", $0) }).joined() == sha256 else { return nil }
+      return file
+    } catch { return nil }
+  }
+}
+
 
 // UI-only state/geometry: no engine, approvals, or routing decisions.
 func barActivityText(_ state: String, busy: Bool) -> String {
@@ -556,6 +597,12 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
   private let sideTabs = NSSegmentedControl(), selectToggle = NSButton()
   private var sideTab = min(3, max(0, KingmakerBar.d.integer(forKey: "km.sideTab")))
   private var artifacts: [[String: Any]] = []
+  private var creationLinks: [String: CreationArtifact] = [:]
+  private var creationNodes: [String: String] = [:]
+  private var creationPopover: NSPopover?
+  private var creationPlayer: AVPlayer?
+  private var creationPreviewGeneration = UUID()
+
   private var selecting = false
   private var marked = Set<String>()                // chat ids, "project:<name>", artifact paths, connector ids
   private let selectBar = NSView(), selectCount = NSTextField(labelWithString: ""), selectDelete = NSButton(), selectMove = NSButton(), selectPin = NSButton()
@@ -1262,7 +1309,7 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
   @objc private func openChat(_ sender: NSButton) {
     if selecting, let id = sender.identifier?.rawValue { toggleMark(id); return }
     guard let id = sender.identifier?.rawValue, let i = chats.firstIndex(where: { $0.id == id }) else { return }
-    restoring = true; log.string = ""; hasLog = false
+    restoring = true; log.string = ""; hasLog = false; clearCreationPresentation()
     for l in chats[i].lines where l.count == 2 {
       if l[0] == "Sources" { appendSources(l[1].split(separator: "\n").compactMap { p in let f = p.split(separator: "\t", maxSplits: 1).map(String.init); return f.count == 2 ? (f[0], f[1]) : nil }) }
       else if l[0] == "Image" { appendImage(l[1]) }
@@ -1273,7 +1320,7 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
     panel.makeFirstResponder(field)
   }
   @objc private func newChat() {
-    chatIndex = nil; newChatProject = nil; log.string = ""; hasLog = false; clearSuggestion()
+    chatIndex = nil; newChatProject = nil; log.string = ""; hasLog = false; clearCreationPresentation(); clearSuggestion()
     drawChats(); layout(); panel.makeFirstResponder(field)
   }
   @objc private func toggleSidebar() { sideShown.toggle(); KingmakerBar.d.set(sideShown, forKey: "km.sidebar"); layout() }
@@ -1483,7 +1530,7 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
       stageSaved = StageSaved(chatIndex: chatIndex, project: newChatProject, log: NSAttributedString(attributedString: log.textStorage ?? NSAttributedString()), hasLog: hasLog,
                               frame: panel.frame, sized: sized, level: panel.level, visible: panel.isVisible, sideShown: sideShown, hides: panel.hidesOnDeactivate, hiddenApps: shown)
       staging = true
-      chatIndex = nil; newChatProject = nil; log.string = ""; hasLog = false; clearPicks(); clearSuggestion()
+      chatIndex = nil; newChatProject = nil; log.string = ""; hasLog = false; clearCreationPresentation(); clearPicks(); clearSuggestion()
       sideShown = false
       let vf = (NSScreen.main ?? NSScreen.screens[0]).visibleFrame
       let w = (vf.width * 0.58).rounded(), h = min(560, (vf.height * 0.6).rounded())
@@ -2689,6 +2736,76 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
   // ── A PICTURE KINGMAKER MADE (@@ghost {"image": {"path": …}}: the image lane, lib/image-lane.mjs) is shown right here in
   // the chat, scaled to fit, instead of opening Preview behind the bar (the owner, 2026-10-16: "images are still appearing
   // behind the chat window instead of inside it"). A click on it opens the file. Kept with the chat like its sources.
+
+  /// Sequential execution chart, not a simulation or quality certificate. No approval is inferred here.
+  func showNativeCreation(_ result: [String: Any]) {
+    guard let p = result["presentation"] as? [String: Any],
+          p["schema"] as? String == "kingmaker.creation-presentation/1",
+          let nodes = p["nodes"] as? [[String: Any]], nodes.count <= 8,
+          let runs = result["runs"] as? [[String: Any]], runs.count <= 8 else { return }
+    let text = NSMutableAttributedString(string: "\nCreation workflow · \(p["status"] as? String ?? "unknown")\nSequential execution · visual quality not certified\n",
+      attributes: [.font: NSFont.systemFont(ofSize: textSize - 1), .foregroundColor: replyColour])
+    for (index, node) in nodes.enumerated() {
+      guard let id = node["id"] as? String, id.count <= 200,
+            let status = node["status"] as? String, status.count <= 80 else { continue }
+      let key = UUID().uuidString
+      creationNodes[key] = "\(id): \(status). Only completed, hash-verified local outputs can be previewed."
+      text.append(NSAttributedString(string: "\(index > 0 ? "↓\n" : "")[\(id)] · \(status)\n",
+        attributes: [.link: URL(string: "kmbar://creation-node/\(key)")!, .foregroundColor: KingmakerBar.gold]))
+      guard status == "completed", let files = node["artifacts"] as? [[String: Any]], files.count <= 128,
+            let run = runs.first(where: { $0["id"] as? String == id }),
+            let path = run["workDir"] as? String, path.hasPrefix("/") else { continue }
+      for file in files {
+        guard let uri = file["uri"] as? String, let url = URL(string: uri), url.isFileURL,
+              let hash = file["sha256"] as? String, let bytes = file["bytes"] as? Int,
+              let kind = file["kind"] as? String else { continue }
+        let token = UUID().uuidString
+        creationLinks[token] = CreationArtifact(url: url, root: URL(fileURLWithPath: path), sha256: hash, bytes: bytes, kind: kind)
+        let label = kind == "video" ? "Play video" : kind == "image" ? "Preview image" : "Show in Finder"
+        text.append(NSAttributedString(string: "    \(label): \(url.lastPathComponent) (verify on click)\n",
+          attributes: [.link: URL(string: "kmbar://creation-artifact/\(token)")!, .foregroundColor: KingmakerBar.gold]))
+      }
+    }
+    // Bound retained capabilities, and make expired links fail closed.
+    if creationLinks.count > 1024 { creationLinks.removeAll() }
+    if creationNodes.count > 256 { creationNodes.removeAll() }
+    log.textStorage?.append(text); hasLog = true
+    layout(); log.scrollToEndOfDocument(nil)
+  }
+  private func clearCreationPresentation() {
+    creationPreviewGeneration = UUID(); creationPlayer?.pause(); creationPopover?.close()
+    creationLinks.removeAll(); creationNodes.removeAll()
+  }
+  private func previewCreation(_ token: String) {
+    guard let artifact = creationLinks[token] else { return }
+    creationPlayer?.pause(); creationPopover?.close()
+    let generation = UUID(); creationPreviewGeneration = generation
+    // Hashing is bounded and off the UI thread. Click capability is checked again on return.
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+      let verified = artifact.verifiedURL()
+      DispatchQueue.main.async { [weak self] in
+        guard let self = self, self.creationLinks[token] != nil, self.creationPreviewGeneration == generation else { return }
+        guard let file = verified else {
+          self.append(who: "", "Artifact unavailable or changed. Nothing was opened."); return
+        }
+        if artifact.kind == "video", file.pathExtension.lowercased() == "mp4" {
+          let player = AVPlayer(url: file)
+          let view = AVPlayerView(frame: NSRect(x: 0, y: 0, width: 560, height: 340))
+          view.player = player; view.controlsStyle = .inline
+          let controller = CreationVideoController(); controller.view = view
+          let popover = NSPopover(); popover.behavior = .transient; popover.contentViewController = controller
+          self.creationPlayer = player; self.creationPopover = popover
+          popover.show(relativeTo: self.log.visibleRect, of: self.log, preferredEdge: .maxY)
+          // User presses Play; never autoplay or launch an external app.
+        } else if artifact.kind == "image", ["png", "jpg", "jpeg"].contains(file.pathExtension.lowercased()) {
+          _ = self.appendImage(file.path)
+        } else {
+          NSWorkspace.shared.activateFileViewerSelecting([file])
+        }
+      }
+    }
+  }
+
   func showImage(_ path: String) {
     guard appendImage(path) else { return }
     record("Image", path)
@@ -2742,6 +2859,8 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
     if u.scheme == "kmbar" {
       let arg = u.pathComponents.dropFirst().first ?? ""
       switch u.host {
+      case "creation-artifact": previewCreation(arg)
+      case "creation-node": if let detail = creationNodes[arg] { append(who: "", detail) }
       case "key": onCommand("key-start \(arg)")
       case "remove": onCommand("connector-remove \(arg)"); DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in self?.onCommand("screen connectors") }
       case "add": openConnectors()
@@ -4237,6 +4356,7 @@ final class GhostApp: NSObject, NSApplicationDelegate {
         if let next = obj["suggest"] as? String { bar.suggest(next) }
         if let src = obj["sources"] as? [[String: Any]] { bar.showSources(src) }
         if let cmds = obj["commands"] as? [[String: Any]] { bar.setCommands(cmds) }
+        if let creation = obj["nativeCreation"] as? [String: Any] { bar.showNativeCreation(creation) }
         if let img = obj["image"] as? [String: Any], let path = img["path"] as? String { bar.showImage(path) }
         if let cal = obj["calibration"] as? [String: Any] { bar.showCalibration(cal) }
         if let flow = obj["flow"] as? [String: Any] { bar.showFlow(flow) }

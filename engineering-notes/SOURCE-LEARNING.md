@@ -1,0 +1,27 @@
+# Governed source learning candidate
+
+`createSourceLearning` supplies a bounded orchestration path: up to five explicit/discovered HTTPS evidence sources → bounded source snapshots with SHA256 → explicit comparison and rights review → independent composition of six already-reviewed native primitives → actual conductor execution with artifact hashes → exact owner review → local candidate admission receipt.
+
+Discovery, source reader, evaluator and reconstructor are explicit trusted application adapters. They are not implemented by this module, and absence fails closed. Tests inject synthetic source/evaluator/reconstructor fixtures, but conduct real original camera geometry/calibration output. Therefore these tests demonstrate the workflow and native test execution, **not autonomous web research or general novel algorithm reconstruction**. Selection means best within evaluated candidates, not best on the Internet. No fetched scripts are executed. Reconstructed method steps cannot select shell, arbitrary code, plugin installation or unknown skills.
+
+Admission rechecks method, index and tested artifact bytes. Receipt is local candidate scope only, not global registry activation, production quality, release upload or redistribution authority. Publishing/streaming the new method to the repository remains a separate authorized integration. Review preserves source provenance and evaluation rationale, while original source content is never authority.
+
+Existing distinctions: `core/skills` prose connectors are instructions; `absorb.mjs` wraps connectors and graduates based on run metrics; `learning.mjs` stores preferences; `method-drafts.mjs` varies bounded observation parameters. None alone constitutes independent arbitrary code reconstruction. The new native composition lane does not rename those operations as general learning.
+
+Open work: real bounded search/read adapters; evaluated model-backed analysis with explicit provenance/license checks; independent new-code implementation in an isolated sandbox with review, tests and security scanning; authenticated UI approval; core registry admission and authorized repo publication. A general 'learn this link' voice command is not enabled prematurely.
+
+## Real source reader
+
+`createLearningSourceReader` now implements actual HTTPS acquisition with exact approved origins, no redirects/credentials, 15-second timeout, textual content-type allowlist, 256 KiB streamed byte ceiling and strict UTF-8. Content remains untrusted evidence and `rightsVerified:false`. A live request to official `https://raw.githubusercontent.com/blender/blender/main/README.md` succeeded with 1,234 bytes of text/plain. A larger Blender manual HTML response was correctly refused at the byte ceiling; guessed RST export returned 404. These are acquisition checks, not proof that Kingmaker autonomously understood or reconstructed Blender. No live discovery/evaluation/reconstruction model adapter has been claimed.
+
+Core registry integrated: 106 existing registered prose skills, 63 nested references, six native implementation candidates and 35 provider references. Remote inventory has 440 draft/unreviewed entries. Registry hashes verify local files but do not supply human admission or license grants.
+
+## Live local provider proof and Armor gate
+
+Local Searx on loopback port8890 successfully returned official Khronos tutorial sources. Added bounded loopback search adapter filtered to explicitly approved HTTPS origins. Added pinned installed Ollama model adapters for comparison and declarative reconstruction; no remote fallback/model downloads. Source rights are checked by a separate digest-bound reviewer, never a model-authored rights flag. Task-approved skill scope prevents a generator from adding unrelated capabilities.
+
+Actual narrow trial used installed qwen3:1.7b and the official Khronos camera tutorial (source digest abc0e5bd5f5666127ca7d05a102f12470629d57b8b338cc4fe50354520310c9a). Official repository CC BY4 license was separately reviewed; source attribution retained, no third-party implementation copied. First unconstrained model attempts added irrelevant primitives and invalid dimensions, and failed actual tests with no admission. With explicit camera-only task scope, the local model produced a declarative method that ran the original camera-orbit primitive and wrote real four-camera calibration JSON. SHA256: 7e110ebc5fb339bd6e4a8489783626506d4ede5b4ca2bb901e24a8468297d1d0. State remains tested-awaiting-admission. Local model unloaded afterward.
+
+This is real source retrieval + local-model composition + execution, not arbitrary novel algorithm synthesis. Live search was verified separately; the learning trial used an explicit tutorial URL, not unattended globally-best-source selection. The model's rationale confused a camera index with source selection, so semantic evaluation quality is not established. No owner/global admission or repository publication occurred.
+
+`scanLearningMethod` runs the actual bundled Armor `scanSourceText` on exact method bytes before functional testing and again at local admission. It forces source scanning because Markdown file classification otherwise skips source rules. The live candidate passed scripture-lexical/1, scan-rules/1. Missing/throwing scanner, invalid digest, warning/critical verdict fail closed. This is lexical pattern evidence, not comprehensive security certification. Functional artifact tests remain mandatory. No paid scanner identity, keys, vaults or entitlement handling is changed.

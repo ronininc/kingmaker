@@ -1,0 +1,97 @@
+{
+  "schema": "kingmaker.methods/1",
+  "status": "staged-native-skills-not-default-admitted",
+  "methods": [
+    {
+      "id": "create-native-pbr-synthesis",
+      "title": "Synthesize original procedural PBR texture maps",
+      "domain": "media",
+      "file": "create-native-pbr-synthesis.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Original built-in procedural implementation; bounded artifact and import tests, no cinematic quality certification."
+      },
+      "nativeExecution": true,
+      "requiredBuiltin": "pbr-synthesis"
+    },
+    {
+      "id": "create-native-lathe-mesh",
+      "title": "Generate original rotational mesh geometry",
+      "domain": "media",
+      "file": "create-native-lathe-mesh.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Original built-in procedural implementation; bounded artifact and import tests, no cinematic quality certification."
+      },
+      "nativeExecution": true,
+      "requiredBuiltin": "lathe-mesh"
+    },
+    {
+      "id": "create-native-textured-lathe",
+      "title": "Compose original textured rotational asset",
+      "domain": "media",
+      "file": "create-native-textured-lathe.method.md",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Original built-in procedural implementation; bounded artifact and import tests, no cinematic quality certification."
+      },
+      "nativeExecution": true,
+      "requiredBuiltin": "textured-lathe"
+    },
+    {
+      "id": "create-native-usd-lathe",
+      "title": "Author original USD mesh and preview material",
+      "domain": "media",
+      "file": "create-native-usd-lathe.method.md",
+      "nativeExecution": true,
+      "requiredBuiltin": "usd-lathe",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Original bounded USD authoring; import validation separate from aesthetic quality."
+      }
+    },
+    {
+      "id": "create-native-camera-orbit",
+      "title": "Generate calibrated camera orbit records",
+      "domain": "media",
+      "file": "create-native-camera-orbit.method.md",
+      "nativeExecution": true,
+      "requiredBuiltin": "camera-orbit",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Mathematical projection tests; no renderer parity validation."
+      }
+    },
+    {
+      "id": "create-native-edit-timeline",
+      "title": "Construct frame-exact edit decisions",
+      "domain": "media",
+      "file": "create-native-edit-timeline.method.md",
+      "nativeExecution": true,
+      "requiredBuiltin": "edit-timeline",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Frame arithmetic and bounded artifact tests only; media render not implemented."
+      }
+    },
+    {
+      "id": "create-native-surface-condition",
+      "title": "Generate correlated bounded surface-condition maps",
+      "domain": "media",
+      "file": "create-native-surface-condition.method.md",
+      "nativeExecution": true,
+      "requiredBuiltin": "surface-condition",
+      "quality": {
+        "tier": "draft",
+        "score": 0,
+        "basis": "Bounded shared field and controlled patch tests, not generalized realism."
+      }
+    }
+  ]
+}
