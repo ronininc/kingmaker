@@ -6,7 +6,7 @@
 // the conductor's check-tool → declare path, the only execution path:
 //
 //   fixture 1 — langcheck NOT staged (the shipped catalog's honest state):
-//               the conduction completes, the parse step stays declared, the grade is
+//               the conduction is incomplete, the parse step stays declared, the grade is
 //               STRUCT and the record says parseCheck "exit=" — an unverified
 //               translation is never delivered as verified.
 //   fixture 2 — langcheck staged through the Brain Library lane (a fixture bundle
@@ -124,7 +124,7 @@ async function realRecords() {
   return enrichRecords(await loadBenchRecords(), buildLibrary().models);
 }
 
-test('fixture 1: langcheck unstaged — completes at STRUCT, record honest about the unrun check', async () => {
+test('fixture 1: langcheck unstaged — incomplete at STRUCT, record honest about the unrun check', async () => {
   const stateDir = await mkdtemp(join(tmpdir(), 'km-tc-unstaged-state-'));
   const payloadDir = await mkdtemp(join(tmpdir(), 'km-tc-unstaged-payloads-'));
   const workDir = await mkdtemp(join(tmpdir(), 'km-tc-unstaged-work-'));
@@ -134,7 +134,8 @@ test('fixture 1: langcheck unstaged — completes at STRUCT, record honest about
     records: await realRecords(), workDir, conductor,
     complete: async () => TRANSLATION_PY,
   });
-  assert.equal(r.status, 'completed');
+  assert.equal(r.status, 'incomplete');
+  assert.equal(r.conduction.declared.length, 1);
   assert.equal(r.model, 'huihui_ai/qwen2.5-coder-abliterate:1.5b');
   assert.equal(r.targetChosenBy, 'explicit');
   assert.equal(r.verification.tier, 'STRUCT');
@@ -203,7 +204,8 @@ test('fixture 4: the surface rule fires end to end (blender-script → python)',
     records: await realRecords(), workDir, conductor,
     complete: async () => TRANSLATION_PY,
   });
-  assert.equal(r.status, 'completed');
+  assert.equal(r.status, 'incomplete');
+  assert.equal(r.conduction.declared.length, 1);
   assert.equal(r.targetLanguage, 'python');
   assert.equal(r.targetChosenBy, 'surface');
   const record = JSON.parse(await readFile(join(workDir, 'translated.py.translation.json'), 'utf8'));
