@@ -83,16 +83,16 @@ test('manifest rules: 1.9 GB per part at most, the parts must add up, digests ar
 test('release pins: the abliterated models plus both coders, flat — no memory fields size a model to a Mac; registry URLs', () => {
   const models = plannedModels();
   assert.ok(models.some((m) => m.name === 'huihui_ai/qwen3-abliterated:1.7b' && m.roles.includes('SOLOMON_OLLAMA_MODEL')));
-  assert.deepEqual(models.filter((m) => /coder/.test(m.name)).map((m) => m.name), ['huihui_ai/qwen2.5-coder-abliterate:1.5b', 'huihui_ai/qwen2.5-coder-abliterate:7b'], 'both coders ship on every Mac now');
+  assert.deepEqual(models.filter((m) => /coder/.test(m.name)).map((m) => m.name), ['huihui_ai/qwen2.5-coder-abliterate:1.5b', 'huihui_ai/qwen2.5-coder-abliterate:7b'], 'both coder options remain in the registry');
   for (const m of models) assert.deepEqual(Object.keys(m).sort(), ['name', 'roles'], `${m.name}: an entry is a name and its roles — no minMemGb, maxMemGb or packs gate it`);
   assert.equal(registryManifestUrl('huihui_ai/qwen3-abliterated:0.6b'), 'https://registry.ollama.ai/v2/huihui_ai/qwen3-abliterated/manifests/0.6b');
   assert.equal(registryManifestUrl('qwen3'), 'https://registry.ollama.ai/v2/library/qwen3/manifests/latest');
   assert.equal(registryManifestUrl('hf.co/mradermacher/Huihui-granite-4.1-3b-abliterated-i1-GGUF:i1-Q4_K_M'), 'https://hf.co/v2/mradermacher/Huihui-granite-4.1-3b-abliterated-i1-GGUF/manifests/i1-Q4_K_M', 'hf.co models pin from Hugging Face');
 });
 
-test('the starter set is flat: the installer pulls the planned models, nothing pack-shaped rides along', () => {
+test('the starter set is flat: registry retains planned model options without expanding the list', () => {
   const all = installerModels();
-  assert.deepEqual(all, plannedModels(), 'the installer pulls exactly the planned set — no pack union on top');
+  assert.deepEqual(all, plannedModels(), 'registry lists exactly the planned options — no pack union on top');
   assert.equal(new Set(all.map((m) => m.name)).size, all.length, 'no model twice');
   for (const m of all) assert.ok(!('packs' in m) && !('minMemGb' in m) && !('maxMemGb' in m), `${m.name}: nothing about it is conditional on a Mac`);
 });
@@ -121,7 +121,7 @@ test('dry run into a temp prefix: downloads, verifies, unpacks, commits the app 
     assert.deepEqual(readdirSync(w.home), [], 'the real HOME is never written in a dry run');
     const pcts = run.events.filter((e) => e.t === 'progress').map((e) => e.pct);
     assert.ok(pcts.every((p, i) => i === 0 || p >= pcts[i - 1] - 0.01) && pcts.at(-1) === 100, 'one progress bar, never going backwards, ending at 100');
-    assert.match(run.out, /Would pull huihui_ai\/qwen3-abliterated:1\.7b/, 'the tools are only checked in a dry run');
+    assert.match(run.out, /huihui_ai\/qwen3-abliterated:1\.7b is unavailable/, 'the tools are only checked in a dry run');
     assert.match(run.out, /SearXNG: would: clone SearXNG/, 'SearXNG\'s installer ran in dry-run mode, under the app\'s own runtime');
     assert.match(run.out, /Would fetch 2 confirmed corpora/, 'the knowledge bootstrap ran in dry-run mode');
     assert.equal(srv.seen.filter((s) => s.url.includes('.part')).length, r.manifest.parts.length, 'each part fetched once');
@@ -344,26 +344,14 @@ test('a tool that needs a newer macOS than this Mac is left out, said plainly, a
   } finally { await srv.close(); }
 });
 
-test('with the tools live (fakes): missing models are pulled and must match their pinned digest; a missing formula is brewed', opts, async () => {
+test('with live tools no model pulls occur; exact models reused and missing or wrong digests unavailable', opts, async () => {
   const r = await release();
   const installed = new Map([['huihui_ai/qwen3-abliterated:1.7b', 'a'.repeat(64)]]);
-  let serveDigest = (name) => r.manifest.models.find((m) => m.name === name)?.digest;
+  let pulls = 0;
   const ollama = (req, res) => {
     if (req.url === '/api/tags') { res.setHeader('content-type', 'application/json'); return res.end(JSON.stringify({ models: [...installed].map(([name, digest]) => ({ name, digest })) })); }
-    if (req.url === '/api/pull') {
-      let body = '';
-      req.on('data', (d) => { body += d; });
-      req.on('end', () => {
-        const { model } = JSON.parse(body);
-        res.write(`${JSON.stringify({ status: 'pulling manifest' })}\n`);
-        res.write(`${JSON.stringify({ status: 'pulling abc', total: 100, completed: 50 })}\n`);
-        res.write(`${JSON.stringify({ status: 'pulling abc', total: 100, completed: 100 })}\n`);
-        installed.set(model, serveDigest(model));
-        res.end(`${JSON.stringify({ status: 'success' })}\n`);
-      });
-      return undefined;
-    }
-    res.statusCode = 404; return res.end();
+    if (req.url === '/api/pull') { pulls++; res.statusCode=500; return res.end('unexpected model download'); }
+    res.statusCode=404; return res.end();
   };
   const srv = await serveRelease(r.out, { ollama });
   try {
@@ -373,22 +361,30 @@ test('with the tools live (fakes): missing models are pulled and must match thei
     const run = await runEngine(['--wake-word', 'Kingmaker', '--prefix', w.prefix, '--with-tools', '--base-url', srv.url, '--manifest', r.manifestFile], env);
     assert.equal(run.code, 0, run.out);
     assert.match(run.out, /huihui_ai\/qwen3-abliterated:1\.7b is here, digest matches the release's pin/);
-    assert.match(run.out, /Pulled huihui_ai\/qwen3-abliterated:0\.6b \(digest matches the pin\)/);
-    assert.deepEqual([...installed.keys()].sort(), r.manifest.models.map((model) => model.name).sort(), 'the complete flat starter set is pulled, not a RAM-class coder');
+    assert.match(run.out, /No model weights downloaded/);
+    assert.equal(pulls, 0);
+    const inventory=JSON.parse(readFileSync(join(dataIn(w),'model-availability.json')));
+    assert.equal(inventory.downloadPolicy,'disabled');
+    assert.equal(inventory.availableCount,1);
+    assert.ok(inventory.models.some(m=>m.status==='missing'));
+    assert.deepEqual([...installed.keys()], ['huihui_ai/qwen3-abliterated:1.7b'], 'no additional weights installed');
     assert.match(readFileSync(join(w.root, 'brew.calls'), 'utf8'), /^brew install openclaw\/tap\/peekaboo$/m, 'the missing Hands of Horus came from Homebrew');
     assert.ok(isFile(join(w.prefix, 'home', 'Library', 'Application Support', 'solomon-desktop', 'services', 'searxng-native', 'commit.txt')), 'SearXNG set up');
     assert.ok(isFile(join(dataIn(w), 'runtime', 'data', 'knowledge', 'sources', '.receipts', 'kaikki-multilingual.json')), 'the knowledge library moved into place');
-    // A model that changed upstream since the release was built is refused, and nothing lands.
+    // A local wrong digest is unavailable, never silently replaced or counted as usable.
     installed.clear();
-    serveDigest = () => 'f'.repeat(64);
+    installed.set('huihui_ai/qwen3-abliterated:1.7b','f'.repeat(64));
     const w2 = world();
     const drift = await runEngine(['--wake-word', 'Kingmaker', '--prefix', w2.prefix, '--with-tools', '--base-url', srv.url, '--manifest', r.manifestFile], { ...w2.env, KINGMAKER_OLLAMA_URL: srv.url });
-    assert.equal(drift.code, 1);
-    assert.match(drift.failed.message, /changed upstream/);
-    assert.equal(existsSync(appIn(w2)), false);
+    assert.equal(drift.code, 0, drift.out);
+    assert.equal(pulls,0);
+    const driftInventory=JSON.parse(readFileSync(join(dataIn(w2),'model-availability.json')));
+    assert.equal(driftInventory.availableCount,0);
+    assert.ok(driftInventory.models.some(m=>m.status==='digest-mismatch'));
+    assert.match(drift.out,/configure inference/);
     // A corpus that fails to download: nothing lands, what came down is kept for the next press.
     const w3 = world();
-    serveDigest = (name) => r.manifest.models.find((m) => m.name === name)?.digest;
+
     const partial = await runEngine(['--wake-word', 'Kingmaker', '--prefix', w3.prefix, '--with-tools', '--base-url', srv.url, '--manifest', r.manifestFile], { ...w3.env, KINGMAKER_OLLAMA_URL: srv.url, KM_FAKE_CORPUS_FAIL: 'kaikki-multilingual' });
     assert.equal(partial.code, 1);
     assert.match(partial.failed.message, /knowledge library is not complete/);
@@ -525,4 +521,12 @@ test('fixture engine still rejects unsigned and tampered manifests before downlo
     assert.match(run.failed.message, kind === 'unsigned' ? /not signed/ : /signature does NOT match/);
     assert.equal(existsSync(appIn(w)), false);
   }
+});
+
+// Installer code cannot silently regress into weight downloads behind --with-tools.
+test('installer contains no model pull route and documents inventory-only inference', () => {
+  const script=readFileSync(new URL('../installer/engine.sh',import.meta.url),'utf8');
+  assert.doesNotMatch(script,/\/api\/pull/);
+  assert.match(script,/downloadPolicy.*disabled/);
+  assert.match(script,/weight streaming is not verified/);
 });

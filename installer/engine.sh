@@ -5,7 +5,7 @@
 #   engine.sh --wake-word "Kingmaker"                  install on this Mac (what the installer runs)
 #   engine.sh --inspect                                what is installed, as one JSON line (the installer's first call)
 #   engine.sh --wake-word W --prefix DIR [--source D]  dry run: the app, its config and data go under DIR; the shared
-#                                                      tools (Ollama, models, Homebrew, SearXNG, the knowledge library)
+#                                                      tools (Ollama, Homebrew, SearXNG, the knowledge library; models are inventory-only)
 #                                                      are only checked, never installed
 #
 # What it does, in order (each download is resumable and sha256-verified; see the README "Installer" section):
@@ -14,15 +14,15 @@
 #                  staging folder beside the target → the app's bundle id and code signature checked
 #   3 prerequisites Apple's Command Line Tools and Homebrew when missing (official package, sha256-pinned; macOS asks
 #                  for your password once, in its own dialog)
-#   4 tools        Ollama (official build, sha256-pinned) → the abliterated models (each checked against its pinned
-#                  registry digest) → Hands of Horus (Peekaboo), sox and Python via Homebrew → SearXNG
+#   4 tools        Ollama (official build, sha256-pinned) → inventory existing model digests (no weight downloads)
+#                  → Hands of Horus (Peekaboo), sox and Python via Homebrew → SearXNG
 #   5 knowledge    the knowledge library (every confirmed corpus) into a staging folder (reused when already complete)
 #   6 commit       Kingmaker.app, the cemented wake word (install.json + wake-word.txt, read-only) and the knowledge
 #                  library are MOVED into place, journaled; any failure here moves everything back
 #   7 launch       Kingmaker opens; the installer quits
 #
 # Kingmaker's own pieces (the app, its config, its library) are only ever moved into place at step 6, so a failure
-# anywhere leaves none of them half-installed. Shared tools installed on the way (Ollama, the models, Homebrew formulas,
+# anywhere leaves none of them half-installed. Shared tools installed on the way (Ollama, Homebrew formulas,
 # SearXNG) are each installed whole by their own installer and kept, with the verified download cache, so pressing the
 # button again picks up where it stopped. The bundle id stays com.ronininc.solghost (macOS permissions carry over) and
 # the data folder stays ~/Library/Application Support/sol-ghost (vault, knowledge index).
@@ -137,8 +137,7 @@ legacy_apps() { # older "Sol Ghost.app" copies (same product, same bundle id), o
 cemented_word() { [ -f "$DATA/install.json" ] && plutil -extract wakeWord raw -o - "$DATA/install.json" 2>/dev/null; }
 
 # This Mac, as information for the install screen: its memory (GiB as sold) and chip. Nothing is
-# picked from these numbers — the starter set is the same on every Mac, and models beyond it are
-# chosen per task at runtime and metered in.
+# picked from these numbers. Model pins are available options; installation downloads no weights.
 MEM_GB="$(sysctl -n hw.memsize 2>/dev/null | awk '{ printf "%d", $1 / 1073741824 + 0.5 }')"; [ -n "$MEM_GB" ] || MEM_GB=8
 CHIP="$(sysctl -n machdep.cpu.brand_string 2>/dev/null || true)"
 
@@ -174,7 +173,7 @@ cleanup() {
   [ -n "$BG_PID" ] && { pkill -TERM -P "$BG_PID" 2>/dev/null; kill "$BG_PID" 2>/dev/null; }
   [ -n "$AUTH_HEADER" ] && rm -f "$AUTH_HEADER"
   [ -n "${GH_HDR:-}" ] && rm -f "$GH_HDR"
-  rm -rf "$STAGE/unpack" "$STAGE/ollama" "$STAGE/launcher" "$STAGE/old" "$STAGE/whole.fifo" "$DSTAGE/config"
+  rm -rf "$STAGE/unpack" "$STAGE/ollama" "$STAGE/launcher" "$STAGE/old" "$STAGE/whole.fifo" "$STAGE/model-availability.json" "$DSTAGE/config"
   [ "$LOCKED" = 1 ] && rm -rf "$STAGE/lock"
   rmdir "$STAGE" 2>/dev/null
   true
@@ -312,11 +311,6 @@ installed_digest() { # installed_digest <tags.json> <model name> → its digest,
     i=$((i + 1))
   done
   return 1
-}
-model_wanted() { # model_wanted <index>: every model in the manifest is pulled — the manifest's list IS
-  # the starter set, identical on every Mac. Nothing is sized or filtered by this Mac's memory: what a
-  # task runs is picked at runtime, and models beyond the starter set are metered in per task.
-  return 0
 }
 receipts_complete() { # receipts_complete <sources dir>: every confirmed corpus has its receipt and its files
   local n i id field
@@ -725,38 +719,29 @@ if ! ollama_up "$TAGS"; then
 fi
 fail_at ollama
 
-phase 64 16 "Getting the models"
-MODEL_COUNT="$(mfn models)"; i=0
+phase 64 16 "Checking available models (no downloads)"
+MODEL_COUNT="$(mfn models)"; i=0; MODEL_AVAILABLE=0
+MODEL_STATUS="$STAGE/model-availability.json"
+printf '{"schema":"kingmaker.model-availability/v1","downloadPolicy":"disabled","models":[' > "$MODEL_STATUS"
 while [ "$i" -lt "$MODEL_COUNT" ]; do
-  model="$(mf "models.$i.name")"; pin="$(mf "models.$i.digest")"; msize="$(mfn "models.$i.size")"
-  if ! model_wanted "$i"; then i=$((i + 1)); continue; fi
-  PHASE_LABEL="Getting the models"
+  model="$(mf "models.$i.name")"; pin="$(mf "models.$i.digest")"
   have="$(installed_digest "$TAGS" "$model")"
-  if [ -n "$have" ] && { [ -z "$pin" ] || [ "$have" = "$pin" ]; }; then
-    note "$model is here$([ -n "$pin" ] && echo ", digest matches the release's pin")."
-  elif [ "$TOOLS_LIVE" = 0 ]; then
-    note "Would pull $model$([ "$msize" -gt 0 ] && echo " ($(gb "$msize"))")$([ -n "$have" ] && echo "; this Mac has another revision")."
+  state="missing"
+  if [ -n "$have" ] && [ -n "$pin" ] && [ "$have" = "$pin" ]; then
+    state="available"; MODEL_AVAILABLE=$((MODEL_AVAILABLE + 1))
+    note "$model is here, digest matches the release's pin."
   else
-    : > "$CACHE/pull.err"; rm -f "$CACHE/pull.ok"
-    # In the background, so Cancel (SIGTERM) stops a multi-GB pull at once instead of after it.
-    ( curl -sN --max-time 7200 "$OLLAMA_URL/api/pull" -d "{\"model\":\"$model\",\"stream\":true}" 2>>"$LOG" | while IFS= read -r line; do
-      case "$line" in *'"error"'*) printf '%s\n' "$line" >> "$CACHE/pull.err" ;; esac
-      case "$line" in *'"status":"success"'*) touch "$CACHE/pull.ok" ;; esac
-      t="$(printf '%s' "$line" | sed -n 's/.*"total":\([0-9]*\).*/\1/p')"; c="$(printf '%s' "$line" | sed -n 's/.*"completed":\([0-9]*\).*/\1/p')"
-      [ -n "$t" ] && [ -n "$c" ] && [ "$t" -gt 0 ] && progress "$(awk -v i="$i" -v n="$MODEL_COUNT" -v c="$c" -v t="$t" 'BEGIN { print (i + c / t) / n }')" "$model: $(gb "$c") of $(gb "$t")"
-    done ) &
-    BG_PID=$!; wait "$BG_PID"; BG_PID=""
-    [ -f "$CACHE/pull.ok" ] || fail "Pulling $model failed: $(head -c 300 "$CACHE/pull.err")"
-    ollama_up "$TAGS" || fail "Ollama stopped answering after pulling $model."
-    have="$(installed_digest "$TAGS" "$model")"
-    if [ -n "$pin" ] && [ "$have" != "$pin" ]; then
-      fail "$model came down as ${have:0:12}…, not the ${pin:0:12}… this release was built and tested with (it changed upstream). A newer release pins the new one."
-    fi
-    note "Pulled $model ($([ -n "$pin" ] && echo "digest matches the pin" || echo "digest ${have:0:12}…, unpinned"))."
+    [ -z "$have" ] || state="digest-mismatch"
+    [ -n "$pin" ] || state="unpinned"
+    note "$model is unavailable ($state). No model weights downloaded; configure inference or explicitly provision a verified model separately."
   fi
+  [ "$i" = 0 ] || printf ',' >> "$MODEL_STATUS"
+  printf '{"name":%s,"status":%s,"expectedDigest":%s,"installedDigest":%s}' "$(json_str "$model")" "$(json_str "$state")" "$(json_str "$pin")" "$(json_str "$have")" >> "$MODEL_STATUS"
   progress "$(awk -v i="$i" -v n="$MODEL_COUNT" 'BEGIN { print (i + 1) / n }')"
   i=$((i + 1))
 done
+printf '],"availableCount":%s,"checkedAt":%s}\n' "$MODEL_AVAILABLE" "$(json_str "$(date -u +%FT%TZ)")" >> "$MODEL_STATUS"
+note "Inference inventory: $MODEL_AVAILABLE pinned models available locally. Model downloads are disabled during installation, including with live tools. Remote inference or weight streaming is not verified by this installer."
 fail_at models
 
 phase 80 5 "Getting Hands of Horus, sox and Python"
@@ -951,6 +936,13 @@ if [ "$KEEP_CONFIG" = 0 ]; then
     mv "$DSTAGE/config/$f" "$DATA/$f" || fail "Could not write $f."; jot moved "$DSTAGE/config/$f" "$DATA/$f"
   done
 fi
+# Inventory is advisory and refreshed on each install, never a claim that inference ran.
+if [ -e "$DATA/model-availability.json" ]; then
+  mv "$DATA/model-availability.json" "$STAGE/old/model-availability.json" || fail "Could not preserve model inventory."
+  jot moved "$DATA/model-availability.json" "$STAGE/old/model-availability.json"
+fi
+mv "$MODEL_STATUS" "$DATA/model-availability.json" || fail "Could not commit model inventory."
+jot moved "$MODEL_STATUS" "$DATA/model-availability.json"
 fail_at commit-config
 ALIAS="$H/Library/Application Support/Kingmaker"
 if [ ! -e "$ALIAS" ] && [ ! -L "$ALIAS" ]; then ln -s sol-ghost "$ALIAS" && jot created "$ALIAS"; fi
