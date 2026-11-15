@@ -181,3 +181,9 @@ test('kingmaker rd is on the console help, and the operator doc matches the pin'
   assert.match(doc, /AGPL/);
   assert.match(doc, /does not deploy/);
 });
+
+test('MCP R&D floor refuses run even when supplied a valid-looking command', async () => {
+  const r = await callTool('rd_floor', { action: 'run', module: 'network-runtime', command: 'inspect-pcap-capture', target: '/tmp/a.pcap' });
+  assert.equal(r.isError, true);
+  assert.match(r.content[0].text, /never runs/);
+});

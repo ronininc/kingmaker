@@ -211,3 +211,14 @@ test('superviseBackend owns the pulse: crashing the child is not a beat, and sto
   for (let i = 0; i < 4; i += 1) await new Promise((r) => setImmediate(r));
   assert.equal(net.crm().length, before);
 });
+
+test('supervision does not enable a heartbeat without explicit configuration', async () => {
+  let stops = 0;
+  const backend = { child: { pid: 123 }, exited: new Promise(() => {}), stop: async () => { stops++; } };
+  const scheduled = [];
+  const supervisor = superviseBackend(backend, { relaunch: async () => backend, schedule: (...args) => scheduled.push(args) });
+  await new Promise((r) => setImmediate(r));
+  assert.equal(scheduled.length, 0);
+  await supervisor.stop();
+  assert.equal(stops, 1);
+});
