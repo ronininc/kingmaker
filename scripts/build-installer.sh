@@ -36,6 +36,15 @@ if [ -n "$manifest" ]; then
   [ -f "$manifest" ] || { echo "no manifest at $manifest (build one: node scripts/release-parts.mjs)" >&2; exit 2; }
   node -e 'import(process.argv[1]).then(({ readManifest }) => readManifest(process.argv[2]))' "$here/lib/release-manifest.mjs" "$manifest" \
     || { echo "the manifest at $manifest is not sound" >&2; exit 2; }
+  node --input-type=module - "$here" "$manifest" <<'VERIFY'
+import { readFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
+const [root, file] = process.argv.slice(2);
+const { verifyManifestBytes } = await import(pathToFileURL(`${root}/lib/release-signing.mjs`));
+try {
+  if (!verifyManifestBytes(readFileSync(file), readFileSync(`${file}.sig`, 'utf8'), readFileSync(`${root}/lib/kingmaker-release-public.pem`, 'utf8'))) throw new Error('signature mismatch');
+} catch { console.error('manifest detached signature missing or invalid against pinned release key'); process.exit(2); }
+VERIFY
   release="$(plutil -extract tag raw -o - "$manifest")"
   version="$(plutil -extract version raw -o - "$manifest")"
 else
@@ -82,8 +91,7 @@ fi
 cp "$here/lib/kingmaker-release-public.pem" "$app/Contents/Resources/kingmaker-release-public.pem"
 if [ -n "$manifest" ]; then
   cp "$manifest" "$app/Contents/Resources/kingmaker-manifest.json"
-  # The detached signature, if the release was signed (release-parts.mjs --sign-key). engine.sh refuses a manifest whose
-  # signature is present-but-bad, always; an absent one is allowed at first install but refused on --require-signed.
+  # The detached signature was checked above; runtime verifies again against its embedded pin.
   if [ -f "$manifest.sig" ]; then
     cp "$manifest.sig" "$app/Contents/Resources/kingmaker-manifest.json.sig"
     echo "· release signature embedded (verified against the pinned key at install time)"
