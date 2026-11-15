@@ -1,12 +1,12 @@
 // Kingmaker Installer: the release payload (parts ≤ 1.9 GB + manifest, every sha256 pinned), the install engine
 // (installer/engine.sh) driven end to end against a local server, all-or-nothing staging, the cemented wake word,
 // resumable downloads, and the private-repo token path. macOS only (codesign, plutil, bsdtar).
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { buildFixtureRelease, fakeTools, isDir, isFile, runEngine, serveRelease } from './fixtures/installer-fixtures.mjs';
+import { buildFixtureRelease, fakeTools, isDir, isFile, runEngine, serveRelease, signFixtureManifest } from './fixtures/installer-fixtures.mjs';
 import { spawnSync } from 'node:child_process';
 import { buildManifest, launcherProblems, macosBelow, MAX_PART_BYTES, manifestProblems, MIN_MACOS, partName, shipProblems, splitStream, verifyParts } from '../lib/release-manifest.mjs';
 import { installerModels, plannedModels, registryManifestUrl, tailscalePin } from '../scripts/release-parts.mjs';
@@ -20,12 +20,16 @@ const opts = { skip: !mac && 'macOS only', timeout: 120_000 };
 let shared;
 const release = async () => (shared ??= await buildFixtureRelease());
 
+const ownedWorlds = new Set();
+after(() => { for (const dir of ownedWorlds) rmSync(dir, { recursive: true, force: true }); });
+
 /** A hermetic world for one engine run: its own prefix, HOME, PATH (fake tools, no Homebrew) and Ollama URL. */
 function world({ tools = {} } = {}) {
   const root = realpathSync(mkdtempSync(join(tmpdir(), 'km-world-')));
+  ownedWorlds.add(root);
   const home = join(root, 'real-home');
   mkdirSync(home, { recursive: true });
-  const PATH = fakeTools(join(root, 'bin'), { 'xcode-select': 'echo /Library/Developer/CommandLineTools', ollama: 'exit 0', peekaboo: 'exit 0', sox: 'exit 0', 'python3.12': 'exit 0', brew: `echo "brew $*" >> "${join(root, 'brew.calls')}"`, ...tools });
+  const PATH = fakeTools(join(root, 'bin'), { 'xcode-select': 'echo /Library/Developer/CommandLineTools', curl: 'for arg in "$@"; do case "$arg" in http://127.0.0.1:*|http://localhost:*) ;; http:*|https:*) echo "fixture refuses external network" >&2; exit 22;; esac; done; exec /usr/bin/curl "$@"', ollama: 'exit 0', peekaboo: 'exit 0', sox: 'exit 0', 'python3.12': 'exit 0', brew: `echo "brew $*" >> "${join(root, 'brew.calls')}"`, ...tools });
   return { root, prefix: join(root, 'prefix'), home, env: { HOME: home, KINGMAKER_PATH: PATH, KINGMAKER_OLLAMA_URL: 'http://127.0.0.1:9/none' } };
 }
 const appIn = (w) => join(w.prefix, 'Applications', 'Kingmaker.app');
@@ -138,7 +142,7 @@ test('a part that does not match its sha256 fails the install: nothing is in pla
   try {
     const run = await runEngine(['--wake-word', 'Kingmaker', '--prefix', w.prefix, '--base-url', srv.url, '--manifest', r.manifestFile], w.env);
     assert.equal(run.code, 1);
-    assert.match(run.failed.message, new RegExp(`Part ${bad.replace(/\./g, '\\.')} did not download or did not match its sha256, twice`));
+    assert.match(run.failed.message, new RegExp(`Part ${bad.replace(/\./g, '\\.')} failed to download .*sha256 did not match`));
     assert.equal(run.failed.nothingInstalled, true);
     assert.equal(existsSync(appIn(w)), false, 'no Kingmaker.app');
     assert.equal(existsSync(join(dataIn(w), 'install.json')), false, 'no install.json');
@@ -291,6 +295,7 @@ test('with a Kingmaker Release certificate pinned, an app signed by anything els
 
 test('an installer ships only when it can: the launcher, the macOS floor, this version, and update enrollment', opts, async () => {
   const r = await release(), m = r.manifest;
+  const why = (changes = {}, options = {}) => shipProblems({ ...m, ...changes }, { pkgVersion: m.version, enroll, ...options }).join("; ");
   const enroll = { url: 'https://updates.example.com', code: 'c0de' };
   assert.ok(!('packs' in m), 'the manifest carries no capability-pack table (the metered-doctrine rework)');
   assert.deepEqual(shipProblems(m, { pkgVersion: m.version, enroll }), [], 'a packless release-parts.mjs manifest of this version, with enrollment, ships');
@@ -305,8 +310,8 @@ test('an installer ships only when it can: the launcher, the macOS floor, this v
   const out = mkdtempSync(join(tmpdir(), 'km-ship-'));
   const b = spawnSync('/bin/sh', [new URL('../scripts/build-installer.sh', import.meta.url).pathname, '--manifest', r.manifestFile, '--out', out],
     { encoding: 'utf8', env: { ...process.env, KINGMAKER_ENROLL_URL: '', KINGMAKER_ENROLL_CODE: '' } });
-  assert.equal(b.status, 3, b.stdout + b.stderr);
-  assert.match(b.stderr, /never get an update/); assert.match(b.stderr, /no DMG was built/);
+  assert.equal(b.status, 2, b.stdout + b.stderr);
+  assert.match(b.stderr, /manifest detached signature missing or invalid/, 'fixture key must never be accepted as the production release key');
   assert.deepEqual(readdirSync(out), []);
 });
 
@@ -316,7 +321,7 @@ test('a tool that needs a newer macOS than this Mac is left out, said plainly, a
   // This Mac is older than the tool needs: the manifest asks for macOS 99.
   // A copy: the fixture release is shared by every test here.
   const m = JSON.parse(readFileSync(r.manifestFile, 'utf8')); m.brew[0].minMacos = '99.0';
-  const manifestFile = join(mkdtempSync(join(tmpdir(), 'km-newer-')), 'kingmaker-manifest.json'); writeFileSync(manifestFile, JSON.stringify(m));
+  const manifestFile = join(mkdtempSync(join(tmpdir(), 'km-newer-')), 'kingmaker-manifest.json'); writeFileSync(manifestFile, JSON.stringify(m)); signFixtureManifest(manifestFile);
   const installed = new Map(m.models.map((x) => [x.name, x.digest]));
   const ollama = (req, res) => {
     if (req.url === '/api/tags') { res.setHeader('content-type', 'application/json'); return res.end(JSON.stringify({ models: [...installed].map(([name, digest]) => ({ name, digest })) })); }
@@ -369,7 +374,7 @@ test('with the tools live (fakes): missing models are pulled and must match thei
     assert.equal(run.code, 0, run.out);
     assert.match(run.out, /huihui_ai\/qwen3-abliterated:1\.7b is here, digest matches the release's pin/);
     assert.match(run.out, /Pulled huihui_ai\/qwen3-abliterated:0\.6b \(digest matches the pin\)/);
-    assert.ok(installed.has('huihui_ai/qwen2.5-coder-abliterate:1.5b') !== installed.has('huihui_ai/qwen2.5-coder-abliterate:7b'), 'exactly one coder, sized to this Mac');
+    assert.deepEqual([...installed.keys()].sort(), r.manifest.models.map((model) => model.name).sort(), 'the complete flat starter set is pulled, not a RAM-class coder');
     assert.match(readFileSync(join(w.root, 'brew.calls'), 'utf8'), /^brew install openclaw\/tap\/peekaboo$/m, 'the missing Hands of Horus came from Homebrew');
     assert.ok(isFile(join(w.prefix, 'home', 'Library', 'Application Support', 'solomon-desktop', 'services', 'searxng-native', 'commit.txt')), 'SearXNG set up');
     assert.ok(isFile(join(dataIn(w), 'runtime', 'data', 'knowledge', 'sources', '.receipts', 'kaikki-multilingual.json')), 'the knowledge library moved into place');
@@ -436,7 +441,7 @@ test('the Ronin Launcher installs beside Kingmaker (required): placed after veri
   try {
     const run = await runEngine(['--wake-word', 'Kingmaker', '--prefix', w2.prefix, '--base-url', bad.url, '--manifest', r.manifestFile], w2.env);
     assert.equal(run.code, 1);
-    assert.match(run.failed.message, /Ronin Launcher did not download or did not match its sha256/);
+    assert.match(run.failed.message, /Ronin Launcher failed to download .*sha256 did not match/);
     assert.equal(existsSync(appIn(w2)), false, 'no Kingmaker.app either: it is a required part');
     assert.equal(existsSync(join(w2.prefix, 'Applications', 'Ronin Launcher.app')), false);
   } finally { await bad.close(); }
@@ -502,4 +507,22 @@ test('Tailscale is pinned from its own stable index, its package hashed and chec
   const pin = await tailscalePin({ fetcher: host(good), base: 'https://pkgs.example/stable' });
   assert.deepEqual(pin, { version: '1.104.1', name: 'Tailscale-1.104.1-macos.pkg', url: 'https://pkgs.example/stable/Tailscale-1.104.1-macos.pkg', sha256: good, size: pkg.length });
   await assert.rejects(tailscalePin({ fetcher: host('0'.repeat(64)), base: 'https://pkgs.example/stable' }), /does not match/);
+});
+
+
+test('fixture engine still rejects unsigned and tampered manifests before downloading', opts, async () => {
+  const r = await release();
+  for (const kind of ['unsigned', 'tampered']) {
+    const w = world();
+    const file = join(w.root, 'kingmaker-manifest.json');
+    writeFileSync(file, readFileSync(r.manifestFile));
+    if (kind === 'tampered') {
+      signFixtureManifest(file);
+      writeFileSync(file, readFileSync(file, 'utf8') + ' ');
+    }
+    const run = await runEngine(['--wake-word', 'Kingmaker', '--prefix', w.prefix, '--manifest', file], w.env);
+    assert.equal(run.code, 1);
+    assert.match(run.failed.message, kind === 'unsigned' ? /not signed/ : /signature does NOT match/);
+    assert.equal(existsSync(appIn(w)), false);
+  }
 });

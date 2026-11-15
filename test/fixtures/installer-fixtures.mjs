@@ -1,16 +1,33 @@
 // Test fixtures for the installer: a tiny ad-hoc-signed Kingmaker.app (with stand-ins for the bundled corpus and
 // SearXNG installers and for Electron-as-Node), a release built from it by the real scripts/release-parts.mjs, a local
 // HTTP server for the parts (Range-aware, with fault switches), and a runner for installer/engine.sh.
+import { after } from 'node:test';
 import { spawn, spawnSync } from 'node:child_process';
 import { createHash, randomBytes } from 'node:crypto';
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync, existsSync } from 'node:fs';
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync, existsSync, copyFileSync, rmSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const ROOT = fileURLToPath(new URL('../..', import.meta.url));
-export const ENGINE = join(ROOT, 'installer', 'engine.sh');
+import { generateReleaseKeypair, signManifestBytes } from '../../lib/release-signing.mjs';
+import { verifyStagedRelease } from '../../scripts/release-gate.mjs';
+const fixtureKeys = generateReleaseKeypair();
+const ownedFixtureDirs = new Set();
+after(() => { for (const dir of ownedFixtureDirs) rmSync(dir, { recursive: true, force: true }); });
+const fixtureEngineDir = mkdtempSync(join(tmpdir(), 'km-fixture-engine-'));
+ownedFixtureDirs.add(fixtureEngineDir);
+copyFileSync(join(ROOT, 'installer', 'engine.sh'), join(fixtureEngineDir, 'engine.sh'));
+chmodSync(join(fixtureEngineDir, 'engine.sh'), 0o755);
+writeFileSync(join(fixtureEngineDir, 'kingmaker-release-public.pem'), fixtureKeys.publicKeyPem);
+export const ENGINE = join(fixtureEngineDir, 'engine.sh');
+
+/** Sign only a manifest intentionally authored by this test, never in runEngine. */
+export function signFixtureManifest(file) {
+  writeFileSync(`${file}.sig`, signManifestBytes(readFileSync(file), fixtureKeys.privateKeyPem));
+}
+
 
 const CORPUS = `// stand-in for the engine's bootstrap-corpus script (same contract: TIER1, receipts, --dry-run)
 import { mkdirSync, writeFileSync, realpathSync } from 'node:fs';
@@ -131,6 +148,7 @@ export function makeFixtureLauncher(parent) {
 
 export async function buildFixtureRelease({ partSize = 100_000, padBytes = 300_000, models = FIXTURE_MODELS, pins = null } = {}) {
   const work = mkdtempSync(join(tmpdir(), 'km-release-'));
+  ownedFixtureDirs.add(work);
   const app = makeFixtureApp(join(work, 'build'), { padBytes });
   const out = join(work, 'release');
   const pinsFile = join(work, 'pins.json');
@@ -139,9 +157,17 @@ export async function buildFixtureRelease({ partSize = 100_000, padBytes = 300_0
   const launcherPin = makeFixtureLauncher(join(work, 'launcher'));
   const lines = [];
   const { main } = await import('../../scripts/release-parts.mjs');
-  const code = await main({ argv: ['--tree-repo', 'ronininc/Kingmaker', '--tree-commit', 'a'.repeat(40), '--app', app, '--out', out, '--part-size', String(partSize), '--offline', '--pins', pinsFile, '--level', '1', '--launcher', launcherPin], env: { ...process.env, KINGMAKER_ALLOW_ADHOC: '1' }, out: (l) => lines.push(l), offlineDigests: async () => models });
+  const code = await main({ argv: ['--tree-repo', 'ronininc/Kingmaker', '--tree-commit', 'a'.repeat(40), '--app', app, '--out', out, '--part-size', String(partSize), '--offline', '--pins', pinsFile, '--level', '1', '--launcher', launcherPin], env: { ...process.env, KINGMAKER_ALLOW_ADHOC: '1' }, out: (l) => lines.push(l), offlineDigests: async () => models,
+    // Fixture-only dependency injection: real part hashes/tree/provenance checks;
+    // synthetic certificate probe. No production env/CLI can select this probe.
+    stagedVerifier: (args) => verifyStagedRelease({ ...args, pin: 'A'.repeat(40), probe: {
+      strictOk: true, detailsText: 'Authority=Fixture Certificate',
+      requirementText: 'designated => certificate leaf = H"' + 'A'.repeat(40) + '"',
+    } }),
+  });
   if (code !== 0) throw new Error(`release-parts exited ${code}:\n${lines.join('\n')}`);
   const manifest = JSON.parse(readFileSync(join(out, 'kingmaker-manifest.json'), 'utf8'));
+  writeFileSync(join(out, 'kingmaker-manifest.json.sig'), signManifestBytes(readFileSync(join(out, 'kingmaker-manifest.json')), fixtureKeys.privateKeyPem));
   return { work, app, out, manifest, lines, manifestFile: join(out, 'kingmaker-manifest.json') };
 }
 

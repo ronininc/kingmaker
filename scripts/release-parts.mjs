@@ -272,7 +272,7 @@ export function notarizeApp(app, { env = process.env, run = spawnSync } = {}) {
   return { ok: true, line: `Notarized and stapled ${basename(app)}.` };
 }
 
-export async function main({ argv = process.argv.slice(2), env = process.env, out: print = console.log, offlineDigests = localOllamaDigests, fetcher = fetchOk } = {}) {
+export async function main({ argv = process.argv.slice(2), env = process.env, out: print = console.log, offlineDigests = localOllamaDigests, fetcher = fetchOk, stagedVerifier = verifyStagedRelease } = {}) {
   const dryRun = argv.includes('--dry-run');
   const offline = argv.includes('--offline');
   const engineSrc = env.KINGMAKER_ENGINE_SRC ? resolve(env.KINGMAKER_ENGINE_SRC) : null; // the engine's source checkout
@@ -405,7 +405,7 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
   };
   const issProblems = issuanceProblems({ version: facts.version, issuance });
   if (issProblems.length) { for (const p of issProblems) print(`✗ Not issuable: ${p}`); print('✗ Record the build provenance (tree --tree-commit; launcher pin sourceRepo/sourceCommit from a launcher built from this tree) and rebuild. Nothing was written.'); return 1; }
-  print(`· issuance: tree ${treeRepo}@${String(treeCommit).slice(0, 12)}; installer + launcher built from the same tree`);
+  print(`· issuance: tree ${treeRepo}@${String(treeCommit).slice(0, 12)}; installer matches the release tree; launcher has its own pinned provenance`);
 
   // Pin the install/update engine's sha256 in the (signed) manifest, so the installed app can authenticate the engine
   // it downloads before running it. This is the SAME engine.sh publish-update.sh ships; it verifies the match.
@@ -447,7 +447,7 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
     writeFileSync(join(outDir, sigName), sig);
     print(`✓ Manifest signed → ${sigName} (verifies against pinned key, fingerprint ${pubkeyFingerprint(RELEASE_PUBLIC_KEY_PEM)})`);
   } else {
-    print('! NOT signed: set KINGMAKER_RELEASE_SIGNING_KEY (or pass --sign-key) to the OFFLINE private key so the installer can verify this release. Unsigned releases still install, but the installer cannot prove they are yours.');
+    print('! NOT signed: set KINGMAKER_RELEASE_SIGNING_KEY (or pass --sign-key) to the OFFLINE private key so the installer can verify this release. The installer refuses unsigned releases; sign before distributing.');
   }
 
   writeFileSync(join(outDir, 'SHA256SUMS'), sha256sums([...split.parts, { name: launcher.archive, sha256: launcher.sha256 }, { name: MANIFEST_FILE, sha256: createHash('sha256').update(manifestText).digest('hex') }]));
@@ -458,9 +458,9 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
   // tree-identical to the inspected app above, and passing the installer's own signature test. v0.4.2 shipped
   // an archive whose app failed that test because every check ran on the build tree. A release that fails the
   // gate does not get a publish command.
-  const gate = await verifyStagedRelease({ manifest, partsDir: outDir, sourceApp: app, stageDir: join(outDir, '.gate-stage'), signature: argv.includes('--skip-codesign') ? 'skip' : 'require', requireIssuance: true });
+  const gate = await stagedVerifier({ manifest, partsDir: outDir, sourceApp: app, stageDir: join(outDir, '.gate-stage'), signature: argv.includes('--skip-codesign') ? 'skip' : 'require', requireIssuance: true });
   if (!gate.ok) { print(`✗ The staged release fails the gate: ${gate.problems.join('; ')}`); return 1; }
-  print('✓ staged gate: the archived app is identical to the inspected app, passes the installer signature test, and its installer + launcher were built from this release\'s tree (issuance)');
+  print('✓ staged gate: the archived app is identical to the inspected app, passes the installer signature test, and its installer and launcher match their pinned provenance (issuance)');
   print('Not published. To publish (the operator\'s call):');
   const sigAsset = keyPath ? ` ${JSON.stringify(join(outDir, sigName))}` : '';
   print(`  gh release create ${tag} --repo ${manifest.repo} --draft --title "Kingmaker ${facts.version}" ${split.parts.map((p) => JSON.stringify(join(outDir, p.name))).join(' ')} ${JSON.stringify(join(outDir, launcher.archive))} ${JSON.stringify(join(outDir, MANIFEST_FILE))}${sigAsset} ${JSON.stringify(join(outDir, 'SHA256SUMS'))} "<Kingmaker Installer DMG>"`);
