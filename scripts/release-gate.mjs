@@ -33,7 +33,7 @@ import { createReadStream, existsSync, lstatSync, mkdirSync, readFileSync, readd
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { issuanceProblems, readManifest, verifyParts } from '../lib/release-manifest.mjs';
-import { leafFromRequirement, readPin, appRequirement, KINGMAKER_BUNDLE_ID } from '../lib/release-identity.mjs';
+import { leafFromRequirement, readPin, appRequirement } from '../lib/release-identity.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -87,7 +87,8 @@ export function treeDiff(a, b) {
 /* ------------------------------------------------------------------ */
 
 /** Pure: decide from a codesign probe whether an app passes the installer's
- *  signature test. probe = { strictOk, requirementText, detailsText }.
+ *  signature test. probe includes strictOk, requirementText, detailsText,
+ *  pinVerified and verifiedPin (the exact certificate evaluated by codesign).
  *  pin = the pinned leaf SHA-1 (uppercase hex) or null. */
 export function decideSignature(probe, pin) {
   const problems = [];

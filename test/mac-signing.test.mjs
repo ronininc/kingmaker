@@ -73,4 +73,3 @@ test('installer removes an alternate Kingmaker copy before committing the new on
   assert.match(script, /installed_apps\(\)/);
   assert.match(script, /Kingmaker\.app\.duplicate/);
 });
-
