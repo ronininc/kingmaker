@@ -4,6 +4,8 @@
 
 Kingmaker is a headless, voice-driven agent for your Mac. Your Mac's own apps are the screen and your voice drives it. Its engine governs every step, and the Hands of Horus do the clicking (ghost-os when they are not installed). It is source-available under the [PolyForm Noncommercial License 1.0.0](LICENSE).
 
+**Current release: [4.5.1](https://github.com/ronininc/Kingmaker/releases/tag/v4.5.1).** One download: everything, or nothing.
+
 Kingmaker runs its engine with no window: the engine's binary is used only as Node, started by its own headless launcher (`desktop/headless-server.mjs`). No Electron window, renderer, or GPU process is ever created.
 
 - **The app (`Kingmaker.app`, installed by Kingmaker Installer) carries the engine inside itself.** Install it with Kingmaker Installer and you have all of it: server, voice runtime, guardrails, agent and knowledge runtimes, the browser runtime, the Chrome connector and the engine catalogs. Electron's binary is in it only as the Node runtime. There are no helper apps, so no window can start.
@@ -29,7 +31,7 @@ What the button does, in order (one progress bar for all of it):
 
 **Nothing is ever half-installed.** Kingmaker's own pieces (the app, its config, its library) exist only in staging until step 7, so a failure anywhere before leaves none of them in place, and a failure during step 7 puts everything back. The shared tools it installs on the way (Ollama and its models, Homebrew and its formulas, SearXNG) are each installed whole by their own installers and are kept, together with the verified downloads, so pressing the button again continues instead of starting over. The installer never installs third-party MCP servers or CLI tools: only Kingmaker's own parts and what they need to run.
 
-**Gatekeeper:** true one-click on someone else's Mac needs the installer signed with an Apple **Developer ID** and **notarized**. Until then it is signed ad hoc, and your Mac shows "Open Anyway" once for the installer.
+**Gatekeeper:** the installer is signed with an Apple **Developer ID** and **notarized**, so it opens with one click on any Mac — no "Open Anyway" step.
 
 ## The wake word is cemented
 
@@ -318,7 +320,7 @@ The engine's ArtCraft adapter drives seven open-source creative apps from `story
 
 ## Known gaps (v0.1, honest)
 
-- **Not notarized yet.** Kingmaker.app is about 4 GB, mostly the knowledge runtime (2 GB) and the voice runtime (1 GB). Kingmaker Installer downloads it as release parts. Until there is an Apple Developer ID to sign and notarize the installer with, your Mac needs "Open Anyway" once for the installer.
+- **Kingmaker.app is about 4 GB,** mostly the knowledge runtime (2 GB) and the voice runtime (1 GB); Kingmaker Installer downloads it as release parts. The installer DMG is Developer ID signed, notarized and stapled.
 - **System software it doesn't bundle** comes with the installer: Ollama and the models, the Hands of Horus, sox, SearXNG (Kingmaker starts an installed `ollama serve` when none is running). ghost-os stays an optional fallback for the hands. Blender, Godot and Chrome are found where they're installed.
 - **The desktop app's first-run installer and knowledge-library offer are pop-ups in its window,** so they don't run headless. The runtime still reports what's missing.
 - **The ledger calls spoken turns typed.** The engine records them as `operator_typed` because Kingmaker sends them with the console's nonce. An honest "spoken at the Kingmaker console" principal needs an engine change.
