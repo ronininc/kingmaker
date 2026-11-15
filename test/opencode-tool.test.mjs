@@ -64,21 +64,17 @@ test('layer 2 — method: opencode-code-task is listed and conducts its steps on
   assert.ok(m, 'the shipped methods index carries opencode-code-task');
   assert.equal(m.domain, 'code');
   assert.deepEqual(m.inputKeys, ['task', 'model', 'toolPath']);
-  // With tool streaming off and no harness installed, the conduction still completes:
+  // With tool streaming off and no harness installed, the conduction remains incomplete:
   // the job record is written and verified, the run step stays declared — never faked.
   const workDir = await mkdtemp(join(tmpdir(), 'km-opencode-declared-'));
   const r = await conductor.conduct('opencode-code-task', { workDir });
-  assert.equal(r.status, 'completed', `trace: ${JSON.stringify(r.trace, null, 1)}`);
+  assert.equal(r.status, 'incomplete', `trace: ${JSON.stringify(r.trace, null, 1)}`);
   const job = JSON.parse(await readFile(join(workDir, 'opencode-job.json'), 'utf8'));
   assert.equal(job.schema, 'kingmaker.code-job/1');
   assert.equal(job.state, 'task-written-run-declared');
   const check = r.trace.find((t) => t.id === 'check-opencode');
   assert.ok(check, 'the method checks for the opencode tool first');
-  if (check.result.found) {
-    assert.equal(r.declared.length, 0, 'opencode is on this node: the run executed instead of declaring');
-  } else {
-    assert.deepEqual(r.declared.map((d) => d.step), ['run-opencode'], 'no harness, no pull: the run stays declared');
-  }
+  assert.deepEqual(r.declared.map((d) => d.step), ['run-opencode'], 'toolProvider:null never authorizes the run, even when the binary exists on PATH');
 });
 
 const PAYLOAD_DIR = process.env.KINGMAKER_TEST_OPENCODE_PAYLOAD_DIR;
@@ -107,7 +103,7 @@ test('layer 3 — ACCEPTANCE: conduction pulls the real OpenCode payload and exe
   const workDir = join(root, 'work');
   await mkdir(workDir, { recursive: true });
   const r = await createMethodConductor({ indexUrl: new URL(`file://${join(catalogDir, 'index.json')}`), toolProvider: provider }).conduct('opencode-version-job', { workDir });
-  assert.equal(r.status, 'completed', `trace: ${JSON.stringify(r.trace, null, 1)}`);
+  assert.equal(r.status, 'incomplete', `trace: ${JSON.stringify(r.trace, null, 1)}`);
   const check = r.trace.find((t) => t.id === 'check-opencode');
   assert.equal(check.result.found, true);
   assert.equal(check.result.via, 'library', 'the harness came from the Brain Library, not PATH');
