@@ -38,14 +38,14 @@ async function makeRelease(appDir, outDir, { partSize = 700 } = {}) {
   return { manifest, split };
 }
 
-const rootProbe = { strictOk: true, requirementText: `designated => identifier "com.ronininc.solghost" and certificate root = H"${PIN}"`, detailsText: 'Authority=Kingmaker Release' };
-const leafProbe = { strictOk: true, requirementText: `designated => identifier "com.ronininc.solghost" and certificate leaf = H"${PIN}"`, detailsText: 'Authority=Kingmaker Release' };
+const rootProbe = { strictOk: true, pinVerified: true, verifiedPin: PIN, requirementText: `designated => identifier "com.ronininc.solghost" and certificate root = H"${PIN}"`, detailsText: 'Authority=Kingmaker Release\nIdentifier=com.ronininc.solghost\nflags=0x10000(runtime)' };
+const leafProbe = { strictOk: true, pinVerified: true, verifiedPin: PIN, requirementText: `designated => identifier "com.ronininc.solghost" and certificate leaf = H"${PIN}"`, detailsText: 'Authority=Kingmaker Release\nIdentifier=com.ronininc.solghost\nflags=0x10000(runtime)' };
 
 /* decideSignature — the installer's own test, replicated */
 {
   ok('root-form requirement passes (the self-signed phrasing)', decideSignature(rootProbe, PIN).ok);
   ok('leaf-form requirement passes', decideSignature(leafProbe, PIN).ok);
-  const wrong = decideSignature({ ...rootProbe, requirementText: `certificate root = H"${'B'.repeat(40)}"` }, PIN);
+  const wrong = decideSignature({ ...rootProbe, pinVerified: false, requirementText: `certificate root = H"${'B'.repeat(40)}"` }, PIN);
   ok('wrong signer refused', !wrong.ok && wrong.problems.some((p) => p.includes('not the pinned')));
   const adhoc = decideSignature({ ...rootProbe, detailsText: 'Signature=adhoc' }, PIN);
   ok('adhoc refused', !adhoc.ok && adhoc.problems.some((p) => p.includes('ad-hoc')));
@@ -82,7 +82,7 @@ const leafProbe = { strictOk: true, requirementText: `designated => identifier "
   ok('stale payload refused', stale.ok === false && stale.problems.some((p) => p.includes('KingmakerEngine')));
 
   // Wrong signer on the staged app.
-  const wrongSig = await verifyStagedRelease({ manifest, partsDir: relDir, sourceApp: app, stageDir: join(d, 'stage3'), pin: PIN, probe: { ...rootProbe, requirementText: `certificate leaf = H"${'C'.repeat(40)}"` } });
+  const wrongSig = await verifyStagedRelease({ manifest, partsDir: relDir, sourceApp: app, stageDir: join(d, 'stage3'), pin: PIN, probe: { ...rootProbe, pinVerified: false, requirementText: `certificate leaf = H"${'C'.repeat(40)}"` } });
   ok('wrong signer refused at the gate', wrongSig.ok === false);
 
   // A corrupted part never reaches extraction.

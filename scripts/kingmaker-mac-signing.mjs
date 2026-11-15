@@ -17,27 +17,32 @@ import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { readPin, leafFromRequirement, KINGMAKER_BUNDLE_ID } from '../lib/release-identity.mjs';
+import { readPin, leafFromRequirement, KINGMAKER_BUNDLE_ID, appRequirement } from '../lib/release-identity.mjs';
 
 function run(cmd, args) {
   const r = spawnSync(cmd, args, { encoding: 'utf8' });
   return { code: r.status ?? 1, out: `${r.stdout || ''}${r.stderr || ''}` };
 }
 
-export function verifyKingmakerSignature(appPath) {
-  if (process.platform !== 'darwin') return { ok: false, adhoc: false, pinned: null, pinMatches: false, leaf: null, reason: 'codesign is macOS-only' };
-  const pin = readPin();
+export function verifyKingmakerSignature(appPath, { runImpl = run, pin = readPin(), platform = process.platform, exists = existsSync } = {}) {
+  if (platform !== 'darwin') return { ok: false, adhoc: false, pinned: null, pinMatches: false, leaf: null, reason: 'codesign is macOS-only' };
   const pinned = pin?.sha1 ?? null;
-  if (!existsSync(appPath)) return { ok: false, adhoc: false, pinned, pinMatches: false, leaf: null, reason: `app not found: ${appPath}` };
-  const strict = run('codesign', ['--verify', '--deep', '--strict', '--verbose=2', appPath]);
-  const details = run('codesign', ['-dvvv', appPath]);
-  const requirement = run('codesign', ['-d', '-r-', appPath]);
+  if (!exists(appPath)) return { ok: false, adhoc: false, pinned, pinMatches: false, leaf: null, reason: `app not found: ${appPath}` };
+  const strict = runImpl('codesign', ['--verify', '--deep', '--strict', '--verbose=2', appPath]);
+  const details = runImpl('codesign', ['-dvvv', appPath]);
+  const requirement = runImpl('codesign', ['-d', '-r-', appPath]);
   const adhoc = /Signature=adhoc/.test(details.out);
   const hardened = /flags=0x[0-9a-f]*\(.*runtime.*\)/i.test(details.out);
   const identifier = /^Identifier=(.+)$/m.exec(details.out)?.[1] ?? null;
   const authority = /^Authority=(.+)$/m.exec(details.out)?.[1] ?? null;
   const leaf = leafFromRequirement(requirement.out);
-  const pinMatches = Boolean(leaf && pinned && leaf === pinned);
+  // A designated-requirement string is diagnostic, not proof of the signing certificate.
+  // Ask codesign to evaluate the pinned requirement against the actual signature.
+  let pinMatches = false;
+  if (pinned) {
+    try { pinMatches = runImpl('codesign', ['--verify', '--strict', `-R=${appRequirement(pinned)}`, appPath]).code === 0; }
+    catch { pinMatches = false; }
+  }
   const ok = strict.code === 0 && !adhoc && hardened && identifier === KINGMAKER_BUNDLE_ID && pinMatches;
   return { ok, strict: strict.code === 0, adhoc, hardened, identifier, authority, leaf, pinned, pinMatches, designatedRequirement: requirement.out.trim() };
 }

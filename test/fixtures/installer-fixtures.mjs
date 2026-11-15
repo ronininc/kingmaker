@@ -139,7 +139,14 @@ export async function buildFixtureRelease({ partSize = 100_000, padBytes = 300_0
   const launcherPin = makeFixtureLauncher(join(work, 'launcher'));
   const lines = [];
   const { main } = await import('../../scripts/release-parts.mjs');
-  const code = await main({ argv: ['--tree-repo', 'ronininc/Kingmaker', '--tree-commit', 'a'.repeat(40), '--app', app, '--out', out, '--part-size', String(partSize), '--offline', '--pins', pinsFile, '--level', '1', '--launcher', launcherPin], env: { ...process.env, KINGMAKER_ALLOW_ADHOC: '1' }, out: (l) => lines.push(l), offlineDigests: async () => models });
+  const code = await main({ argv: ['--tree-repo', 'ronininc/Kingmaker', '--tree-commit', 'a'.repeat(40), '--app', app, '--out', out, '--part-size', String(partSize), '--offline', '--pins', pinsFile, '--level', '1', '--launcher', launcherPin], env: { ...process.env, KINGMAKER_ALLOW_ADHOC: '1' }, out: (l) => lines.push(l), offlineDigests: async () => models,
+    // Fixture-only dependency injection: real part hashes/tree/provenance checks;
+    // synthetic certificate probe. No production env/CLI can select this probe.
+    stagedVerifier: (args) => verifyStagedRelease({ ...args, pin: 'A'.repeat(40), probe: {
+      strictOk: true, pinVerified: true, verifiedPin: 'A'.repeat(40), detailsText: 'Authority=Fixture Certificate\nIdentifier=com.ronininc.solghost\nflags=0x10000(runtime)',
+      requirementText: 'designated => certificate leaf = H"' + 'A'.repeat(40) + '"',
+    } }),
+  });
   if (code !== 0) throw new Error(`release-parts exited ${code}:\n${lines.join('\n')}`);
   const manifest = JSON.parse(readFileSync(join(out, 'kingmaker-manifest.json'), 'utf8'));
   return { work, app, out, manifest, lines, manifestFile: join(out, 'kingmaker-manifest.json') };
