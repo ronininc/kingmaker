@@ -1,0 +1,29 @@
+{
+  "schema": "kingmaker.imported-skill-policy/1",
+  "activation": "disabled",
+  "trust": "untrusted-upstream-instructions",
+  "source": {
+    "repository": "https://github.com/deepseek-ai/dsh-superagent-prototype",
+    "commit": "6337fc823ce20251c8de8085948165c81aaa701e",
+    "license": "MIT",
+    "path": "skills/dsh-superagent-feishu/SKILL.md",
+    "skillSha256": "5cd538eef17f39d3a7c8beb0ff12ab2fff6e405139e59e8667009fd16ebd23c8"
+  },
+  "execution": {
+    "allowSkillTextAsContext": false,
+    "allowShell": false,
+    "allowAbsoluteCommands": false,
+    "allowChildProcesses": false,
+    "allowNetwork": false,
+    "allowFilesystemWrite": false,
+    "allowCredentialAccess": false,
+    "allowPrivilegeChange": false
+  },
+  "reason": "Disabled: the required orchestrator and provider adapters are not registered as host-enforced Kingmaker tools; prompt text cannot grant those capabilities.",
+  "requiredHostControls": [
+    "orchestrator_read",
+    "lark-cli scoped reads",
+    "ticket-source binding",
+    "provider credential isolation"
+  ]
+}

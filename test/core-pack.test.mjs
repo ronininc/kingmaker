@@ -81,8 +81,22 @@ const SANDBOXED_CORE = new Set(['claude-code-skillforge', 'deepcamera', 'docker-
 test('every shipped core skill passes REA and is licensed to give away', () => {
   const core = builtInSkills(null);
   assert.ok(core.length >= 100, `${core.length} core skills`);
+  // 4.4.2: an imported upstream skill (the DeepSeek dsh-superagent-* ones) ships DISABLED by its KINGMAKER-SKILL-POLICY.json: its
+  // prompt text cannot grant the host-enforced tools it asks for. It still passes REA and is licensed, but it is listed, dead, and
+  // says why; every other core skill is enabled.
+  const policyDisabled = core.filter((c) => c.importedIdentity || c.importPolicy);
+  assert.deepEqual(policyDisabled.map((c) => c.name).sort(), ['dsh-superagent-feishu', 'dsh-superagent-github'], 'only the governed imports are policy-disabled');
   for (const c of core) {
     assert.equal(c.verdict, SANDBOXED_CORE.has(c.name) ? 'sandboxed' : 'clean', `${c.name}: ${c.summary}`);
-    assert.equal(c.enabled, true, `${c.name}: ${c.summary}`);
+    if (policyDisabled.includes(c)) {
+      assert.equal(c.enabled, false, `${c.name} is disabled by policy`);
+      assert.equal(c.callable, false, `${c.name} is not callable`);
+      assert.equal(c.importPolicy?.activation, 'disabled', `${c.name}: policy says disabled`);
+      assert.equal(c.importPolicyError, null, `${c.name}: its policy is valid (hash and provenance match the trusted identity)`);
+      assert.match(c.disabledReason, /^import policy: /, `${c.name}: the reason is carried in the record`);
+      assert.match(c.disabledReason, /host-enforced/, `${c.name}: the reason names the missing host controls`);
+    } else {
+      assert.equal(c.enabled, true, `${c.name}: ${c.summary}`);
+    }
   }
 });
