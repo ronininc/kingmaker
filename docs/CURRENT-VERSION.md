@@ -1,21 +1,18 @@
 # Which Kingmaker version is current
 
-Read this before assuming a version. Do not assume 4.4.4.
+Verified 2026-11-15. Do not infer production from historical notes or a candidate's package version.
 
-| Where | Version | How it was checked (2026-11-11) |
+| Location | Version | Evidence |
 |---|---|---|
-| Published release (what the site hands out) | **4.4.4** | `Kingmaker-Installer-v4.4.4.dmg` exists on the `v4.4.4` release; no installer asset exists under `v4.4.5`, `v4.4.6` or `v4.4.7` |
-| This repository, `main` (the testing copy) | **4.4.5 work, unreleased** | the chat-route fix of 2026-11-09 (`lib/state-conductor.mjs`, `lib/local-task.mjs`; pull requests #125 to #127) is merged here |
-| The owner's installed app | **4.4.6** | `/Applications/Kingmaker.app/Contents/Info.plist`, per the owner's inspection of 2026-11-11 |
-| Public repository `ronininc/kingmaker` | `package.json` says 4.4.5; `README.md` still says 4.4.4 | read from its `main` |
+| Published GitHub release | **4.5.1** | `gh release view v4.5.1 --repo ronininc/kingmaker`: published, not draft/prerelease; installer DMG, two app archive parts, signed manifest and Launcher 0.3.17 ZIP present |
+| Installed owner application | **4.5.1** | `/Applications/Kingmaker.app/Contents/Info.plist` `CFBundleShortVersionString` |
+| This isolated integrated source candidate | **4.5.2, unpublished** | `package.json` and lockfile; new version avoids replacing immutable existing 4.5.1 release assets |
+| Last fully built isolated candidate | **4.5.1, not deployed** | Prior full-runtime signed build, isolated health/CLI proofs; requires rebuilding from the final 4.5.2 source |
 
-What this means:
+Before choosing 4.5.2, both `gh release view v4.5.2` and `git ls-remote` for tags `v4.5.2` / `4.5.2` found no existing release/tag. Recheck immediately before publication to avoid a concurrent collision.
 
-- **Production is 4.4.4.** That is the only version a customer can download.
-- **The testing copy is ahead of production.** Work on `main` here has not been released.
-- **A 4.4.6 build exists on the owner's Mac.** Which commit it was built from is not recorded in this repository. If you need to know, ask the owner; do not guess.
-- The version is not stored in this tree. `app/Info.plist` and `installer/Info.plist` carry `@VERSION@`, filled in at build time, and `package.json` (`0.3.0`) is not the product version.
+App and installer plist templates obtain the product version from this checkout's `package.json` during their builds. The engine repository's own package version is separate and must not be mistaken for the product version.
 
-Two copies of every build (owner's standing rule, 2026-11-11): this repository is where Kingmaker is tested and iterated; production is whatever the site is serving. When production is behind this copy, production is brought up to it.
+4.5.2 is not a completed release: final artifact refresh, signed manifest, full staged extraction and installation verification, and published download verification remain required. Preserve the existing usable public release until its replacement passes the gates. The source for candidate changes must be preserved in the repository; do not publish generated private engine imports or signing secrets.
 
-Update this file whenever a release is published or the installed build changes.
+Historical 2026-11-11 notes claiming 4.4.4 was the only published installer are superseded by the direct checks above. No assertion of Linux/Windows 4.5.2 readiness is made; their current portable installer sources remain incomplete.
