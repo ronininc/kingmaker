@@ -161,7 +161,7 @@ export async function buildFixtureRelease({ partSize = 100_000, padBytes = 300_0
     // Fixture-only dependency injection: real part hashes/tree/provenance checks;
     // synthetic certificate probe. No production env/CLI can select this probe.
     stagedVerifier: (args) => verifyStagedRelease({ ...args, pin: 'A'.repeat(40), probe: {
-      strictOk: true, detailsText: 'Authority=Fixture Certificate',
+      strictOk: true, pinVerified: true, verifiedPin: 'A'.repeat(40), detailsText: 'Authority=Fixture Certificate\nIdentifier=com.ronininc.solghost\nflags=0x10000(runtime)',
       requirementText: 'designated => certificate leaf = H"' + 'A'.repeat(40) + '"',
     } }),
   });

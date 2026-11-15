@@ -17,8 +17,8 @@
 //      here — an old-line installer inside a new-line release.
 //   5. SIGNATURE — the extracted app must pass the installer's own test: strict
 //      codesign verify + a designated requirement whose signer hash (leaf OR
-//      root — a self-signed identity phrases as root; see lib/release-identity)
-//      equals the pinned Kingmaker Release certificate, and not be ad-hoc.
+//      root text is diagnostic only). codesign must evaluate the pinned certificate
+//      requirement; hardened runtime and bundle identity are mandatory.
 //
 // The decision core is pure and platform-free (the codesign probe is injected),
 // so the gate's logic is testable anywhere; on the release Mac the CLI builds
@@ -33,7 +33,7 @@ import { createReadStream, existsSync, lstatSync, mkdirSync, readFileSync, readd
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { issuanceProblems, readManifest, verifyParts } from '../lib/release-manifest.mjs';
-import { leafFromRequirement, readPin } from '../lib/release-identity.mjs';
+import { leafFromRequirement, readPin, appRequirement } from '../lib/release-identity.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -87,7 +87,8 @@ export function treeDiff(a, b) {
 /* ------------------------------------------------------------------ */
 
 /** Pure: decide from a codesign probe whether an app passes the installer's
- *  signature test. probe = { strictOk, requirementText, detailsText }.
+ *  signature test. probe includes strictOk, requirementText, detailsText,
+ *  pinVerified and verifiedPin (the exact certificate evaluated by codesign).
  *  pin = the pinned leaf SHA-1 (uppercase hex) or null. */
 export function decideSignature(probe, pin) {
   const problems = [];
@@ -97,21 +98,31 @@ export function decideSignature(probe, pin) {
   const adhoc = /Signature=adhoc/.test(String(probe.detailsText ?? ''));
   if (adhoc) problems.push('the staged app is ad-hoc signed (Signature=adhoc)');
   const leaf = leafFromRequirement(probe.requirementText ?? '');
-  if (!leaf) problems.push('the staged app has no certificate signer in its designated requirement');
-  const pinMatches = Boolean(pin && leaf && leaf === String(pin).toUpperCase());
-  if (pin && leaf && !pinMatches) problems.push(`the staged app is signed by ${leaf}, not the pinned Kingmaker Release certificate ${pin}`);
+  const pinMatches = Boolean(pin && probe.pinVerified === true && probe.verifiedPin === String(pin).toUpperCase());
+  if (!pinMatches) problems.push('the staged app does not satisfy the pinned Kingmaker Release certificate requirement (not the pinned signature)');
+  const details = String(probe.detailsText ?? '');
+  if (!/^Identifier=com\.ronininc\.solghost$/m.test(details)) problems.push('the staged app has the wrong bundle identifier');
+  if (!/flags=0x[0-9a-f]*\(.*runtime.*\)/i.test(details)) problems.push('the staged app lacks hardened runtime');
   return { ok: problems.length === 0, leaf, pinMatches, adhoc, problems };
 }
 
 /** Build the probe on macOS with the same codesign calls the installer makes.
  *  Off macOS (or if codesign is absent) returns null — the decision then
  *  refuses on the missing probe rather than waving the release through. */
-export function codesignProbe(app, { run = spawnSync } = {}) {
-  if (process.platform !== 'darwin') return null;
+export function codesignProbe(app, { run = spawnSync, pin = readPin()?.sha1, platform = process.platform } = {}) {
+  if (platform !== 'darwin') return null;
   const strict = run('codesign', ['--verify', '--deep', '--strict', app], { encoding: 'utf8' });
   const req = run('codesign', ['-d', '-r-', app], { encoding: 'utf8' });
   const details = run('codesign', ['-dv', '--verbose=2', app], { encoding: 'utf8' });
+  let pinVerified = false;
+  let verifiedPin = null;
+  try {
+    const requirement = appRequirement(pin);
+    verifiedPin = String(pin).toUpperCase();
+    pinVerified = run('codesign', ['--verify', '--strict', `-R=${requirement}`, app], { encoding: 'utf8' }).status === 0;
+  } catch { /* no usable pin: fail closed */ }
   return {
+    pinVerified, verifiedPin,
     strictOk: strict.status === 0,
     requirementText: `${req.stdout ?? ''}\n${req.stderr ?? ''}`,
     detailsText: `${details.stdout ?? ''}\n${details.stderr ?? ''}`,
@@ -207,7 +218,7 @@ export async function verifyStagedRelease({ manifest, partsDir, sourceApp, stage
       checks.signature = { skipped: true, note: 'signature check waived by the operator (--skip-codesign); recorded, never silent' };
     } else {
       const thePin = pin ?? readPin()?.sha1 ?? null;
-      const theProbe = probe !== undefined ? probe : codesignProbe(stagedApp);
+      const theProbe = probe !== undefined ? probe : codesignProbe(stagedApp, { pin: thePin });
       const sig = decideSignature(theProbe, thePin);
       checks.signature = sig;
       if (!sig.ok) problems.push(...sig.problems);
