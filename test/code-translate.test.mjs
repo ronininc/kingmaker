@@ -79,7 +79,7 @@ test('grade: a declared (unexecuted) parse check is STRUCT when verifies passed'
   const trace = traceParseOk.map((t) => t.id === 'parse-check'
     ? { n: 7, id: 'parse-check', type: 'declare', status: 'declared', result: { action: 'langcheck translated.py' } }
     : t);
-  const g = gradeTranslation(completedWith(trace));
+  const g = gradeTranslation({ ...completedWith(trace), status: 'incomplete', declared: [{ step: 'parse-check' }] });
   assert.equal(g.tier, 'STRUCT');
   assert.deepEqual(g.checks[0], { name: 'parse', ran: false, exitCode: null, ok: false, checker: null });
 });
