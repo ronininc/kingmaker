@@ -1,6 +1,6 @@
 // The free Kingmaker as ONE file (lib/payload.mjs, scripts/build-payload.mjs): everything it runs travels together, and an
 // install that lost any of it says so plainly at start instead of crashing while it loads (0.2.6's red icon).
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
@@ -13,6 +13,7 @@ import { FORK_DIR } from '../lib/fork.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 let built;
+after(() => { if (built?.tar) rmSync(dirname(built.tar), { recursive: true, force: true }); });
 const payload = () => (built ??= buildPayload({ out: mkdtempSync(join(tmpdir(), 'km-payload-')) }));
 const unpack = () => { const d = mkdtempSync(join(tmpdir(), 'km-unpacked-')); execFileSync('tar', ['-xf', payload().tar, '-C', d]); return join(d, 'sol-ghost'); };
 const start = (dir, args = ['version']) => spawnSync(process.execPath, [join(dir, 'lib', 'kingmaker.mjs'), ...args], { encoding: 'utf8', env: { ...process.env, KINGMAKER_ADDONS: 'off' } });
