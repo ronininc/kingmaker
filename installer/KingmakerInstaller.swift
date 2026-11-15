@@ -4,8 +4,8 @@
 //
 // One field (the wake word: empty, "Give me a name", cemented at install) and one button (Download &
 // Install). Kingmaker is everything or nothing — no component checkboxes, and since the metered-doctrine
-// rework (2026-11-14) no model packs either: the installer pulls the same starter set on every Mac, and
-// the models a task needs beyond it are picked at runtime and metered in from the Brain Library. This
+// no model packs either: installation inventories existing pinned models without downloading weights.
+// Inference must be configured separately; this UI does not certify streamed inference. This
 // window shows the engine's (Resources/engine.sh) "@@km {json}" progress lines as one bar, then quits
 // once Kingmaker has launched.
 //
@@ -369,7 +369,7 @@ struct InstallerView: View {
             .font(.system(size: 12 * look.scale)).foregroundColor(Machine.inkDim).padding(.top, 10)
           controls.padding(.horizontal, 40).padding(.top, 22)
           Rectangle().fill(Machine.lineFaint).frame(height: 1).padding(.top, 22)
-          Text("Kingmaker.app · Ronin Launcher · the abliterated models · the knowledge library · SearXNG · Hands of Horus")
+          Text("Kingmaker.app · Ronin Launcher · model inventory (no weight downloads) · the knowledge library · SearXNG · Hands of Horus")
             .font(Machine.mono(9.5)).foregroundColor(Machine.inkFaint).multilineTextAlignment(.center).padding(.top, 10).padding(.horizontal, 20)
           Text(verbatim: "Free for personal, noncommercial use · PolyForm Noncommercial 1.0.0")
             .font(Machine.mono(9.5)).foregroundColor(Machine.inkFaint).padding(.top, 3).padding(.bottom, 16)
