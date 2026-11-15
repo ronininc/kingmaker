@@ -8,8 +8,8 @@ at that point. This is a classification, not a full-suite pass or release approv
 
 - `addons`: actual CLI help bug. A hard-coded 32-line slice printed a JavaScript
   import and dropped the markets commands. Extract the contiguous usage comment.
-- `aliases` and `payload`: actual duplicated-file alias bug. Restore relative
-  `bin/sol-ghost -> kingmaker`; payload round-trip verifies it remains relative.
+- `aliases` and `payload`: actual duplicated-file alias bug. Use a regular-file sibling trampoline (release archives reject symlinks);
+  payload round-trip verifies relocation, exact arguments, and exit status.
 - `device-desk-intent`: actual routing omission. Recognize bounded colloquial
   capability questions before live lookup; do not intercept embedded work requests.
 - `engine-names`: obsolete fixture/expectation. Current runtime requires its

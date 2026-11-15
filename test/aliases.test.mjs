@@ -3,7 +3,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { lstatSync, readFileSync, readlinkSync } from 'node:fs';
+import { lstatSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { LEGACY_WAKE_LINK, WAKE_LINK } from '../lib/cli.mjs';
 import { resolvePaths } from '../lib/paths.mjs';
@@ -16,7 +16,7 @@ test('CLI: kingmaker is the command, sol-ghost an alias of the same script', () 
   const pkg = JSON.parse(readFileSync(at('package.json'), 'utf8'));
   assert.equal(pkg.name, 'kingmaker');
   assert.deepEqual(pkg.bin, { kingmaker: 'bin/kingmaker', 'sol-ghost': 'bin/sol-ghost' });
-  assert.ok(lstatSync(at('bin/sol-ghost')).isSymbolicLink() && readlinkSync(at('bin/sol-ghost')) === 'kingmaker');
+  assert.ok(lstatSync(at('bin/sol-ghost')).isFile(), 'archive admission requires a regular-file alias');
   for (const name of ['kingmaker', 'sol-ghost']) {
     const r = spawnSync(at(`bin/${name}`), ['--version'], { encoding: 'utf8', env: { ...process.env, SOL_GHOST_RUNTIME: '' } });
     assert.equal(r.stdout.trim(), pkg.version, `${name} --version`);
