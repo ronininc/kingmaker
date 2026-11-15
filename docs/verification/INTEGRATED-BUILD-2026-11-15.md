@@ -18,3 +18,13 @@ The package dry-run requires 4 GB free; available space was 2.2 GB and later 1.9
 Full release suite after the baseline-repair merge: 1482 tests, 1396 passed, 39 failed, 47 skipped. This run exposed an alias-symlink conflict with strict archive admission, referred for correction. It is not a green release. Prior baseline had 50 failures; remaining baseline failures include missing imported sources, native profile wiring, release provenance and heartbeat integration. Preserve failures instead of bypassing release/security gates.
 
 Reports live beside the isolated checkout: `engine-build-corrected-result.txt`, `engine-frontend-build.txt`, `engine-sdk-policy-test.txt`, `engine-substrate-test.txt`, `engine-board-lock-test.txt`, `engine-readiness-test.txt`, `engine-package-plan.txt`, `release-gate-focused.txt`, `release-integrated-gates-tests.txt`.
+
+## Subsequent integration checkpoint
+
+- Merged e75d6bd: regular executable alias trampoline, preserving exact arguments/exit codes after relocation. Strict archive type checks unchanged. Actual compiled Swift wrapper and fixture engine handshake passed again.
+- Added the two existing public product identity-policy files to the exact Armor compatibility allowlist (six files including LICENSE), not any paid daemon/app/service. Updated the exact-list fixtures; `test/payload.test.mjs`: 7/7.
+- Native explicit profile overrides now validate complete absolute distinct paths and port before saved-profile or link-key access; malformed input fails closed rather than selecting live state. Native helper test passed and full Swift compiled in the handshake suite.
+- Launcher provenance remains its independently maintained repository/commit and is checked against the Launcher artifact pin; installer provenance still must match Kingmaker release tree. Issuance/assets suite: 9/9. Ledger/gate suite: 11/11, including 11 internal release-gate checks.
+- Most recent full suite report `release-integrated-latest-tests.txt`: 1483 tests, 1404 passed, 32 failed, 47 skipped. Twenty original baseline failures resolved. Two new failures in that run were fixture manifests missing newly required Launcher source provenance; corrected with explicitly synthetic provenance in 62f80d4 and independently rerun successfully (`launcher-provenance-fixtures-tests.txt`). Do not represent this as a fully green full-suite run. Remaining 30 baseline failure names still require work.
+- Test payload archive cleanup now removes only the archive created by that suite, avoiding accumulating repeated 57 MB temporary archives. No user files or preexisting artifacts deleted.
+- Packaging still not attempted: free space ended near 770 MiB, below the unchanged 4 GB minimum. Both engine build outputs remain preserved.
