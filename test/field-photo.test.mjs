@@ -338,7 +338,7 @@ test('the engine routes a photo turn to the photo desk before any lane that cann
   const branch = cli.slice(desk, cli.indexOf("else if (skill) { log('crm_skill_turn'"));
   assert.match(branch, /governed: \(words, image\) => session\.runTurn\(words, \{ \.\.\.turnOpts, image \}\)/);
   assert.match(branch, /crmJob: crmJobs && cal\(\)\.crmJobs\.on \? \(words, attachments\) => crmJobs\.handle\(words, \{ attachments \}\) : null/);
-  assert.match(branch, /makeImage\(words, \{ setup: imageSetup, initImage: path \}\)/);
+  assert.match(branch, /makeImage\(words, \{ setup: imageSetup, initImage: path, policy: evictionPolicy \}\)/);
   assert.match(branch, /brain,/);
 });
 

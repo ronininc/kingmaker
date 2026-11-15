@@ -37,7 +37,7 @@ test('the SearXNG pin is read from the setup script, plain or minified', () => {
   assert.equal(searxngPin('export const OTHER = 1;'), null);
 });
 
-test('a release refuses older names, web files and source maps inside the app; node_modules maps are fine', { timeout: 60_000 }, () => {
+test('a release refuses older names, missing frontend and source maps inside the app; node_modules maps are fine', { timeout: 60_000 }, () => {
   const dir = mkdtempSync(join(tmpdir(), 'km-names-'));
   try {
     const app = makeFixtureApp(dir, { version: '0.3.0' });
@@ -48,9 +48,9 @@ test('a release refuses older names, web files and source maps inside the app; n
     assert.deepEqual(engineSourceMaps(rt), ['scripts/tool.mjs.map']);
     assert.throws(() => inspectApp(app, { skipCodesign: true }), /scripts\/tool\.mjs\.map \(a source map\)/);
     rmSync(join(rt, 'scripts', 'tool.mjs.map'));
-    mkdirSync(join(rt, 'app', 'dist'), { recursive: true });
-    assert.throws(() => inspectApp(app, { skipCodesign: true }), /kingmaker-runtime\/app \(web files Kingmaker never serves\)/);
-    rmSync(join(rt, 'app'), { recursive: true });
+    rmSync(join(rt, 'app', 'dist', 'index.html'));
+    assert.throws(() => inspectApp(app, { skipCodesign: true }), /no kingmaker-runtime\/app\/dist\/index.html/);
+    writeFileSync(join(rt, 'app', 'dist', 'index.html'), '<title>Fixture frontend</title>');
     mkdirSync(join(app, 'Contents', 'Resources', LEGACY_RUNTIME_DIR));
     writeFileSync(join(app, 'Contents', 'MacOS', LEGACY_RUNTIME_BINARY), '');
     assert.throws(() => inspectApp(app, { skipCodesign: true }), (e) => /the runtime folder is kingmaker-runtime/.test(e.message) && /the engine binary is KingmakerEngine/.test(e.message));
