@@ -1,4 +1,13 @@
 {
   "schema": "kingmaker.launcher-ledger/1",
-  "entries": []
+  "entries": [
+    {
+      "version": "0.3.18",
+      "channel": "direct",
+      "issuedAt": "2026-11-15T23:58:05.697Z",
+      "archiveSha256": "0af8cbd4d9fbb5a0956f62b06669ad2eca0bf09bafa2eeecb68a9f97a0a375c2",
+      "bundleSha256": "f4ae76f164f7165cf8aed2bec5a201c4c9bc4f464f8fc57ce5d914a09e534812",
+      "note": "Kingmaker 4.5.2 release: Developer ID signed Launcher bridge and bounded Armor reader fixes; ronininc/ronin-launcher f6aeb090b90e9a8cb9cfdff53a89dff627813b1d"
+    }
+  ]
 }
