@@ -29,7 +29,7 @@ test('the payload is every part of the free Kingmaker, in one file, and nothing 
 
 test('the unpacked payload includes and loads the exact native armor runtime closure', { timeout: 120_000 }, () => {
   const files = payloadFiles(ROOT).filter((f) => f.startsWith('scripture-armor/'));
-  assert.deepEqual(files, ['scripture-armor/LICENSE', 'scripture-armor/armor.mjs', 'scripture-armor/refit-net.mjs', 'scripture-armor/scan.mjs']);
+  assert.deepEqual(files, ['scripture-armor/LICENSE', 'scripture-armor/armor.mjs', 'scripture-armor/product-paths.mjs', 'scripture-armor/product.json', 'scripture-armor/refit-net.mjs', 'scripture-armor/scan.mjs']);
   const dir = unpack();
   try {
     const url = pathToFileURL(join(dir, 'lib/armor-native.mjs')).href;
@@ -50,7 +50,7 @@ test('armor vault, state, sealed bundles, app files and paid add-ons cannot ente
     for (const name of excluded) { const p = join(root, name); mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, 'excluded fixture'); }
     const files = payloadFiles(root);
     for (const name of excluded) assert.ok(!files.includes(name), name);
-    assert.equal(files.filter((f) => f.startsWith('scripture-armor/')).length, 4);
+    assert.equal(files.filter((f) => f.startsWith('scripture-armor/')).length, 6);
     assert.ok(!PAYLOAD_PARTS.includes('scripture-armor'), 'the full tree must never become a payload part');
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
