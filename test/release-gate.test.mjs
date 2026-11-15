@@ -33,7 +33,7 @@ async function makeRelease(appDir, outDir, { partSize = 700 } = {}) {
     app: { bundleId: 'com.ronininc.solghost', version: '9.9.9' },
     archive: { name: 'Kingmaker-9.9.9.tar.gz', size: split.size, sha256: split.sha256 },
     parts: split.parts, partSize,
-    launcher: { name: 'Ronin Launcher.app', format: 'zip', required: true, version: '0.3.1', archive: 'Ronin-Launcher.zip', sha256: 'a'.repeat(64), size: 123 },
+    launcher: { sourceRepo: 'fixture/launcher', sourceCommit: 'b'.repeat(40), name: 'Ronin Launcher.app', format: 'zip', required: true, version: '0.3.1', archive: 'Ronin-Launcher.zip', sha256: 'a'.repeat(64), size: 123 },
   });
   return { manifest, split };
 }
