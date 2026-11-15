@@ -313,7 +313,7 @@ test('conductor — an image-backed tool: the check pulls + registers it, the co
     const workDir = join(root, 'work');
     await mkdir(workDir, { recursive: true });
     const r = await createMethodConductor({ indexUrl, toolProvider: provider }).conduct('image-tool-job', { workDir });
-    assert.equal(r.status, 'completed', `trace: ${JSON.stringify(r.trace, null, 1)}`);
+    assert.equal(r.status, 'incomplete', `trace: ${JSON.stringify(r.trace, null, 1)}`);
     const check = r.trace.find((t) => t.id === 'check-image');
     assert.equal(check.result.found, false, 'an image tool is not a PATH binary — the check stays a miss, honestly');
     assert.equal(check.result.pull.tool, 'fixture-image');

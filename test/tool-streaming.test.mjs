@@ -218,20 +218,20 @@ test('layers 2+3 — ACCEPTANCE: a method pulls its missing tool from the librar
 test('layer 3 — negative: tools NOT in the catalog, and Blender while unstaged, keep the declared behavior exactly', async () => {
   const { root, payloadDir, tool } = await fixtureTool();
   const stateDir = join(root, 'state');
-  const provider = createToolStreamingProvider({ stateDir, toolPayloadDir: payloadDir, toolsIndex: [tool, ...loadToolsIndex()] });
+  const provider = createToolStreamingProvider({ stateDir, toolPayloadDir: payloadDir, toolsIndex: [tool, {...loadToolsIndex().find(t=>t.id==='blender'), id:'fixture-unstaged-blender', provides:['fixture-unstaged-blender']}] });
   const indexUrl = await fixtureMethodLib({
     id: 'missing-tools-job', version: '1.0', inputs: {},
     steps: [
       { n: 1, id: 'check-absent', type: 'check-tool', command: 'no-such-tool-xyz' },
       { n: 2, id: 'declare-absent', type: 'declare', action: 'no-such-tool-xyz --run job', reason: 'the tool is not on this node' },
-      { n: 3, id: 'check-blender', type: 'check-tool', command: 'blender' },
+      { n: 3, id: 'check-blender', type: 'check-tool', command: 'fixture-unstaged-blender' },
       { n: 4, id: 'declare-blender', type: 'declare', action: 'blender --background --render', reason: 'Blender is not installed on this node' },
     ],
   });
   const workDir = join(root, 'work');
   await mkdir(workDir, { recursive: true });
   const r = await createMethodConductor({ indexUrl, toolProvider: provider }).conduct('missing-tools-job', { workDir });
-  assert.equal(r.status, 'completed', `trace: ${JSON.stringify(r.trace, null, 1)}`);
+  assert.equal(r.status, 'incomplete', `trace: ${JSON.stringify(r.trace, null, 1)}`);
   assert.deepEqual(r.declared.map((d) => d.step), ['declare-absent', 'declare-blender'], 'both steps stayed declared — nothing executed, nothing faked');
   const absent = r.trace.find((t) => t.id === 'check-absent');
   assert.equal(absent.result.found, false);
@@ -248,7 +248,7 @@ test('layer 3 — the production wiring: a no-arg conductor (the execution loop 
   // exactly as before tool streaming: the OpenCAD export stays declared.
   const workDir = await mkdtemp(join(tmpdir(), 'km-tools-prod-'));
   const r = await createMethodConductor().conduct('opencad-part-spec', { workDir });
-  assert.equal(r.status, 'completed', `trace: ${JSON.stringify(r.trace, null, 1)}`);
+  assert.equal(r.status, 'incomplete', `trace: ${JSON.stringify(r.trace, null, 1)}`);
   assert.deepEqual(r.declared.map((d) => d.step), ['declare-export-stl']);
   const check = r.trace.find((t) => t.id === 'check-openscad');
   assert.ok(!('pull' in check.result) || check.result.pull === null, 'openscad is not a catalog tool: no pull attempted');
