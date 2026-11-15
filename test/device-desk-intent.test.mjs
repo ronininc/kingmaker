@@ -15,3 +15,9 @@ test('capability questions are handled by the device desk before live web lookup
   // This documents the bug the desk interception prevents: "right now" alone is a live lookup cue.
   assert.equal(ruleLane('what can ya do right now'), 'lookup');
 });
+
+test('capability wording inside a work request is not intercepted as a tools listing', () => {
+  for (const text of ['what can you do to fix this code', 'show me what can you do', 'what can you do for the customer']) {
+    assert.equal(deviceIntent(text), null);
+  }
+});

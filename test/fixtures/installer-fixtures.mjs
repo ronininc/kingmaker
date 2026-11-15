@@ -53,6 +53,8 @@ export function makeFixtureApp(parent, { version = '0.2.0', padBytes = 300_000, 
   const c = join(app, 'Contents');
   mkdirSync(join(c, 'MacOS'), { recursive: true });
   mkdirSync(join(c, 'Resources', 'kingmaker-runtime', 'scripts'), { recursive: true });
+  mkdirSync(join(c, 'Resources', 'kingmaker-runtime', 'app', 'dist'), { recursive: true });
+  writeFileSync(join(c, 'Resources', 'kingmaker-runtime', 'app', 'dist', 'index.html'), '<!doctype html><title>Fixture frontend</title>');
   // Stand-ins for every runtime a release requires (release-parts REQUIRED_RUNTIMES); the release refuses an app without them.
   for (const r of ['voice-runtime', 'guardrails-runtime', 'guardrails-config', 'agent-runtime', 'knowledge-runtime', 'playwright-browsers', 'chrome-connector', 'sol-ghost', 'app.asar']) {
     mkdirSync(join(c, 'Resources', r), { recursive: true });
@@ -121,7 +123,7 @@ export function makeFixtureLauncher(parent) {
   const z = spawnSync('ditto', ['-c', '-k', '--keepParent', app, zip], { encoding: 'utf8' });
   if (z.status !== 0) throw new Error(`zip the fixture launcher: ${z.stderr}`);
   const bytes = readFileSync(zip);
-  const pin = { name: 'Ronin Launcher.app', bundleId: 'org.ronininc.launcher', version: '0.1.0', archive: basename(zip), format: 'zip', url: null, size: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex'), required: true };
+  const pin = { sourceRepo: 'ronininc/Kingmaker', sourceCommit: 'a'.repeat(40), name: 'Ronin Launcher.app', bundleId: 'org.ronininc.launcher', version: '0.1.0', archive: basename(zip), format: 'zip', url: null, size: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex'), required: true };
   const pinFile = join(parent, 'ronin-launcher-pin.json');
   writeFileSync(pinFile, JSON.stringify(pin, null, 2));
   return pinFile;
@@ -137,7 +139,7 @@ export async function buildFixtureRelease({ partSize = 100_000, padBytes = 300_0
   const launcherPin = makeFixtureLauncher(join(work, 'launcher'));
   const lines = [];
   const { main } = await import('../../scripts/release-parts.mjs');
-  const code = await main({ argv: ['--app', app, '--out', out, '--part-size', String(partSize), '--offline', '--pins', pinsFile, '--level', '1', '--launcher', launcherPin], env: { ...process.env, KINGMAKER_ALLOW_ADHOC: '1' }, out: (l) => lines.push(l), offlineDigests: async () => models });
+  const code = await main({ argv: ['--tree-repo', 'ronininc/Kingmaker', '--tree-commit', 'a'.repeat(40), '--app', app, '--out', out, '--part-size', String(partSize), '--offline', '--pins', pinsFile, '--level', '1', '--launcher', launcherPin], env: { ...process.env, KINGMAKER_ALLOW_ADHOC: '1' }, out: (l) => lines.push(l), offlineDigests: async () => models });
   if (code !== 0) throw new Error(`release-parts exited ${code}:\n${lines.join('\n')}`);
   const manifest = JSON.parse(readFileSync(join(out, 'kingmaker-manifest.json'), 'utf8'));
   return { work, app, out, manifest, lines, manifestFile: join(out, 'kingmaker-manifest.json') };

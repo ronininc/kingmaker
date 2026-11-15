@@ -17,6 +17,7 @@ test('without the Ronin add-on its commands say so and exit 2; nothing else chan
   const help = free(['help']);
   assert.doesNotMatch(help.stdout, /owner-call|kingmaker pair|office muse|Ronin CRM/, 'the free edition does not advertise them');
   assert.match(help.stdout, /kingmaker markets/);
+  assert.doesNotMatch(help.stdout, /import \{|from '\.\//, 'help never prints source imports');
 });
 
 test('the add-on loader is the only way in: no core module imports an add-on file directly', async () => {
