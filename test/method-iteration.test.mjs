@@ -36,7 +36,7 @@ A fixture method: the prose stands, the block below is the technique.
   "inputs": { "width": 100, "label": "draft" },
   "steps": [
     { "n": 1, "id": "note-start", "type": "note", "text": "checking {{inputs.label}} at width {{inputs.width}}" },
-    { "n": 2, "id": "declare-widget", "type": "declare", "action": "widget --width {{inputs.width}}", "reason": "fixture: the widget binary does not exist" }
+    { "n": 2, "id": "write-widget", "type": "write-json", "path": "widget.json", "value": { "width": "{{inputs.width}}", "label": "{{inputs.label}}" } }
   ]
 }
 \`\`\`
@@ -44,17 +44,18 @@ A fixture method: the prose stands, the block below is the technique.
 ## Steps (prose mirror)
 
 1. **note-start** — trace note with the effective inputs.
-2. **declare-widget** — DECLARED: the widget command, never run by this fixture.
+2. **write-widget** — writes the widget configuration as a real local artifact.
 `;
 
-const CONDUCTION = {
-  status: 'completed',
-  trace: [
-    { n: 1, id: 'note-start', type: 'note', status: 'executed', detail: 'checking draft at width 320' },
-    { n: 2, id: 'declare-widget', type: 'declare', status: 'declared', detail: 'declared, not executed: widget --width 320' },
-  ],
-  declared: [{ step: 'declare-widget', action: 'widget --width 320', reason: 'fixture' }],
-};
+async function completedConduction(sourceIndexUrl, inputs = { width: 320 }) {
+  const workDir = await mkdtemp(join(tmpdir(), 'km-iteration-proof-'));
+  const result = await createMethodConductor({ indexUrl: sourceIndexUrl, toolProvider: null })
+    .conduct('sample-widget-check', { workDir, inputs });
+  assert.equal(result.status, 'completed');
+  assert.equal(result.declared.length, 0);
+  assert.ok(existsSync(join(workDir, 'widget.json')));
+  return result;
+}
 
 async function fixtureCatalog() {
   const dir = await mkdtemp(join(tmpdir(), 'km-iteration-src-'));
@@ -83,7 +84,7 @@ test('iterateMethod files the next version: proven inputs in, steps verbatim, re
   const storeDir = await mkdtemp(join(tmpdir(), 'km-iteration-store-'));
   const r = await iterateMethod({
     methodId: 'sample-widget-check',
-    conduction: CONDUCTION,
+    conduction: await completedConduction(sourceIndexUrl),
     sourceIndexUrl,
     storeDir,
     inputUpdates: { width: 320, bogus: 'never smuggled' },
@@ -110,10 +111,10 @@ test('iterateMethod files the next version: proven inputs in, steps verbatim, re
 test('iteration is recursive: the store file iterates again, and the conductor conducts from the store', async () => {
   const sourceIndexUrl = await fixtureCatalog();
   const storeDir = await mkdtemp(join(tmpdir(), 'km-iteration-store2-'));
-  await iterateMethod({ methodId: 'sample-widget-check', conduction: CONDUCTION, sourceIndexUrl, storeDir, inputUpdates: { width: 320 } });
+  await iterateMethod({ methodId: 'sample-widget-check', conduction: await completedConduction(sourceIndexUrl), sourceIndexUrl, storeDir, inputUpdates: { width: 320 } });
   const r2 = await iterateMethod({
     methodId: 'sample-widget-check',
-    conduction: CONDUCTION,
+    conduction: await completedConduction(methodStoreIndexUrl(storeDir), { label: 'proven' }),
     sourceIndexUrl: methodStoreIndexUrl(storeDir),
     storeDir,
     inputUpdates: { label: 'proven' },
@@ -139,13 +140,23 @@ test('iterateMethod fails closed: unknown method, missing storeDir — nothing w
   const sourceIndexUrl = await fixtureCatalog();
   const storeDir = await mkdtemp(join(tmpdir(), 'km-iteration-store3-'));
   await assert.rejects(
-    () => iterateMethod({ methodId: 'no-such-method', conduction: CONDUCTION, sourceIndexUrl, storeDir }),
+    async () => iterateMethod({ methodId: 'no-such-method', conduction: await completedConduction(sourceIndexUrl), sourceIndexUrl, storeDir }),
     /no method "no-such-method"/,
   );
   await assert.rejects(
-    () => iterateMethod({ methodId: 'sample-widget-check', conduction: CONDUCTION, sourceIndexUrl }),
+    async () => iterateMethod({ methodId: 'sample-widget-check', conduction: await completedConduction(sourceIndexUrl), sourceIndexUrl }),
     /needs a storeDir/,
   );
   assert.equal(existsSync(join(storeDir, 'index.json')), false, 'a refused iteration writes no index');
   assert.equal(existsSync(join(storeDir, 'sample-widget-check.method.md')), false, 'a refused iteration writes no file');
+});
+
+test('iteration refuses declared-only evidence even when its status claims completed', async () => {
+  const sourceIndexUrl = await fixtureCatalog();
+  const storeDir = await mkdtemp(join(tmpdir(), 'km-iteration-unproven-'));
+  for (const status of ['completed', 'incomplete']) {
+    await assert.rejects(() => iterateMethod({ methodId: 'sample-widget-check', sourceIndexUrl,
+      storeDir, conduction: { status, declared: [{ step: 'unrun' }] } }), /cannot learn successful defaults/);
+  }
+  assert.equal(existsSync(join(storeDir, 'index.json')), false);
 });

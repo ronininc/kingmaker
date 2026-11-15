@@ -71,7 +71,7 @@ test('conducting the plan writes a real scene script and job record and declares
   const workDir = scratch();
   const plan = planCapacity({ text: 'render a 3d scene of a mountain range at dawn', methods, find: blenderHere });
   const done = await conductCapacity(plan, { conductor: createMethodConductor(), workDir, subject: 'Mountain range at dawn', inputs: { widthPx: 1920, heightPx: 1080 } });
-  assert.equal(done.status, 'completed');
+  assert.equal(done.status, 'incomplete');
   const script = readFileSync(join(workDir, 'scene.py'), 'utf8');
   assert.match(script, /scene\.render\.resolution_x = 1920/); assert.match(script, /Mountain range at dawn/);
   const job = JSON.parse(readFileSync(join(workDir, 'job.json'), 'utf8'));
@@ -105,6 +105,9 @@ test('a draft is checked before it is kept, and one using an unknown step is ref
   const good = draftMethodFromObservation({ title: 'Soft key light', look: { lightWatts: 300 } }, BASE);
   assert.equal((await writeDraft(dir, good)).written, true);
   assert.equal(listDrafts(dir)[0].status, DRAFT_STATUS);
+  assert.equal(listDrafts(dir)[0].validation.executionProven, false);
+  assert.equal(listDrafts(dir)[0].validation.conductionStatus, 'incomplete');
+  assert.equal(listDrafts(dir)[0].validation.declared.length, 1);
   assert.equal((await writeDraft(dir, good)).reason, 'already drafted');
   const bad = { ...good, id: 'draft-bad', text: good.text.replace('"type": "declare"', '"type": "run-program"').replace(good.id, 'draft-bad') };
   const r = await writeDraft(dir, bad);
@@ -144,7 +147,7 @@ test('a subject cannot put code into the generated scene script', async () => {
   const workDir = scratch();
   const plan = planCapacity({ text: 'render a 3d scene', methods, find: blenderHere });
   const done = await conductCapacity(plan, { conductor: createMethodConductor(), workDir, subject: hostile, inputs: { subject: 'x"""; evil()' } });
-  assert.equal(done.status, 'completed');
+  assert.equal(done.status, 'incomplete');
   const script = readFileSync(join(workDir, 'scene.py'), 'utf8');
   const lines = script.split('\n');
   assert.ok(lines[0].startsWith('# Scene for "') && lines[1].startsWith('# Run headless:'), 'the subject stayed on its one comment line');
@@ -179,4 +182,10 @@ test('a partial observation keeps the base method\'s other dials', () => {
   assert.match(d.text, /- lensMm: 24\n/);
   assert.match(d.text, /- lightWatts: 300 \(not observed; kept from the base method\)/);
   assert.deepEqual(dialsFromObservation({ look: { lensMm: 5000 } }, { samples: 99999 }), { ...dialsFromObservation({}), lensMm: 300, samples: 4096 });
+});
+
+test('draft validation rejects a failed guard rather than treating all incomplete work as valid', async () => {
+  const good = draftMethodFromObservation({ title: 'Guarded draft' }, BASE);
+  const bad = { ...good, text: good.text.replace('"type": "declare"', '"type": "guard", "assert": { "var": "inputs", "field": "missingRequiredField", "equals": "required" }, "else": { "reason": "refused fixture" }') };
+  assert.equal((await checkDraft(bad)).ok, false);
 });
