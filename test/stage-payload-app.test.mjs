@@ -54,7 +54,7 @@ test('verified raw payload stages into the installer app layout', () => {
     writeFileSync(join(engineResources, 'voice-runtime', 'framework-target'), 'framework bytes\n');
     symlinkSync('framework-target', join(engineResources, 'voice-runtime', 'framework-current'));
     const result = stagePayloadApp({ payload: built.tar, wrapper, engine: fixtureEngine(dir), engineResources, out, expectedSha256: built.sha256, expectedVersion: built.version, fixtureAdhoc: true, resources: join(dir, 'none') });
-    assert.equal(result.version, '4.4.3');
+    assert.equal(result.version, built.version);
     assert.ok(result.files > 100, 'the governed Kingmaker payload should contain its complete runtime tree');
     for (const file of ['lib/cli.mjs', 'core/pack.json', 'catalog/essentials.json', 'scripture-armor/armor.mjs']) {
       assert.ok(readFileSync(join(out, 'Contents', 'Resources', 'sol-ghost', file)).length > 0, `missing required payload file ${file}`);

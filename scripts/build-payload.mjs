@@ -10,7 +10,7 @@
 // unpacked `kingmaker version`: a payload that doesn't start is never handed on.
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -23,7 +23,11 @@ export function buildPayload({ root = ROOT, out = join(ROOT, 'dist', 'payload') 
   const files = payloadFiles(root);
   rmSync(out, { recursive: true, force: true });
   const stage = join(out, 'stage', 'sol-ghost');
-  for (const f of files) { mkdirSync(dirname(join(stage, f)), { recursive: true }); cpSync(join(root, f), join(stage, f), { preserveTimestamps: true, verbatimSymlinks: true }); }
+  for (const f of files) { mkdirSync(dirname(join(stage, f)), { recursive: true }); cpSync(join(root, f), join(stage, f), { preserveTimestamps: true, verbatimSymlinks: true });
+    // Staging explicitly requires executable entry points. Git can preserve a
+    // shebang file as0644, so normalize only the private output copy.
+    const target=join(stage,f);if(f==='bin/kingmaker'||readFileSync(target).subarray(0,2).toString()==='#!')chmodSync(target,0o755);
+  }
   writeFileSync(join(stage, PAYLOAD_FILE), buildManifest(stage, { files }));
   const tar = join(out, PAYLOAD_TAR);
   execFileSync('tar', ['-cf', tar, '-C', join(out, 'stage'), 'sol-ghost'], { env: { ...process.env, COPYFILE_DISABLE: '1' } });
