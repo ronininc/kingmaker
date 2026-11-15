@@ -3855,6 +3855,30 @@ final class TranscriptPanel {
   }
 }
 
+// BEGIN NATIVE_RUNTIME_PROFILE
+struct NativeRuntimeProfile {
+  let state: String
+  let runtimeHome: String
+  let port: Int
+}
+enum NativeRuntimeProfileError: Error { case invalidOverride }
+func nativeRuntimeProfile(_ environment: [String: String]) throws -> NativeRuntimeProfile? {
+  let keys = ["SOL_GHOST_HOME", "SOL_GHOST_RUNTIME_HOME", "SOL_GHOST_PORT"]
+  if !keys.contains(where: { environment[$0] != nil }) { return nil }
+  guard let state = environment[keys[0]], let runtime = environment[keys[1]], let rawPort = environment[keys[2]],
+        let port = Int(rawPort), String(port) == rawPort, (1024...65535).contains(port) else { throw NativeRuntimeProfileError.invalidOverride }
+  func path(_ raw: String) throws -> String {
+    guard raw.hasPrefix("/"), !raw.unicodeScalars.contains(where: { CharacterSet.controlCharacters.contains($0) }) else { throw NativeRuntimeProfileError.invalidOverride }
+    let result = URL(fileURLWithPath: raw, isDirectory: true).standardizedFileURL.resolvingSymlinksInPath().path
+    guard result != "/" else { throw NativeRuntimeProfileError.invalidOverride }
+    return result
+  }
+  let a = try path(state), b = try path(runtime)
+  guard a != b, !a.hasPrefix(b + "/"), !b.hasPrefix(a + "/") else { throw NativeRuntimeProfileError.invalidOverride }
+  return NativeRuntimeProfile(state: a, runtimeHome: b, port: port)
+}
+// END NATIVE_RUNTIME_PROFILE
+
 final class GhostApp: NSObject, NSApplicationDelegate {
   private struct ActiveProfile: Decodable {
     let schema: Int
@@ -3933,6 +3957,11 @@ final class GhostApp: NSObject, NSApplicationDelegate {
     return (firstExecutable(runtimeApp) ?? "\(runtimeApp)/Contents/MacOS/KingmakerEngine", false)
   }
   private lazy var activeProfile: ActiveProfile? = {
+    do {
+      if let override = try nativeRuntimeProfile(ProcessInfo.processInfo.environment) {
+        return ActiveProfile(schema: 1, profile: "isolated", state: override.state, runtime_home: override.runtimeHome, port: override.port)
+      }
+    } catch { fatalError("Invalid native runtime profile override; refusing saved profile fallback") }
     let home = URL(fileURLWithPath: NSHomeDirectory(), isDirectory: true)
     let support = home.appendingPathComponent("Library/Application Support", isDirectory: true).standardizedFileURL
     let pointer = support.appendingPathComponent("Kingmaker/active-profile.json")
@@ -3958,6 +3987,8 @@ final class GhostApp: NSObject, NSApplicationDelegate {
   }
 
   func applicationDidFinishLaunching(_ notification: Notification) {
+    do { _ = try nativeRuntimeProfile(ProcessInfo.processInfo.environment) }
+    catch { fputs("Invalid native runtime profile override; refusing startup\n", stderr); NSApp.terminate(nil); return }
     buildEditMenu()
     watchFnKey()
     buildMenuBar()

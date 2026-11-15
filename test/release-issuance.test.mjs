@@ -41,3 +41,10 @@ test('installer provenance must still match the Kingmaker release tree', () => {
   assert.equal(problems.length, 1);
   assert.match(problems[0], /installer was built from/);
 });
+
+ test('launcher issuance cannot disagree with the actual pinned artifact', () => {
+   const m = {version:'4.4.2',launcher,issuance:{tree:{repo:'ronininc/Kingmaker',commit:sha,version:'4.4.2'},installer:{repo:'ronininc/Kingmaker',commit:sha,version:'4.4.2'},launcher:{repo:launcher.sourceRepo,commit:sha,version:launcher.version}}};
+   assert.match(issuanceProblems(m,{required:true}).join(' '), /does not match/);
+   m.issuance.launcher.commit=launcher.sourceCommit;
+   assert.deepEqual(issuanceProblems(m,{required:true}), []);
+ });
