@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { issuanceProblems, launcherProblems } from '../lib/release-manifest.mjs';
+import { buildManifest, issuanceProblems, launcherProblems } from '../lib/release-manifest.mjs';
 
 const sha = 'a'.repeat(40);
 const otherSha = 'b'.repeat(40);
@@ -48,3 +48,21 @@ test('installer provenance must still match the Kingmaker release tree', () => {
    m.issuance.launcher.commit=launcher.sourceCommit;
    assert.deepEqual(issuanceProblems(m,{required:true}), []);
  });
+
+test('manifest construction preserves the exact separately pinned Launcher provenance', () => {
+  const issuance = {
+    tree: { repo: 'ronininc/Kingmaker', commit: sha, version: '4.4.2' },
+    installer: { repo: 'ronininc/Kingmaker', commit: sha, version: '4.4.2' },
+    launcher: { repo: launcher.sourceRepo, commit: launcher.sourceCommit, version: launcher.version },
+  };
+  const m = buildManifest({ version: '4.4.2', tag: 'v4.4.2',
+    app: { bundleId: 'com.ronininc.solghost' },
+    archive: { name: 'Kingmaker-4.4.2.tar.gz', size: 1, sha256: 'd'.repeat(64) },
+    parts: [{ name: 'Kingmaker-4.4.2.tar.gz.part01', size: 1, sha256: 'd'.repeat(64) }],
+    partSize: 1, launcher, issuance });
+  assert.equal(m.launcher.sourceRepo, launcher.sourceRepo);
+  assert.equal(m.launcher.sourceCommit, launcher.sourceCommit);
+  assert.deepEqual(issuanceProblems(JSON.parse(JSON.stringify(m)), { required: true }), []);
+  m.launcher.sourceCommit = sha;
+  assert.match(issuanceProblems(m, { required: true }).join(' '), /does not match/);
+});
