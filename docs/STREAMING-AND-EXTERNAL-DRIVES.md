@@ -59,4 +59,26 @@ cd ~/Projects/kingmaker-private && node --expose-gc scripts/streaming-bench.mjs 
 
 - **Knowledge on a drive:** point a `fileSource` at files on the drive. Reads are by range; memory stays at one portion.
 - **Models on a drive:** the model server needs the complete model file and loads it into memory. A drive holds the files; it does not let a model larger than RAM run fast. The reference the owner supplied (`techjarves/USB-Uncensored-LLM`, marked deprecated by its author) does this by pointing `OLLAMA_MODELS`, `OLLAMA_HOME` and `OLLAMA_TMPDIR` at the drive. It does not stream weights.
-- **Not built:** recognising a specific drive by identity, a user-facing setting for either control, and the macOS removable-volume permission prompt.
+- **Built 2026-11-16:** recognising an approved drive by identity — see *Approved external storage* below. **Still not built:** a user-facing setting for the streaming controls, and handling of the macOS removable-volume permission prompt (TCC "Removable Volumes"; untested in the signed app).
+
+## Approved external storage (lib/external-storage.mjs, `kingmaker storage …`)
+
+A USB stick, external SSD/HDD or SD card can hold the same stores as the internal disk, with the same layout and indexes:
+
+```
+<drive>/Kingmaker/<install id>/owner.json                       pins the folder to this install and drive
+<drive>/Kingmaker/<install id>/abilities/methods/index.json     your own methods        (role user-methods)
+<drive>/Kingmaker/<install id>/fleet/abilities/methods/…        fleet abilities         (role fleet-abilities)
+<drive>/Kingmaker/<install id>/brain-library/methods/…          curated library cache   (role library-cache)
+<drive>/Kingmaker/<install id>/models/                          model files             (role models, documented config only)
+<drive>/Kingmaker/<install id>/memory/                          reserved                (role memory; MemPalace stays in the engine)
+```
+
+- **Discovery is read-only.** macOS: `mount`, `df -k`, `diskutil info -plist <mount>`. Linux: `/proc/mounts` + `lsblk -J -b -o NAME,PATH,TYPE,FSTYPE,UUID,LABEL,RM,RO,HOTPLUG,TRAN,SIZE,FSAVAIL,FSSIZE,MOUNTPOINTS`. Windows: parsers for `Get-Volume | ConvertTo-Json` and `Get-CimInstance Win32_Volume | ConvertTo-Json` (fixture-tested only; nothing runs PowerShell). Every command passes an allowlist; erase/partition/mount/unmount/chmod are refused by code.
+- **Approval** (`kingmaker storage approve <mount> --roles user-methods,library-cache`) is the user's own answer. It is recorded in `<state>/storage/drives.json` with the stable id (macOS VolumeUUID, else DiskUUID; Linux filesystem UUID; Windows volume GUID, else serial). A volume without a stable id is refused. One role lives on at most one drive.
+- **Reconnect:** matched by stable id only; a changed mount path is followed and recorded; a same-named volume with a different or missing id is reported and not used.
+- **Layers:** a connected drive's stores join the conductor in the same order (user > fleet > library > built-in), the drive store first within its layer. Missing / read-only / foreign drives are reported per resource in every `kingmaker ask` report; local abilities keep working; the curated hunt does not run for a cache whose drive is missing, and nothing is fetched or duplicated instead.
+- **Saves to a drive:** capacity and filesystem-limit checks (FAT32 < 4 GiB per file), journal, temp file, fsync, read-back sha256, rename, read-back sha256. `kingmaker storage status` (and every start) rolls back interrupted saves. `kingmaker storage copy <role>` copies an internal store to the drive with verification and keeps the originals.
+- **Models:** `kingmaker storage models` prints the `OLLAMA_MODELS=…` line to use; Kingmaker never edits the live Ollama configuration.
+- **Eject:** `kingmaker storage eject-check <label>` lists open files (lsof), writes in progress and unfinished saves. Kingmaker never unmounts.
+

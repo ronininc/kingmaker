@@ -1,0 +1,29 @@
+{
+   "blockdevices": [
+      {"name":"nvme0n1", "path":"/dev/nvme0n1", "type":"disk", "fstype":null, "uuid":null, "label":null, "rm":false, "ro":false, "hotplug":false, "tran":"nvme", "size":512110190592, "fsavail":null, "fssize":null, "mountpoints":[null],
+         "children": [
+            {"name":"nvme0n1p1", "path":"/dev/nvme0n1p1", "type":"part", "fstype":"vfat", "uuid":"A1B2-C3D4", "label":null, "rm":false, "ro":false, "hotplug":false, "tran":null, "size":536870912, "fsavail":520000000, "fssize":536000000, "mountpoints":["/boot/efi"]},
+            {"name":"nvme0n1p2", "path":"/dev/nvme0n1p2", "type":"part", "fstype":"ext4", "uuid":"0b1e7c1a-0000-4000-8000-00000000abcd", "label":null, "rm":false, "ro":false, "hotplug":false, "tran":null, "size":511000000000, "fsavail":300000000000, "fssize":500000000000, "mountpoints":["/"]}
+         ]
+      },
+      {"name":"sdb", "path":"/dev/sdb", "type":"disk", "fstype":null, "uuid":null, "label":null, "rm":true, "ro":false, "hotplug":true, "tran":"usb", "size":32010928128, "fsavail":null, "fssize":null, "mountpoints":[null],
+         "children": [
+            {"name":"sdb1", "path":"/dev/sdb1", "type":"part", "fstype":"vfat", "uuid":"5E21-9A0F", "label":"KM USB", "rm":true, "ro":false, "hotplug":true, "tran":null, "size":32009879552, "fsavail":31000000000, "fssize":32000000000, "mountpoints":["/media/robbie/KM USB"]}
+         ]
+      },
+      {"name":"sdc", "path":"/dev/sdc", "type":"disk", "fstype":null, "uuid":null, "label":null, "rm":false, "ro":false, "hotplug":true, "tran":"usb", "size":1000204886016, "fsavail":null, "fssize":null, "mountpoints":[null],
+         "children": [
+            {"name":"sdc1", "path":"/dev/sdc1", "type":"part", "fstype":"crypto_LUKS", "uuid":"3f1c0000-1111-2222-3333-444455556666", "label":null, "rm":false, "ro":false, "hotplug":true, "tran":null, "size":1000203837440, "fsavail":null, "fssize":null, "mountpoints":[null],
+               "children": [
+                  {"name":"luks-3f1c", "path":"/dev/mapper/luks-3f1c", "type":"crypt", "fstype":"ext4", "uuid":"9c9c9c9c-aaaa-bbbb-cccc-dddddddddddd", "label":"VAULT", "rm":false, "ro":false, "hotplug":false, "tran":null, "size":1000186994688, "fsavail":900000000000, "fssize":984000000000, "mountpoints":["/media/robbie/VAULT"]}
+               ]
+            }
+         ]
+      },
+      {"name":"mmcblk0", "path":"/dev/mmcblk0", "type":"disk", "fstype":null, "uuid":null, "label":null, "rm":true, "ro":false, "hotplug":true, "tran":"mmc", "size":63864569856, "fsavail":null, "fssize":null, "mountpoints":[null],
+         "children": [
+            {"name":"mmcblk0p1", "path":"/dev/mmcblk0p1", "type":"part", "fstype":"exfat", "uuid":"64A2-11F0", "label":"SDCARD", "rm":true, "ro":true, "hotplug":true, "tran":null, "size":63863521280, "fsavail":60000000000, "fssize":63800000000, "mountpoints":["/media/robbie/SDCARD"]}
+         ]
+      }
+   ]
+}
