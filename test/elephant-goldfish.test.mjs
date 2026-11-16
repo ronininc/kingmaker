@@ -51,3 +51,15 @@ test('a reviewer that returns no valid JSON is "not run", never a clean round', 
   assert.equal(r.rounds[0].reviewerRan, false);
   assert.match(r.stoppedBecause, /not run/);
 });
+
+test('citation ids written loosely by a small model resolve to the real id; truly unknown ids stay findings', async () => {
+  const { canonicalCite, canonicalizePlan } = await import('../lib/elephant-goldfish.mjs');
+  const ex = { 'CLAUDE_PROMPT.md:7': 'x', 'README.md:12': 'y' };
+  assert.equal(canonicalCite('CLAUDE_Prompt. md:7', ex), 'CLAUDE_PROMPT.md:7');
+  assert.equal(canonicalCite('readme.md:12', ex), 'README.md:12');
+  assert.equal(canonicalCite('README.md:99', ex), null);
+  const p = canonicalizePlan({ steps: [{ id: 's1', cites: ['CLAUDE_Prompt. md:7', 'nope:1'], expects: 'e', onFailure: 'f' }], decisionPoints: [], checks: [{ objective: true }], prerequisites: ['p'] }, ex);
+  assert.deepEqual(p.steps[0].cites, ['CLAUDE_PROMPT.md:7', 'nope:1']);
+  const f = structuralFindings(p, ex, 1);
+  assert.equal(f.length, 1); assert.match(f[0].issue, /unknown source "nope:1"/);
+});
