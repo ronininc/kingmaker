@@ -39,7 +39,7 @@ export function installLinux(source,dest,home=homedir()){
   if(existsSync(alias)||(()=>{try{return lstatSync(alias).isSymbolicLink();}catch{return false;}})()){
    if(!lstatSync(alias).isSymbolicLink()||resolve(dirname(alias),readlinkSync(alias))!==target)throw Error('Refusing to replace an unrelated kingmaker command');
   }
-  mkdirSync(stage);stageOwned=true;cpSync(source,stage,{recursive:true,dereference:false,errorOnExist:true,force:false});verifyUnit(stage,'linux');
+  mkdirSync(stage);stageOwned=true;for(const name of readdirSync(source))cpSync(join(source,name),join(stage,name),{recursive:true,dereference:false,errorOnExist:true,force:false});verifyUnit(stage,'linux');
   if(existsSync(dest)){renameSync(dest,backup);moved=true;}
   renameSync(stage,dest);placed=true;mkdirSync(dirname(alias),{recursive:true});if(!existsSync(alias))symlinkSync(target,alias);
   if(moved)rmSync(backup,{recursive:true});return dest;
