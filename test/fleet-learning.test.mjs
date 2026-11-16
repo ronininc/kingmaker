@@ -12,6 +12,9 @@ import {
   validateEnvelope,
 } from '../lib/fleet-learning.mjs';
 
+import { sanitizeForFleet } from '../vendor/fleet/fleet-packet.mjs';
+const samplePacket=sanitizeForFleet({installationId:'fi_'+'a'.repeat(32),runtimeVersion:'4.5.3',device:{platform:'darwin',arch:'arm64',totalMemBytes:8*1024**3}}).packet;
+const packet=()=>structuredClone(samplePacket);
 const FIXED_NOW = new Date('2026-10-18T15:30:00.000Z');
 const MODEL_ID = 'hf:dealignai/DeepSeek-V4.1-Flash-1017-uncensored';
 
@@ -31,34 +34,34 @@ function report(overrides = {}) {
 
 // 1. sealEnvelope hardcodes customerDataIncluded to false.
 {
-  const env = sealEnvelope(report(), FIXED_NOW);
+  const env = sealEnvelope(packet(), FIXED_NOW);
   assert.equal(env.customerDataIncluded, false);
   assert.equal(env.sentAt, FIXED_NOW.toISOString());
-  assert.deepEqual(env.payload, report());
+  assert.deepEqual(env.payload, packet());
   console.log('ok 1 - sealed envelope hardcodes customerDataIncluded false');
 }
 
 // 2. sealEnvelope is deterministic for the same clock.
 {
   assert.deepEqual(
-    sealEnvelope(report(), FIXED_NOW),
-    sealEnvelope(report(), FIXED_NOW),
+    sealEnvelope(packet(), FIXED_NOW),
+    sealEnvelope(packet(), FIXED_NOW),
   );
   console.log('ok 2 - sealing is deterministic for the same clock');
 }
 
 // 3. validateEnvelope accepts a sealed envelope.
 {
-  const env = sealEnvelope(report(), FIXED_NOW);
+  const env = sealEnvelope(packet(), FIXED_NOW);
   const v = validateEnvelope(env);
   assert.equal(v.valid, true);
-  assert.match(v.reason, /diode intact/);
+  assert.match(v.reason, /closed packet/);
   console.log('ok 3 - sealed envelope validates');
 }
 
 // 4. validateEnvelope rejects an envelope with customerDataIncluded true.
 {
-  const env = sealEnvelope(report(), FIXED_NOW);
+  const env = sealEnvelope(packet(), FIXED_NOW);
   const poisoned = { ...env, customerDataIncluded: true };
   const v = validateEnvelope(poisoned);
   assert.equal(v.valid, false);
@@ -68,7 +71,7 @@ function report(overrides = {}) {
 
 // 5. validateEnvelope rejects an empty modelId.
 {
-  const env = sealEnvelope(report({ modelId: '   ' }), FIXED_NOW);
+  const env = {payload:report({modelId:'   '}),customerDataIncluded:false,sentAt:FIXED_NOW.toISOString()};
   const v = validateEnvelope(env);
   assert.equal(v.valid, false);
   assert.match(v.reason, /modelId/);

@@ -7,7 +7,7 @@ import { test } from 'node:test';
 import { describePacket, fleetDraft, installationId, openSharing, SHARE_BOX, sharingWords } from '../lib/sharing.mjs';
 import { newInstallationId, sanitizeForFleet, validatePacket } from '../vendor/fleet/fleet-packet.mjs';
 
-const packet = { schema: 'solomon.fleet-contribution.v1', day: '2026-10-15', runtimeVersion: '0.9.0', deviceClass: 'darwin-arm64-24gb', artifacts: [{ kind: 'route_stats' }, { kind: 'route_stats' }, { kind: 'model_trial' }, { kind: 'preference_stats', prefs: [{ pref: 'price_first', polarity: 'always', n: 2 }] }] };
+const packet = sanitizeForFleet({installationId:'fi_'+'a'.repeat(32),runtimeVersion:'0.9.0',device:{platform:'darwin',arch:'arm64',totalMemBytes:24*1024**3},preferences:[{statement:'Always give me the price first'},{statement:'Always give me the price first'}]}).packet;
 const fresh = (opts = {}) => {
   const sent = [];
   const s = openSharing({ state: mkdtempSync(join(tmpdir(), 'sharing-')), env: {}, buildPacket: async () => packet, send: async (p) => { sent.push(p); return { ok: true, receipt: 'r1' }; }, ...opts });
@@ -64,7 +64,7 @@ test('the bar words: "what have you shared" reads the log back; "forget what I s
   assert.match(await s.handle('what have you shared'), /Nothing has been shared/);
   await s.contribute();
   const line = await s.handle('what have you shared');
-  assert.match(line, /2 route stats, 1 model trial, 1 preference stats \[price first always ×2\]/); assert.match(line, /darwin-arm64-24gb/);
+  assert.match(line, /1 preference stats \[price first always ×2\]/); assert.match(line, /darwin-arm64-24gb/);
   assert.match(await s.handle('forget what I shared'), /isn't live yet/);
   assert.equal(describePacket({}), '?: nothing (Kingmaker ?, device class not set)');
 });
