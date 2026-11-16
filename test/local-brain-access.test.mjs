@@ -148,3 +148,26 @@ test('"done" requires an objective check: a record-only check reports "NOT verif
     assert.match(b.lines.join('\n'), /Outcome: done — the method's objective check passed/);
   } finally { rmSync(p.state, { recursive: true, force: true }); }
 });
+
+test('the method lane emits tool-panel events whose final state is the TRUE outcome, and the bar/voice turn chain routes to it', async () => {
+  const { createMethodLane } = await import('../lib/method-request.mjs');
+  const { readFileSync } = await import('node:fs');
+  const p = freshProfile();
+  try {
+    const store = join(p.state, 'abilities', 'methods'); mkdirSync(store, { recursive: true });
+    const spec = { id: 'tally-sheet', version: '1.0', title: 'tally sheet', domain: 'tally', inputs: { prompt: '' }, steps: [{ n: 1, id: 'solve', type: 'reason', into: 'answer', preamble: 'Answer.', prompt: '{{inputs.prompt}}' }, { n: 2, id: 'rec', type: 'write-json', path: 'r.json', value: { method: 'tally-sheet' } }, { n: 3, id: 'check', type: 'verify', assertions: [{ file: 'r.json', field: 'method', equals: 'tally-sheet' }] }] };
+    writeFileSync(join(store, 'tally-sheet.method.md'), `# m\n\n\`\`\`kingmaker-method\n${JSON.stringify(spec)}\n\`\`\`\n`);
+    writeFileSync(join(store, 'index.json'), JSON.stringify({ schema: 'kingmaker.methods/1', methods: [{ id: 'tally-sheet', title: 'tally sheet', domain: 'tally', file: 'tally-sheet.method.md', quality: { tier: 'draft', score: 1, basis: 't' } }] }));
+    const events = []; const said = [];
+    const lane = createMethodLane({ state: p.state, panel: (e) => events.push(e), say: async (l) => said.push(l), brainOptions: { remote: false, reasoner: stubReasoner } });
+    assert.equal(await lane.wants('Kingmaker, run the tally sheet', 'c1'), true);
+    assert.equal(await lane.wants('what is the weather', 'c1'), false, 'unaddressed chat is not claimed');
+    await lane.handle('Kingmaker, run the tally sheet', 'c1');
+    assert.equal(events[0].state, 'running'); assert.equal(events.at(-1).state, 'unverified', 'record-only check → unverified, never "completed"');
+    assert.match(said.at(-1), /NOT verified/);
+    const cli = readFileSync(new URL('../lib/cli.mjs', import.meta.url), 'utf8');
+    assert.match(cli, /if \(!who\?\.typed\) \{\s*const lane = await getMethodLane\(\);/, 'voice turns reach the lane');
+    assert.match(cli, /lane\.isApproval\(text\) && !who\?\.attested/, 'voice approval requires the attested owner voice');
+    assert.match(cli, /await \(await getMethodLane\(\)\)\.wants\(text, phoneConv\)/, 'typed bar turns reach the lane');
+  } finally { rmSync(p.state, { recursive: true, force: true }); }
+});
