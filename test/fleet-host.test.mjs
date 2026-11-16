@@ -1,4 +1,5 @@
-// Legacy server contract tests. New clients refuse this telemetry schema; these direct fixture requests test server storage in
+import {buildReusableSkillPacket} from '../lib/reusable-skill-policy.mjs';
+// Actual client and skill-only host roundtrip with synthetic keys/storage in
 // memory: a real Ed25519 key pair, in-memory R2/KV, the Mac's packet from the engine's own sanitizer.
 import assert from 'node:assert/strict';
 import { generateKeyPairSync } from 'node:crypto';
@@ -32,15 +33,9 @@ const macWith = (env) => {
   writeFileSync(join(state, 'fleet', 'fleet.json'), JSON.stringify({ url: 'https://fleet.example', publicKeyPem: env.FLEET_PUBLIC_KEY }));
   const fetchImpl = (url, init) => worker.fetch(new Request(url, init), env, {});
   const id = installationId(state, newInstallationId);
-  const packet = () => sanitizeForFleet(fleetDraft({ id, version: '0.9.0', totalMemBytes: 24 * 1024 ** 3, preferences: [{ statement: 'always give me the price first' }] })).packet;
+  const packet = () => buildReusableSkillPacket({installationId:id,methodIds:['file-review']});
   const client=fleetTransport({state,env:{},fetchImpl});
-  // Raw synthetic legacy requests exercise retained host compatibility only.
-  const t={...client,send:async packet=>{
-    const r=await fetchImpl('https://fleet.example/contribute',{method:'POST',headers:{'content-type':'application/json','x-fleet-install':id,'x-fleet-proof':installSecret(state)},body:JSON.stringify({packet})});
-    const j=await r.json();const rc=j.receipt;const ok=r.ok&&rc?.accepted===true&&receiptValid(rc,{publicKeyPem:env.FLEET_PUBLIC_KEY,installationId:id,packetId:packet.packetId});
-    return {ok,receipt:ok?rc:null,refused:rc?.accepted===false?rc.reasons:undefined,status:r.status};
-  }};
-  return { state, id, packet, t, client, fetchImpl };
+  return {state,id,packet,t:client,client,fetchImpl};
 };
 
 test('no server configured: nothing to send with (sharing logs locally)', () => {
@@ -55,7 +50,7 @@ test('a Mac shares a packet: stored, a receipt signed by the pinned key, verifie
   const p = mac.packet();
   const r = await mac.t.send(p);
   assert.equal(r.ok, true); assert.equal(r.receipt.accepted, true);
-  assert.ok([...env._r2.keys()].some((k) => k === `packets/${mac.id}/${p.day}/${p.packetId}.json`));
+  assert.ok([...env._r2.keys()].some((k) => k === `packets/${mac.id}/${new Date().toISOString().slice(0,10)}/${p.packetId}.json`));
   assert.equal(receiptValid({ ...r.receipt, accepted: false }, { publicKeyPem: env.FLEET_PUBLIC_KEY, installationId: mac.id, packetId: p.packetId }), false, 'a tampered receipt fails');
   const other = generateKeyPairSync('ed25519').publicKey.export({ type: 'spki', format: 'pem' });
   assert.equal(receiptValid(r.receipt, { publicKeyPem: other, installationId: mac.id, packetId: p.packetId }), false, 'another key fails');
@@ -67,15 +62,18 @@ test('hostile and careless requests are refused, and nothing refused is stored',
   const p = mac.packet();
   // Free text smuggled into a packet: refused with a signed reason, not stored.
   const bad = { ...p, artifacts: [{ kind: 'preference_stats', prefs: [{ pref: 'price_first', polarity: 'always', n: 1, note: 'email maria@acme.com' }] }] };
-  const rb = await mac.t.send(bad);
+  const rejected=await mac.fetchImpl('https://fleet.example/contribute',{method:'POST',headers:{'content-type':'application/json','x-fleet-install':mac.id,'x-fleet-proof':installSecret(mac.state)},body:JSON.stringify({packet:bad})});
+  const rb={ok:false,refused:(await rejected.json()).receipt.reasons};
   assert.equal(rb.ok, false); assert.ok(rb.refused?.length); assert.equal([...env._r2.keys()].length, 0);
   assert.doesNotMatch(JSON.stringify(rb), /maria|acme/, 'the refusal never echoes the content');
-  // The Mac's proof is registered on its first contribution: a stranger using the same install id is refused.
+  // Invalid content cannot enroll an install. First send a real allowed packet.
+  assert.equal(env._kv.has(`proof:${mac.id}`),false);await mac.t.send(p);
+  // The Mac's proof is now registered: a stranger is refused.
   const res = await mac.fetchImpl('https://fleet.example/contribute', { method: 'POST', headers: { 'content-type': 'application/json', 'x-fleet-install': mac.id, 'x-fleet-proof': 'f'.repeat(64) }, body: JSON.stringify({ packet: p }) });
   assert.equal(res.status, 403, 'a different proof for the same install is refused');
   const mismatch = await mac.fetchImpl('https://fleet.example/contribute', { method: 'POST', headers: { 'content-type': 'application/json', 'x-fleet-install': newInstallationId(), 'x-fleet-proof': installSecret(mac.state) }, body: JSON.stringify({ packet: p }) });
   assert.equal(mismatch.status, 400, "a packet under another install's id is refused");
-  assert.equal([...env._r2.keys()].length, 0);
+  assert.equal([...env._r2.keys()].length, 1);
   const big = await mac.fetchImpl('https://fleet.example/contribute', { method: 'POST', headers: { 'content-length': String(300 * 1024) }, body: 'x' });
   assert.equal(big.status, 413);
 });
@@ -98,5 +96,26 @@ test('"forget what I shared": every packet, the bundle and the proof are erased;
 });
 
 test('new client refuses legacy telemetry before any host storage',async()=>{
- const env=memEnv(),mac=macWith(env);assert.equal((await mac.client.send(mac.packet())).error,'REUSABLE_SKILL_ADMISSION_REQUIRED');assert.equal(env._r2.size,0);assert.equal(env._kv.size,0);
+ const env=memEnv(),mac=macWith(env);assert.equal((await mac.client.send(sanitizeForFleet(fleetDraft({id:mac.id,version:'4.5.3',totalMemBytes:8*1024**3})).packet)).error,'REUSABLE_SKILL_ADMISSION_REQUIRED');assert.equal(env._r2.size,0);assert.equal(env._kv.size,0);
+});
+
+test('host rejects altered methods, source rights, secrets, unknown IDs and legacy telemetry without storing content',async()=>{
+ const env=memEnv(),mac=macWith(env);
+ const send=packet=>mac.fetchImpl('https://fleet.example/contribute',{method:'POST',headers:{'x-fleet-install':mac.id,'x-fleet-proof':installSecret(mac.state)},body:JSON.stringify({packet})});
+ for(const change of [p=>p.methods[0].instructions+='password: SECRET_FIXTURE',p=>p.methods[0].license='MIT',p=>p.methods[0].licenseText='forged',p=>p.methods[0].notice='forged',p=>p.methods[0].methodId='unknown',p=>p.methods[0].proprietary='private source']){const p=mac.packet();change(p);const r=await send(p);const body=await r.json();assert.equal(body.receipt.accepted,false);assert.ok(!JSON.stringify(body).includes('SECRET_FIXTURE'));}
+ const telemetry=sanitizeForFleet(fleetDraft({id:mac.id,version:'4.5.3',totalMemBytes:8*1024**3})).packet;assert.equal((await (await send(telemetry)).json()).receipt.accepted,false);assert.equal(env._r2.size,0);assert.equal(env._kv.size,0);
+});
+test('serial replay and withdrawn old proof cannot re-enroll; unreviewed bundles are not served',async()=>{
+ const env=memEnv(),mac=macWith(env),p=mac.packet();assert.equal((await mac.t.send(p)).ok,true);assert.equal((await mac.t.send(p)).status,409);
+ env._r2.set(`bundles/${mac.id}.json`,JSON.stringify({arbitrary:'not reviewed'}));
+ const response=await mac.fetchImpl('https://fleet.example/bundle',{headers:{'x-fleet-install':mac.id,'x-fleet-proof':installSecret(mac.state)}});assert.equal(response.status,501);
+ assert.equal((await mac.t.forgetRemote(mac.id)).ok,true);assert.equal((await mac.t.send(mac.packet())).status,403);assert.equal(env._r2.size,0);assert.equal(env._kv.get(`withdrawn:${mac.id}`),'1');
+});
+
+test('bounded body cannot bypass limit without header; withdrawal cleanup can retry after storage failure',async()=>{
+ const env=memEnv(),mac=macWith(env);
+ const big=await mac.fetchImpl('https://fleet.example/contribute',{method:'POST',body:'x'.repeat(256*1024+1)});assert.equal(big.status,413);
+ await mac.t.send(mac.packet());const remove=env.PACKETS.delete;let fail=true;env.PACKETS.delete=async keys=>{if(fail){fail=false;throw Error('synthetic storage failure');}return remove(keys);};
+ assert.equal((await mac.t.forgetRemote(mac.id)).ok,false);assert.equal((await mac.t.send(mac.packet())).status,403);
+ assert.equal((await mac.t.forgetRemote(mac.id)).ok,true);assert.equal(env._r2.size,0);
 });
