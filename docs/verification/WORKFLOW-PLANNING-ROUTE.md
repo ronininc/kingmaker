@@ -1,0 +1,7 @@
+# Workflow planning role versus execution authority
+
+Recognized Blender/3D/declarative creation requests now carry a `coder` planning role while remaining on the governed `act` lane. A local model selection is not permission to execute tools, a rendered artifact, or permission to send/publish output. The prose fast lane remains excluded, including chained external actions.
+
+Lightweight proof: `node --test test/workflow-planning-route.test.mjs test/weight-hunter*.test.mjs test/fast-route.test.mjs` passed 32/32. Exact `Create and render a metallic cyberpunk control panel from the declarative workflow.` selects an installed fixture coder with zero materialization calls, and blocks when that model is unavailable under no-download policy. No inference, Blender, build or deployment ran for this change.
+
+This fixes role classification only. The actual demo wrapper already rewrote the request to “Write Python code” and selected a 7B coder using M5 24GB benchmark records plus a hardcoded installed inventory. Its subsequent direct Ollama request timed out on this Mac. That resource/performance problem is independent of classification and is not fixed by this patch. A safe real demo must obtain current availability, use a suitable bounded model and pass its exact selected tag to the schema-constrained compiler; preserve execution approval and validate actual output. Existing CLI governed action execution does not automatically consume `taskChoice` as its planner model, so do not claim this patch wires autonomous rendering end to end.
