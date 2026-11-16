@@ -146,3 +146,19 @@ test('KNOWN LIMIT: keyword coverage lets a near-miss local method satisfy the ga
     assert.equal(r.conduction.method.id, 'tide-pool-census', 'documents current behavior: "tide pool" alone reaches the gate (6)');
   } finally { await srv.close(); for (const d of [repo, store, work]) rmSync(d, { recursive: true, force: true }); }
 });
+
+test('Jev routing closes the near-miss: a confident "none" makes the loop hunt the right method; a confident pick counts as coverage', async () => {
+  const repo = fixtureRepo([...METHODS, { id: 'tide-pool-report', title: 'Tide pool report', domain: 'tidereport', preamble: 'Report.' }]); const srv = await serve(repo);
+  const store = mkdtempSync(join(tmpdir(), 'km-store-')); const work = mkdtempSync(join(tmpdir(), 'km-work-'));
+  try {
+    await loopFor(store, srv.baseUrl).run('tide pool census: 1 crab', { workDir: join(work, 'a'), inputs: { prompt: '1 crab' } });
+    const seen = [];
+    const jev = async ({ request, candidates }) => { seen.push(candidates.map((c) => c.id)); return /report/.test(request) && !candidates.some((c) => c.id === 'tide-pool-report') ? { decided: true, none: true, confidence: 0.93, model: 'stub-jev', ms: 1 } : { decided: true, id: candidates.find((c) => /report/.test(request) ? c.id === 'tide-pool-report' : c.id === 'tide-pool-census')?.id ?? candidates[0].id, confidence: 0.95, model: 'stub-jev', ms: 1 }; };
+    const r = await loopFor(store, srv.baseUrl, { methodSelector: jev }).run('tide pool report please', { workDir: join(work, 'b'), inputs: { prompt: 'x' } });
+    assert.equal(r.trace.find((t) => t.phase === 'method-hunt')?.result?.id, 'tide-pool-report', 'Jev said none → hunted the right method');
+    assert.equal(r.conduction.method.id, 'tide-pool-report');
+    assert.match(r.picks.method.reason, /Jev picked it/);
+    const low = await loopFor(store, srv.baseUrl, { methodSelector: async () => ({ decided: false, reason: 'unsure', model: 'stub-jev' }) }).run('tide pool census: 2 crabs', { workDir: join(work, 'c'), inputs: { prompt: '2 crabs' } });
+    assert.equal(low.conduction.method.id, 'tide-pool-census'); assert.equal(low.picks.method.jev.decided, false, 'undecided Jev → keyword pick stands, recorded');
+  } finally { await srv.close(); for (const d of [repo, store, work]) rmSync(d, { recursive: true, force: true }); }
+});
