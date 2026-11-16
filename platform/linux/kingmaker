@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+self=$0
+while [ -L "$self" ]; do
+ link=$(readlink "$self")
+ case "$link" in /*) self=$link ;; *) self=$(dirname "$self")/$link ;; esac
+done
+here=$(CDPATH= cd -- "$(dirname -- "$self")" && pwd -P)
+command -v node >/dev/null 2>&1 || { echo 'Kingmaker needs Node 24 or newer; no runtime is downloaded automatically.' >&2; exit 78; }
+node "$here/portable-verify.mjs" verify "$here" linux >/dev/null
+exec node "$here/engine/lib/kingmaker.mjs" "$@"

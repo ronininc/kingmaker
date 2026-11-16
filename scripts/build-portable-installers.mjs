@@ -22,6 +22,7 @@ export function buildPortableInstallers({ payload, out, version } = {}) {
     const linuxRoot = join(scratch, `Kingmaker-${version}-linux-x64`), windowsRoot = join(scratch, `Kingmaker-${version}-windows-x64`);
     mkdirSync(linuxRoot); mkdirSync(windowsRoot);
     cpSync(runtime, join(linuxRoot, 'engine'), { recursive: true }); cpSync(runtime, join(windowsRoot, 'engine'), { recursive: true });
+    for (const unitRoot of [linuxRoot, windowsRoot]) cpSync(join(ROOT, 'platform/portable-verify.mjs'), join(unitRoot, 'portable-verify.mjs'));
     const identity = (platform) => ({ schema: 'kingmaker.unit/1', unit: 'kingmaker', version, platform, arch: 'x64' });
     writeFileSync(join(linuxRoot, 'UNIT.json'), `${JSON.stringify(identity('linux'), null, 2)}\n`);
     writeFileSync(join(windowsRoot, 'UNIT.json'), `${JSON.stringify(identity('windows'), null, 2)}\n`);
