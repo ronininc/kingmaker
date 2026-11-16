@@ -1,18 +1,20 @@
 # Which Kingmaker version is current
 
-Verified 2026-11-15. Do not infer production from historical notes or a candidate's package version.
+Use the published tag and its signed manifest, not historical notes or a working branch's version.
 
 | Location | Version | Evidence |
 |---|---|---|
-| Published GitHub release | **4.5.1** | `gh release view v4.5.1 --repo ronininc/kingmaker`: published, not draft/prerelease; installer DMG, two app archive parts, signed manifest and Launcher 0.3.17 ZIP present |
-| Installed owner application | **4.5.1** | `/Applications/Kingmaker.app/Contents/Info.plist` `CFBundleShortVersionString` |
-| This isolated integrated source candidate | **4.5.2, unpublished** | `package.json` and lockfile; new version avoids replacing immutable existing 4.5.1 release assets |
-| Last fully built isolated candidate | **4.5.1, not deployed** | Prior full-runtime signed build, isolated health/CLI proofs; requires rebuilding from the final 4.5.2 source |
+| Published GitHub release | **4.5.2** | [Release](https://github.com/ronininc/kingmaker/releases/tag/v4.5.2), published/latest, seven verified assets |
+| Released source | **4.5.2** | tag `v4.5.2` points to `4a453cc8d798a5adfcd50bcfbbbe2b40ddfe6429`; installer provenance matches |
+| Included Ronin Launcher | **0.3.18** | independent source `ronininc/ronin-launcher@f6aeb090b90e9a8cb9cfdff53a89dff627813b1d`, signed archive and bundle identities in the issued ledger |
+| Owner's installed application at verification | **4.5.1** | inspected plist; the release workflow did not replace the owner's installed app |
 
-Before choosing 4.5.2, both `gh release view v4.5.2` and `git ls-remote` for tags `v4.5.2` / `4.5.2` found no existing release/tag. Recheck immediately before publication to avoid a concurrent collision.
+4.5.2 targets Apple Silicon macOS 14.0 or newer. App and installer plist templates obtain the product version from `package.json`; the engine repository has its own versioning.
 
-App and installer plist templates obtain the product version from this checkout's `package.json` during their builds. The engine repository's own package version is separate and must not be mistaken for the product version.
+The signed archive passed full staged extraction, tree comparison and certificate verification, followed by an isolated installation and engine health check. Public installer, Launcher, manifest, signature and checksum downloads were verified against their expected bytes; both large parts are publicly accessible and GitHub's stored digests match the signed manifest. See [release verification](releases/4.5.2-verification.md).
 
-4.5.2 is not a completed release: final artifact refresh, signed manifest, full staged extraction and installation verification, and published download verification remain required. Preserve the existing usable public release until its replacement passes the gates. The source for candidate changes must be preserved in the repository; do not publish generated private engine imports or signing secrets.
+Model weights and knowledge corpora are **not automatically downloaded** by the installer. Existing data is inventoried; unavailable inference/data is stated explicitly. Clean machines need explicitly configured inference for model-dependent work. This is not a claim that arbitrary-model streaming has been proven.
 
-Historical 2026-11-11 notes claiming 4.4.4 was the only published installer are superseded by the direct checks above. No assertion of Linux/Windows 4.5.2 readiness is made; their current portable installer sources remain incomplete.
+The installer and Launcher are Developer ID signed; Kingmaker retains its established pinned release certificate. None is notarized, and fresh Macs may present Gatekeeper restrictions. First-run ownership and permission setup remain required.
+
+Existing 4.5.1 release assets were preserved. Linux/Windows artifacts were not relabeled as 4.5.2; current portable installer source remains incomplete. Generated private engine imports and signing secrets must never be committed to this public repository.
