@@ -2,13 +2,12 @@
 // Receives only exact release-reviewed generic method packets and signs receipts.
 // It never executes content; legacy telemetry and unreviewed redistribution are refused.
 //   POST /contribute  {packet}         → a signed receipt (accepted or refused, with reasons; never the content)
-//   GET  /bundle                       → 501 until governed redistribution exists
-//   POST /forget                       → erases this install's packets, bundle and proof
+//   GET  /bundle?nonce=...              → signed exact reviewed catalog, never executable code
+//   POST /forget                       → atomically erases packets, retains revocation tombstone/proof hash
 //   GET  /key                          → the public key and keyId installs pin
-// An install proves itself with X-Fleet-Install (its random fi_ id) and X-Fleet-Proof (a random secret it made; only its
-// SHA-256 is stored, on first contribution). Bindings: PACKETS (R2), FLEET (KV), FLEET_SIGNING_KEY (secret, PKCS#8 PEM,
-// Ed25519), FLEET_PUBLIC_KEY (var, SPKI PEM). Aggregation (the engine's stand-in: quorum, trimmed FedAvg, validation) runs
-// on Ronin's side over the stored packets and writes bundles to PACKETS under bundles/<install>.json.
+// One SQLite Durable Object owns each install's hashed proof, rate/replay and
+// withdrawal state. No KV/R2 authorization fallback or cross-store packet race.
+// Existing first-valid-proof enrollment is not signed CRM benefit entitlement.
 import {validateReusableSkillPacket} from '../lib/reusable-skill-catalog.mjs';
 import { canonicalJson } from '../vendor/fleet/fleet-packet.mjs';
 
@@ -38,16 +37,11 @@ async function receipt(env, installationId, packetId, accepted, reasons, now) {
   return { ...unsigned, signature: await signFleet(env.FLEET_SIGNING_KEY, RECEIPT_DOMAIN, unsigned) };
 }
 
-/** The install's proof: on first sight its hash is stored; afterwards it must match. → 'ok' | 'new' | 'bad' */
-async function checkProof(env, install, proof, { create, allowWithdrawn = false }) {
-  if (!INSTALL_RE.test(install || '') || !PROOF_RE.test(proof || '')) return 'bad';
-  if(!allowWithdrawn&&await env.FLEET.get(`withdrawn:${install}`))return 'bad';
-  const want = await env.FLEET.get(`proof:${install}`);
-  const got = await sha256(proof);
-  if (!want) { if (!create) return 'bad'; await env.FLEET.put(`proof:${install}`, got); return 'new'; }
-  return want === got ? 'ok' : 'bad';
+async function coordinate(env,install,proof,operation,packet){
+ if(!INSTALL_RE.test(install)||!PROOF_RE.test(proof))return {status:403,error:'bad proof'};
+ if(!env.FLEET_COORDINATOR)return {status:503,error:'strongly consistent fleet coordinator unavailable'};
+ return env.FLEET_COORDINATOR.getByName(install).operate({install,proofHash:await sha256(proof),operation,packet});
 }
-
 export default {
   async fetch(request, env, ctx, now = new Date()) {
     const url = new URL(request.url);
@@ -72,39 +66,22 @@ export default {
           const packetId=/^fp_[a-f0-9]{32}$/.test(packet?.packetId||'')?packet.packetId:'invalid';
           return json(200,{receipt:await receipt(env,install,packetId,false,['reviewed reusable skill required'],now)});
         }
-        const p = await checkProof(env, install, proof, { create: true });
-        if (p === 'bad') return json(403, { error: 'bad proof' });
-        const day = now.toISOString().slice(0, 10);
-        const rlKey = `rl:${install}:${day}`;
-        const used = Number(await env.FLEET.get(rlKey) || 0);
-        if (used >= MAX_PACKETS_PER_DAY) return json(429, { error: 'enough for today' });
-        if(await env.FLEET.get(`seen:${install}:${packet.packetId}`))return json(409,{error:'packet already received'});
-        await env.FLEET.put(rlKey, String(used + 1), { expirationTtl: 2 * 86400 });
-        await env.PACKETS.put(`packets/${install}/${day}/${packet.packetId}.json`, canonicalJson(packet), { httpMetadata: { contentType: 'application/json' } });
-        await env.FLEET.put(`seen:${install}:${packet.packetId}`,'1');
-        return json(200, { receipt: await receipt(env, install, packet.packetId, true, [], now) });
+        const decision=await coordinate(env,install,proof,'contribute',packet);
+        if(decision.status!==200)return json(decision.status,{error:decision.error});
+        return json(200,{receipt:await receipt(env,install,packet.packetId,true,[],now)});
+      }
+      if(request.method==='GET'&&url.pathname==='/bundle'){
+        const nonce=url.searchParams.get('nonce');if(!/^[a-f0-9]{64}$/.test(nonce||''))return json(400,{error:'fresh nonce required'});
+        const decision=await coordinate(env,install,proof,'bundle');if(decision.status!==200)return json(decision.status,{error:decision.error});
+        const issuedAt=Date.now(),methods=decision.methods;
+        const doc={schema:'kingmaker.fleet-bundle/1',installationId:install,nonce,issuedAt,expiresAt:issuedAt+60000,catalogHash:await sha256(canonicalJson(methods)),methods};
+        return json(200,{doc,signature:await signFleet(env.FLEET_SIGNING_KEY,'kingmaker.fleet-bundle/1',doc)});
+      }
+      if(request.method==='POST'&&url.pathname==='/forget'){
+        const decision=await coordinate(env,install,proof,'forget');
+        return decision.status===200?json(200,{forgotten:true,packets:decision.packets}):json(decision.status,{error:decision.error});
       }
 
-      if (request.method === 'GET' && url.pathname === '/bundle') {
-        if (await checkProof(env, install, proof, { create: false }) !== 'ok') return json(403, { error: 'bad proof' });
-        // No reviewed redistribution issuer exists yet. Never serve arbitrary old bundles.
-        return json(501,{error:'reviewed skill redistribution not configured'});
-      }
-
-      if (request.method === 'POST' && url.pathname === '/forget') {
-        if (await checkProof(env, install, proof, { create: false, allowWithdrawn: true }) !== 'ok') return json(403, { error: 'bad proof' });
-        // Tombstone first: old credentials cannot silently re-enroll after erasure.
-        await env.FLEET.put(`withdrawn:${install}`,'1');
-        let cursor, deleted = 0;
-        do {
-          const page = await env.PACKETS.list({ prefix: `packets/${install}/`, cursor });
-          if (page.objects.length) { await env.PACKETS.delete(page.objects.map((o) => o.key)); deleted += page.objects.length; }
-          cursor = page.truncated ? page.cursor : undefined;
-        } while (cursor);
-        await env.PACKETS.delete(`bundles/${install}.json`);
-        await env.FLEET.delete(`proof:${install}`);
-        return json(200, { forgotten: true, packets: deleted });
-      }
       return json(404, { error: 'not found' });
     } catch (e) {
       return json(500, { error: 'server error' }); // never echo what was sent
