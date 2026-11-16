@@ -123,7 +123,7 @@ test('dry run into a temp prefix: downloads, verifies, unpacks, commits the app 
     assert.ok(pcts.every((p, i) => i === 0 || p >= pcts[i - 1] - 0.01) && pcts.at(-1) === 100, 'one progress bar, never going backwards, ending at 100');
     assert.match(run.out, /huihui_ai\/qwen3-abliterated:1\.7b is unavailable/, 'the tools are only checked in a dry run');
     assert.match(run.out, /SearXNG: would: clone SearXNG/, 'SearXNG\'s installer ran in dry-run mode, under the app\'s own runtime');
-    assert.match(run.out, /Would fetch 2 confirmed corpora/, 'the knowledge bootstrap ran in dry-run mode');
+    assert.match(run.out, /Automatic corpus downloads disabled/, 'no knowledge bootstrap even in dry run');
     assert.equal(srv.seen.filter((s) => s.url.includes('.part')).length, r.manifest.parts.length, 'each part fetched once');
     const inspect = await runEngine(['--inspect', '--prefix', w.prefix, '--manifest', r.manifestFile], w.env);
     const { memGb, chip, freeGb, ...facts } = JSON.parse(inspect.out);
@@ -357,7 +357,7 @@ test('with live tools no model pulls occur; exact models reused and missing or w
   try {
     const w = world();
     rmSync(join(w.root, 'bin', 'peekaboo'));
-    const env = { ...w.env, KINGMAKER_OLLAMA_URL: srv.url };
+    const env = { ...w.env, KINGMAKER_OLLAMA_URL: srv.url, KM_FAKE_BOOTSTRAP_CALLS:join(w.root,'bootstrap.calls') };
     const run = await runEngine(['--wake-word', 'Kingmaker', '--prefix', w.prefix, '--with-tools', '--base-url', srv.url, '--manifest', r.manifestFile], env);
     assert.equal(run.code, 0, run.out);
     assert.match(run.out, /huihui_ai\/qwen3-abliterated:1\.7b is here, digest matches the release's pin/);
@@ -370,7 +370,9 @@ test('with live tools no model pulls occur; exact models reused and missing or w
     assert.deepEqual([...installed.keys()], ['huihui_ai/qwen3-abliterated:1.7b'], 'no additional weights installed');
     assert.match(readFileSync(join(w.root, 'brew.calls'), 'utf8'), /^brew install openclaw\/tap\/peekaboo$/m, 'the missing Hands of Horus came from Homebrew');
     assert.ok(isFile(join(w.prefix, 'home', 'Library', 'Application Support', 'solomon-desktop', 'services', 'searxng-native', 'commit.txt')), 'SearXNG set up');
-    assert.ok(isFile(join(dataIn(w), 'runtime', 'data', 'knowledge', 'sources', '.receipts', 'kaikki-multilingual.json')), 'the knowledge library moved into place');
+    assert.equal(existsSync(join(w.root,'bootstrap.calls')),false,'bootstrap never invoked');
+    assert.equal(existsSync(join(dataIn(w),'runtime','data','knowledge','sources')),false,'no corpus files created');
+    assert.equal(JSON.parse(readFileSync(join(dataIn(w),'knowledge-availability.json'))).presentCount,0);
     // A local wrong digest is unavailable, never silently replaced or counted as usable.
     installed.clear();
     installed.set('huihui_ai/qwen3-abliterated:1.7b','f'.repeat(64));
@@ -382,15 +384,23 @@ test('with live tools no model pulls occur; exact models reused and missing or w
     assert.equal(driftInventory.availableCount,0);
     assert.ok(driftInventory.models.some(m=>m.status==='digest-mismatch'));
     assert.match(drift.out,/configure inference/);
-    // A corpus that fails to download: nothing lands, what came down is kept for the next press.
+    // Existing corpus data and matching receipts remain in place; incomplete data is not invented.
     const w3 = world();
+    const sources=join(dataIn(w3),'runtime','data','knowledge','sources');
+    mkdirSync(join(sources,'.receipts'),{recursive:true});
+    mkdirSync(join(sources,'software','spec-standards'),{recursive:true});
+    writeFileSync(join(sources,'software','spec-standards','data.txt'),'existing owner corpus');
+    writeFileSync(join(sources,'.receipts','spec-standards.json'),JSON.stringify({id:'spec-standards'}));
+    const reused = await runEngine(['--wake-word','Kingmaker','--prefix',w3.prefix,'--with-tools','--base-url',srv.url,'--manifest',r.manifestFile], {...w3.env,KINGMAKER_OLLAMA_URL:srv.url,KM_FAKE_BOOTSTRAP_CALLS:join(w3.root,'bootstrap.calls'),KM_FAKE_CORPUS_FAIL:'kaikki-multilingual'});
+    assert.equal(reused.code,0,reused.out);
+    assert.equal(existsSync(join(w3.root,'bootstrap.calls')),false);
+    assert.equal(readFileSync(join(sources,'software','spec-standards','data.txt'),'utf8'),'existing owner corpus');
+    const knowledge=JSON.parse(readFileSync(join(dataIn(w3),'knowledge-availability.json')));
+    assert.equal(knowledge.presentCount,1);
+    assert.equal(knowledge.contentVerification,'not-performed');
+    assert.ok(knowledge.corpora.some(c=>c.id==='kaikki-multilingual'&&c.status==='unavailable'));
+    assert.equal(pulls,0);
 
-    const partial = await runEngine(['--wake-word', 'Kingmaker', '--prefix', w3.prefix, '--with-tools', '--base-url', srv.url, '--manifest', r.manifestFile], { ...w3.env, KINGMAKER_OLLAMA_URL: srv.url, KM_FAKE_CORPUS_FAIL: 'kaikki-multilingual' });
-    assert.equal(partial.code, 1);
-    assert.match(partial.failed.message, /knowledge library is not complete/);
-    assert.equal(existsSync(appIn(w3)), false);
-    assert.ok(isFile(join(dataIn(w3), '.install-staging', 'knowledge', 'sources', '.receipts', 'spec-standards.json')), 'the corpus that did come down is kept in staging');
-    assert.equal(existsSync(join(dataIn(w3), 'runtime')), false, 'and nothing is in the live data folder');
   } finally { await srv.close(); }
 });
 
@@ -529,4 +539,6 @@ test('installer contains no model pull route and documents inventory-only infere
   assert.doesNotMatch(script,/\/api\/pull/);
   assert.match(script,/downloadPolicy.*disabled/);
   assert.match(script,/weight streaming is not verified/);
+  assert.doesNotMatch(script,/\"\$NODE_BIN\" \"\$KNOW_SCRIPT\"/);
+  assert.doesNotMatch(script,/NEED=.*knowledge.totalMB/);
 });

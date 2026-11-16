@@ -40,6 +40,7 @@ export const TIER1 = [
 ];
 const direct = (() => { try { return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url)); } catch { return false; } })();
 if (direct) {
+  if(process.env.KM_FAKE_BOOTSTRAP_CALLS)writeFileSync(process.env.KM_FAKE_BOOTSTRAP_CALLS,'called');
   const dir = process.env.SOLOMON_CORPUS_DIR;
   for (const e of TIER1.filter((x) => x.confirmed)) {
     console.log('  ▸ ' + e.id + ' [' + e.field + ']');
