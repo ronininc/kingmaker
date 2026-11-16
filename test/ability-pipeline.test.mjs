@@ -13,6 +13,7 @@ import { join } from 'node:path';
 import { FLEET_DISCLOSURE_DIGEST, BOX_WORDING_VERSION } from '../lib/sharing.mjs';
 import { acceptAbilityRelease, applyRevocations, approveAbility, approveRuntimeRelease, createOwnerAuthority, pinOwnerTrust, proposeAbility, reviewProposal, revokeAbility, verifyRuntimeApproval } from '../lib/ability-pipeline.mjs';
 import { createLocalBrain, handleMethodRequest } from '../lib/method-request.mjs';
+import { setFleetPolicy } from '../lib/corpus-guard.mjs';
 
 const dir = () => mkdtempSync(join(tmpdir(), 'km-fleet-'));
 const consentOn = (state) => { mkdirSync(join(state, 'fleet'), { recursive: true }); writeFileSync(join(state, 'fleet', 'sharing.json'), JSON.stringify({ on: true, shown: true, at: 'x', by: 'owner', how: 'box: share', wording: BOX_WORDING_VERSION, disclosureDigest: FLEET_DISCLOSURE_DIGEST })); writeFileSync(join(state, 'fleet', 'install-id'), 'synthetic-install-a\n'); };
@@ -26,6 +27,9 @@ async function pipeline() {
   const owner = dir(), a = dir(), b = dir();
   const trust = createOwnerAuthority(join(owner, 'owner-authority'));
   pinOwnerTrust(b, trust); consentOn(a);
+  // Install B is a free install: receiving fleet abilities there needs the (owner-decided) policy flag; the member
+  // path and the conservative default are covered in test/fleet-boundaries.test.mjs.
+  setFleetPolicy(b, { freeInstallsReceiveFleetAbilities: true });
   return { owner, a, b, trust, ownerDir: join(owner, 'owner-authority'), cleanup: () => [owner, a, b].forEach((d) => rmSync(d, { recursive: true, force: true })) };
 }
 
