@@ -17,7 +17,7 @@ function kit({ withAct = true } = {}) {
   return dir;
 }
 // Scripted local model: answers by prompt kind; picks options by their words (AWAY for zones, TOWARD for the goal).
-function scripted({ roles = { 0: 'setup', 1: 'observe', 2: 'act', 3: 'verify' } } = {}) {
+function scripted({ roles = { 0: 'setup', 1: 'observe', 2: 'act', 3: 'verify' }, conflictRight = true } = {}) {
   const calls = [];
   const complete = async (system, user) => {
     calls.push(system.slice(0, 40));
@@ -29,6 +29,12 @@ function scripted({ roles = { 0: 'setup', 1: 'observe', 2: 'act', 3: 'verify' } 
     if (/physics code/.test(system)) return JSON.stringify({ conditions: [] });
     if (/describe a vehicle state/.test(system)) return JSON.stringify({ views: [] });
     if (/name an activity/.test(system)) return JSON.stringify({ word: 'sailing' });
+    if (/answer one question/.test(system) && /keep the side you are on|change sides at every|keep turning the same way|back into the best band/.test(user)) {
+      if (!conflictRight) return pick(/anyway|every observation|follow the zone rule|turn away from the side/);
+      const ev = [...user.matchAll(/⟨([^⟩]+)⟩ → mean progress (-?[\d.]+)/g)].map((m) => [m[1], Number(m[2])]);
+      if (ev.length) { const best = ev.sort((a, b) => b[1] - a[1])[0][0]; return pick(new RegExp(best.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').slice(0, 30))); }
+      return pick(/keep the side you are on|DIFFERENT sides|keep turning the same way|back into the best band/);
+    }
     if (/answer one question/.test(system)) return /direction to where the vehicle must go/.test(user) ? pick(/goal_bearing/) : /INSIDE/.test(user) ? pick(/AWAY/) : pick(/TOWARD/);
     return '{}';
   };
@@ -101,4 +107,13 @@ test('promoteDraft: refused without passing held-out checks; accepted ones are l
   const after = (await createLocalBrain({ state, remote: false }).loop.conductor.listMethods()).map((m) => m.id);
   assert.ok(after.includes(r.id));
   assert.match(readFileSync(join(state, 'abilities', 'methods', 'authored.jsonl'), 'utf8'), /heldout/);
+});
+
+test('multi-step conflict answers that lose the rollout check are rejected (draft not written)', async () => {
+  const state = mkdtempSync(join(tmpdir(), 'lane-state-')); const dir = kit(); const { complete } = scripted({ conflictRight: false });
+  const { l, shown } = lane(state, complete);
+  await l.handle(`Kingmaker, run the race ${dir}/README.md ${dir}/sim.py`);
+  const r = await l.handle('yes');
+  assert.equal(r.status, 'rejected'); assert.equal(r.draftPath, null);
+  assert.ok(shown.some((x) => /multi-step conflict rules failed their rollout check/.test(x)));
 });
