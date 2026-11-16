@@ -105,7 +105,7 @@ test('signed certificate status is nonce, tuple, freshness and issuer bound', as
   const provider = (envelope) => createInstallCertificateStatusProviderForFixture({ baseUrl: 'https://status.invalid', bearer: updateBearer,
     now: () => at, nonceFactory: () => nonce, fetchImpl: async (url) => { seenUrl = String(url); return new Response(JSON.stringify(envelope), { status: 200 }); } }, trust.installCertPublicKeyPem);
   assert.deepEqual(await provider(status())({ installCertificate: cert, ...install }), { current: true, revoked: false, installId: install.installId, keySha: install.keySha, releaseTag: install.releaseTag });
-  assert.match(seenUrl, /cert-status/); assert.match(seenUrl, new RegExp(`nonce=${nonce}`));
+  assert.match(seenUrl, /install-cert-status/); assert.equal(new URL(seenUrl).search, '');
   await assert.rejects(() => provider(status({ issuer: 'attacker' }))({ installCertificate: cert, ...install }), /UNTRUSTED/);
   await assert.rejects(() => provider(status({ complete: false }))({ installCertificate: cert, ...install }), /UNTRUSTED/);
   await assert.rejects(() => provider(status({ expiresAt: at }))({ installCertificate: cert, ...install }), /UNTRUSTED/);
@@ -118,6 +118,6 @@ test('fixture trust and caller-selected Armor pins cannot enter production compo
   assert.throws(() => createLauncherCrmIdentityClient({ baseUrl: 'https://crm.invalid', bearerToken: 'fixture-token', applicationId: 'app', memberId: 'member', providerRegistrationId: 'reg', provider: 'launcher', providerPublicJwk: reportKeys.publicKey.export({ format: 'jwk' }), expectedArmorIdentity: { senderSignFp: 'attacker', keyTypes }, checkInstallCertificateStatus: async () => ({ current: true }), signReport: async () => ({ keyId: 'k', value: 'v' }), fetchImpl: async () => { throw new Error('SHOULD_NOT_FETCH'); } }), /STATUS_AUTHORITY_UNAVAILABLE/);
   assert.throws(() => createProductionLauncherIdentityReporter({ fixtureMode: true }), /TRUST_OVERRIDE_FORBIDDEN/);
   assert.throws(() => createProductionLauncherIdentityReporter({ expectedArmorIdentity: { senderSignFp: 'attacker' } }), /TRUST_OVERRIDE_FORBIDDEN/);
-  assert.throws(() => createProductionLauncherIdentityReporter({ installCertificateStatusProvider: async () => ({ current: true, revoked: false }) }), /INSTALL_STATUS_ORIGIN_UNAVAILABLE/);
-  assert.throws(() => createProductionLauncherIdentityReporter({}), /INSTALL_STATUS_ORIGIN_UNAVAILABLE/);
+  assert.throws(() => createProductionLauncherIdentityReporter({ installCertificateStatusProvider: async () => ({ current: true, revoked: false }) }), /INSTALL_STATUS_CONFIG_INVALID/);
+  assert.throws(() => createProductionLauncherIdentityReporter({}), /INSTALL_STATUS_CONFIG_INVALID/);
 });

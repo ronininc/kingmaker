@@ -17,6 +17,7 @@ export default {
     const token = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '').trim();
     const path = new URL(req.url).pathname;
     if (path === '/enroll') return enroll(req, env, token);
+    if (path === '/install-cert-status') return signedInstallStatus(req, env, token);
     // Public installer download (R2 `public/<name>`, no key; ronininc.org links it): GET|HEAD /download/<name>.dmg|.zip.
     // Only a plain file name is accepted and only the public/ prefix is read, so no release or add-on file is reachable
     // here. Handled before the method check and the key gate; every other path still needs a key.
@@ -211,6 +212,60 @@ function derToRaw(der) {
   const raw = new Uint8Array(64);
   raw.set(r, 0); raw.set(s, 32);
   return raw;
+}
+
+// Fresh installation status is distinct from the legacy unsigned revocation query.
+// No caller-selected identity is signed: all identity claims come from a verified
+// enrollment certificate and its matching device record. This grants no paid access.
+const canonicalStatus = (v) => v === null || typeof v !== 'object' ? JSON.stringify(v)
+  : Array.isArray(v) ? `[${v.map(canonicalStatus).join(',')}]`
+    : `{${Object.keys(v).sort().map(k => `${JSON.stringify(k)}:${canonicalStatus(v[k])}`).join(',')}}`;
+async function signedInstallStatus(req, env, token) {
+  const reply = (body, status = 200) => Response.json(body, { status, headers: { 'cache-control': 'no-store' } });
+  if (req.method !== 'POST') return reply({ error: 'method_not_allowed' }, 405);
+  if (!env.CERT_SIGNING_KEY || !env.DEVICES || !env.RELEASES) return reply({ error: 'status_unavailable' }, 503);
+  if (!token || token.length > 4096) return reply({ error: 'unauthorized' }, 401);
+  let body;
+  try {
+    const reader = req.body?.getReader(); if (!reader) throw new Error();
+    const chunks = []; let size = 0;
+    for (;;) { const { value, done } = await reader.read(); if (done) break;
+      size += value.byteLength; if (size > 32768) { await reader.cancel(); return reply({ error: 'request_too_large' }, 413); }
+      chunks.push(value);
+    }
+    const bytes = new Uint8Array(size); let at = 0; for (const c of chunks) { bytes.set(c, at); at += c.length; }
+    body = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes));
+  } catch { return reply({ error: 'invalid_request' }, 400); }
+  if (!/^[A-Za-z0-9_-]{32,128}$/.test(body?.nonce || '')) return reply({ error: 'invalid_nonce' }, 400);
+  const cert = body.installCertificate;
+  const claims = await verifyEntitlementClaims(env, cert);
+  const keySha = await sha(token);
+  const rec = await env.DEVICES.get(`key:${keySha}`, 'json');
+  if (!claims || claims.schema !== 'ronin.install-cert/1' || claims.issuer !== 'ronin-update-host'
+      || claims.bundleId !== 'com.ronininc.solghost' || claims.keySha !== keySha
+      || !/^[0-9a-f-]{8,64}$/i.test(claims.installId || '')
+      || !/^[0-9a-f]{16,64}$/i.test(claims.deviceSha256 || '')
+      || !/^v[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.-]+)?$/.test(claims.releaseTag || '')
+      || !rec || rec.device !== claims.deviceSha256 || typeof rec.revoked !== 'boolean'
+      || !Number.isFinite(Date.parse(claims.issuedAt)) || Date.parse(claims.issuedAt) > Date.now() + 5000) {
+    return reply({ error: 'certificate_binding_invalid' }, 401);
+  }
+  let latest;
+  try { const obj = await env.RELEASES.get('latest.json'); latest = obj && await obj.json(); }
+  catch { return reply({ error: 'release_status_unavailable' }, 503); }
+  if (!/^v[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.-]+)?$/.test(latest?.tag || '')) return reply({ error: 'release_status_unavailable' }, 503);
+  const revoked = rec.revoked || await isRevoked(env, '', claims.installId);
+  const digestBytes = new Uint8Array(await crypto.subtle.digest('SHA-256', enc.encode(canonicalStatus(cert))));
+  const certDigest = b64(digestBytes).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
+  const issuedAt = Math.floor(Date.now() / 1000);
+  try {
+    return reply(await issueInstallCert(env.CERT_SIGNING_KEY, {
+      schema: 'ronin.install-cert-status/1', issuer: 'ronin-update-host', nonce: body.nonce,
+      installId: claims.installId, deviceSha256: claims.deviceSha256, keySha,
+      releaseTag: claims.releaseTag, certDigest, bundleId: claims.bundleId, complete: true,
+      current: latest.tag === claims.releaseTag && !revoked, revoked, issuedAt, expiresAt: issuedAt + 60,
+    }));
+  } catch { return reply({ error: 'signing_unavailable' }, 503); }
 }
 
 /** POST /enroll {device, installId?} (a `name` from an older installer is ignored): a new key for this Mac, returned once (only its sha256 is kept), plus a
