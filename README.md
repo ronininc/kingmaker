@@ -4,7 +4,7 @@
 
 Kingmaker is a headless, voice-driven agent for your Mac. Your Mac's own apps are the screen and your voice drives it. Its engine governs every step, and the Hands of Horus do the clicking (ghost-os when they are not installed). It is source-available under the [PolyForm Noncommercial License 1.0.0](LICENSE).
 
-**Current release: [4.5.1](https://github.com/ronininc/Kingmaker/releases/tag/v4.5.1).** One download: everything, or nothing.
+**Published release: [4.5.2](https://github.com/ronininc/kingmaker/releases/tag/v4.5.2).** The 4.5.3 ecosystem changes described below are local review candidates, not deployed. See [current version and release limits](docs/CURRENT-VERSION.md).
 
 ## The system, in its own terms
 
@@ -20,15 +20,15 @@ Kingmaker's parts have names, and the names are load-bearing: each one is a defi
 
 **Metering.** Seeker's sizing law. For each task the router picks the smallest sufficient base model; capability is never tiered by device, and a bigger model is spent only when the metric demands it. Models arrive in portions of 1 MiB, each verified against its pin before use. A model too large for memory gets a sandbox or paged plan; off-device escalation is the last resort, never the default, and refusal is not a sizing outcome.
 
-**The Brain Library.** The catalog Kingmaker draws from: model weights and the Knowledge Library. Proprietary, free, no pay gate. Nothing enters it except through the owner's human admission gate. Every item is pinned by hash; an install pulls from the nearest verified source — its own disk, a peer install, then the GitHub door — and verifies the pin identically, whichever door served it.
+**The Brain Library.** A catalog of model and knowledge sources governed by human admission and integrity checks. The installer does not automatically download model weights or corpora. Existing verified local data can be used; unavailable inference is reported. Selected-weight local streaming is demonstrated for specific Kronos architectures, not arbitrary models or universal cross-engine conversion.
 
-**The Knowledge Library.** The Brain Library's written half: 23 confirmed corpora, about 18 GB — reference texts, standards, primary documents — bootstrapped into staging at install and moved into place with the app. It is the ground the local models reason over, so work is checked against absorbed material instead of generated from weights alone.
+**The Knowledge Library.** Written reference sources intended to ground reasoning. Existing files are inventoried without automatic bootstrap downloads. A receipt alone is not content verification; missing material remains unavailable until explicitly provisioned and verified.
 
 **The Weight Hunter.** When Seeker chooses a weight, the Hunter finds the hardware-fit local equivalent and proves the equivalent on the gold standard before it enters the working set. A chosen capability is never refused for the machine it runs on; it is re-housed until it fits, and the proof travels with it.
 
 **The Bliterator.** Kingmaker's built-in abliteration engine. It removes refusal training from local weights, because a tool that answers to its owner cannot take orders from its manufacturer's policy instead. Abliterated weights are produced locally and verified like any other weight.
 
-**The Fleet.** Every installed Kingmaker, together. Installs share what they learn, under each owner's choice: sanitized skill procedures and scorecards, evaluation and model-trial results — never the owner's words, files or data, which stay on the device that made them. N installs are N copies of the library and N attempts at every new requirement, so the Fleet's skill grows with every install. In the end state there is no server: the Fleet is the library.
+**The Fleet (review candidate).** Explicit opt-in sharing of reviewed, generally reusable skills/tool-use methods only. No preference statistics, prompts, customer/project data, secrets or proprietary source. Current export and signed retrieval admit two original immutable generic method templates, not arbitrary newly learned skills. The runtime also has independent native generation skills; their execution is not automatically fleet licensing approval. See [privacy and mint boundary](docs/verification/FLEET-SKILL-ADMISSION-REVIEW.md).
 
 **Pipelines and Daemons.** Work runs as pipelines, and every pipeline is manned by exactly one daemon — one owner per line. A daemon executes its line, reports what it did with receipts, and stops and escalates to the owner the moment a counterparty refuses, corrects or rejects its work. Dissent is an owner-seat matter; no daemon argues past a no.
 
@@ -57,13 +57,13 @@ What the button does, in order (one progress bar for all of it):
 1. **Checks this Mac:** macOS 14 or newer (15 for clicking and typing in other apps), Apple silicon, the wake word, and room on the disk (it says how much it needs before it starts, and stops there if it won't fit).
 2. **Downloads Kingmaker.app** as release parts of at most 1.9 GB each (GitHub caps a release file at 2 GB; the app is about 4 GB). Every part is checked against the sha256 in the manifest the installer carries, then the whole archive is, then it is unpacked into a hidden staging folder beside its destination and its bundle id and code signature are checked. A download that gets cut off resumes from where it stopped the next time you press the button.
 3. **Apple's Command Line Tools and Homebrew**, only if they are missing (Homebrew's official package, pinned by sha256). macOS asks for your password once, in its own dialog.
-4. **Ollama** (its official build, pinned by sha256) if it is missing, then **the abliterated models** Kingmaker runs (`lib/profile.mjs`), with the coder sized to the Mac: the 1.5b under 16 GB of memory, the 7b from 16 GB. Each model must come down with exactly the digest the release pinned from Ollama's registry; if one changed upstream since the release was built, the install stops and says so.
+4. **Existing model inventory:** no automatic model pulls. Exact installed model digests are checked; missing or mismatched models are reported unavailable. Model-dependent work needs explicitly configured compatible inference.
 5. **Hands of Horus** (Peekaboo), **sox** (the microphone) and Python for SearXNG, through Homebrew, then **SearXNG** (private web search) with the engine's own installer, run by Kingmaker's own runtime.
-6. **The knowledge library:** every confirmed corpus in the engine's bootstrap (about 17 GB), into a staging folder. A library that is already complete in Kingmaker's data folder is reused, not downloaded again.
-7. **Moves Kingmaker into place:** the app (into `/Applications`, or `~/Applications` when `/Applications` isn't writable), the cemented wake word and the knowledge library. This step is journaled: if anything in it fails, everything it moved is moved back. An older copy is moved to the Trash (not deleted), and a running Kingmaker is asked to quit first.
+6. **Existing knowledge inventory:** no corpus bootstrap or implicit transfers. Existing files remain untouched; missing material is reported unavailable.
+7. **Moves Kingmaker into place:** app and configuration changes are journaled and rolled back on failure; existing knowledge is not replaced by a bootstrap. Destination is `/Applications` or the writable per-user Applications directory.
 8. **Opens Kingmaker** and the installer quits.
 
-**Nothing is ever half-installed.** Kingmaker's own pieces (the app, its config, its library) exist only in staging until step 7, so a failure anywhere before leaves none of them in place, and a failure during step 7 puts everything back. The shared tools it installs on the way (Ollama and its models, Homebrew and its formulas, SearXNG) are each installed whole by their own installers and are kept, together with the verified downloads, so pressing the button again continues instead of starting over. The installer never installs third-party MCP servers or CLI tools: only Kingmaker's own parts and what they need to run.
+**Journaled installation:** verified app/config placement is rolled back on failure. Shared prerequisite tools installed separately may remain for a retry. No automatic model or corpus downloads occur.
 
 **Gatekeeper:** the installer is signed with an Apple **Developer ID** and **notarized**, so it opens with one click on any Mac — no "Open Anyway" step.
 
@@ -354,8 +354,8 @@ The engine's ArtCraft adapter drives seven open-source creative apps from `story
 
 ## Known gaps (v0.1, honest)
 
-- **Kingmaker.app is about 4 GB,** mostly the knowledge runtime (2 GB) and the voice runtime (1 GB); Kingmaker Installer downloads it as release parts. The installer DMG is Developer ID signed, notarized and stapled.
-- **System software it doesn't bundle** comes with the installer: Ollama and the models, the Hands of Horus, sox, SearXNG (Kingmaker starts an installed `ollama serve` when none is running). ghost-os stays an optional fallback for the hands. Blender, Godot and Chrome are found where they're installed.
+- **Kingmaker.app is about 4 GB.** Installer and Launcher are Developer ID signed; Kingmaker retains its established pinned release certificate. These review artifacts are not notarized or stapled. Fresh Macs may present Gatekeeper restrictions.
+- **External runtime prerequisites** and explicitly configured inference may still be needed. Existing model/corpus data is reused where compatible; missing data is not silently downloaded. Blender, Godot and Chrome must be available for operations that require them.
 - **The desktop app's first-run installer and knowledge-library offer are pop-ups in its window,** so they don't run headless. The runtime still reports what's missing.
 - **The ledger calls spoken turns typed.** The engine records them as `operator_typed` because Kingmaker sends them with the console's nonce. An honest "spoken at the Kingmaker console" principal needs an engine change.
 - **Mic capture is not live-tested here.** The first `kingmaker start` in Terminal triggers macOS's microphone prompt for Terminal.
@@ -371,7 +371,7 @@ Free for personal and noncommercial use under the [PolyForm Noncommercial Licens
 
 ## Fine print
 
-Kingmaker shares what it learns by default, and it's your choice: the first time it has something to share, a permissions box asks, and "Keep it on this Mac" turns it off (so does "sharing off", any time). The line between your data and ours is absolute: everything you say, type, see or store stays on your device and stays yours. Only sanitized learning about how Kingmaker works is sent: skill procedures and scorecards, per-device evaluation and model-trial results, counts of public task words, and counts of preference kinds. Every packet is logged locally, exactly as sent, in `fleet/contributed.jsonl`. The collective's signed improvements go only to installs that share. Full terms: [TERMS.md](TERMS.md); the design is in [docs/community-learning.md](docs/community-learning.md).
+Fleet sharing is off until explicit current consent. The review policy is $99 monthly or explicit fleet participation for the skill base and Scripture Armor; this does not mean live billing/activation has been configured. Sharing excludes passwords, secret keys, user/project/proprietary data and telemetry. Unknown content or rights blocks mint/export pending independent review. Approved original reusable components carry Apache-2.0 LICENSE/NOTICE; projects created using them remain controlled by their owners and are not uploaded or relicensed. Third-party content retains its own applicable terms. Withdrawal stops further sharing and supports server forgetting, but cannot retract copies already delivered. See [coordinator and distribution limitations](docs/verification/FLEET-COORDINATOR-REVIEW.md) and [authority configuration review](docs/verification/AUTHORITY-CONFIGURATION-REVIEW.md). Existing legacy terms are not silently rewritten by this review branch.
 
 
 ---
