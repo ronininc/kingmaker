@@ -25,3 +25,11 @@ test('a parent rule with sub-rules triggers a second model classification among 
   const r = await decide({ ask, guidance: G, fields: { helm: [-1, 1], sheet: [0, 1] }, turnField: 'helm', userMsg: 'OBS', votes: 3, decompose: true });
   assert.equal(r.classify.rule, '3b'); assert.deepEqual(r.classify.sub, ['3b', '3b', '3b']); assert.equal(r.d.turn, 'straight');
 });
+test('level words: the pilot answers a word for a one-sided field; the value is converted, never chosen by code', async () => {
+  const { levelValue } = await import('../lib/pilot-prompt.mjs');
+  assert.equal(levelValue('off', [0, 1]), 0); assert.equal(levelValue('High', [0, 1]), 0.75); assert.ok(Number.isNaN(levelValue('lots', [0, 1])));
+  let sys = '';
+  const ask = async (system) => { sys = system; return { d: { heat_level: 'off', reason: 'too hot' }, raw: '' }; };
+  const r = await decide({ ask, guidance: 'g', fields: { heat: [0, 1] }, turnField: null, userMsg: 'OBS', levelField: 'heat' });
+  assert.equal(r.d.heat, 0); assert.match(sys, /"heat_level" \(one of "off", "low", "medium", "high", "full"\)/); assert.doesNotMatch(sys, /"heat" \(number/);
+});
