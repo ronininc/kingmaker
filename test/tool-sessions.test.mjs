@@ -98,3 +98,21 @@ test('the panel follows the user\'s look, accent, size and font; dismissed panel
   assert.match(sys, /background:Canvas/); assert.match(sys, /font:12px Avenir/); assert.match(sys, /color:#00aa55">running/);
   assert.doesNotMatch(black, /data-id="t2"/, 'dismissed panel not rendered');
 });
+test('voice/text routing: "tell python3 to …" reaches that tool; ambiguity is refused; the panel reads the bar\'s real look', async () => {
+  const { routeInput, barThemeFromDefaults } = await import('../lib/tool-sessions.mjs');
+  const cwd = dir();
+  try {
+    const ts = createToolSessions({ registry });
+    const a = ts.start({ tool: 'python3', args: ['-u', '-c', 'import sys\nfor l in sys.stdin:\n  print("python3 heard:", l.strip(), flush=True)'], cwd, interactive: true });
+    await new Promise((r) => setTimeout(r, 300));
+    const r1 = routeInput(ts, 'tell python3 to render frame 4');
+    assert.equal(r1.ok, true); assert.equal(r1.routedTo, a.id); assert.equal(r1.text, 'render frame 4');
+    const b = ts.start({ tool: 'python3', args: ['-u', '-c', 'import sys\nfor l in sys.stdin: pass'], cwd, interactive: true });
+    await new Promise((r) => setTimeout(r, 300));
+    assert.equal(routeInput(ts, 'tell python3 to stop').ok, false, 'two python3 sessions: refused, not guessed');
+    await ts.dismiss(a.id); await ts.dismiss(b.id);
+    const theme = barThemeFromDefaults({ read: (k) => ({ 'km.look': 'black', 'km.replyColor': 'amber', 'km.textSize': '16' })[k] ?? null });
+    assert.deepEqual([theme.look, theme.accent, theme.textSize], ['black', '#FFBF4D', 16]);
+    assert.match(renderToolPanels([{ id: 'x', tool: 'blender', state: 'running', activity: 'a', progress: null, lines: 0, visible: true }], theme), /font:16px/);
+  } finally { rmSync(cwd, { recursive: true, force: true }); }
+});

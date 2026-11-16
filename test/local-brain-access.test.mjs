@@ -131,3 +131,20 @@ test('a drafted method may not smuggle in tool or declare steps', async () => {
     await assert.rejects(writeMethod({ task: 'x task', sample: 's', draft, reasoner: async () => 'y', userStore: join(p.state, 'u'), draftsDir: join(p.state, 'd') }), /METHOD_DRAFT_STEP_REFUSED/);
   } finally { rmSync(p.state, { recursive: true, force: true }); }
 });
+
+test('"done" requires an objective check: a record-only check reports "NOT verified"; an objective check that passes reports done', async () => {
+  const p = freshProfile();
+  try {
+    const store = join(p.state, 'abilities', 'methods'); mkdirSync(store, { recursive: true });
+    const mk = (id, objective) => `# m\n\n\`\`\`kingmaker-method\n${JSON.stringify({ id, version: '1.0', title: id.replace(/-/g, ' '), domain: id.split('-')[0], inputs: { prompt: '' }, steps: [
+      { n: 1, id: 'solve', type: 'reason', into: 'answer', preamble: 'Answer.', prompt: '{{inputs.prompt}}' }, { n: 2, id: 'rec', type: 'write-json', path: 'r.json', value: { method: id, answer: '{{answer}}' } },
+      { n: 3, id: 'check', type: 'verify', ...(objective ? { objective: true } : {}), assertions: [{ file: 'r.json', field: 'method', equals: id }] }] })}\n\`\`\`\n`;
+    writeFileSync(join(store, 'tally-record-only.method.md'), mk('tally-record-only', false)); writeFileSync(join(store, 'gauge-objective-check.method.md'), mk('gauge-objective-check', true));
+    writeFileSync(join(store, 'index.json'), JSON.stringify({ schema: 'kingmaker.methods/1', methods: ['tally-record-only', 'gauge-objective-check'].map((id) => ({ id, title: id.replace(/-/g, ' '), domain: id.split('-')[0], file: `${id}.method.md`, quality: { tier: 'draft', score: 1, basis: 't' } })) }));
+    const brain = () => createLocalBrain({ state: p.state, remote: false, reasoner: stubReasoner });
+    const a = await handleMethodRequest('run the tally record only', { brain: brain(), workDir: p.work('a') });
+    assert.match(a.lines.join('\n'), /Outcome: ran, but the result is NOT verified/); assert.doesNotMatch(a.lines.join('\n'), /Outcome: done/);
+    const b = await handleMethodRequest('run the gauge objective check', { brain: brain(), workDir: p.work('b') });
+    assert.match(b.lines.join('\n'), /Outcome: done — the method's objective check passed/);
+  } finally { rmSync(p.state, { recursive: true, force: true }); }
+});
