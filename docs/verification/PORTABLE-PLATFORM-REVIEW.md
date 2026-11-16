@@ -18,3 +18,5 @@ Evidence outside source: `portable-real-linux-proof.json`, `portable-platform-fo
 ## Not yet proved
 
 Full Windows execution, platform-native GUI/voice/desktop automation, private engine packaging, Launcher and paid Armor integration on Linux/Windows, secure native credential stores, signing/notarization equivalents and real three-OS onboarding remain work. The existing Windows secret-reader failclosed boundary must not be restored with plaintext shortcuts. A successful CLI version or one generated asset is not proof of those features. No deployment was performed.
+
+Actual Linux testing caught a Node24 versus Node26 `fs.cpSync` behavior difference: copying a directory onto an already-created exclusive stage with `errorOnExist` failed on Node24. The installer now copies each source entry into the exclusively created stage, preserving the no-overwrite property. Both local tests and the actual Linux proof were rerun after correction. This is why source inspection/static Windows checks are not substituted for native execution.
