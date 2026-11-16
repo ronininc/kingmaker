@@ -2821,6 +2821,66 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
     layout(); log.scrollToEndOfDocument(nil)
     return true
   }
+  // ── TOOL PANELS (@@ghost {"toolPanel": {...}}: lib/tool-sessions.mjs createPanelChannel, sent by the method lane) ──
+  // One small block per tool run, drawn inline in the conversation and redrawn IN PLACE as its events arrive (found by
+  // its id attribute, never by a stored range that later text would shift). It shows only what the engine reported:
+  // the state (running · ran, not verified · completed · failed · cancelled), the tool's latest real output line and its
+  // last few lines, and a percentage ONLY when the event carries one (the tool's own output) — nothing is animated or
+  // estimated here. Look follows Customize: km.look (black/system text colours), km.replyColor (running), km.textSize.
+  static let toolPanelKey = NSAttributedString.Key("km.toolPanel")
+  private var toolPanelSeq: [String: Int] = [:]
+  func showToolPanel(_ p: [String: Any]) {
+    guard let id = p["id"] as? String, !id.isEmpty, id.count <= 120,
+          let state = p["state"] as? String, !state.isEmpty, state.count <= 40 else { return }
+    // Events can only move forward: an older or repeated event never redraws over a newer (e.g. final) one.
+    if let seq = (p["seq"] as? NSNumber)?.intValue {
+      if let last = toolPanelSeq[id], seq <= last { return }
+      if toolPanelSeq.count > 256 { toolPanelSeq.removeAll() }
+      toolPanelSeq[id] = seq
+    }
+    let tool = String((p["tool"] as? String ?? "tool").prefix(80))
+    let activity = String((p["activity"] as? String ?? "").replacingOccurrences(of: "\n", with: " ").prefix(200))
+    let progress: Int? = (p["progress"] as? NSNumber).map { $0.intValue }.flatMap { (0...100).contains($0) ? $0 : nil }
+    let tail: [String] = ((p["tail"] as? [Any]) ?? []).compactMap { $0 as? String }.suffix(3).map { String($0.replacingOccurrences(of: "\n", with: " ").prefix(300)) }
+    let black = lookPref == "black"
+    let dim = black ? NSColor.white.withAlphaComponent(0.5) : NSColor.secondaryLabelColor
+    let body = black ? NSColor.white.withAlphaComponent(0.88) : NSColor.labelColor
+    let stateColour: NSColor
+    switch state {
+    case "running", "starting": stateColour = replyColour
+    case "completed": stateColour = NSColor(srgbRed: 0.25, green: 0.73, blue: 0.31, alpha: 1)
+    case "unverified": stateColour = NSColor(srgbRed: 1, green: 0.75, blue: 0.3, alpha: 1)
+    case "failed", "cancel-failed": stateColour = NSColor(srgbRed: 0.97, green: 0.32, blue: 0.29, alpha: 1)
+    default: stateColour = dim   // cancelled, dismissed, anything new: plain
+    }
+    let label = state == "unverified" ? "ran — not verified" : state == "cancel-failed" ? "cancel failed — still running" : state
+    let size = textSize
+    let s = NSMutableAttributedString()
+    s.append(NSAttributedString(string: "● ", attributes: [.font: NSFont.systemFont(ofSize: size - 3), .foregroundColor: stateColour]))
+    s.append(NSAttributedString(string: tool, attributes: [.font: NSFont.systemFont(ofSize: size - 1, weight: .semibold), .foregroundColor: body]))
+    s.append(NSAttributedString(string: " · \(label)", attributes: [.font: NSFont.systemFont(ofSize: size - 1), .foregroundColor: stateColour]))
+    if let pct = progress { s.append(NSAttributedString(string: " · \(pct)%", attributes: [.font: NSFont.monospacedDigitSystemFont(ofSize: size - 1, weight: .regular), .foregroundColor: body])) }
+    if !activity.isEmpty { s.append(NSAttributedString(string: "\n   \(activity)", attributes: [.font: NSFont.systemFont(ofSize: size - 2), .foregroundColor: dim])) }
+    for line in tail where line != activity {
+      s.append(NSAttributedString(string: "\n   │ \(line)", attributes: [.font: NSFont.monospacedSystemFont(ofSize: size - 3, weight: .regular), .foregroundColor: dim]))
+    }
+    s.addAttribute(KingmakerBar.toolPanelKey, value: id, range: NSRange(location: 0, length: s.length))
+    guard let storage = log.textStorage else { return }
+    var found: NSRange? = nil
+    storage.enumerateAttribute(KingmakerBar.toolPanelKey, in: NSRange(location: 0, length: storage.length), options: [.reverse]) { value, range, stop in
+      if (value as? String) == id { found = range; stop.pointee = true }
+    }
+    if let range = found {
+      storage.replaceCharacters(in: range, with: s)
+    } else {
+      let gap = NSMutableParagraphStyle(); gap.paragraphSpacingBefore = 6
+      let block = NSMutableAttributedString()
+      if hasLog { block.append(NSAttributedString(string: "\n", attributes: [.paragraphStyle: gap])) }
+      block.append(s)
+      storage.append(block); hasLog = true
+    }
+    layout(); log.scrollToEndOfDocument(nil)
+  }
   func showSources(_ list: [[String: Any]]) {
     let items: [(String, String)] = list.prefix(8).compactMap { s in
       guard let u = s["url"] as? String, let t = s["title"] as? String, KingmakerBar.barLink(u) != nil else { return nil }
@@ -4388,6 +4448,7 @@ final class GhostApp: NSObject, NSApplicationDelegate {
         if let src = obj["sources"] as? [[String: Any]] { bar.showSources(src) }
         if let cmds = obj["commands"] as? [[String: Any]] { bar.setCommands(cmds) }
         if let creation = obj["nativeCreation"] as? [String: Any] { bar.showNativeCreation(creation) }
+        if let panel = obj["toolPanel"] as? [String: Any] { bar.showToolPanel(panel) }   // lib/tool-sessions.mjs createPanelChannel
         if let img = obj["image"] as? [String: Any], let path = img["path"] as? String { bar.showImage(path) }
         if let cal = obj["calibration"] as? [String: Any] { bar.showCalibration(cal) }
         if let flow = obj["flow"] as? [String: Any] { bar.showFlow(flow) }

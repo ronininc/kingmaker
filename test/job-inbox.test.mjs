@@ -137,7 +137,7 @@ test('no running inbox: submitJob says so; the link fallback carries the key and
 
 test('the daemon wires the inbox to the same typed-turn path, and `kingmaker job` is a command', () => {
   const cli = readFileSync(new URL('../lib/cli.mjs', import.meta.url), 'utf8');
-  assert.match(cli, /createJobInbox\(\{ state: paths\.state[\s\S]*?submit: \(text, \{ conversationId, onStart, onDone \}\) => \{ settled\(typedTurns, onStart\); phoneTurn\(text, \{ conversationId \}\); settled\(typedTurns, onDone\); \}/);
+  assert.match(cli, /createJobInbox\(\{ state: paths\.state[\s\S]*?submit: \(text, \{ conversationId, onStart, onDone \}\) => \{ settled\(typedTurns, onStart\); phoneTurn\(text, \{ conversationId, source: 'job' \}\); settled\(typedTurns, onDone\); \}/);
   assert.match(cli, /case 'job': return cmdJob\(args\);/);
   assert.match(cli, /await jobInboxStop\(\)/);
   assert.doesNotMatch(readFileSync(new URL('../lib/job-inbox.mjs', import.meta.url), 'utf8'), /approve_item|approveProposal|confirmProposal/);

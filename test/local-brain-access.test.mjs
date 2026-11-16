@@ -167,7 +167,7 @@ test('the method lane emits tool-panel events whose final state is the TRUE outc
     assert.match(said.at(-1), /NOT verified/);
     const cli = readFileSync(new URL('../lib/cli.mjs', import.meta.url), 'utf8');
     assert.match(cli, /if \(!who\?\.typed\) \{\s*const lane = await getMethodLane\(\);/, 'voice turns reach the lane');
-    assert.match(cli, /lane\.isApproval\(text\) && !who\?\.attested/, 'voice approval requires the attested owner voice');
+    assert.match(cli, /source: who\?\.ownerVoice \? 'owner-voice' : 'voice'/, 'voice decisions require the attested owner voice (the lane refuses other sources: test/bar-panels-cancel.test.mjs)');
     assert.match(cli, /await \(await getMethodLane\(\)\)\.wants\(text, phoneConv\)/, 'typed bar turns reach the lane');
   } finally { rmSync(p.state, { recursive: true, force: true }); }
 });
