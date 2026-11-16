@@ -32,6 +32,37 @@ import { installationMetadata } from './installation-metadata.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SESSION_COOKIE = 'sa_session';
+// Headers sent on EVERY dashboard response (HTML, JSON, NDJSON, 404): no MIME
+// sniffing, no framing (clickjacking), no referrer leakage, isolated browsing
+// context, same-origin-only resource reads.
+const SECURITY_HEADERS = Object.freeze({
+  'x-content-type-options': 'nosniff',
+  'x-frame-options': 'DENY',
+  'referrer-policy': 'no-referrer',
+  'cross-origin-opener-policy': 'same-origin',
+  'cross-origin-resource-policy': 'same-origin',
+});
+const API_CSP = "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'";
+// Strict page CSP built from SHA-256 hashes of the page's own inline <script>
+// and <style> blocks. No 'unsafe-inline', no 'unsafe-eval', and no nonce: the
+// page is static per process, so hashes pin exactly the shipped code and
+// nothing has to be echoed into the DOM for inspect-element to find.
+export function dashboardContentSecurityPolicy(html) {
+  const hashes = (tag) => [...String(html).matchAll(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`, 'g'))]
+    .map(m => `'sha256-${crypto.createHash('sha256').update(m[1], 'utf8').digest('base64')}'`);
+  const scripts = hashes('script'), styles = hashes('style');
+  return [
+    "default-src 'none'",
+    `script-src ${scripts.join(' ') || "'none'"}`,
+    `style-src ${styles.join(' ') || "'none'"}`,
+    'img-src data:',
+    "connect-src 'self'",
+    "base-uri 'none'",
+    "form-action 'none'",
+    "object-src 'none'",
+    "frame-ancestors 'none'",
+  ].join('; ');
+}
 // Read a single cookie value without exposing it to the page. Used so the
 // loopback API secret travels in an HttpOnly cookie instead of the DOM.
 function readCookie(header, name) {
@@ -212,7 +243,7 @@ function readFeed() {return readProtectionFeed(feedFile);}
 
 function json(res, status, body) {
   const data = Buffer.from(JSON.stringify(body));
-  res.writeHead(status, { 'content-type': 'application/json', 'content-length': data.length, 'cache-control': 'no-store' });
+  res.writeHead(status, { ...SECURITY_HEADERS, 'content-security-policy': API_CSP, 'content-type': 'application/json; charset=utf-8', 'content-length': data.length, 'cache-control': 'no-store' });
   res.end(data);
 }
 
@@ -277,7 +308,7 @@ async function api(req, res, url) {
     if(!status().activated)return json(res,409,{ok:false,error:'Activate Scripture Armor first.'});
     const input=await body(req);
     if(url.pathname==='/api/review/native-report'){
-      const file=repositoryReview.report(input.id);res.writeHead(200,{'content-type':'application/x-ndjson','cache-control':'no-store'});fs.createReadStream(file).pipe(res);return;
+      const file=repositoryReview.report(input.id);res.writeHead(200,{...SECURITY_HEADERS,'content-security-policy':API_CSP,'content-type':'application/x-ndjson','cache-control':'no-store'});fs.createReadStream(file).pipe(res);return;
     }
     if(url.pathname==='/api/review/native-retain'){
       if(Object.keys(input).length!==1||typeof input.text!=='string'||!input.text.trim()||input.text.length>32768)return json(res,400,{ok:false,error:'Select up to 32 KiB of useful text.'});
@@ -469,7 +500,8 @@ async function api(req, res, url) {
 }
 
 const logo = (() => { try { return fs.readFileSync(path.join(HERE, 'ui', 'scripture-armor-crest-ronin.png')).toString('base64'); } catch { return ''; } })();
-const html = renderArmorDashboard({ token, logo, termsText: TERMS_TEXT, checkout: armorCheckout });
+const html = renderArmorDashboard({ logo, termsText: TERMS_TEXT, checkout: armorCheckout });
+const pageCsp = dashboardContentSecurityPolicy(html);
 
 let mutationBusy = false;
 const server = http.createServer(async (req, res) => {
@@ -484,8 +516,8 @@ const server = http.createServer(async (req, res) => {
       try { return await api(req, res, url); } finally { mutationBusy = false; }
     }
     if (url.pathname.startsWith('/api/')) return await api(req, res, url);
-    if (req.method !== 'GET' || url.pathname !== '/') { res.writeHead(404); return res.end('not found'); }
-    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'set-cookie': `${SESSION_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Strict`, 'content-security-policy': "default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'" });
+    if (req.method !== 'GET' || url.pathname !== '/') { res.writeHead(404, { ...SECURITY_HEADERS, 'content-security-policy': API_CSP, 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' }); return res.end('not found'); }
+    res.writeHead(200, { ...SECURITY_HEADERS, 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'set-cookie': `${SESSION_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Strict`, 'content-security-policy': pageCsp });
     res.end(html);
   } catch (error) { json(res, 500, { ok: false, error: error.message }); }
 });
