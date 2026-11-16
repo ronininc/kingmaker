@@ -16,6 +16,14 @@
       "archiveSha256": "ebc9b28cc7f17abeaa2ea2a12b3ef5043168dfa65645607c040cad94623a5ced",
       "bundleSha256": "ab8bd59126b0ba00cae8ebf2964554439c1becf4e65713766f5b878218f0e976",
       "note": "Locally signed review candidate; authenticated Kingmaker placement and bounded owner telemetry credentials; publication pending owner permission"
+    },
+    {
+      "version": "0.3.19",
+      "channel": "direct",
+      "issuedAt": "2026-11-16T06:31:10.535Z",
+      "archiveSha256": "e5a52436439f08f3c248ce008d182dfc421a3120ba168d14486ea5ff2d4831d3",
+      "bundleSha256": "612c5e0ebd00f6c75eca895868029a91f92849873149d9c54aa38a6b5f907c2a",
+      "note": "Kingmaker 4.5.3 candidate: Launcher 0.3.19 rebuilt from ronininc/ronin-launcher 6ff698ecb55efb8e8f337839103fea67bb3ae874 (integrity quarantine), Developer ID signed W9DZM3W6QC, not notarized; publication pending owner permission"
     }
   ]
 }
