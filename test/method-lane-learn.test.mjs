@@ -83,3 +83,22 @@ test('a message without attachments is not taken by the learn path', async () =>
   assert.equal(await l.wants('Kingmaker, run the race please'), false);
   assert.equal(await l.handle('Kingmaker, run the race please'), null);
 });
+
+test('promoteDraft: refused without passing held-out checks; accepted ones are loaded by the conductor', async () => {
+  const { promoteDraft } = await import('../lib/method-from-source.mjs');
+  const { createLocalBrain } = await import('../lib/method-request.mjs');
+  const state = mkdtempSync(join(tmpdir(), 'lane-state-')); const dir = kit(); const { complete } = scripted();
+  const { l } = lane(state, complete);
+  await l.handle(`Kingmaker, run the race ${dir}/README.md ${dir}/sim.py`); const r = await l.handle('yes');
+  const text = readFileSync(r.draftPath, 'utf8');
+  await assert.rejects(promoteDraft({ state, text, checks: [] }), /no decision checks/);
+  await assert.rejects(promoteDraft({ state, text, checks: [{ set: 'heldout', total: 26, passed: 23 }] }), /not all passing/);
+  await assert.rejects(promoteDraft({ state, text, checks: [{ set: 'dev', total: 21, passed: 21 }] }), /no held-out/);
+  const before = (await createLocalBrain({ state, remote: false }).loop.conductor.listMethods()).map((m) => m.id);
+  assert.ok(!before.includes(r.id));
+  const p = await promoteDraft({ state, text, checks: [{ set: 'heldout', total: 26, passed: 26 }, { set: 'dev', total: 21, passed: 21 }] });
+  assert.equal(p.status, 'promoted');
+  const after = (await createLocalBrain({ state, remote: false }).loop.conductor.listMethods()).map((m) => m.id);
+  assert.ok(after.includes(r.id));
+  assert.match(readFileSync(join(state, 'abilities', 'methods', 'authored.jsonl'), 'utf8'), /heldout/);
+});
