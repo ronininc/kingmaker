@@ -18,6 +18,7 @@ export default {
     const path = new URL(req.url).pathname;
     if (path === '/enroll') return enroll(req, env, token);
     if (path === '/install-cert-status') return signedInstallStatus(req, env, token);
+    if (path === '/capability-grant' || path === '/capability-status') return capabilityAuthority(req, env, token);
     // Public installer download (R2 `public/<name>`, no key; ronininc.org links it): GET|HEAD /download/<name>.dmg|.zip.
     // Only a plain file name is accepted and only the public/ prefix is read, so no release or add-on file is reachable
     // here. Handled before the method check and the key gate; every other path still needs a key.
@@ -212,6 +213,62 @@ function derToRaw(der) {
   const raw = new Uint8Array(64);
   raw.set(r, 0); raw.set(s, 32);
   return raw;
+}
+
+// Capability grants require a configured CRM service-binding RPC. There is no
+// caller-selected URL or HTTP fallback, and enrollment never implies payment.
+async function capabilityAuthority(req, env, token) {
+  const reply = (body, status=200) => Response.json(body,{status,headers:{'cache-control':'no-store'}});
+  if(req.method!=='POST')return reply({error:'method_not_allowed'},405);
+  if(!env.CERT_SIGNING_KEY||!env.DEVICES||!env.RELEASES||typeof env.CRM_CAPABILITIES?.evaluateCapabilityEvidence!=='function')return reply({error:'authority_unavailable'},503);
+  if(!token||token.length>4096)return reply({error:'unauthorized'},401);
+  let body;
+  try {
+    const reader=req.body?.getReader();if(!reader)throw Error();let size=0;const parts=[];
+    for(;;){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>32768){await reader.cancel();return reply({error:'request_too_large'},413);}parts.push(value);}
+    const bytes=new Uint8Array(size);let at=0;for(const b of parts){bytes.set(b,at);at+=b.length;}body=JSON.parse(new TextDecoder('utf8',{fatal:true}).decode(bytes));
+  }catch{return reply({error:'invalid_request'},400);}
+  const cert=await verifyEntitlementClaims(env,body?.installCertificate),keySha=await sha(token);
+  const record=await env.DEVICES.get(`key:${keySha}`,'json');
+  if(!cert||cert.schema!=='ronin.install-cert/1'||cert.issuer!=='ronin-update-host'||cert.bundleId!=='com.ronininc.solghost'
+    ||cert.keySha!==keySha||!record||record.device!==cert.deviceSha256||record.revoked!==false
+    ||!/^[0-9a-f-]{8,64}$/i.test(cert.installId||'')||!/^[0-9a-f]{64}$/.test(cert.deviceSha256||'')
+    ||!Number.isFinite(Date.parse(cert.issuedAt))||Date.parse(cert.issuedAt)>Date.now()+5000)return reply({error:'installation_not_authorized'},401);
+  let latest;try{const obj=await env.RELEASES.get('latest.json');latest=obj&&await obj.json();}catch{}
+  if(!latest?.tag||latest.tag!==cert.releaseTag||await isRevoked(env,'',cert.installId))return reply({error:'installation_not_current'},403);
+  const status=new URL(req.url).pathname==='/capability-status';
+  let prior=null,memberId=body.memberId,providerFingerprint=body.providerFingerprint,basis=body.basis,grantId=crypto.randomUUID(),nonce=null,grantDigest=null;
+  if(status){
+    prior=await verifyEntitlementClaims(env,body.grant);const c=body.challenge;
+    if(!prior||prior.schema!=='ronin.capability-grant/1'||prior.issuer!=='ronin-update-host'||prior.product!=='kingmaker'
+      ||prior.installId!==cert.installId||prior.deviceSha256!==cert.deviceSha256||!Number.isSafeInteger(prior.expiresAt)||prior.expiresAt<=Date.now()
+      ||!Number.isSafeInteger(prior.issuedAt)||prior.issuedAt>Date.now()||!c||c.schema!=='ronin.capability-status-challenge/1'
+      ||!/^[0-9a-f]{64}$/.test(c.nonce||'')||c.installId!==cert.installId||c.deviceSha256!==cert.deviceSha256
+      ||c.grantDigest!==await sha(body.grant.payload))return reply({error:'grant_challenge_invalid'},401);
+    ({memberId,providerFingerprint,basis,grantId}=prior);nonce=c.nonce;grantDigest=c.grantDigest;
+  }
+  if((memberId!==undefined&&(typeof memberId!=='string'||!memberId||memberId.length>200))||!/^[0-9a-f]{64}$/.test(providerFingerprint||'')
+    ||!['paid','fleet'].includes(basis)||typeof grantId!=='string'||!grantId||grantId.length>200)return reply({error:'binding_invalid'},400);
+  const query={installId:cert.installId,deviceSha256:cert.deviceSha256,providerFingerprint,basis,grantId,nonce:hex(crypto.getRandomValues(new Uint8Array(32)))};
+  let decision,timer;
+  try{decision=await Promise.race([env.CRM_CAPABILITIES.evaluateCapabilityEvidence(query),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('deadline')),5000);})]);}
+  catch{return reply({error:'evidence_unavailable'},503);}finally{clearTimeout(timer);}
+  if(!decision||decision.current!==true)return reply({error:'capability_not_authorized'},403);
+  const at=Date.now(),caps=['ronin.skill-base','scripture-armor.pqc'];
+  if(['installId','deviceSha256','providerFingerprint','basis'].some(k=>decision[k]!==query[k])
+    ||decision.nonce!==query.nonce||typeof decision.memberId!=='string'||!decision.memberId||decision.memberId.length>200||(memberId!==undefined&&decision.memberId!==memberId)
+    ||!Array.isArray(decision.capabilities)||decision.capabilities.length!==2||caps.some(c=>!decision.capabilities.includes(c))
+    ||typeof decision.evidenceId!=='string'||!decision.evidenceId||decision.evidenceId.length>200
+    ||!Number.isSafeInteger(decision.verifiedAt)||decision.verifiedAt>at||decision.verifiedAt<at-60000
+    ||!Number.isSafeInteger(decision.expiresAt)||decision.expiresAt<=at||decision.expiresAt>decision.verifiedAt+60000
+    ||(basis==='fleet'&&(!decision.consent||typeof decision.consent.id!=='string'||!decision.consent.id||decision.consent.id.length>200||!Number.isSafeInteger(decision.consent.version)||decision.consent.version<1))
+    ||(basis==='paid'&&decision.consent!==null))return reply({error:'evidence_invalid'},503);
+  memberId=decision.memberId;
+  if(status&&(prior.evidenceId!==decision.evidenceId||JSON.stringify(prior.consent??null)!==JSON.stringify(decision.consent??null)))return reply({error:'grant_evidence_changed'},403);
+  const common={issuer:'ronin-update-host',grantId,installId:cert.installId,deviceSha256:cert.deviceSha256,issuedAt:at,expiresAt:Math.min(at+60000,decision.expiresAt,prior?.expiresAt??Infinity)};
+  const payload=status?{schema:'ronin.capability-status/1',...common,current:true,revoked:false,nonce,grantDigest}
+    :{schema:'ronin.capability-grant/1',...common,product:'kingmaker',memberId,providerFingerprint,basis,capabilities:caps,evidenceId:decision.evidenceId,...(basis==='fleet'?{consent:decision.consent}:{})};
+  try{return reply(await issueInstallCert(env.CERT_SIGNING_KEY,payload));}catch{return reply({error:'signing_unavailable'},503);}
 }
 
 // Fresh installation status is distinct from the legacy unsigned revocation query.
