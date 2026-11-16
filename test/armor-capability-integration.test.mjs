@@ -18,7 +18,7 @@ const authority=generateKeyPairSync('ec',{namedCurve:'prime256v1'});
 const envelope=c=>{const payload=JSON.stringify(c);return {alg:'ES256',payload,sig:sign('sha256',Buffer.from(payload),authority.privateKey).toString('base64')};};
 function fixture(basis='paid'){
  let consent={id:'consent-fixture',version:1,optedIn:true,acceptedAt:clock-1};
- const installation={installId:'fixture-install',deviceSha256:'a'.repeat(64)};
+ const installation={installId:'12345678-1234-1234-1234-123456789012',deviceSha256:'a'.repeat(64)};
  const api=createUnifiedCapabilityAccessForFixture({installation,publicIdentity:identity,now:()=>clock,readFleetConsent:()=>consent},authority.publicKey.export({type:'spki',format:'pem'}));
  const claims={schema:'ronin.capability-grant/1',issuer:'ronin-update-host',product:'kingmaker',grantId:'fixture-grant',...installation,providerFingerprint:hash(JSON.stringify(identity)),basis,capabilities:['ronin.skill-base','scripture-armor.pqc'],issuedAt:clock-1,expiresAt:clock+600000,...(basis==='fleet'?{consent:{id:'consent-fixture',version:1}}:{})};
  const grant=envelope(claims);
@@ -88,7 +88,7 @@ test('production factories reject caller-defined authority and unverified instal
 });
 test('output composition demands fresh signed grants before and after every seal, and denies withdrawal',async()=>{
  for(const basis of ['paid','fleet']){
- const f=fixture(basis),installation={installId:'fixture-install',deviceSha256:'a'.repeat(64)};
+ const f=fixture(basis),installation={installId:'12345678-1234-1234-1234-123456789012',deviceSha256:'a'.repeat(64)};
  let calls=0,seals=0,withdrawn=false,revoke=false,withdrawDuringSeal=false;
  const protect=createStandaloneGeneratedOutputProtectionForFixture({installation,publicIdentity:identity,recipient:identity,now:()=>clock,
  readFleetConsent:()=>({id:'consent-fixture',version:1,optedIn:!withdrawn,acceptedAt:clock-1}),readGrant:async()=>f.grant,
@@ -114,4 +114,25 @@ test('absolute socket deadline defeats slow-drip and parent symlink is rejected'
  const start=Date.now();await assert.rejects(armorOwnerRoundTrip({request:{cmd:'status'},home,timeoutMs:50}),/TIMEOUT/);assert.ok(Date.now()-start<1000);
  await fs.rename(root,path.join(home,'real'));await fs.symlink(path.join(home,'real'),root);
  await assert.rejects(armorOwnerRoundTrip({request:{cmd:'status'},home}),/ROOT_UNSAFE/);
+});
+
+test('output composition revalidates signed installation revocation before and after sealing',async()=>{
+ const {readFileSync}=await import('node:fs');
+ const {createInstallCertificateStatusProviderForFixture,INSTALL_STATUS_ORIGIN}=await import('../lib/launcher-crm-identity-client.mjs');
+ const worker=(await import('data:text/javascript;base64,'+readFileSync(new URL('../update-host/worker.js',import.meta.url)).toString('base64'))).default;
+ const bearer='synthetic-install-bearer',keySha=hash(bearer),installation={installId:'12345678-1234-1234-1234-123456789012',deviceSha256:'a'.repeat(64)};
+ const certClaims={schema:'ronin.install-cert/1',issuer:'ronin-update-host',...installation,bundleId:'com.ronininc.solghost',releaseTag:'v4.5.3',keySha,issuedAt:new Date(Date.now()-1000).toISOString()},installCertificate=envelope(certClaims);
+ let revoked=false,checks=0,seals=0,revokeDuringSeal=false;
+ const statusProvider=createInstallCertificateStatusProviderForFixture({baseUrl:INSTALL_STATUS_ORIGIN,bearer,fetchImpl:async(url,opts)=>{checks++;return worker.fetch(new Request(url,opts),{CERT_SIGNING_KEY:authority.privateKey.export({type:'pkcs8',format:'pem'}),DEVICES:{async get(k){return k===`key:${keySha}`?{device:installation.deviceSha256,revoked}:null;}},RELEASES:{async get(){return {async json(){return {tag:'v4.5.3'};}};}}});}},authority.publicKey.export({type:'spki',format:'pem'}));
+ await statusProvider({installCertificate,...installation,keySha,releaseTag:'v4.5.3'});checks=0;
+ const f=fixture();
+ const protect=createStandaloneGeneratedOutputProtectionForFixture({installation,publicIdentity:identity,recipient:identity,now:()=>clock,readGrant:async()=>f.grant,
+ checkInstallation:()=>statusProvider({installCertificate,...installation,keySha,releaseTag:'v4.5.3'}),
+ checkGrantStatus:async({challenge})=>envelope({schema:'ronin.capability-status/1',issuer:'ronin-update-host',grantId:'fixture-grant',...installation,nonce:challenge.nonce,grantDigest:challenge.grantDigest,current:true,revoked:false,issuedAt:clock,expiresAt:clock+60000})},authority.publicKey.export({type:'spki',format:'pem'}),{
+ proof:async()=>{const c=createArmorDockChallenge({publicIdentity:identity,now:()=>clock});return c.verify(response(c.request));},seal:async options=>{seals++;if(revokeDuringSeal)revoked=true;const c=createArmorOutputChallenge(options);return c.verify(sealResponse(c.request));}});
+ assert.equal((await protect({bytes:Buffer.from('test'),language:'js'})).status,'protected');assert.equal(checks,2);
+ revoked=true;await assert.rejects(protect({bytes:Buffer.from('test'),language:'js'}),/PROVIDER_FAILED/);assert.equal(seals,1);
+ revoked=false;revokeDuringSeal=true;await assert.rejects(protect({bytes:Buffer.from('test'),language:'js'}),/PROVIDER_FAILED/);assert.equal(seals,2);assert.equal(checks,5);
+ for(const config of [{now:()=>0},{clock:()=>0},{checkInstallation:async()=>({current:true,revoked:false})}])assert.throws(()=>createStandaloneGeneratedOutputProtection(config),/OVERRIDE/);
+ assert.throws(()=>createUnifiedCapabilityAccess({now:()=>0}),/OVERRIDE/);
 });
