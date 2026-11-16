@@ -1,4 +1,4 @@
-// The collective's front door (fleet-host/worker.js) and the Mac's side of it (lib/fleet-transport.mjs), end to end in
+// Legacy server contract tests. New clients refuse this telemetry schema; these direct fixture requests test server storage in
 // memory: a real Ed25519 key pair, in-memory R2/KV, the Mac's packet from the engine's own sanitizer.
 import assert from 'node:assert/strict';
 import { generateKeyPairSync } from 'node:crypto';
@@ -33,7 +33,14 @@ const macWith = (env) => {
   const fetchImpl = (url, init) => worker.fetch(new Request(url, init), env, {});
   const id = installationId(state, newInstallationId);
   const packet = () => sanitizeForFleet(fleetDraft({ id, version: '0.9.0', totalMemBytes: 24 * 1024 ** 3, preferences: [{ statement: 'always give me the price first' }] })).packet;
-  return { state, id, packet, t: fleetTransport({ state, env: {}, fetchImpl }), fetchImpl };
+  const client=fleetTransport({state,env:{},fetchImpl});
+  // Raw synthetic legacy requests exercise retained host compatibility only.
+  const t={...client,send:async packet=>{
+    const r=await fetchImpl('https://fleet.example/contribute',{method:'POST',headers:{'content-type':'application/json','x-fleet-install':id,'x-fleet-proof':installSecret(state)},body:JSON.stringify({packet})});
+    const j=await r.json();const rc=j.receipt;const ok=r.ok&&rc?.accepted===true&&receiptValid(rc,{publicKeyPem:env.FLEET_PUBLIC_KEY,installationId:id,packetId:packet.packetId});
+    return {ok,receipt:ok?rc:null,refused:rc?.accepted===false?rc.reasons:undefined,status:r.status};
+  }};
+  return { state, id, packet, t, client, fetchImpl };
 };
 
 test('no server configured: nothing to send with (sharing logs locally)', () => {
@@ -88,4 +95,8 @@ test('"forget what I shared": every packet, the bundle and the proof are erased;
   const f = await mac.t.forgetRemote(mac.id);
   assert.deepEqual(f, { ok: true, packets: 2 });
   assert.equal([...env._r2.keys()].length, 0); assert.equal(env._kv.has(`proof:${mac.id}`), false);
+});
+
+test('new client refuses legacy telemetry before any host storage',async()=>{
+ const env=memEnv(),mac=macWith(env);assert.equal((await mac.client.send(mac.packet())).error,'REUSABLE_SKILL_ADMISSION_REQUIRED');assert.equal(env._r2.size,0);assert.equal(env._kv.size,0);
 });

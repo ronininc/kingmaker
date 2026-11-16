@@ -1,3 +1,4 @@
+import {buildReusableSkillPacket} from '../lib/reusable-skill-policy.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {mkdtempSync,rmSync,writeFileSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';
@@ -9,7 +10,7 @@ test('raw private report and extra fields rejected despite false privacy flag',(
  const raw={modelId:'fixture',prompt:'private@example.test',customerDataIncluded:false};
  assert.throws(()=>sealEnvelope(raw),/CLOSED_PACKET/);
  for(const env of [null,{}, {payload:raw,customerDataIncluded:false,sentAt:new Date().toISOString()}])assert.equal(validateEnvelope(env).valid,false);
- const p=sanitizeForFleet(draft).packet;const good=sealEnvelope(p);
+ const p=buildReusableSkillPacket({installationId:draft.installationId,methodIds:['file-review']});const good=sealEnvelope(p);
  assert.equal(validateEnvelope(good).valid,true);assert.equal(validateEnvelope({...good,secret:'private'}).valid,false);
  p.prompt='private';assert.equal(validateEnvelope(good).valid,true,'sealed payload detached');
 });
@@ -20,7 +21,8 @@ test('real sanitizer and outbound sink exclude private fixture fields; no permis
  const sent=[];let outgoing=packet;
  const s=openSharing({state:dir,env:{},buildPacket:async()=>outgoing,validate:()=>({ok:true}),send:async p=>{sent.push(JSON.stringify(p));return {ok:true};}});
  s.answer('yes please no');await s.contribute();assert.equal(sent.length,0,'ambiguous prefix is not opt in');
- s.answer('yes');await s.contribute();assert.equal(sent.length,1);assert.ok(!sent[0].includes(secret));
+ s.answer('yes');await s.contribute();assert.equal(sent.length,0,'old telemetry sanitizer is not skill admission');
+ outgoing=buildReusableSkillPacket({installationId:draft.installationId,methodIds:['file-review']});await s.contribute();assert.equal(sent.length,1);assert.ok(!sent[0].includes(secret));
  outgoing={...packet,prompt:secret};assert.equal((await s.contribute()).sent,false);assert.equal(sent.length,1);
  outgoing=packet;s.answer('off');await s.contribute();assert.equal(sent.length,1);
 });
