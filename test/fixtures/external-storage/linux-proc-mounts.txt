@@ -1,0 +1,6 @@
+/dev/nvme0n1p2 / ext4 rw,relatime 0 0
+proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
+/dev/nvme0n1p1 /boot/efi vfat rw,relatime,fmask=0077,dmask=0077 0 0
+/dev/sdb1 /media/robbie/KM\040USB vfat rw,nosuid,nodev,relatime,uid=1000,gid=1000,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,showexec,utf8,flush,errors=remount-ro 0 0
+/dev/mapper/luks-3f1c /media/robbie/VAULT ext4 rw,nosuid,nodev,relatime 0 0
+/dev/mmcblk0p1 /media/robbie/SDCARD exfat ro,nosuid,nodev,relatime,uid=1000,gid=1000 0 0
