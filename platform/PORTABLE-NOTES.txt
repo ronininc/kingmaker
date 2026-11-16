@@ -1,0 +1,18 @@
+Kingmaker portable CLI candidate (Linux/Windows x64)
+
+Verify the archive hash against a trusted signed release manifest before extracting.
+The internal payload list detects changes but is not independent publisher authentication.
+Run install.sh (Linux) or install.ps1 (Windows) from the extracted unit. Node 24+
+is required and must already be installed. No automatic model/corpus/runtime downloads.
+The installer validates the unit, refuses unsafe targets, stages and verifies the
+copy, and rolls back failed replacement. A prior installation is retained as a
+backup after successful replacement; it is not permanently erased. Existing unrelated commands are not overwritten.
+Windows does not modify PATH; invoke the installed kingmaker.cmd explicitly.
+
+This contains the portable Kingmaker CLI payload, NOT the macOS desktop application,
+private engine runtime, native voice/UI stack, Scripture Armor service or Ronin Launcher.
+Commands requiring those unavailable components must report their prerequisite.
+A successful version command does not establish full platform functionality.
+Linux/Windows native runtime, UI, entitlement, security and integration tests on
+real supported hosts are required before calling these complete product releases.
+Component license notices do not relicense third-party dependencies or project outputs.

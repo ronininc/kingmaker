@@ -1,0 +1,22 @@
+name: Portable CLI platform proof (manual review)
+on:
+  push:
+    branches: [review/windows-vm-proof]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-platform:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify native portable installation and tamper refusal
+        run: node test/portable-native-platform.proof.mjs
