@@ -20,3 +20,8 @@ test('no agreed rule falls back to the full method prompt (still a model decisio
   const r = await decide({ ask, guidance: G, fields: { helm: [-1, 1], sheet: [0, 1] }, turnField: 'helm', userMsg: 'OBS', votes: 3, decompose: true });
   assert.equal(r.d.turn, 'right'); assert.ok(r.classify.fallback || r.classify.rule);
 });
+test('a parent rule with sub-rules triggers a second model classification among its sub-rules', async () => {
+  const ask = async (system) => { if (/SUB-RULE CONDITIONS/.test(system)) return { d: { rule: '3b' }, raw: '' }; if (/say which rule applies/.test(system)) return { d: { rule: '3' }, raw: '' }; return { d: { turn: /RULE 3b APPLIES/.test(system) ? 'straight' : 'left', amount: 0, sheet: 0.3 }, raw: '' }; };
+  const r = await decide({ ask, guidance: G, fields: { helm: [-1, 1], sheet: [0, 1] }, turnField: 'helm', userMsg: 'OBS', votes: 3, decompose: true });
+  assert.equal(r.classify.rule, '3b'); assert.deepEqual(r.classify.sub, ['3b', '3b', '3b']); assert.equal(r.d.turn, 'straight');
+});
