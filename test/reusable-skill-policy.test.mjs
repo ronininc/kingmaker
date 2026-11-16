@@ -14,7 +14,7 @@ test('active mint refuses credentials, private content and unknown rights withou
 });
 test('reviewed original method mints and exports only exact Apache component; outputs remain owner controlled',t=>{
  const state=fresh(t);assert.equal(buildMintedReusableSkillPacket({state,installationId}),null);
- const made=createSkillFolder(state,{methodId:'file-review'});assert.equal(made.ok,true);const packet=buildMintedReusableSkillPacket({state,installationId});assert.equal(validateReusableSkillPacket(packet).ok,true);assert.equal(packet.methods[0].license,'Apache-2.0');assert.match(packet.methods[0].projectOutputsLicense,/owner-controlled/);
+ const made=createSkillFolder(state,{methodId:'file-review'});assert.equal(made.ok,true);assert.match(readFileSync(join(made.dir,'LICENSE'),'utf8'),/END OF TERMS AND CONDITIONS/);assert.match(readFileSync(join(made.dir,'NOTICE'),'utf8'),/not owner project outputs/);const packet=buildMintedReusableSkillPacket({state,installationId});assert.equal(validateReusableSkillPacket(packet).ok,true);assert.equal(packet.methods[0].license,'Apache-2.0');assert.match(packet.methods[0].projectOutputsLicense,/owner-controlled/);
  writeFileSync(join(made.dir,'SKILL.md'),'password = PRIVATE_PROJECT_CONTENT');const again=buildMintedReusableSkillPacket({state,installationId});assert.ok(!JSON.stringify(again).includes('PRIVATE_PROJECT_CONTENT'));
  for(const mutate of [p=>p.methods[0].instructions+='secret',p=>p.preferences=[],p=>p.methods[0].authorship='unverified author',p=>p.methods[0].license='unknown']){const p=structuredClone(packet);mutate(p);assert.equal(validateReusableSkillPacket(p).ok,false);}
  assert.throws(()=>materializeReviewedMethod('unknown'),/RIGHTS/);

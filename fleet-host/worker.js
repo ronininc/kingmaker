@@ -1,15 +1,16 @@
 // fleet-host/worker.js — the collective's front door (Cloudflare Worker "kingmaker-fleet"; design: docs/community-learning.md).
-// It receives the closed packets Kingmakers share, stores them, and hands each install back its signed bundle. It never
-// executes anything it receives, and the packet schema it enforces is the engine's own (vendor/fleet/fleet-packet.mjs).
+// Receives only exact release-reviewed generic method packets and signs receipts.
+// It never executes content; legacy telemetry and unreviewed redistribution are refused.
 //   POST /contribute  {packet}         → a signed receipt (accepted or refused, with reasons; never the content)
-//   GET  /bundle                       → this install's latest signed bundle (204 when there is none yet)
+//   GET  /bundle                       → 501 until governed redistribution exists
 //   POST /forget                       → erases this install's packets, bundle and proof
 //   GET  /key                          → the public key and keyId installs pin
 // An install proves itself with X-Fleet-Install (its random fi_ id) and X-Fleet-Proof (a random secret it made; only its
 // SHA-256 is stored, on first contribution). Bindings: PACKETS (R2), FLEET (KV), FLEET_SIGNING_KEY (secret, PKCS#8 PEM,
 // Ed25519), FLEET_PUBLIC_KEY (var, SPKI PEM). Aggregation (the engine's stand-in: quorum, trimmed FedAvg, validation) runs
 // on Ronin's side over the stored packets and writes bundles to PACKETS under bundles/<install>.json.
-import { canonicalJson, validatePacket } from '../vendor/fleet/fleet-packet.mjs';
+import {validateReusableSkillPacket} from '../lib/reusable-skill-catalog.mjs';
+import { canonicalJson } from '../vendor/fleet/fleet-packet.mjs';
 
 export const MAX_BODY = 256 * 1024;
 export const MAX_PACKETS_PER_DAY = 4;
@@ -38,8 +39,9 @@ async function receipt(env, installationId, packetId, accepted, reasons, now) {
 }
 
 /** The install's proof: on first sight its hash is stored; afterwards it must match. → 'ok' | 'new' | 'bad' */
-async function checkProof(env, install, proof, { create }) {
+async function checkProof(env, install, proof, { create, allowWithdrawn = false }) {
   if (!INSTALL_RE.test(install || '') || !PROOF_RE.test(proof || '')) return 'bad';
+  if(!allowWithdrawn&&await env.FLEET.get(`withdrawn:${install}`))return 'bad';
   const want = await env.FLEET.get(`proof:${install}`);
   const got = await sha256(proof);
   if (!want) { if (!create) return 'bad'; await env.FLEET.put(`proof:${install}`, got); return 'new'; }
@@ -56,34 +58,43 @@ export default {
       if (request.method === 'POST' && url.pathname === '/contribute') {
         const len = Number(request.headers.get('content-length') || 0);
         if (len > MAX_BODY) return json(413, { error: 'too large' });
-        const raw = await request.text();
-        if (raw.length > MAX_BODY) return json(413, { error: 'too large' });
+        const reader=request.body?.getReader();if(!reader)return json(400,{error:'body required'});
+        const chunks=[];let size=0;
+        try{while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>MAX_BODY)return json(413,{error:'too large'});chunks.push(value);}}finally{await reader.cancel();}
+        const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}const raw=new TextDecoder().decode(bytes);
         let body; try { body = JSON.parse(raw); } catch { return json(400, { error: 'not json' }); }
         const packet = body?.packet;
         // The proof binds the install: a stranger can't contribute under (or erase) someone else's id.
         if (packet?.installationId !== install) return json(400, { error: 'install mismatch' });
+        const verdict=validateReusableSkillPacket(packet);
+        if(Object.keys(body||{}).length!==1||!verdict.ok){
+          if(!INSTALL_RE.test(install)||!PROOF_RE.test(proof))return json(403,{error:'bad proof'});
+          const packetId=/^fp_[a-f0-9]{32}$/.test(packet?.packetId||'')?packet.packetId:'invalid';
+          return json(200,{receipt:await receipt(env,install,packetId,false,['reviewed reusable skill required'],now)});
+        }
         const p = await checkProof(env, install, proof, { create: true });
         if (p === 'bad') return json(403, { error: 'bad proof' });
         const day = now.toISOString().slice(0, 10);
         const rlKey = `rl:${install}:${day}`;
         const used = Number(await env.FLEET.get(rlKey) || 0);
         if (used >= MAX_PACKETS_PER_DAY) return json(429, { error: 'enough for today' });
-        const verdict = validatePacket(packet);
-        // Refused packets are never stored: the reasons name the rule and path, never the value.
-        if (!verdict.ok) return json(200, { receipt: await receipt(env, install, String(packet?.packetId || 'unknown').slice(0, 40), false, verdict.errors.slice(0, 10), now) });
+        if(await env.FLEET.get(`seen:${install}:${packet.packetId}`))return json(409,{error:'packet already received'});
         await env.FLEET.put(rlKey, String(used + 1), { expirationTtl: 2 * 86400 });
-        await env.PACKETS.put(`packets/${install}/${packet.day}/${packet.packetId}.json`, canonicalJson(packet), { httpMetadata: { contentType: 'application/json' } });
+        await env.PACKETS.put(`packets/${install}/${day}/${packet.packetId}.json`, canonicalJson(packet), { httpMetadata: { contentType: 'application/json' } });
+        await env.FLEET.put(`seen:${install}:${packet.packetId}`,'1');
         return json(200, { receipt: await receipt(env, install, packet.packetId, true, [], now) });
       }
 
       if (request.method === 'GET' && url.pathname === '/bundle') {
         if (await checkProof(env, install, proof, { create: false }) !== 'ok') return json(403, { error: 'bad proof' });
-        const obj = await env.PACKETS.get(`bundles/${install}.json`);
-        return obj ? new Response(obj.body, { status: 200, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } }) : new Response(null, { status: 204 });
+        // No reviewed redistribution issuer exists yet. Never serve arbitrary old bundles.
+        return json(501,{error:'reviewed skill redistribution not configured'});
       }
 
       if (request.method === 'POST' && url.pathname === '/forget') {
-        if (await checkProof(env, install, proof, { create: false }) !== 'ok') return json(403, { error: 'bad proof' });
+        if (await checkProof(env, install, proof, { create: false, allowWithdrawn: true }) !== 'ok') return json(403, { error: 'bad proof' });
+        // Tombstone first: old credentials cannot silently re-enroll after erasure.
+        await env.FLEET.put(`withdrawn:${install}`,'1');
         let cursor, deleted = 0;
         do {
           const page = await env.PACKETS.list({ prefix: `packets/${install}/`, cursor });

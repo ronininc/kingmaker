@@ -26,3 +26,18 @@ The new `kingmaker.fleet-skills/1` wire schema has not been deployed or added to
 Tests retain legacy host storage checks as direct synthetic requests (not a claim the new client still exports telemetry). Active client tests prove old schema refusal, credential/unknown-rights mint refusal, exact component admission, tamper refusal, explicit consent and withdrawal, and task-local tuning without reusable promotion.
 
 Focused verification: 38 tests passed, zero failures/skips (including legacy host synthetic compatibility and active new-client refusal).
+
+
+## Follow-up: skill-only host acceptance (local review)
+
+The legacy host gap described above is now addressed in source: actual `fleetTransport.send` -> Worker `/contribute` -> synthetic KV/R2 -> pinned signed receipt succeeds for exact `kingmaker.fleet-skills/1` packets. Both ends import the same reviewed catalog (`reusable-skill-catalog.mjs`, no filesystem APIs). Full standard Apache-2.0 license text and component-only NOTICE accompany every method, with exact validation; minted folders also receive LICENSE and NOTICE. This does not change repository-wide or owner-project licensing.
+
+The Worker refuses legacy telemetry, unknown IDs, changed instructions, extra source/password fields, changed authorship/license/notice and malformed packets. Body reading is bounded by actual streamed bytes. Refusals use fixed reasons and do not echo arbitrary packet IDs or content. Storage paths use server day, not client-provided paths. Existing install-proof binding and signed receipts remain; invalid content cannot enroll an install. Serial replay IDs are refused. Forget tombstones the old install before deleting stored packets so it cannot silently re-enroll with an old proof; a failed deletion can be retried with its matching retained proof.
+
+`/bundle` returns 501 even for a valid proof until a governed signed redistribution issuer exists; old arbitrary bundle objects are never returned. No new remote execution/import path is provided. No production consent issuance or fleet entitlement is minted by this host. The install-proof remains its existing first-valid-contribution trust model, not a substitute for the separate signed CRM benefit consent.
+
+**Remaining production limits:** KV rate/replay/tombstone checks are not cross-region transactional; serial tests do not prove race-free distributed admission/withdrawal. A strongly consistent coordinator is needed before claiming such guarantees. Explicit sharing-off prevents future local sends; remote forgetting/tombstoning is the separate forget action. Re-enrollment after tombstoning has no automatic reset route. Actual hosted deployment, bindings, remote grant readiness and governed redistribution remain unproved. No live deployment, signing keys or user state were changed.
+
+Packaging now additionally includes `lib/reusable-skill-catalog.mjs` and `lib/method-component-license.mjs`; the signed Kingmaker app must be rebuilt. The Worker update is separate reviewable code, not a live service change.
+
+Follow-up evidence: 40/40 broader focused tests passed; final host-only suite after added body-limit and failed-cleanup retry cases: 9/9 passed, zero skips.
