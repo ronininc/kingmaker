@@ -8,6 +8,14 @@
       "archiveSha256": "0af8cbd4d9fbb5a0956f62b06669ad2eca0bf09bafa2eeecb68a9f97a0a375c2",
       "bundleSha256": "f4ae76f164f7165cf8aed2bec5a201c4c9bc4f464f8fc57ce5d914a09e534812",
       "note": "Kingmaker 4.5.2 release: Developer ID signed Launcher bridge and bounded Armor reader fixes; ronininc/ronin-launcher f6aeb090b90e9a8cb9cfdff53a89dff627813b1d"
+    },
+    {
+      "version": "0.3.19",
+      "channel": "direct",
+      "issuedAt": "2026-11-16T01:16:57.057Z",
+      "archiveSha256": "ebc9b28cc7f17abeaa2ea2a12b3ef5043168dfa65645607c040cad94623a5ced",
+      "bundleSha256": "ab8bd59126b0ba00cae8ebf2964554439c1becf4e65713766f5b878218f0e976",
+      "note": "Locally signed review candidate; authenticated Kingmaker placement and bounded owner telemetry credentials; publication pending owner permission"
     }
   ]
 }
