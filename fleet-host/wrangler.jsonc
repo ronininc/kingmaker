@@ -10,6 +10,8 @@
   "workers_dev": true,
   // Review-only: activation requires separate approved deployment/migration.
   "durable_objects": {"bindings":[{"name":"FLEET_COORDINATOR","class_name":"FleetCoordinator"}]},
+  // Unmounted CRM authority entrypoint must be separately reviewed and bound.
+  "services": [{"binding":"FLEET_AUTHORITY","service":"SET-BEFORE-DEPLOY","entrypoint":"PlatformCapabilityAuthority"}],
   "migrations": [{"tag":"fleet-coordinator-v1","new_sqlite_classes":["FleetCoordinator"]}],
   "vars": { "FLEET_PUBLIC_KEY": "SET-BEFORE-DEPLOY" }
 }
