@@ -31,6 +31,18 @@ import { externalFile, sameExternalFile } from './vault-paths.mjs';
 import { installationMetadata } from './installation-metadata.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
+const SESSION_COOKIE = 'sa_session';
+// Read a single cookie value without exposing it to the page. Used so the
+// loopback API secret travels in an HttpOnly cookie instead of the DOM.
+function readCookie(header, name) {
+  if (!header) return null;
+  for (const part of String(header).split(';')) {
+    const eq = part.indexOf('=');
+    if (eq < 0) continue;
+    if (part.slice(0, eq).trim() === name) return part.slice(eq + 1).trim();
+  }
+  return null;
+}
 export async function analyzeDashboardFile(target, analyze = scanFile) {
   // Ghidra refuses project locations with dot-prefixed path components.
   // Keep transient projects separate from the hidden identity/vault directory.
@@ -60,6 +72,28 @@ async function refreshProtection() {
 const migrationManifest = options.migrationManifest || null;
 
 const token = crypto.randomBytes(24).toString('base64url');
+// Install-identity (email->install binding) resolution for the local auth
+// context. The paid build docks with the owner's site by the install's email,
+// so throttling/rate-limiting MUST key off this stable install identity via
+// req.armorAuth.rateLimitKey -- never a bare per-IP or per-token counter.
+let cachedInstallationId;
+function resolvedInstallationId() {
+  if (cachedInstallationId === undefined) {
+    try { cachedInstallationId = installationMetadata(identityDir).installationId; }
+    catch { cachedInstallationId = null; }
+  }
+  return cachedInstallationId;
+}
+function rateLimitIdentity() {
+  const installationId = resolvedInstallationId();
+  let boundEmail = null; try { boundEmail = account.state().email || null; } catch {}
+  const material = 'scripture-armor.install-identity/1\0' + (installationId || 'unbound') + '\0' + (boundEmail || '');
+  return { installationId, email: boundEmail, rateLimitKey: crypto.createHash('sha256').update(material).digest('hex').slice(0, 32) };
+}
+function authContext(req) {
+  const id = rateLimitIdentity();
+  return { channel: req.armorPeerAuthenticated ? 'unix-peer' : 'loopback-cookie', installationId: id.installationId, email: id.email, rateLimitKey: id.rateLimitKey };
+}
 const feedFile = path.join(identityDir, 'dashboard-feed.jsonl');
 // Little Brother enrichment (INTEGRATION-NOTE-item-09-10.md Part A):
 // the bridge is built once per dashboard through the host wiring in
@@ -279,7 +313,19 @@ async function api(req, res, url) {
       return json(res,200,{ok:true,review,sourceEjectionId,nativeSourcePath:source.target.path});
     }finally{source?.bytes.fill(0);device?.start('resume');}
   }
-  if (req.headers['x-scripture-armor-token'] !== token) return json(res, 403, { ok: false, error: 'forbidden' });
+  // Authenticate the loopback API without ever placing the secret in the served
+  // page. The browser view carries the per-process token in an HttpOnly,
+  // SameSite=Strict session cookie it cannot read from the DOM; the
+  // Unix-domain-socket channel is authenticated by the connecting peer
+  // (owner-only 0700 dir / 0600 socket) and needs no token. A legacy header is
+  // still accepted for same-user native/CLI callers.
+  if (!req.armorPeerAuthenticated) {
+    const presented = readCookie(req.headers.cookie, SESSION_COOKIE) || req.headers['x-scripture-armor-token'] || '';
+    const expected = token;
+    const ok = presented.length === expected.length && crypto.timingSafeEqual(Buffer.from(presented), Buffer.from(expected));
+    if (!ok) return json(res, 403, { ok: false, error: 'forbidden' });
+  }
+  req.armorAuth = authContext(req);
   if (req.method === 'GET' && url.pathname === '/api/account/me') {
     try { await account.ensureAuthenticated(); return json(res, 200, { ok: true, ...account.state() }); }
     catch { return json(res, 401, { ok: false, ...account.state(), error: 'Sign in and verify your email code.' }); }
@@ -439,10 +485,44 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname.startsWith('/api/')) return await api(req, res, url);
     if (req.method !== 'GET' || url.pathname !== '/') { res.writeHead(404); return res.end('not found'); }
-    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'content-security-policy': "default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'" });
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'set-cookie': `${SESSION_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Strict`, 'content-security-policy': "default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'" });
     res.end(html);
   } catch (error) { json(res, 500, { ok: false, error: error.message }); }
 });
+// Optional strong local channel: a Unix-domain-socket API listener. The socket
+// lives in a 0700 (owner-only) directory and is chmod 0600, so only the owning
+// uid (and root) can connect -- same-user peer isolation enforced by filesystem
+// permissions. This channel serves the API with no page and no token: the peer
+// is authenticated by the socket itself, so no secret is ever exposed to a DOM.
+// (Syscall-level LOCAL_PEERCRED/SO_PEERCRED would add a second check but needs a
+// native addon; the 0700/0600 perms already enforce owner-only access.)
+let apiSocketServer = null;
+if (options.apiSocketPath) {
+  const socketPath = options.apiSocketPath;
+  const socketDir = path.dirname(socketPath);
+  fs.mkdirSync(socketDir, { recursive: true, mode: 0o700 });
+  try { fs.chmodSync(socketDir, 0o700); } catch {}
+  try { if (fs.existsSync(socketPath)) fs.unlinkSync(socketPath); } catch {}
+  apiSocketServer = http.createServer(async (req, res) => {
+    const url = new URL(req.url, 'http://scripture-armor.local');
+    try {
+      req.armorPeerAuthenticated = true;
+      if (!url.pathname.startsWith('/api/')) return json(res, 404, { ok: false, error: 'not found' });
+      if (req.method === 'POST') {
+        if (mutationBusy) return json(res, 409, { ok: false, error: 'Wait for the current request to finish.' });
+        mutationBusy = true;
+        try { return await api(req, res, url); } finally { mutationBusy = false; }
+      }
+      return await api(req, res, url);
+    } catch (error) { json(res, 500, { ok: false, error: error.message }); }
+  });
+  apiSocketServer.on('listening', () => { try { fs.chmodSync(socketPath, 0o600); } catch {} });
+  apiSocketServer.on('error', () => {});
+  apiSocketServer.listen(socketPath);
+  server.on('close', () => { try { apiSocketServer.close(); } catch {} try { fs.unlinkSync(socketPath); } catch {} });
+  server.armorApiSocketPath = socketPath;
+}
+server.rateLimitIdentity = rateLimitIdentity;
 server.on('listening',()=>device?.start('installation'));
 server.on('close',()=>{repositoryReview.close();void device?.stop();});
 return server;
@@ -454,7 +534,8 @@ if (process.argv[1] && canonicalPath(process.argv[1]) === canonicalPath(fileURLT
   const args = process.argv.slice(2);
   const option = (name, fallback) => { const index = args.indexOf(name); return index >= 0 ? args[index + 1] : fallback; };
   const port = Number(option('--port', process.env.SCRIPTURE_ARMOR_UI_PORT || 8788));
-  const server = createArmorDashboard({ deviceProtection:true, nativeReviewToken:process.env.SCRIPTURE_ARMOR_NATIVE_REVIEW_TOKEN||null, sessionStore:createAccountSessionStore(), identityDir: option('--identity-dir', defaultIdentityDir()), migrationManifest: option('--migration-manifest', process.env.SCRIPTURE_ARMOR_MIGRATION_MANIFEST || null) });
+  const identityDir = option('--identity-dir', defaultIdentityDir());
+  const server = createArmorDashboard({ deviceProtection:true, nativeReviewToken:process.env.SCRIPTURE_ARMOR_NATIVE_REVIEW_TOKEN||null, sessionStore:createAccountSessionStore(), identityDir, apiSocketPath: path.join(identityDir, 'dashboard-api.sock'), migrationManifest: option('--migration-manifest', process.env.SCRIPTURE_ARMOR_MIGRATION_MANIFEST || null) });
   server.listen(port, '127.0.0.1', () => {
     console.log(`Scripture Armor UI: http://127.0.0.1:${server.address().port}/`);
     console.log('Loopback only. The API requires this process\'s one-time token.');

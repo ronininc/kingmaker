@@ -50,7 +50,7 @@ test('quota409 stops dashboard activation before identity, terms, migration or p
  const root=temp(),identityDir=path.join(root,'vault'),f=transport(()=>json({error:'limit'},409));
  const server=createArmorDashboard({identityDir,fetchImpl:f.fetch});await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const origin='http://127.0.0.1:'+server.address().port;
  try{
-  const html=await(await fetch(origin)).text(),token=JSON.parse(/const TOKEN=("[^"]+")/.exec(html)[1]);
+  const page=await fetch(origin),html=await page.text(),token=/sa_session=([^;]+)/.exec(page.headers.get('set-cookie'))[1];
   const post=(route,body)=>fetch(origin+route,{method:'POST',headers:{origin,'content-type':'application/json','x-scripture-armor-token':token},body:JSON.stringify(body)});
   assert.equal((await post('/api/account/login',{email:EMAIL,password:'synthetic-password'})).status,200);assert.equal((await post('/api/account/verify',{code:'12345678'})).status,200);
   const response=await post('/api/activate',{acceptTerms:true,confirmMigration:true,installationId:'f'.repeat(64),installationEvidenceRef:'not trusted'});assert.equal(response.status,409);assert.equal(fs.existsSync(identityDir),false);
@@ -68,7 +68,7 @@ test('each protected operation rechecks the trusted installation and rejects rev
  };
  const server=createArmorDashboard({identityDir,fetchImpl:transportFetch});await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const origin='http://127.0.0.1:'+server.address().port;
  try{
-  const html=await(await fetch(origin)).text(),token=JSON.parse(/const TOKEN=("[^"]+")/.exec(html)[1]);
+  const page=await fetch(origin),html=await page.text(),token=/sa_session=([^;]+)/.exec(page.headers.get('set-cookie'))[1];
   const post=(route,body)=>fetch(origin+route,{method:'POST',headers:{origin,'content-type':'application/json','x-scripture-armor-token':token},body:JSON.stringify(body)});
   for(const route of ['/api/scan','/api/clean']){
    await post('/api/account/login',{email:EMAIL,password:'synthetic-password'});await post('/api/account/verify',{code:'12345678'});

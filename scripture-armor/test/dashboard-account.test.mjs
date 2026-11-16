@@ -24,9 +24,10 @@ test('loopback HTTP requires origin + process token, completes password/OTP tran
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const base = `http://127.0.0.1:${server.address().port}`;
   try {
-    const html = await (await fetch(base)).text();
-    const token = /const TOKEN=("[^"]+")/.exec(html); assert.ok(token);
-    const headers = { 'content-type': 'application/json', 'x-scripture-armor-token': JSON.parse(token[1]), origin: base };
+    const page = await fetch(base); const html = await page.text();
+    const token = /sa_session=([^;]+)/.exec(page.headers.get('set-cookie')); assert.ok(token, 'session cookie is set on GET /');
+    assert.doesNotMatch(html, /const TOKEN|x-scripture-armor-token/, 'the API secret must not be embedded in the served page');
+    const headers = { 'content-type': 'application/json', 'x-scripture-armor-token': token[1], origin: base };
     const post = (route, body, override = {}) => fetch(base + route, { method: 'POST', headers: { ...headers, ...override }, body: JSON.stringify(body) });
     assert.equal((await post('/api/account/login', { email: EMAIL, password: PASSWORD }, { origin: 'https://attacker.invalid' })).status, 403);
     assert.equal((await post('/api/account/login', { email: EMAIL, password: PASSWORD }, { 'x-scripture-armor-token': 'wrong' })).status, 403);

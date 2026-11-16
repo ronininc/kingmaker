@@ -29,7 +29,8 @@ test('real local account activation starts scanning automatically and Scan devic
     }});
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const origin='http://127.0.0.1:'+server.address().port,local=createLoopbackClient(origin);
   try{
-    const html=await(await local('/')).text(),token=JSON.parse(/const TOKEN=("[^"]+")/.exec(html)[1]);
+    const pg=await local('/'),html=await pg.text(),token=/sa_session=([^;]+)/.exec(pg.headers.get('set-cookie'))[1];
+    assert.doesNotMatch(html,/const TOKEN|x-scripture-armor-token/,'the API secret must not be embedded in the served page');
     assert.match(html,/SCAN DEVICE/);assert.match(html,/Advanced: manual file analysis/);
     const headers={origin,'content-type':'application/json','x-scripture-armor-token':token};
     const post=(route,body={})=>local(route,{method:'POST',headers,body:JSON.stringify(body)});

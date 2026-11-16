@@ -33,12 +33,13 @@ test('the account surface files a request under the signed-in member — and onl
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const base = `http://127.0.0.1:${server.address().port}`;
   try {
-    const html = await (await fetch(base)).text();
+    const page = await fetch(base); const html = await page.text();
     assert.match(html, /id="requestPanel"/);
     assert.match(html, /SUBMIT A REQUEST TO RONIN INC/);
     assert.match(html, /\/api\/request\/submit/);
-    const token = /const TOKEN=("[^"]+")/.exec(html); assert.ok(token);
-    const headers = { 'content-type': 'application/json', 'x-scripture-armor-token': JSON.parse(token[1]), origin: base };
+    const token = /sa_session=([^;]+)/.exec(page.headers.get('set-cookie')); assert.ok(token, 'session cookie is set on GET /');
+    assert.doesNotMatch(html, /const TOKEN|x-scripture-armor-token/, 'the API secret must not be embedded in the served page');
+    const headers = { 'content-type': 'application/json', 'x-scripture-armor-token': token[1], origin: base };
     const post = (route, body) => fetch(base + route, { method: 'POST', headers, body: JSON.stringify(body) });
     const form = { type: 'brain', name: 'Fixture Brain', source: 'https://example.invalid/b', description: 'A fixture brain.' };
     // Signed out: the surface refuses — a request is filed under a member or not at all.

@@ -31,7 +31,8 @@ test('library dashboard cannot read or clear the production Keychain store by de
  const server=createArmorDashboard({identityDir:path.join(temp,'identity')});
  try{
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const origin='http://127.0.0.1:'+server.address().port;
-  const html=await(await fetch(origin)).text(),token=JSON.parse(/const TOKEN=("[^"]+")/.exec(html)[1]);
+  const page=await fetch(origin),html=await page.text(),token=/sa_session=([^;]+)/.exec(page.headers.get('set-cookie'))[1];
+  assert.doesNotMatch(html,/const TOKEN|x-scripture-armor-token/,'the API secret must not be embedded in the served page');
   const response=await fetch(origin+'/api/status',{headers:{'x-scripture-armor-token':token}});assert.equal(response.status,200);
   assert.equal((await response.json()).account.authenticated,false);assert.equal(calls.length,0);
  }finally{childProcess.spawnSync=original;syncBuiltinESMExports();await new Promise(resolve=>server.close(resolve));fs.rmSync(temp,{recursive:true,force:true});}
@@ -40,7 +41,7 @@ test('server/browser capability boundary is explicit, packaged and removes the c
  const server=fs.readFileSync(path.join(ROOT,'dashboard.mjs'),'utf8'),view=fs.readFileSync(path.join(ROOT,'dashboard-view.mjs'),'utf8');
  assert.doesNotMatch(server,/\bfetch\s*\(/);assert.doesNotMatch(view,/from ['"]node:|readFileSync|readdirSync|createArmorAccountSession|verifyEntitlement/);
  const html=renderArmorDashboard({token:'synthetic-token',logo:'',termsText:'<terms>',checkout:{download:'https://www.ronininc.org/armor/checkout?purpose=download',discordMembership:'https://www.ronininc.org/armor/checkout?purpose=discord-membership'}});
- assert.match(html,/mode:'same-origin',credentials:'omit',redirect:'error'/);assert.match(html,/API_PATHS\.has\(url\)/);assert.match(html,/&lt;terms&gt;/);
+ assert.doesNotMatch(html,/synthetic-token|const TOKEN|x-scripture-armor-token/,'render must not embed the API secret in the page');assert.match(html,/mode:'same-origin',credentials:'same-origin',redirect:'error'/);assert.match(html,/API_PATHS\.has\(url\)/);assert.match(html,/&lt;terms&gt;/);
  for(const [name,source] of [['dashboard.mjs',server],['dashboard-view.mjs',view]]) {
   const r=scanSourceText(source,name,crypto.createHash('sha256').update(source).digest('hex'));assert(!r.findings.some(f=>f.rule==='behavior-covert-exfiltration'));assert(!r.findings.some(f=>['critical','high'].includes(f.severity)));
  }
@@ -67,7 +68,7 @@ test('real local scan and clean denial preserve clean bytes; fixed-origin accoun
   throw Error('unexpected remote action');
  }});await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const origin='http://127.0.0.1:'+server.address().port;
  try{
-  const html=await(await fetch(origin)).text(),token=JSON.parse(/const TOKEN=("[^"]+")/.exec(html)[1]);
+  const page=await fetch(origin),html=await page.text(),token=/sa_session=([^;]+)/.exec(page.headers.get('set-cookie'))[1];
   const post=(route,body,extra={})=>fetch(origin+route,{method:'POST',headers:{origin,'content-type':'application/json','x-scripture-armor-token':token,...extra},body:JSON.stringify(body)});
   assert.equal((await post('/api/account/login',{}, {host:'attacker.invalid'})).status,403);assert.equal(remote.length,0);
   assert.equal((await post('/api/account/login',{email:'fixture@example.test',password:'synthetic-password'})).status,200);
