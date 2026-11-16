@@ -42,3 +42,19 @@ test('pause policy is reversible and blocked hunter carries no fallback model',a
  assert.equal(normalize({weightHunter:{retrievalPolicy:'approved-download'}}).weightHunter.retrievalPolicy,'approved-download');
  const r=await beforeModelSelection({text:'write a story',library,profileModel:'unwanted-fallback',calibration:{weightHunter:{on:true}}});assert.equal(r.blocked,true);assert.equal(r.model,null);
 });
+
+test('local-only ranks available models before inference without materializing remote winner', async()=>{
+ const l={models:[model('remote',100),model('local',80),model('cached',90)]};let ensured=[];
+ const r=await beforeModelSelection({text:'write a story',library:l,installed:['local'],cached:['cached'],calibration:{weightHunter:{on:true}},ensure:async p=>ensured.push(p.tag)});
+ assert.equal(r.model,'cached');assert.equal(r.availability,'cached');assert.deepEqual(ensured,['cached']);assert.equal(r.swap,false);
+ const only=await beforeModelSelection({text:'write a story',library:l,installed:['local'],calibration:{weightHunter:{on:true}},ensure:async()=>{throw Error('unexpected ensure')}});assert.equal(only.model,'local');
+});
+test('local-only cache candidates include locally cached alternatives below remote score',()=>{
+ const l={models:[model('remote',100),model('cached',90),model('local',80),model('lower',20)]};
+ assert.deepEqual(cacheCandidatesForTask({text:'write a story',library:l,installed:['local'],allowDownload:false}).map(m=>m.tag),['remote','cached']);
+});
+test('execution loop honors the same local-only selection',async()=>{
+ const {executionLoopBeforeWeights}=await import('../lib/weight-hunter.mjs');
+ const hook=executionLoopBeforeWeights({library:{models:[model('remote',100),model('local',80)]},installed:['local'],calibration:{weightHunter:{on:true}},ensure:async()=>{throw Error('unexpected ensure')}});
+ const r=await hook({request:'write a story',records:[]});assert.equal(r.model,'local');
+});
