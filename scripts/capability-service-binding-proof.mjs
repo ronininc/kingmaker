@@ -11,6 +11,8 @@ const {build}=require('esbuild'),{Miniflare,convertV4MiniflareOptions}=require('
 const bundle=await build({entryPoints:[resolve(crm,'worker/platform-authority-rpc.ts')],bundle:true,write:false,format:'esm',platform:'neutral',external:['cloudflare:workers']});
 const bridge=await build({entryPoints:[resolve(crm,'worker/platform-authority-bridge.ts')],bundle:true,write:false,format:'esm',platform:'node'});
 const {signAuthorityEnvelope}=await import('data:text/javascript;base64,'+Buffer.from(bridge.outputFiles[0].text).toString('base64'));
+const ingestionBundle=await build({entryPoints:[resolve(crm,'worker/platform-authority-ingestion.ts')],bundle:true,write:false,format:'esm',platform:'node'});
+const {ingestPlatformAuthorityEvent}=await import('data:text/javascript;base64,'+Buffer.from(ingestionBundle.outputFiles[0].text).toString('base64'));
 const authority=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']);
 const host=generateKeyPairSync('ec',{namedCurve:'P-256'}),pub=host.publicKey.export({type:'spki',format:'pem'});
 const sha=x=>createHash('sha256').update(x).digest('hex');
@@ -39,17 +41,21 @@ try{
  for(const basis of ['paid','fleet']){
   const at=Date.now(),binding={memberId:'member',installId,deviceSha256,providerFingerprint};
   const current={id:'current',startsAt:at-1000,expiresAt:at+120000,revokedAt:null};
-  const snapshot={binding,account:{...current,active:true},device:{...current,active:true,proofVerified:true},provider:{...current,active:true,proofVerified:true},paid:{...current,confirmed:true,product:'ronin-platform',offerId:'synthetic-only'},fleet:{...current,id:'consent',decision:'affirmative',proofVerified:true,purpose:'fleet-participation-for-platform-benefits',consentVersion:1,disclosureDigest:'d'.repeat(64),binding},grantRevoked:false};
-  const record={schema:'ronin.platform-authority-record/1',issuer:'ronin-crm-authority',evidenceId:'rpc-'+basis,basis,issuedAt:at,expiresAt:at+120000,snapshot};
-  const envelope=await signAuthorityEnvelope(record,'synthetic',authority.privateKey);
-  await db.prepare('INSERT INTO platform_authority_evidence VALUES(?,?,?,?,?,?,?,?,?,?)').bind(record.evidenceId,'member',installId,deviceSha256,providerFingerprint,basis,'synthetic',JSON.stringify(envelope),record.expiresAt,at).run();
+  const snapshot={binding,account:{...current,active:true},device:{...current,active:true,proofVerified:true},provider:{...current,active:true,proofVerified:true},paid:{...current,confirmed:true,product:'ronin-platform',offerId:'ronin-platform-usd-99-monthly-v1'},fleet:{...current,id:'consent',decision:'affirmative',proofVerified:true,purpose:'fleet-participation-for-platform-benefits',consentVersion:1,disclosureDigest:'e36af28bdeb5fe7ad71fae31ba727d700a9d0e193ea6cc2073904a44999f9d32',binding},grantRevoked:false};
+  const source=basis==='paid'?'confirmed-payment-authority':'authenticated-consent-authority';
+  const policy={sourceKeyId:'synthetic',sourcePublicKey:authority.publicKey,recordKeyId:'synthetic',recordPrivateKey:authority.privateKey,source,approvedOffer:{id:'ronin-platform-usd-99-monthly-v1',amountMinor:9900,currency:'USD',cadence:'monthly'},approvedDisclosure:{version:1,digest:'e36af28bdeb5fe7ad71fae31ba727d700a9d0e193ea6cc2073904a44999f9d32'}};
+  const event={schema:'ronin.platform-authority-event/1',audience:'ronin-crm',source,id:'rpc-'+basis,issuedAt:at,expiresAt:at+60000,query:{...binding,basis},action:'grant',snapshot,payment:{state:'confirmed',reference:'synthetic-payment',periodStartsAt:current.startsAt,periodEndsAt:current.expiresAt,offerId:'ronin-platform-usd-99-monthly-v1',amountMinor:9900,currency:'USD',cadence:'monthly'},consent:{action:'affirmative',authenticatedMemberId:'member',sessionEvidenceRef:'synthetic-session',disclosureDigest:policy.approvedDisclosure.digest,sharingScope:'generalized-skills-and-tool-use-only'}};
+  const signedEvent=await signAuthorityEnvelope(event,'synthetic',authority.privateKey);
+  const ingested=await ingestPlatformAuthorityEvent(db,signedEvent,policy,at);assert.equal(ingested.accepted,true,JSON.stringify(ingested));
+  assert.equal((await ingestPlatformAuthorityEvent(db,signedEvent,policy,at)).duplicate,true);
   const response=await call('capability-grant',{providerFingerprint,basis});assert.equal(response.status,200,await response.clone().text());
   const grant=await response.json();assert(verify('sha256',Buffer.from(grant.payload),pub,Buffer.from(grant.sig,'base64')));
   assert.equal(JSON.parse(grant.payload).memberId,'member');
   const challenge={schema:'ronin.capability-status-challenge/1',nonce:'f'.repeat(64),grantDigest:sha(grant.payload),installId,deviceSha256};
   assert.equal((await call('capability-status',{grant,challenge})).status,200);
-  await db.prepare('INSERT INTO platform_authority_revocations VALUES(?,?,?)').bind('evidence',record.evidenceId,Date.now()).run();
+  const withdrawal={...event,id:'revoke-'+basis,action:'revoke',evidenceId:ingested.evidenceId};
+  assert.equal((await ingestPlatformAuthorityEvent(db,await signAuthorityEnvelope(withdrawal,'synthetic',authority.privateKey),policy,Date.now())).revoked,true);
   assert.notEqual((await call('capability-status',{grant,challenge})).status,200);
  }
- console.log('PASS real local workerd named service binding: host -> CRM WorkerEntrypoint -> D1. Both signed paid/fleet grants and current status succeed; missing records and revoked evidence deny. Synthetic only; no deployed binding, ingestion, billing or consent claimed.');
+ console.log('PASS real local workerd named service binding: host -> CRM WorkerEntrypoint -> D1. Verified signed-source ingestion and idempotency, both signed paid/fleet grants and current status succeed; missing records and revoked evidence deny. Synthetic only; no deployed binding, ingestion, billing or consent claimed.');
 }finally{await mf.dispose();}
