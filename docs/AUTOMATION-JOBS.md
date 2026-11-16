@@ -16,6 +16,12 @@ submitted/started/ended times, text SHA-256, the answer lines and the `bar.log` 
 bar commands (`/…`) and console commands (`:…`) are refused. Anything a job asks for that sends, spends, installs or changes
 a record waits at the bar for the owner's own word.
 
+A job turn is tagged `source: job` inside the engine, so the method lane (lib/method-request.mjs) also refuses it when
+the decision word is behind a wake phrase ("Kingmaker, yes" / "Kingmaker, stop"): a job can never approve a plan, decline
+it, or stop a running method. Stopping a running method is the owner's typed "stop"/"cancel" in the bar or the owner's
+attested voice; the lane then kills the tool's process tree, the tool panel shows "cancelled", and the report lists what
+had already run.
+
 ## How it works
 
 The running Kingmaker (Kingmaker.app → engine) serves `http://127.0.0.1:<random port>`, written to
