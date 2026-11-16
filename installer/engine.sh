@@ -16,7 +16,7 @@
 #                  for your password once, in its own dialog)
 #   4 tools        Ollama (official build, sha256-pinned) → inventory existing model digests (no weight downloads)
 #                  → Hands of Horus (Peekaboo), sox and Python via Homebrew → SearXNG
-#   5 knowledge    the knowledge library (every confirmed corpus) into a staging folder (reused when already complete)
+#   5 knowledge    inventory existing corpora and receipts in place; no bootstrap or corpus downloads
 #   6 commit       Kingmaker.app, the cemented wake word (install.json + wake-word.txt, read-only) and the knowledge
 #                  library are MOVED into place, journaled; any failure here moves everything back
 #   7 launch       Kingmaker opens; the installer quits
@@ -169,11 +169,11 @@ rollback() {
   rm -f "$JOURNAL"
 }
 cleanup() {
-  # The background step and its children (curl inside a pull, git/curl under the knowledge bootstrap).
+  # Stop any active release/tool transfer and its children.
   [ -n "$BG_PID" ] && { pkill -TERM -P "$BG_PID" 2>/dev/null; kill "$BG_PID" 2>/dev/null; }
   [ -n "$AUTH_HEADER" ] && rm -f "$AUTH_HEADER"
   [ -n "${GH_HDR:-}" ] && rm -f "$GH_HDR"
-  rm -rf "$STAGE/unpack" "$STAGE/ollama" "$STAGE/launcher" "$STAGE/old" "$STAGE/whole.fifo" "$STAGE/model-availability.json" "$DSTAGE/config"
+  rm -rf "$STAGE/unpack" "$STAGE/ollama" "$STAGE/launcher" "$STAGE/old" "$STAGE/whole.fifo" "$STAGE/model-availability.json" "$STAGE/knowledge-availability.json" "$DSTAGE/config"
   [ "$LOCKED" = 1 ] && rm -rf "$STAGE/lock"
   rmdir "$STAGE" 2>/dev/null
   true
@@ -312,19 +312,6 @@ installed_digest() { # installed_digest <tags.json> <model name> → its digest,
   done
   return 1
 }
-receipts_complete() { # receipts_complete <sources dir>: every confirmed corpus has its receipt and its files
-  local n i id field
-  n="$(mfn knowledge.corpora)"; [ "$n" -ge 1 ] || return 1
-  i=0
-  while [ "$i" -lt "$n" ]; do
-    id="$(mf "knowledge.corpora.$i.id")"; field="$(mf "knowledge.corpora.$i.field")"
-    [ -f "$1/.receipts/$id.json" ] || return 1
-    [ -n "$(ls -A "$1/$field/$id" 2>/dev/null)" ] || return 1
-    i=$((i + 1))
-  done
-  return 0
-}
-
 # Room: what is still to download and unpack, plus 2 GB.
 CACHED=0; i=0
 while [ "$i" -lt "$PART_COUNT" ]; do
@@ -333,11 +320,7 @@ while [ "$i" -lt "$PART_COUNT" ]; do
   i=$((i + 1))
 done
 NEED=$((ARCHIVE_SIZE - CACHED + UNPACKED + 2000000000))
-KNOW_REUSE=""
-# Kingmaker's library is its own (operator 2026-10-13): a windowed desktop app's ~/.solomon library is never counted as Kingmaker's.
-if receipts_complete "$KNOW_TARGET"; then KNOW_REUSE="$KNOW_TARGET"; fi
-if [ -z "$KNOW_REUSE" ] && receipts_complete "$SYS_HOME/.solomon/knowledge/sources"; then note "A desktop app on the same engine keeps a knowledge library on this Mac (~/.solomon/knowledge). Kingmaker does not read it; Kingmaker keeps its own library under its data folder."; fi
-if [ -z "$KNOW_REUSE" ] && [ "$TOOLS_LIVE" = 1 ]; then NEED=$((NEED + $(mfn knowledge.totalMB) * 1048576)); fi
+# Existing corpora are inventoried later; no corpus bytes enter installation sizing.
 if [ "$TOOLS_LIVE" = 1 ] && ! find_ollama >/dev/null; then NEED=$((NEED + 2 * $(mfn ollama.size))); fi
 FREE=$(( $(df -k "$APPS" | awk 'NR==2 {print $4}') * 1024 ))
 if [ "$FREE" -lt "$NEED" ]; then
@@ -807,30 +790,27 @@ fi
 fail_at tailscale
 
 # ── 5 the knowledge library ──────────────────────────────────────────────────────────────────────────────────────
-phase 88 9 "Getting the knowledge library"
-KNOW_SCRIPT="$STAGED_APP/$(mf knowledge.script)"
-KNOW_STAGED=0
-[ -n "$(mf knowledge.script)" ] && [ -f "$KNOW_SCRIPT" ] || fail "This Kingmaker.app carries no knowledge library installer."
-if [ -n "$KNOW_REUSE" ]; then note "The knowledge library is already complete ($KNOW_REUSE): every confirmed corpus has its receipt."
-elif [ "$TOOLS_LIVE" = 0 ]; then
-  out="$(SOLOMON_CORPUS_DIR="$KNOW_STAGE" HOME="$SYS_HOME" ELECTRON_RUN_AS_NODE=1 "$NODE_BIN" "$KNOW_SCRIPT" --dry-run 2>&1)" || fail "The knowledge library installer did not run under Kingmaker's own runtime."
-  note "Would fetch $(mfn knowledge.corpora) confirmed corpora ($(mfn knowledge.totalMB) MB): $(printf '%s' "$out" | grep -c '▸') planned by the bundled bootstrap (dry run)."
-  rm -rf "$DSTAGE/knowledge"
-else
-  mkdir -p "$KNOW_STAGE"
-  SOLOMON_CORPUS_DIR="$KNOW_STAGE" HOME="$SYS_HOME" ELECTRON_RUN_AS_NODE=1 "$NODE_BIN" "$KNOW_SCRIPT" >> "$LOG" 2>&1 &
-  BG_PID=$!
-  total="$(mfn knowledge.corpora)"
-  while kill -0 "$BG_PID" 2>/dev/null; do
-    done_n="$(ls "$KNOW_STAGE/.receipts" 2>/dev/null | grep -c '\.json$')"
-    progress "$(awk -v d="$done_n" -v t="$total" 'BEGIN { print (t > 0) ? d / t : 0 }')" "$done_n of $total corpora"
-    sleep 1
-  done
-  wait "$BG_PID"; BG_PID=""
-  receipts_complete "$KNOW_STAGE" || fail "The knowledge library is not complete (a corpus failed to download). What came down is kept: press Download & Install again to resume."
-  KNOW_STAGED=1
-  note "The knowledge library is complete in staging ($total corpora)."
-fi
+phase 88 9 "Checking existing knowledge (no downloads)"
+KNOW_STATUS="$STAGE/knowledge-availability.json"
+total="$(mfn knowledge.corpora)"; i=0; present=0
+printf '{"schema":"kingmaker.knowledge-availability/v1","downloadPolicy":"disabled","contentVerification":"not-performed","corpora":[' > "$KNOW_STATUS"
+while [ "$i" -lt "$total" ]; do
+  id="$(mf "knowledge.corpora.$i.id")"; field="$(mf "knowledge.corpora.$i.field")"
+  state="unavailable"
+  # Receipts indicate a previous provision, not a fresh content-integrity or retrieval proof.
+  receipt="$KNOW_TARGET/.receipts/$id.json"
+  if [ -f "$receipt" ] && [ "$(plutil -extract id raw -o - "$receipt" 2>/dev/null)" = "$id" ] && [ -n "$(ls -A "$KNOW_TARGET/$field/$id" 2>/dev/null)" ]; then
+    state="present-with-receipt"; present=$((present + 1))
+    note "$id: existing corpus and matching receipt left in place; content not reverified."
+  else
+    note "$id: unavailable. No corpus downloaded; provision requested sources separately."
+  fi
+  [ "$i" = 0 ] || printf ',' >> "$KNOW_STATUS"
+  printf '{"id":%s,"field":%s,"status":%s}' "$(json_str "$id")" "$(json_str "$field")" "$(json_str "$state")" >> "$KNOW_STATUS"
+  i=$((i + 1))
+done
+printf '],"presentCount":%s,"checkedAt":%s}\n' "$present" "$(json_str "$(date -u +%FT%TZ)")" >> "$KNOW_STATUS"
+note "Knowledge inventory: $present of $total registered corpora present with receipts. Automatic corpus downloads disabled. Retrieval and streamed capability are not verified by installation."
 fail_at knowledge
 
 # ── 6 commit: everything Kingmaker owns moves into place, journaled ──────────────────────────────────────────────
@@ -923,11 +903,6 @@ if [ -n "$LAUNCHER_STAGED" ]; then
   mv "$LAUNCHER_STAGED" "$L_TARGET" || fail "Could not move Ronin Launcher.app into $APPS."; jot moved "$LAUNCHER_STAGED" "$L_TARGET"
 fi
 fail_at commit-launcher
-if [ "$KNOW_STAGED" = 1 ]; then
-  if [ -d "$KNOW_TARGET" ]; then mv "$KNOW_TARGET" "$STAGE/old/knowledge-sources" || fail "Could not move the old knowledge folder aside."; jot moved "$KNOW_TARGET" "$STAGE/old/knowledge-sources"; fi
-  if [ ! -d "$(dirname "$KNOW_TARGET")" ]; then mkdir -p "$(dirname "$KNOW_TARGET")" && jot created "$(dirname "$KNOW_TARGET")"; fi
-  mv "$KNOW_STAGE" "$KNOW_TARGET" || fail "Could not move the knowledge library into place."; jot moved "$KNOW_STAGE" "$KNOW_TARGET"
-fi
 fail_at commit-knowledge
 if [ "$KEEP_CONFIG" = 0 ]; then
   if [ ! -d "$DATA" ]; then mkdir -p "$DATA" && jot created "$DATA"; fi
@@ -936,13 +911,15 @@ if [ "$KEEP_CONFIG" = 0 ]; then
     mv "$DSTAGE/config/$f" "$DATA/$f" || fail "Could not write $f."; jot moved "$DSTAGE/config/$f" "$DATA/$f"
   done
 fi
-# Inventory is advisory and refreshed on each install, never a claim that inference ran.
-if [ -e "$DATA/model-availability.json" ]; then
-  mv "$DATA/model-availability.json" "$STAGE/old/model-availability.json" || fail "Could not preserve model inventory."
-  jot moved "$DATA/model-availability.json" "$STAGE/old/model-availability.json"
-fi
-mv "$MODEL_STATUS" "$DATA/model-availability.json" || fail "Could not commit model inventory."
-jot moved "$MODEL_STATUS" "$DATA/model-availability.json"
+# Inventories are advisory; rollback restores each prior inventory independently.
+for inventory in model-availability knowledge-availability; do
+  if [ -e "$DATA/$inventory.json" ]; then
+    mv "$DATA/$inventory.json" "$STAGE/old/$inventory.json" || fail "Could not preserve $inventory."
+    jot moved "$DATA/$inventory.json" "$STAGE/old/$inventory.json"
+  fi
+  mv "$STAGE/$inventory.json" "$DATA/$inventory.json" || fail "Could not commit $inventory."
+  jot moved "$STAGE/$inventory.json" "$DATA/$inventory.json"
+done
 fail_at commit-config
 ALIAS="$H/Library/Application Support/Kingmaker"
 if [ ! -e "$ALIAS" ] && [ ! -L "$ALIAS" ]; then ln -s sol-ghost "$ALIAS" && jot created "$ALIAS"; fi
