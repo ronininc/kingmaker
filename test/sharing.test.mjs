@@ -1,3 +1,4 @@
+import {buildReusableSkillPacket} from '../lib/reusable-skill-policy.mjs';
 // Community sharing (lib/sharing.mjs): on by default, a real choice, nothing leaves before the box is shown.
 import assert from 'node:assert/strict';
 import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
@@ -7,21 +8,22 @@ import { test } from 'node:test';
 import { describePacket, fleetDraft, installationId, openSharing, SHARE_BOX, sharingWords } from '../lib/sharing.mjs';
 import { newInstallationId, sanitizeForFleet, validatePacket } from '../vendor/fleet/fleet-packet.mjs';
 
-const packet = sanitizeForFleet({installationId:'fi_'+'a'.repeat(32),runtimeVersion:'0.9.0',device:{platform:'darwin',arch:'arm64',totalMemBytes:24*1024**3},preferences:[{statement:'Always give me the price first'},{statement:'Always give me the price first'}]}).packet;
+const oldPacket = sanitizeForFleet({installationId:'fi_'+'a'.repeat(32),runtimeVersion:'0.9.0',device:{platform:'darwin',arch:'arm64',totalMemBytes:24*1024**3},preferences:[{statement:'Always give me the price first'},{statement:'Always give me the price first'}]}).packet;
+const packet=buildReusableSkillPacket({installationId:'fi_'+'a'.repeat(32),methodIds:['file-review']});
 const fresh = (opts = {}) => {
   const sent = [];
   const s = openSharing({ state: mkdtempSync(join(tmpdir(), 'sharing-')), env: {}, buildPacket: async () => packet, send: async (p) => { sent.push(p); return { ok: true, receipt: 'r1' }; }, ...opts });
   return { s, sent };
 };
 
-test('on by default, but nothing leaves the Mac until the permissions box has been shown', async () => {
+test('off by default; sharing requires explicit current-disclosure choice', async () => {
   const { s, sent } = fresh();
-  assert.equal(s.enabled(), true);
+  assert.equal(s.enabled(), false);
   assert.equal(s.mayShare(), false);
-  assert.deepEqual(await s.contribute(), { sent: false, why: 'box not shown' });
+  assert.deepEqual(await s.contribute(), { sent: false, why: 'off' });
   assert.equal(sent.length, 0);
   const box = s.ask();
-  assert.equal(box.defaultChoice, 'yes'); assert.equal(box.yes, SHARE_BOX.yes); assert.match(box.never, /words, files, screen/);
+  assert.equal(box.defaultChoice, 'no'); assert.equal(box.yes, SHARE_BOX.yes); assert.match(box.never, /words, files, screen/);
 });
 
 test('"Share" in the box: the next contribution is sent, logged exactly as sent, and the box is not asked again', async () => {
@@ -64,7 +66,7 @@ test('the bar words: "what have you shared" reads the log back; "forget what I s
   assert.match(await s.handle('what have you shared'), /Nothing has been shared/);
   await s.contribute();
   const line = await s.handle('what have you shared');
-  assert.match(line, /1 preference stats \[price first always ×2\]/); assert.match(line, /darwin-arm64-24gb/);
+  assert.match(line, /1 reviewed reusable methods/); assert.doesNotMatch(line, /darwin-arm64/);
   assert.match(await s.handle('forget what I shared'), /isn't live yet/);
   assert.equal(describePacket({}), '?: nothing (Kingmaker ?, device class not set)');
 });

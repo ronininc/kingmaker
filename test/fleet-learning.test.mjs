@@ -1,3 +1,4 @@
+import {buildReusableSkillPacket} from '../lib/reusable-skill-policy.mjs';
 /**
  * Stage 7 fleet learning — tests. The diode is one-way: envelopes can never
  * carry customer data (contract-level false plus runtime defense in depth).
@@ -13,7 +14,7 @@ import {
 } from '../lib/fleet-learning.mjs';
 
 import { sanitizeForFleet } from '../vendor/fleet/fleet-packet.mjs';
-const samplePacket=sanitizeForFleet({installationId:'fi_'+'a'.repeat(32),runtimeVersion:'4.5.3',device:{platform:'darwin',arch:'arm64',totalMemBytes:8*1024**3}}).packet;
+const samplePacket=buildReusableSkillPacket({installationId:'fi_'+'a'.repeat(32),methodIds:['file-review']});
 const packet=()=>structuredClone(samplePacket);
 const FIXED_NOW = new Date('2026-10-18T15:30:00.000Z');
 const MODEL_ID = 'hf:dealignai/DeepSeek-V4.1-Flash-1017-uncensored';

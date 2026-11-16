@@ -124,7 +124,9 @@ test('authorized practice improves a failing method, retains trace and leaves on
   assert.equal(r.practice.history[0].grade.met, false);
   assert.equal(r.practice.history.at(-1).grade.met, true);
   assert.equal(f.events().filter(e => e.sub === 'init' && e.cwd === f.cwd).length, 1);
-  assert.ok(r.practice.saved.startsWith(join(f.cwd, '.kingmaker-methods')));
+  assert.equal(r.practice.saved,null);
+  assert.ok(r.practice.mintBlocked.flags.includes('unknown_content_or_rights'));
+  assert.equal(existsSync(join(f.cwd,'.kingmaker-methods')),false,'task-specific material is not promoted into reusable methods');
   assert.equal(JSON.parse(readFileSync(join(f.methods, 'control.method.json'))).rules[0].value, .5);
   assert.ok(notes.some(n => n.startsWith('PRACTICE ')));
   for (const e of f.events().filter(e => e.cwd !== f.cwd)) assert.equal(existsSync(e.cwd), false);
