@@ -15,7 +15,7 @@ try{
  if(platform==='windows'){
   // Default execution policy retained: if unsigned local test scripts are blocked, report rather than bypass.
   execFileSync('pwsh',['-NoLogo','-NoProfile','-NonInteractive','-File',join(unit,'install.ps1')],{env,stdio:'inherit',timeout:60000});
-  result=execFileSync('cmd.exe',['/d','/s','/c',`"${join(dest,'kingmaker.cmd')}" version`],{env,encoding:'utf8',timeout:30000});
+  result=execFileSync('cmd.exe',['/d','/c','kingmaker.cmd','version'],{cwd:dest,env,encoding:'utf8',timeout:30000});
  }else{
   execFileSync('/bin/sh',[join(unit,'install.sh')],{env,stdio:'inherit',timeout:60000});
   result=execFileSync(join(dest,'kingmaker'),['version'],{env,encoding:'utf8',timeout:30000});
