@@ -33,3 +33,9 @@ test('level words: the pilot answers a word for a one-sided field; the value is 
   const r = await decide({ ask, guidance: 'g', fields: { heat: [0, 1] }, turnField: null, userMsg: 'OBS', levelField: 'heat' });
   assert.equal(r.d.heat, 0); assert.match(sys, /"heat_level" \(one of "off", "low", "medium", "high", "full"\)/); assert.doesNotMatch(sys, /"heat" \(number/);
 });
+test('diff views describe a measured difference in words (state, not action)', async () => {
+  const { perceive } = await import('../lib/perception.mjs');
+  const v = perceive({ temp: 22.9, setpoint: 21 }, { t: ['diff', 'temp', 'setpoint', 'the room temperature', 'the setpoint'] });
+  assert.equal(v.t, 'the room temperature is 1.9 ABOVE the setpoint');
+  assert.equal(perceive({ temp: 20.98, setpoint: 21 }, { t: ['diff', 'temp', 'setpoint', 'temp', 'setpoint'] }).t, 'temp is equal to setpoint');
+});
