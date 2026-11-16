@@ -5,7 +5,8 @@ The internal payload list detects changes but is not independent publisher authe
 Run install.sh (Linux) or install.ps1 (Windows) from the extracted unit. Node 24+
 is required and must already be installed. No automatic model/corpus/runtime downloads.
 The installer validates the unit, refuses unsafe targets, stages and verifies the
-copy, and rolls back failed replacement. Existing unrelated commands are not overwritten.
+copy, and rolls back failed replacement. A prior installation is retained as a
+backup after successful replacement; it is not permanently erased. Existing unrelated commands are not overwritten.
 Windows does not modify PATH; invoke the installed kingmaker.cmd explicitly.
 
 This contains the portable Kingmaker CLI payload, NOT the macOS desktop application,

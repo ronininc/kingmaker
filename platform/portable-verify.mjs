@@ -42,7 +42,8 @@ export function installLinux(source,dest,home=homedir()){
   mkdirSync(stage);stageOwned=true;for(const name of readdirSync(source))cpSync(join(source,name),join(stage,name),{recursive:true,dereference:false,errorOnExist:true,force:false});verifyUnit(stage,'linux');
   if(existsSync(dest)){renameSync(dest,backup);moved=true;}
   renameSync(stage,dest);placed=true;mkdirSync(dirname(alias),{recursive:true});if(!existsSync(alias))symlinkSync(target,alias);
-  if(moved)rmSync(backup,{recursive:true});return dest;
+  // Keep the old installation recoverable; cleanup failure must never roll back to a partially deleted backup.
+  if(moved)console.error('Previous installation retained at '+backup);return dest;
  }catch(e){if(placed)rmSync(dest,{recursive:true});if(moved&&existsSync(backup))renameSync(backup,dest);throw e;}
  finally{if(stageOwned&&existsSync(stage))rmSync(stage,{recursive:true});rmSync(lock,{recursive:true});}
 }

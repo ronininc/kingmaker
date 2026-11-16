@@ -28,7 +28,7 @@ try {
   if (Test-Path -LiteralPath $Dest) { Move-Item -LiteralPath $Dest -Destination $Backup; $Moved = $true }
   Move-Item -LiteralPath $Stage -Destination $Dest
   $Placed = $true
-  if ($Moved) { Remove-Item -LiteralPath $Backup -Recurse -Force }
+  if ($Moved) { Write-Output "Previous installation retained at $Backup" }
   Write-Output "Installed portable CLI: $Dest\kingmaker.cmd. No PATH, service, security or model-download settings changed."
 } catch {
   if ($Placed) { Remove-Item -LiteralPath $Dest -Recurse -Force }
