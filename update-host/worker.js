@@ -47,6 +47,10 @@ export default {
     // Paid add-on zips: GET|HEAD /addons/<id>/<version>/<file>. No update key — the entitlement in the
     // x-ronin-entitlement header is the credential (docs/addons.md §4). Handled before the key gate below.
     if (path.startsWith('/addons/')) return serveAddon(req, env);
+    // The curated method library (local-brain access model, 2026-11-16): GET|HEAD /library/methods/<file>. Same credential
+    // as a paid add-on — a host-signed ronin.entitlement/1 for sku `library.methods`, unexpired and unrevoked — checked
+    // HERE, at the distribution boundary. A free install never receives the curated corpus from this route.
+    if (path.startsWith('/library/methods/')) return serveLibraryMethod(req, env);
     const keys = String(env.UPDATE_KEYS || '').split(',').map((k) => k.trim()).filter(Boolean);
     let operator = false;
     for (const k of keys) if (token && await same(k, token)) operator = true;
@@ -159,6 +163,38 @@ async function serveAddon(req, env) {
       headers.set('content-length', String(len));
       return new Response(req.method === 'HEAD' ? null : obj.body, { status: 206, headers });
     }
+    headers.set('content-length', String(obj.size));
+    return new Response(req.method === 'HEAD' ? null : obj.body, { headers });
+  } catch { return deny(); }
+}
+
+/**
+ * GET|HEAD /library/methods/<file>: the curated methods index (index.json) or one method file (<id>.method.md), from R2
+ * `kingmaker-releases` key `library/methods/<file>`, only to a request carrying a valid entitlement for sku
+ * `library.methods` (the individual membership's corpus). Anything else: 401, no body. Already-downloaded files are not
+ * revocable by this route; revocation stops further downloads.
+ */
+const LIBRARY_METHODS_SKU = 'library.methods';
+async function serveLibraryMethod(req, env) {
+  const deny = () => new Response(null, { status: 401 });
+  try {
+    if (req.method !== 'GET' && req.method !== 'HEAD') return deny();
+    const m = /^\/library\/methods\/(index\.json|[a-z0-9][a-z0-9._-]{0,80}\.method\.md)$/.exec(new URL(req.url).pathname);
+    if (!m) return deny();
+    const hdr = req.headers.get('x-ronin-entitlement') || '';
+    if (!hdr) return deny();
+    let envelope; try { envelope = JSON.parse(new TextDecoder().decode(b64ToBytes(hdr))); } catch { return deny(); }
+    const claims = await verifyEntitlementClaims(env, envelope);
+    if (!claims || claims.schema !== 'ronin.entitlement/1' || claims.issuer !== 'ronin-update-host') return deny();
+    if (claims.expiresAt && !(Date.parse(claims.expiresAt) > Date.now())) return deny();
+    if (claims.sku !== LIBRARY_METHODS_SKU) return deny();
+    const entId = String(claims.order || `${claims.installId || ''}:${claims.sku}`);
+    if (await isRevoked(env, entId, claims.installId)) return deny();
+    const obj = await env.RELEASES.get(`library/methods/${m[1]}`);
+    if (!obj) return new Response('Not found', { status: 404 });
+    const headers = new Headers();
+    obj.writeHttpMetadata(headers);
+    headers.set('cache-control', 'private, no-store');
     headers.set('content-length', String(obj.size));
     return new Response(req.method === 'HEAD' ? null : obj.body, { headers });
   } catch { return deny(); }
