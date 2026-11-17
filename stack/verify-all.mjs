@@ -58,11 +58,8 @@ const SUITES = [
     cwd: join(WS, 'littlebrother'), file: 'tests/run-tests.mjs',
     parse: ratioCount(/(\d+)\/(\d+) checks passed/),
   },
-  {
-    id: 'stack-littlebrother/acceptance', component: 'littlebrother',
-    cwd: join(STACK_DIR, 'littlebrother'), file: 'tests/run-tests.mjs',
-    parse: ratioCount(/(\d+)\/(\d+) checks passed/),
-  },
+  // 2026-11-17 (owner decision): Kingmaker no longer carries a Little Brother copy (stack/littlebrother removed).
+  // Scripture Armor owns LB (scripture-armor/littlebrother/, test/lb-module.test.mjs, lb-wiring.test.mjs in the Armor repo).
   {
     id: 'harness2/acceptance', component: 'harness2',
     cwd: join(STACK_DIR, 'harness2'), file: 'tests/run-tests.mjs',

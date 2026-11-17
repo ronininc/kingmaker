@@ -87,7 +87,7 @@
    "id": "littlebrother",
    "name": "LittleBrother — governed OSINT method set",
    "home": "~/workspace/littlebrother",
-   "role": "Spine-facing lookup core. kingmaker build: 5 public-source methods + 3 tap-gated full methods (stubs until a founder points a live source); solomon build physically excludes the full set (build-solomon.mjs). Every call/refusal on a hash-chained JSONL audit log. INSTALLED 2026-10-20: real code vendored in-stack at kingmaker-stack/littlebrother (ships in the app payload as lib/stack-littlebrother); acceptance suite runs against the installed copy.",
+   "role": "Spine-facing lookup core. kingmaker build: 5 public-source methods + 3 tap-gated full methods (stubs until a founder points a live source); solomon build physically excludes the full set (build-solomon.mjs). Every call/refusal on a hash-chained JSONL audit log. INSTALLED 2026-10-20: real code vendored in-stack at kingmaker-stack/littlebrother (ships in the app payload as lib/stack-littlebrother); acceptance suite runs against the installed copy. REMOVED FROM KINGMAKER 2026-11-17 (owner decision): Scripture Armor owns Little Brother (scripture-armor/littlebrother/, versioned entry lb-host.mjs, interface scripture-armor.lb-host/1); Kingmaker reaches it only through the installed Armor (lib/armor-toolkit.mjs). The tap-gated full-method stubs (methods-full.mjs) are recoverable from Kingmaker git history; their home is an open owner decision.",
    "versionStamp": "2026-10-21T02:41:12.883120Z",
    "entryModules": [
     {
@@ -120,7 +120,7 @@
     }
    ],
    "license": "Ronin Inc original work, clean-room from the boundary spec (GPL upstream never read) — see NOTICE.",
-   "installedHome": "kingmaker-stack/littlebrother"
+   "installedHome": null
   },
   {
    "id": "space-cell",
