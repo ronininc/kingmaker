@@ -2842,6 +2842,19 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
     let activity = String((p["activity"] as? String ?? "").replacingOccurrences(of: "\n", with: " ").prefix(200))
     let progress: Int? = (p["progress"] as? NSNumber).map { $0.intValue }.flatMap { (0...100).contains($0) ? $0 : nil }
     let tail: [String] = ((p["tail"] as? [Any]) ?? []).compactMap { $0 as? String }.suffix(3).map { String($0.replacingOccurrences(of: "\n", with: " ").prefix(300)) }
+    // TRUE progress (lib/tool-sessions.mjs progressFields/progressLabel): steps or bytes from the job's own events/output;
+    // "indeterminate" while running with no real total — then words, never an invented percentage or a timer.
+    let num: (Any?) -> Int? = { ($0 as? NSNumber).map { $0.intValue } }
+    let steps = (p["steps"] as? [String: Any]).flatMap { d -> (Int, Int)? in guard let a = num(d["done"]), let b = num(d["total"]), b > 0, a >= 0, a <= b else { return nil }; return (a, b) }
+    let bytes = (p["bytes"] as? [String: Any]).flatMap { d -> (Int, Int?)? in guard let a = num(d["done"]), a >= 0 else { return nil }; return (a, num(d["total"])) }
+    let indeterminate = (p["indeterminate"] as? Bool) == true
+    let phase = String((p["phase"] as? String ?? "").replacingOccurrences(of: "\n", with: " ").prefix(80))
+    let mb: (Int) -> String = { String(format: "%.1f MB", Double($0) / 1_000_000) }
+    var measure = ""
+    if let st = steps { measure = "\(st.0)/\(st.1)" + (progress.map { " · \($0)%" } ?? "") }
+    else if let by = bytes { measure = by.1.map { "\(mb(by.0)) of \(mb($0))" + (progress.map { " · \($0)%" } ?? "") } ?? "\(mb(by.0)) so far (total not reported)" }
+    else if let pct = progress { measure = "\(pct)%" }
+    else if indeterminate { measure = "working — the tool reports no total" }
     let black = lookPref == "black"
     let dim = black ? NSColor.white.withAlphaComponent(0.5) : NSColor.secondaryLabelColor
     let body = black ? NSColor.white.withAlphaComponent(0.88) : NSColor.labelColor
@@ -2859,7 +2872,8 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
     s.append(NSAttributedString(string: "● ", attributes: [.font: NSFont.systemFont(ofSize: size - 3), .foregroundColor: stateColour]))
     s.append(NSAttributedString(string: tool, attributes: [.font: NSFont.systemFont(ofSize: size - 1, weight: .semibold), .foregroundColor: body]))
     s.append(NSAttributedString(string: " · \(label)", attributes: [.font: NSFont.systemFont(ofSize: size - 1), .foregroundColor: stateColour]))
-    if let pct = progress { s.append(NSAttributedString(string: " · \(pct)%", attributes: [.font: NSFont.monospacedDigitSystemFont(ofSize: size - 1, weight: .regular), .foregroundColor: body])) }
+    if !measure.isEmpty { s.append(NSAttributedString(string: " · \(measure)", attributes: [.font: NSFont.monospacedDigitSystemFont(ofSize: size - 1, weight: .regular), .foregroundColor: progress == nil ? dim : body])) }
+    if !phase.isEmpty { s.append(NSAttributedString(string: "\n   \(phase)", attributes: [.font: NSFont.systemFont(ofSize: size - 2, weight: .medium), .foregroundColor: body])) }
     if !activity.isEmpty { s.append(NSAttributedString(string: "\n   \(activity)", attributes: [.font: NSFont.systemFont(ofSize: size - 2), .foregroundColor: dim])) }
     for line in tail where line != activity {
       s.append(NSAttributedString(string: "\n   │ \(line)", attributes: [.font: NSFont.monospacedSystemFont(ofSize: size - 3, weight: .regular), .foregroundColor: dim]))

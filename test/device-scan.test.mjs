@@ -373,7 +373,11 @@ test('desk: intents; a read-back waits for HIS word (typed, or spoken when his v
   assert.equal(ownerWord({ typed: true }, 'propose', false), true);
   assert.equal(ownerWord({ spoken: true }, 'propose', true), false);
   assert.equal(ownerWord({ spoken: true }, 'verified', true), false);
-  assert.equal(ownerWord({ spoken: true, attested: true }, 'verified', true), true);
+  assert.equal(ownerWord({ spoken: true, attested: true, ownerVoice: true }, 'verified', true), true);
+  // A token is minted for every speaker: under 'verified' it approves only with the owner gate's owner_match.
+  assert.equal(ownerWord({ spoken: true, attested: true }, 'verified', true), false);
+  assert.equal(ownerWord({ spoken: true, attested: true, ownerVoice: false }, 'verified', true), false);
+  assert.equal(ownerWord({ spoken: true, ownerVoice: true }, 'verified', true), false, 'owner_match without a token for this text is not enough either');
 
   const f = deskFixture({ voiceAuthority: 'propose' });
   await f.desk.handle('put my keys in the vault', { spoken: true });
@@ -637,4 +641,21 @@ test('a cached map from an older Kingmaker: a route kind it renamed reads as the
   assert.equal(m.apps[0].routes[1].kind, 'hands');
   const line = closestCapabilityLine(m, 'open Blender and make a cube', "I can't do that.");
   assert.ok(line == null || /its Blender engine|Hands of Horus/.test(line), String(line));
+});
+
+test('desk under verified voice: an attestation token from ANY speaker does not approve a read-back; the owner gate\'s match does', async () => {
+  const f = deskFixture({ voiceAuthority: 'verified' });
+  await f.desk.handle('put my keys in the vault', { spoken: true, attested: true, ownerVoice: true });
+  assert.ok(f.desk.pending());
+  await f.desk.answer('yes', { spoken: true, attested: true });
+  assert.deepEqual(f.calls, [], 'a token without owner_match imports nothing');
+  assert.ok(f.desk.pending()); assert.match(f.said.at(-1), /That needs your word/);
+  await f.desk.answer('yes', { spoken: true, attested: true, ownerVoice: false });
+  assert.deepEqual(f.calls, []);
+  await f.desk.answer('yes', { spoken: true, attested: true, ownerVoice: true });
+  assert.deepEqual(f.calls, ['import']);
+  // The voice loop hands the desk the same `who` it hands the method lane: ownerVoice from isAttestedOwnerVoice.
+  const cli = readFileSync(new URL('../lib/cli.mjs', import.meta.url), 'utf8');
+  assert.match(cli, /attested: Boolean\(attestation\), ownerVoice: isAttestedOwnerVoice\(attestation, decision\)/);
+  assert.match(cli, /desk\.answer\(kind, who\)/);
 });

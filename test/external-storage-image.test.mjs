@@ -18,7 +18,11 @@ import { writeMethod } from '../lib/method-writing.mjs';
 const IMAGES = String(process.env.KM_STORAGE_IMAGES ?? '').split(',').map((s) => s.trim()).filter(Boolean);
 const skip = process.platform !== 'darwin' || !IMAGES.length ? 'set KM_STORAGE_IMAGES to scratch .dmg test images (macOS only)' : false;
 const sha = (b) => createHash('sha256').update(b).digest('hex');
-const attach = (dmg, mp, ro = false) => { mkdirSync(mp, { recursive: true }); execFileSync('hdiutil', ['attach', '-nobrowse', ...(ro ? ['-readonly'] : []), '-mountpoint', mp, dmg], { stdio: 'ignore' }); };
+// An image created with `hdiutil create -encryption … -stdinpass` is attached with KM_STORAGE_IMAGE_PASSPHRASE (a TEST
+// passphrase chosen for the scratch image — never a real secret).
+const PASS = process.env.KM_STORAGE_IMAGE_PASSPHRASE ?? '';
+const encryptedImage = (dmg) => { try { return /encrypted: YES/.test(execFileSync('hdiutil', ['isencrypted', dmg], { encoding: 'utf8' })); } catch { return false; } };
+const attach = (dmg, mp, ro = false) => { mkdirSync(mp, { recursive: true }); const enc = encryptedImage(dmg); execFileSync('hdiutil', ['attach', '-nobrowse', ...(enc ? ['-stdinpass'] : []), ...(ro ? ['-readonly'] : []), '-mountpoint', mp, dmg], { stdio: [enc ? 'pipe' : 'ignore', 'ignore', 'ignore'], ...(enc ? { input: PASS } : {}) }); };
 const detach = (mp) => { try { execFileSync('hdiutil', ['detach', mp], { stdio: 'ignore' }); } catch { /* not attached */ } };
 const discover = (mp) => {
   const v = discoverMac({ extraMounts: [mp] }).find((x) => x.mountPoint === mp);
@@ -28,7 +32,7 @@ const discover = (mp) => {
 const proposal = async () => JSON.stringify({ title: 'Miles to kilometres', domain: 'conversion', steps: [{ id: 'convert', type: 'reason', preamble: 'Convert miles to kilometres.', prompt: '{{inputs.prompt}}' }] });
 const reasoner = async ({ prompt }) => `${(Number(/[\d.]+/.exec(prompt)?.[0] ?? 0) * 1.609344).toFixed(2)} km`;
 
-if (!IMAGES.length) test('real filesystem disk images (exFAT / FAT32)', { skip }, () => {});
+if (!IMAGES.length) test('real filesystem disk images (exFAT / FAT32 / HFS+ / APFS)', { skip }, () => {});
 for (const dmg of IMAGES) {
   test(`real filesystem ${basename(dmg)}: discovery → approval → save/retrieve → remount → missing → read-only → interruption → limits`, { skip }, async () => {
     const scratch = dirname(dmg);
@@ -46,10 +50,12 @@ for (const dmg of IMAGES) {
       const keep = sha(readFileSync(join(mp1, 'Photos', 'keep.jpg')));
       const e = approveDrive({ state, volume: v, roles: ['user-methods', 'library-cache', 'models'], confirm: true });
       console.log(`# probed on the real filesystem: ${JSON.stringify(e.capabilities.probed)}`);
-      assert.equal(e.capabilities.probed.caseSensitive, false);
+      assert.equal(e.capabilities.probed.caseSensitive, v.capabilities.caseSensitive, 'declared case sensitivity matches the real filesystem');
       // Measured: macOS EMULATES symlinks on exFAT/FAT (stored as special files other systems do not read as links),
       // so the probe can succeed; the declared capability stays "no native symlinks" and Kingmaker never creates one.
-      assert.equal(typeof e.capabilities.probed.symlinks, 'boolean'); assert.equal(v.capabilities.symlinks, false);
+      assert.equal(typeof e.capabilities.probed.symlinks, 'boolean');
+      if (['FAT', 'exFAT'].includes(v.capabilities.family)) assert.equal(v.capabilities.symlinks, false);
+      else assert.equal(e.capabilities.probed.symlinks, v.capabilities.symlinks, 'native symlinks: declared = probed');
       // save through the normal path, then retrieve through listMethods/conductor
       let storage = resolveStorage({ state, volumes: [v] });
       const dest = userMethodsDestination(state, { storage });
