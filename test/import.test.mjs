@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { test } from 'node:test';
+import { pathToFileURL } from 'node:url';
+import { engineRootWith, engineSkip } from './helpers/engine-source.mjs';
 
 const manifest = JSON.parse(readFileSync(new URL('../solomon-strip.json', import.meta.url), 'utf8'));
 const rules = manifest.removeTestsReferencing.map((s) => new RegExp(s));
@@ -19,14 +21,17 @@ test('a test suite goes only when it needs the stripped UI or Electron', () => {
   assert.ok(!hit("const ELECTRON_RUN_AS_NODE = '1'"));
 });
 
-test('the imported tree records where it came from and has no dangling imports into stripped paths', () => {
-  const from = JSON.parse(readFileSync(new URL('../solomon/IMPORTED_FROM.json', import.meta.url), 'utf8'));
+// The imported tree: solomon/ after scripts/import-solomon.mjs, or KINGMAKER_ENGINE_SRC. Absent → a visible skip.
+const engineURL = (...need) => new URL(`${pathToFileURL(engineRootWith(...need)).href}/`);
+
+test('the imported tree records where it came from and has no dangling imports into stripped paths', { skip: engineSkip('IMPORTED_FROM.json') }, () => {
+  const from = JSON.parse(readFileSync(new URL('IMPORTED_FROM.json', engineURL('IMPORTED_FROM.json')), 'utf8'));
   assert.match(from.sha, /^[0-9a-f]{40}$/);
   assert.deepEqual(from.danglingImports, []);
 });
 
-test('every suite left in solomon/tests/run-all.ts has its file (the import prunes what the strip removed)', () => {
-  const root = new URL('../solomon/', import.meta.url);
+test('every suite left in solomon/tests/run-all.ts has its file (the import prunes what the strip removed)', { skip: engineSkip('IMPORTED_FROM.json', 'tests/run-all.ts') }, () => {
+  const root = engineURL('IMPORTED_FROM.json', 'tests/run-all.ts');
   const runAll = readFileSync(new URL('tests/run-all.ts', root), 'utf8');
   const suites = [...runAll.matchAll(/\{ name: '([^']+)', file: '([^']+)'/g)];
   assert.ok(suites.length > 0, 'run-all lists suites');

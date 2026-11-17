@@ -4,6 +4,7 @@ import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSy
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
+import { engineRootWith, engineSkip } from './helpers/engine-source.mjs';
 import { convertFile, corpusInstalled, fetchCorpus, loadManifest, planFetch, recordToMarkdown, recordsOf } from '../lib/security-corpus.mjs';
 
 const manifest = loadManifest();
@@ -147,7 +148,8 @@ test('a file that fails part-way leaves no Markdown where the knowledge build lo
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('buildShard runs the engine\'s extract and index steps for this one field and produces the SQLite shard', async () => {
+const SCRIPTS = ['scripts/solomon-extract-knowledge.mjs', 'scripts/solomon-index-knowledge.mjs'];
+test('buildShard runs the engine\'s extract and index steps for this one field and produces the SQLite shard', { skip: engineSkip(...SCRIPTS) }, async () => {
   const { buildShard } = await import('../lib/security-corpus.mjs');
   const { DatabaseSync } = await import('node:sqlite');
   const dir = tmp();
@@ -157,7 +159,7 @@ test('buildShard runs the engine\'s extract and index steps for this one field a
     const tree = [{ type: 'file', path: 'blue-team/detections.json', size: Buffer.byteLength(doc), oid: 'd1' }];
     await fetchCorpus({ manifest, sourcesDir: sources, token: 't', tree, fetchImpl: fakeHub({ 'blue-team/detections.json': doc }).fetchImpl });
     const env = { PATH: process.env.PATH, HOME: dir };
-    const built = buildShard({ manifest, sourcesDir: sources, env });
+    const built = buildShard({ manifest, sourcesDir: sources, env, scriptsDir: join(engineRootWith(...SCRIPTS), 'scripts') });
     assert.equal(built.state, 'built', JSON.stringify(built));
     assert.equal(built.shard, join(dir, 'knowledge', 'index', 'security-diagnostics.db'));
     const db = new DatabaseSync(built.shard, { readOnly: true });
@@ -169,10 +171,9 @@ test('buildShard runs the engine\'s extract and index steps for this one field a
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('the engine\'s field contract routes security questions to this field, as an optional field', async () => {
+test('the engine\'s field contract routes security questions to this field, as an optional field', { skip: engineSkip('contracts/knowledge-fields.json') }, async () => {
   const { applyFieldRoute } = await import('../lib/security-corpus.mjs');
-  const { fileURLToPath } = await import('node:url');
-  const contractPath = fileURLToPath(new URL('../solomon/contracts/knowledge-fields.json', import.meta.url));
+  const contractPath = join(engineRootWith('contracts/knowledge-fields.json'), 'contracts', 'knowledge-fields.json');
   const original = readFileSync(contractPath, 'utf8');
   const entry = JSON.parse(original).fields.find((f) => f.field === manifest.field);
   assert.ok(entry, 'the route is in the committed contract; an engine import must put it back (scripts/import-solomon.mjs does)');
