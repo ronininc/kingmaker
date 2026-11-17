@@ -11,6 +11,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { CA_DAYS, PAIR_CODE_TTL_MS, PAIR_LOCK_MS, caConfig, companionControl, companionWanted, createCompanion, ensureTls, deviceStore, isLoopback, lanIp, setCompanionWanted, tailscalePeer, tailscalePeerAsync } from '../lib/phone-companion.mjs';
 import { connect as tlsConnect } from 'node:tls';
+import { phoneTurnLine } from '../lib/cli.mjs';
 
 const at = (p) => new URL(`../${p}`, import.meta.url);
 
@@ -208,12 +209,34 @@ test('the engine runs the companion: control line, remembered on/off, stop on sh
   // A phone's turn is the engine's own typed-turn line, in-process: no URL, no open, no key. It carries the phone's
   // stable conversationId (a resuming thread) and the latest field photo as `image`, both forwarded in the payload.
   assert.match(cli, /onTurn: async \(text, meta\) => \{ if \(!phoneTurn\) throw new Error\('Kingmaker runs without its bar'\); phoneTurn\(text, meta\); \}/);
-  assert.match(cli, /phoneTurn = \(text, meta = \{\}\) => onControlLines\(`typed-turn \$\{Buffer\.from\(JSON\.stringify\(\{ text, model: 'auto', \.\.\.\(meta\?\.conversationId \? \{ conversationId: meta\.conversationId \} : \{\}\), \.\.\.\(meta\?\.image \? \{ image: meta\.image \} : \{\}\) \}\)/);
+  // The line itself is checked by behaviour below (phoneTurnLine); here only that the engine sends it.
+  assert.match(cli, /phoneTurn = \(text, meta = \{\}\) => onControlLines\(phoneTurnLine\(text, meta\)\)/);
   assert.match(cli, /process\.stdin\.on\('data', onControlLines\)/);
   assert.ok(!/bar-link\.key|kingmaker:\/\/bar\?/.test(cli), 'the engine never builds a bar link or reads its key');
   // The companion line is the last branch, so no earlier control line (stop, pair…) can swallow it.
   const branch = cli.indexOf('else if (companionControl(said))');
   assert.ok(branch > cli.indexOf("else if (/^pair\\b/.test(said))") && branch > cli.indexOf("else if (/^stop\\b/.test(said))"));
+});
+
+test('a phone\'s turn is one typed-turn line that round-trips text, thread and photo, and can only be demoted to a job', () => {
+  // Read back exactly as the engine's typed-turn branch does (lib/cli.mjs): base64 JSON; source 'job' or else 'typed'.
+  const read = (line) => { try { return JSON.parse(Buffer.from(line.replace(/^typed-turn\s+/, ''), 'base64').toString('utf8')); } catch { return null; } };
+  const sourceOf = (t) => (t?.source === 'job' ? 'job' : 'typed');
+  const line = phoneTurnLine('quote the Hendricks roof\nstop\npair 123456', { conversationId: 'phone-abc', image: 'data:image/jpeg;base64,AAAA' });
+  assert.match(line, /^typed-turn [A-Za-z0-9+/=]+\n$/, 'one line: the phone\'s text can never become a control line');
+  const t = read(line.trim());
+  assert.deepEqual(t, { text: 'quote the Hendricks roof\nstop\npair 123456', model: 'auto', conversationId: 'phone-abc', image: 'data:image/jpeg;base64,AAAA' });
+  assert.equal(sourceOf(t), 'typed');
+  // Without a thread or photo, neither key appears.
+  assert.deepEqual(read(phoneTurnLine('hi')), { text: 'hi', model: 'auto' });
+  // The job inbox tags its turns (029df47): propose-only.
+  const job = read(phoneTurnLine('draft the invoice', { conversationId: 'job-1', source: 'job' }));
+  assert.deepEqual(job, { text: 'draft the invoice', model: 'auto', conversationId: 'job-1', source: 'job' });
+  assert.equal(sourceOf(job), 'job');
+  // Nothing in meta can claim a stronger source, and unknown meta is not forwarded.
+  for (const source of ['owner-voice', 'typed', 'voice', 'owner']) {
+    assert.deepEqual(read(phoneTurnLine('approve', { source, ownerVoice: true, attested: true })), { text: 'approve', model: 'auto' }, source);
+  }
 });
 
 test('kingmaker://companion → the control line, never the bar or focus', { timeout: 120_000 }, (t) => {
