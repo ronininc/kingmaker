@@ -94,7 +94,7 @@ import { createVoiceArtifactService } from './voice-artifact.mjs';
 import { createProposalsClient } from './proposals.mjs';
 import { createFailureRegistry } from './failures.mjs';
 import { createDaemonFeeds, FEEDS_SCHEMA } from './feeds.mjs';
-import { armorBundleState } from '../lib/armor-bundle.mjs';
+import { armorConnectionState } from '../lib/armor-connection.mjs';
 
 const readJson = (path) => { try { return JSON.parse(readFileSync(path, 'utf8')); } catch { return null; } };
 
@@ -387,10 +387,10 @@ export function createLightRuntimeServer({ assetsDir, stateDir = assetsDir, prof
         } catch (e) { voiceError = artifactRefusal(e); }
         return json(res, 200, {
           ok: true, schema: FEEDS_SCHEMA,
-          // Scripture Armor as an active item: the bundle loader's own state in this
-          // process, and the sealed artifacts' manifests — fingerprints and pins are the
+          // Scripture Armor as an active item: this process's connection to the installed Armor
+          // (authenticated, versioned, or the precise refusal), and the sealed artifacts' manifests — fingerprints and pins are the
           // device layer's published record of the armor that sealed them.
-          armorBundle: armorBundleState(),
+          armor: armorConnectionState(),
           engine, engineError, voice: voiceLib, voiceError,
           catalog: getFeeds().catalog(join(assetsDir, '..', 'catalog')),
         });

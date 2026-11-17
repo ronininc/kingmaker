@@ -28,10 +28,8 @@
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
-import {
-  createIdentity, loadIdentity, publicBlock, parsePublicBlock, sealPlaintext,
-  parseScriptureFile, verifyFrameSignature, unsealFileKey, openSealedFile, armorDecode,
-} from '../scripture-armor/armor.mjs';
+import { armor, armorFns } from '../lib/armor-connection.mjs';
+const { createIdentity, loadIdentity, publicBlock, parsePublicBlock, sealPlaintext, parseScriptureFile, verifyFrameSignature, unsealFileKey, openSealedFile, armorDecode } = armorFns(armor, ['createIdentity', 'loadIdentity', 'publicBlock', 'parsePublicBlock', 'sealPlaintext', 'parseScriptureFile', 'verifyFrameSignature', 'unsealFileKey', 'openSealedFile', 'armorDecode']);
 
 export const ENGINE_MANIFEST_SCHEMA = 'kingmaker.light-engine/1';
 export const DEVICE_IDENTITY_LABEL = 'kingmaker-light-host';

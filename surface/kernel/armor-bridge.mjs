@@ -31,7 +31,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import * as armor from '../../scripture-armor/armor.mjs';
+import { armor } from '../../lib/armor-connection.mjs';
 import { readProvenance, recordBeacon, identityDir } from '../../lib/armor-native.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));

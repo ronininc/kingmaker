@@ -3,22 +3,25 @@ import { chmodSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
-import { createIdentity, publicBlock, signPayload, signRevocation } from '../scripture-armor/armor.mjs';
+import { armor, armorFns } from '../lib/armor-connection.mjs';
+const { createIdentity, publicBlock, signPayload, signRevocation } = armorFns(armor, ['createIdentity', 'publicBlock', 'signPayload', 'signRevocation']);
 import { createArmorRevocationChecker, createDockChallengeStore, createKingmakerArmorProofVerifier, createKingmakerInstallProof } from '../lib/install-docking-runtime.mjs';
 import { createLauncherDockGate } from '../lib/install-docking.mjs';
-import { ARMOR_KEM_SKIP, ARMOR_PQ_TODO } from './helpers/host-tool-skips.mjs';
+import { ARMOR_KEM_SKIP, ARMOR_SKIP } from './helpers/host-tool-skips.mjs';
 
+// The installed Armor's identities are hybrid; the proof protocol carries the key types the signer actually holds.
+const HYBRID_KEY_TYPES = ['X25519', 'Ed25519', 'ML-KEM-768', 'ML-DSA-65'];
 const deviceSha256 = 'a'.repeat(64);
 const expectedInstallIdentity = { installId: 'install-fixture', deviceSha256, keySha: 'b'.repeat(64), releaseTag: 'v4.4.2' };
 const fixture = () => {
   const root = mkdtempSync(join(tmpdir(), 'kingmaker-dock-')); chmodSync(root, 0o700);
   const identity = createIdentity(join(root, 'identity'), 'Kingmaker fixture');
-  const expectedArmorIdentity = { senderSignFp: identity.signFp, keyTypes: ['Ed25519'] };
+  const expectedArmorIdentity = { senderSignFp: identity.signFp, keyTypes: HYBRID_KEY_TYPES };
   return { root, identity, expectedArmorIdentity };
 };
 const proof = (identity, challenge, issuedAt) => signPayload(identity, {
   type: 'kingmaker.install-proof/1', nonce: challenge, at: new Date(issuedAt).toISOString(),
-  body: { schema: 'kingmaker.install-proof/1', challenge, issuedAt, ...expectedInstallIdentity },
+  body: { schema: 'kingmaker.install-proof/1', keyTypes: HYBRID_KEY_TYPES, challenge, issuedAt, ...expectedInstallIdentity },
 });
 const revocationSnapshot = (issuer, querySignFp, at, overrides = {}) => signPayload(issuer, {
   type: 'armor.revocation-query-response/1', at: new Date(at).toISOString(),
@@ -26,7 +29,7 @@ const revocationSnapshot = (issuer, querySignFp, at, overrides = {}) => signPayl
     generatedAt: new Date(at).toISOString(), validUntil: new Date(at + 60_000).toISOString(), records: [], ...overrides },
 });
 
-test('concrete Armor verifier binds signature, embedded fingerprint, challenge and install claims', { skip: ARMOR_KEM_SKIP, todo: ARMOR_PQ_TODO }, async (t) => {
+test('concrete Armor verifier binds signature, embedded fingerprint, challenge and install claims', { skip: ARMOR_KEM_SKIP || ARMOR_SKIP }, async (t) => {
   const f = fixture(); t.after(() => rmSync(f.root, { recursive: true, force: true }));
   const issuedAt = Date.parse('2026-11-01T00:00:00Z'); const challenge = 'challenge_concrete01';
   const verify = createKingmakerArmorProofVerifier({ expectedArmorIdentity: f.expectedArmorIdentity, expectedInstallIdentity });
@@ -37,7 +40,7 @@ test('concrete Armor verifier binds signature, embedded fingerprint, challenge a
   assert.equal((await verify({ challenge, issuedAt, proof: proof(other.identity, challenge, issuedAt) })).ok, false);
 });
 
-test('proof producer uses the installed Armor identity and fails closed on trust or revocation', { skip: ARMOR_KEM_SKIP, todo: ARMOR_PQ_TODO }, async (t) => {
+test('proof producer uses the installed Armor identity and fails closed on trust or revocation', { skip: ARMOR_KEM_SKIP || ARMOR_SKIP }, async (t) => {
   const root = mkdtempSync(join(tmpdir(), 'kingmaker-proof-')); chmodSync(root, 0o700);
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const identity = createIdentity(join(root, 'armor', 'identity'), 'Kingmaker fixture');
@@ -76,7 +79,7 @@ test('durable challenge consumption survives restart and permits only one winner
   assert.equal(await store.consumeChallenge(item), false); store.close();
 });
 
-test('Launcher gate runs concrete Armor verification and durable replay refusal', { skip: ARMOR_KEM_SKIP, todo: ARMOR_PQ_TODO }, async (t) => {
+test('Launcher gate runs concrete Armor verification and durable replay refusal', { skip: ARMOR_KEM_SKIP || ARMOR_SKIP }, async (t) => {
   const f = fixture(); t.after(() => rmSync(f.root, { recursive: true, force: true }));
   const challenge = 'challenge_endtoend01'; const issuedAt = Date.parse('2026-11-01T00:00:00Z');
   const issuer = createIdentity(join(f.root, 'revocation-issuer'), 'Revocation fixture');
@@ -95,7 +98,7 @@ test('Launcher gate runs concrete Armor verification and durable replay refusal'
   assert.equal((await gate(request)).reason, 'replayed_challenge');
 });
 
-test('revocation requires a fresh authenticated complete query-bound response', { skip: ARMOR_KEM_SKIP, todo: ARMOR_PQ_TODO }, async (t) => {
+test('revocation requires a fresh authenticated complete query-bound response', { skip: ARMOR_KEM_SKIP || ARMOR_SKIP }, async (t) => {
   const f = fixture(); t.after(() => rmSync(f.root, { recursive: true, force: true }));
   const issuer = createIdentity(join(f.root, 'issuer'), 'Revocation fixture');
   const other = createIdentity(join(f.root, 'other'), 'Other fixture');

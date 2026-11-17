@@ -40,10 +40,8 @@
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import {
-  parsePublicBlock, publicBlock, sealPlaintext, parseScriptureFile, verifyFrameSignature,
-  unsealFileKey, openSealedFile, armorDecode,
-} from '../scripture-armor/armor.mjs';
+import { armor, armorFns } from '../lib/armor-connection.mjs';
+const { parsePublicBlock, publicBlock, sealPlaintext, parseScriptureFile, verifyFrameSignature, unsealFileKey, openSealedFile, armorDecode } = armorFns(armor, ['parsePublicBlock', 'publicBlock', 'sealPlaintext', 'parseScriptureFile', 'verifyFrameSignature', 'unsealFileKey', 'openSealedFile', 'armorDecode']);
 import { ensureDeviceIdentity, readTreeFiles } from './artifact.mjs';
 
 export const VOICE_MANIFEST_SCHEMA = 'kingmaker.light-voice/1';

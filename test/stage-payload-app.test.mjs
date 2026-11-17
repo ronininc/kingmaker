@@ -28,18 +28,13 @@ const fixtureEngineResources = (dir) => {
 };
 const repack = (tar, dir) => execFileSync('tar', ['-cf', tar, '-C', dir, 'sol-ghost'], { env: { ...process.env, COPYFILE_DISABLE: '1' } });
 
-test('free Kingmaker carries only shared Armor compatibility modules, not the paid standalone product', () => {
+test('free Kingmaker carries no Scripture Armor files at all (Armor is installed separately)', () => {
   const dir = mkdtempSync(join(tmpdir(), 'km-payload-armor-boundary-'));
   try {
     const built = buildPayload({ out: join(dir, 'payload') });
     const entries = execFileSync('tar', ['-tf', built.tar], { encoding: 'utf8' }).trim().split('\n');
-    for (const file of ['armor.mjs', 'refit-net.mjs', 'scan.mjs', 'product-paths.mjs', 'product.json']) {
-      assert.ok(entries.includes(`sol-ghost/scripture-armor/${file}`), `missing shared compatibility module ${file}`);
-    }
-    for (const paid of ['open-standalone.mjs', 'vaultd.mjs', 'launch.mjs', 'account-session.mjs', 'dashboard.mjs', 'paid-activation.mjs', 'mac/install-armor.sh', 'windows/install-armor.ps1', 'linux/install-armor.sh']) {
-      assert.ok(!entries.includes(`sol-ghost/scripture-armor/${paid}`), `free payload leaked standalone Armor file ${paid}`);
-    }
-    assert.ok(!entries.some((entry) => entry.startsWith('sol-ghost/scripture-armor/test/')), 'free payload leaked standalone Armor tests');
+    assert.deepEqual(entries.filter((entry) => entry.startsWith('sol-ghost/scripture-armor')), []);
+    assert.ok(entries.includes('sol-ghost/lib/armor-connection.mjs'), 'the connection to the installed Armor must ship');
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
@@ -56,7 +51,7 @@ test('verified raw payload stages into the installer app layout', () => {
     const result = stagePayloadApp({ payload: built.tar, wrapper, engine: fixtureEngine(dir), engineResources, out, expectedSha256: built.sha256, expectedVersion: built.version, fixtureAdhoc: true, resources: join(dir, 'none') });
     assert.equal(result.version, built.version);
     assert.ok(result.files > 100, 'the governed Kingmaker payload should contain its complete runtime tree');
-    for (const file of ['lib/cli.mjs', 'core/pack.json', 'catalog/essentials.json', 'scripture-armor/armor.mjs']) {
+    for (const file of ['lib/cli.mjs', 'core/pack.json', 'catalog/essentials.json', 'lib/armor-connection.mjs']) {
       assert.ok(readFileSync(join(out, 'Contents', 'Resources', 'sol-ghost', file)).length > 0, `missing required payload file ${file}`);
     }
     assert.ok(readFileSync(join(out, 'Contents', 'Info.plist'), 'utf8').includes(`<key>CFBundleShortVersionString</key><string>${built.version}</string>`));

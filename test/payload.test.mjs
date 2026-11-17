@@ -28,14 +28,18 @@ test('the payload is every part of the free Kingmaker, in one file, and nothing 
   assert.equal(provePayload(p.tar).version, JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version);
 });
 
-test('the unpacked payload includes and loads the exact native armor runtime closure', { timeout: 120_000 }, () => {
-  const files = payloadFiles(ROOT).filter((f) => f.startsWith('scripture-armor/'));
-  assert.deepEqual(files, ['scripture-armor/LICENSE', 'scripture-armor/armor.mjs', 'scripture-armor/product-paths.mjs', 'scripture-armor/product.json', 'scripture-armor/refit-net.mjs', 'scripture-armor/scan.mjs']);
+test('the payload ships NO Scripture Armor code; unpacked, armor-native loads and fails closed on use without an installed Armor', { timeout: 120_000 }, () => {
+  // Owner decision 2026-11-17: Armor is a separate product that owns its code; Kingmaker connects to the installed one.
+  assert.deepEqual(payloadFiles(ROOT).filter((f) => f.startsWith('scripture-armor/')), []);
   const dir = unpack();
   try {
     const url = pathToFileURL(join(dir, 'lib/armor-native.mjs')).href;
-    const r = spawnSync(process.execPath, ['--input-type=module', '-e', `const m = await import(${JSON.stringify(url)}); if (typeof m.armor.createIdentity !== 'function' || typeof m.Flow !== 'function' || typeof m.openFlow !== 'function') process.exit(1);`], { encoding: 'utf8' });
+    const probe = `const m = await import(${JSON.stringify(url)});
+      try { m.armor.createIdentity; console.log('NO-REFUSAL'); } catch (e) { console.log(e.name + ':' + e.code); }`;
+    const missing = join(dir, '..', 'no-armor-here');
+    const r = spawnSync(process.execPath, ['--input-type=module', '-e', probe], { encoding: 'utf8', env: { ...process.env, KINGMAKER_ARMOR_HOME: missing } });
     assert.equal(r.status, 0, r.stderr);
+    assert.equal(r.stdout.trim(), 'ArmorUnavailableError:ARMOR_MISSING');
   } finally { rmSync(join(dir, '..'), { recursive: true, force: true }); }
 });
 
@@ -51,7 +55,7 @@ test('armor vault, state, sealed bundles, app files and paid add-ons cannot ente
     for (const name of excluded) { const p = join(root, name); mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, 'excluded fixture'); }
     const files = payloadFiles(root);
     for (const name of excluded) assert.ok(!files.includes(name), name);
-    assert.equal(files.filter((f) => f.startsWith('scripture-armor/')).length, 6);
+    assert.equal(files.filter((f) => f.startsWith('scripture-armor/')).length, 0);
     assert.ok(!PAYLOAD_PARTS.includes('scripture-armor'), 'the full tree must never become a payload part');
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
