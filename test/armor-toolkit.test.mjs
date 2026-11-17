@@ -38,14 +38,14 @@ test('discovery finds the ONE installed Armor, verifies its tools in place again
   assert.equal(discoverArmorToolkit({ candidates: ['/nonexistent/Scripture Armor.app'] }).status, 'armor-not-installed');
 });
 
-test('entitled profile: invokes Armor\'s REA and Ghidra from the installed Armor bundle', { skip: !installed && 'Scripture Armor not installed' }, async () => {
+test('entitled profile: invokes Armor\'s REA from the installed Armor bundle; Armor\'s Ghidra is refused in place', { skip: !installed && 'Scripture Armor not installed' }, async () => {
   const p = profile({ ent: mint(claims()) });
   try {
     const rea = await p.run({ tool: 'armor-rea', args: ['sample.sh'], readOnly: true, cwd: p.work });
     assert.equal(rea.exitCode, 0, rea.refused ?? rea.stderr); assert.match(rea.stdout, /"verdict":"rejected"/); assert.match(rea.stdout, /remote_code\.pipe/);
+    // Ghidra is NOT run in place from Kingmaker any more (it would write *.sla.lock into Armor's signed app).
     const g = await p.run({ tool: 'armor-ghidra-headless', args: [], readOnly: true, cwd: p.work, timeoutMs: 120000 });
-    assert.equal(g.refused, undefined); assert.match(g.path, /Scripture Armor\.app\/Contents\/Resources\/armor\/tools\/ghidra/);
-    assert.match(`${g.stdout}${g.stderr}`, /analyzeHeadless|Headless Analyzer|usage/i, 'Ghidra started from Armor\'s bundle with Armor\'s JDK');
+    assert.ok(g.refused, 'Armor\'s Ghidra must not be runnable in place from Kingmaker');
   } finally { p.done(); }
 });
 

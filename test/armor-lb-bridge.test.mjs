@@ -62,16 +62,7 @@ test('a modified Armor verifier, a modified tool or an unpinned module is refuse
   } finally { c.cleanup(); }
 });
 
-test('runs only through Armor\'s packaged engine, scope-enforced (localhost fixture)', opts, async () => {
-  const b = await makeBundle();
-  const server = http.createServer((req, res) => { res.writeHead(200); res.end(req.url === '/.env' ? 'DB_PASSWORD=synthetic\n' : 'ok'); });
-  await new Promise((r) => server.listen(0, '127.0.0.1', r)); const origin = `http://127.0.0.1:${server.address().port}`;
-  try {
-    const authorization = { schema: 'scripture-armor.lb-authorization/1', targets: [origin], purpose: 'synthetic fixture test', approvedBy: 'test owner', expiresAt: new Date(Date.now() + 600000).toISOString() };
-    const eng = await armorLittleBrotherEngine({ found: discoverArmorToolkit({ roots: [b.out] }), authorization });
-    const rep = await eng.run([{ adapter: 'nuclei', target: origin, template: 'stub' }, { adapter: 'nuclei', target: 'http://127.0.0.2:9', template: 'stub' }]);
-    assert.equal(rep.toolkit.packaged, true);
-    assert.equal(rep.steps[0].status, 'completed'); assert.equal(rep.findings.length, 1);
-    assert.equal(rep.steps[1].status, 'refused', 'out-of-scope target refused by Armor\'s engine');
-  } finally { server.closeAllConnections?.(); server.close(); b.cleanup(); }
+test('Kingmaker refuses to run Little Brother in its own process (Armor\'s boundary is the separate lb-host process)', async () => {
+  // 2026-11-17 owner decision: entitlement is enforced at Armor's boundary; an in-process engine would bypass it.
+  await assert.rejects(armorLittleBrotherEngine({ authorization: { targets: ['http://127.0.0.1:9'] } }), /LB_IN_PROCESS_REFUSED/);
 });
