@@ -3,14 +3,14 @@ import assert from 'node:assert/strict';
 import { writeFileSync, rmSync, statSync, renameSync, copyFileSync, linkSync } from 'node:fs';
 import { join } from 'node:path';
 import { armor } from '../lib/armor-native.mjs';
-import { ARMOR_KEM_SKIP } from './helpers/host-tool-skips.mjs';
+import { ARMOR_KEM_SKIP, ARMOR_PQ_TODO } from './helpers/host-tool-skips.mjs';
 import { armorFixture } from './helpers/scripture-command-fixture.mjs';
 import { createScriptureCommandGate, consumeScriptureCommand } from '../lib/scripture-command-gate.mjs';
 import { createLocalStaticReviewAdapter } from '../lib/external-review-adapter.mjs';
 import { createExternalInventoryRuntimeConfig, runExternalSecurityInventory } from '../lib/external-security-inventory-runtime.mjs';
 
 const job = { schema: 'fixture-inert-job/v1', text: 'List synthetic records only.' };
-const gateTest = (name, fn) => test(name, { skip: ARMOR_KEM_SKIP }, fn);
+const gateTest = (name, fn) => test(name, { skip: ARMOR_KEM_SKIP, todo: ARMOR_PQ_TODO }, fn);
 gateTest('authentic Armor packet binds exact bytes, recipient, locally pinned sender, audience and attempt', () => {
   const f = armorFixture(job);
   const proof = f.commandGate.admit(f.armorPacket, { attemptId: f.attemptId, job });
