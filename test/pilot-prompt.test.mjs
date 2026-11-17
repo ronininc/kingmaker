@@ -39,3 +39,14 @@ test('diff views describe a measured difference in words (state, not action)', a
   assert.equal(v.t, 'the room temperature is 1.9 ABOVE the setpoint');
   assert.equal(perceive({ temp: 20.98, setpoint: 21 }, { t: ['diff', 'temp', 'setpoint', 'temp', 'setpoint'] }).t, 'temp is equal to setpoint');
 });
+
+test('relative level words convert from the observed current output; no current value → no decision', async () => {
+  const { decide, relativeLevelValue } = await import('../lib/pilot-prompt.mjs');
+  assert.equal(relativeLevelValue('raise', [0, 1], 0.5), 0.75); assert.equal(relativeLevelValue('lower', [0, 1], 0.1), 0); assert.equal(relativeLevelValue('keep', [0, 1], 0.62), 0.62);
+  assert.ok(Number.isNaN(relativeLevelValue('raise', [0, 1], null)));
+  const ask = async () => ({ d: { heat_level: 'raise', rule: 1 }, raw: '' });
+  const a = await decide({ ask, guidance: 'g', fields: { heat: [0, 1] }, turnField: null, userMsg: 'o', levelField: 'heat', relative: true, current: 0.25 });
+  assert.equal(a.d.heat, 0.5);
+  const b = await decide({ ask, guidance: 'g', fields: { heat: [0, 1] }, turnField: null, userMsg: 'o', levelField: 'heat', relative: false, current: 0.25 });
+  assert.ok(Number.isNaN(b.d.heat), 'relative words are not accepted unless the method enables them');
+});

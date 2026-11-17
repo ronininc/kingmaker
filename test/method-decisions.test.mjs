@@ -36,13 +36,17 @@ def main():
     json.dump(s, open(p, 'w')); print(json.dumps({'t': s['t'], 'temp': s['temp'], 'setpoint': s['setpoint'], 'terminal': s['t'] >= 40}))
 main()
 `;
+// same physics, but the observation also reports the current output (enables raise / lower / keep)
+const SIM_HEAT = SIM.replace("s = {'t': 0, 'temp': 15.0, 'setpoint': sp}", "s = {'t': 0, 'temp': 15.0, 'setpoint': sp, 'heat': 0.0}")
+  .replace("s['temp'] = advance(s['temp'], min(1.0, max(0.0, float(a[a.index('--heat') + 1])))); s['t'] += 1", "h = min(1.0, max(0.0, float(a[a.index('--heat') + 1]))); s['temp'] = advance(s['temp'], h); s['heat'] = h; s['t'] += 1")
+  .replace("'setpoint': s['setpoint'], 'terminal'", "'setpoint': s['setpoint'], 'heat': s['heat'], 'terminal'");
 const have = fs.existsSync('/usr/bin/sandbox-exec') && fs.existsSync('/usr/bin/python3') && fs.existsSync('/usr/bin/zip');
 const opts = have ? {} : { skip: 'needs macOS sandbox-exec, python3 and zip' };
 
-function kit({ readme = README } = {}) {
+function kit({ readme = README, reportHeat = false } = {}) {
   const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'km-dec-')));
   const k = path.join(root, 'heatkit'); fs.mkdirSync(k);
-  fs.writeFileSync(path.join(k, 'README.md'), readme); fs.writeFileSync(path.join(k, 'sim.py'), SIM);
+  fs.writeFileSync(path.join(k, 'README.md'), readme); fs.writeFileSync(path.join(k, 'sim.py'), reportHeat ? SIM_HEAT : SIM);
   execFileSync('/usr/bin/zip', ['-qr', path.join(root, 'kit.zip'), 'heatkit'], { cwd: root });
   const work = path.join(root, 'work'); fs.mkdirSync(work);
   const sources = readSources([path.join(root, 'kit.zip')], { workDir: work });
@@ -181,4 +185,32 @@ test('a comparison over a field the observation does not return is refused befor
     const r2 = await writeDecisionRules({ instruction: 'x', sources: k.sources, plan: k.plan, decision, views: [bad, view], complete: w.complete, fixtureDir: path.join(k.work, 'b'), trace });
     assert.equal(r2.view.name, 'temp_vs_setpoint'); assert.match(trace.find((t) => t.step === 'decisions-view').note, /dropped/);
   } finally { k.cleanup(); }
+});
+
+test('relative actions are offered only when the observation reports the current output, and are measured from each probed state', opts, async () => {
+  const k = kit({ reportHeat: true }); const trace = [];
+  const prompts = [];
+  const complete = async (system, user) => {
+    prompts.push(user);
+    if (/Which number, stated in one of the excerpts/.test(user)) return JSON.stringify({ number: 0.75, cite: 'README.md:L4' });
+    const sit = /SITUATION: ([^\n]*?)\.( \(|\n)/.exec(user);
+    if (sit) { const w = sit[1]; const d = /BELOW setpoint by MORE/.test(w) ? 'full' : /ABOVE setpoint by MORE/.test(w) ? 'off' : /BELOW/.test(w) ? 'raise' : /ABOVE/.test(w) ? 'lower' : 'keep'; return JSON.stringify({ when: w, do: d, effect: 'x', cite: ['README.md:3'] }); }
+    const conv = /^RULE: when "([^"]*)"; do "([^"]*)"/.exec(user);
+    if (conv) { const w = conv[1].toLowerCase(); const n = Number((conv[1].match(/\d+(\.\d+)?/) ?? [null])[0]); return JSON.stringify({ side: /equal/.test(w) ? 'EQUAL' : /above/.test(w) ? 'ABOVE' : 'BELOW', more_than: /more than/.test(w) ? n : null, at_most: /at most/.test(w) ? n : null, level: conv[2], effect: /equal|at most/.test(w) ? 'STAY' : 'TOWARD' }); }
+    throw new Error(`unexpected prompt: ${user.slice(0, 80)}`);
+  };
+  try {
+    const r = await writeDecisionRules({ instruction: 'keep the room at the setpoint', sources: k.sources, plan: k.plan, decision, view, complete, fixtureDir: k.work, trace });
+    assert.equal(r.relative, true);
+    assert.ok(prompts.some((p) => /raise \(one level above the current "heat"\)/.test(p)));
+    assert.deepEqual(r.rules.map((x) => x.structured.level), ['full', 'raise', 'keep', 'lower', 'off']);
+    // measured from each state's own current heat (exactly what the daemon will do)
+    assert.equal(r.status, "pass", JSON.stringify(r.problems)); for (const x of r.rules.filter((y) => ["raise", "lower", "keep"].includes(y.structured.level))) for (const m of x.effectCheck.measured) assert.ok(Number.isFinite(m.action.value), JSON.stringify(m));
+    assert.match(renderDecisionGuidance({ rules: r.rules, view, decision }), /heat_level "raise" \(one level above your current heat\)/);
+  } finally { k.cleanup(); }
+  const k2 = kit(); const w = writer();
+  try {
+    const r2 = await writeDecisionRules({ instruction: 'x', sources: k2.sources, plan: k2.plan, decision, view, complete: w.complete, fixtureDir: k2.work });
+    assert.equal(r2.relative, false); assert.ok(!w.prompts.some((p) => /raise \(one level above/.test(p)));
+  } finally { k2.cleanup(); }
 });
