@@ -22,7 +22,11 @@ const IMAGES = String(process.env.KM_STORAGE_IMAGES ?? '').split(',').map((s) =>
 const skip = process.platform !== 'darwin' || !IMAGES.length ? 'set KM_STORAGE_IMAGES to scratch .dmg test images (macOS only)' : false;
 const STUB = fileURLToPath(new URL('./fixtures/external-storage/stub-engine.mjs', import.meta.url));
 const LIB = new URL('../lib/external-storage.mjs', import.meta.url).href;
-const attach = (dmg, mp, ro = false) => { mkdirSync(mp, { recursive: true }); execFileSync('hdiutil', ['attach', '-nobrowse', ...(ro ? ['-readonly'] : []), '-mountpoint', mp, dmg], { stdio: 'ignore' }); };
+// An image created with `hdiutil create -encryption … -stdinpass` is attached with KM_STORAGE_IMAGE_PASSPHRASE (a TEST
+// passphrase chosen for the scratch image — never a real secret).
+const PASS = process.env.KM_STORAGE_IMAGE_PASSPHRASE ?? '';
+const encryptedImage = (dmg) => { try { return /encrypted: YES/.test(execFileSync('hdiutil', ['isencrypted', dmg], { encoding: 'utf8' })); } catch { return false; } };
+const attach = (dmg, mp, ro = false) => { mkdirSync(mp, { recursive: true }); const enc = encryptedImage(dmg); execFileSync('hdiutil', ['attach', '-nobrowse', ...(enc ? ['-stdinpass'] : []), ...(ro ? ['-readonly'] : []), '-mountpoint', mp, dmg], { stdio: [enc ? 'pipe' : 'ignore', 'ignore', 'ignore'], ...(enc ? { input: PASS } : {}) }); };
 const detach = (mp) => { try { execFileSync('hdiutil', ['detach', mp], { stdio: 'ignore' }); } catch { /* not attached */ } };
 // diskutil can answer with an empty record for a moment right after an attach (measured once on the FAT32 image):
 // ask again briefly; anything still not a disk image is refused.
@@ -47,7 +51,7 @@ async function engineRun(paths, env, storage, remember = null) {
   return JSON.parse(line.slice('STUB_MEMORY '.length));
 }
 
-if (!IMAGES.length) test('routed write paths on real filesystem disk images (exFAT / FAT32)', { skip }, () => {});
+if (!IMAGES.length) test('routed write paths on real filesystem disk images (exFAT / FAT32 / HFS+ / APFS)', { skip }, () => {});
 for (const dmg of IMAGES) {
   test(`routed write paths on ${basename(dmg)}: memory (SQLite), files, iteration — save/retrieve → remount → missing → read-only → interruption`, { skip }, async () => {
     const scratch = dirname(dmg), tag = basename(dmg, '.dmg');
