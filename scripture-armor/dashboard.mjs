@@ -57,6 +57,22 @@ const migrationManifest = options.migrationManifest || null;
 
 const token = crypto.randomBytes(24).toString('base64url');
 const feedFile = path.join(identityDir, 'dashboard-feed.jsonl');
+const dashboardSettingsFile = path.join(identityDir, 'dashboard-settings.json');
+// Home-surface palette: the only user setting the dashboard persists. Keys are
+// the camelCase names the view maps to its CSS variables; values are #rrggbb.
+const PALETTE_KEYS = new Set(['bg','bgGlow','panel','panelDeep','line','lineSoft','text','muted','inputBg','inputText','gold','goldText','goldDeep','goldWash','mint','green','greenDeep','greenWash','greenText','chipLine','chipBg','chipText','onGreen','shieldA','shieldB','danger','dangerBright','dangerDeep','dangerWash','termBg','termText','termDim','termAccent']);
+function cleanPalette(input) {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return null;
+  const palette = {};
+  for (const [key, value] of Object.entries(input)) {
+    if (!PALETTE_KEYS.has(key) || typeof value !== 'string' || !/^#[0-9a-f]{6}$/i.test(value)) return null;
+    palette[key] = value.toLowerCase();
+  }
+  return palette;
+}
+function readPalette() {
+  try { return cleanPalette(JSON.parse(fs.readFileSync(dashboardSettingsFile, 'utf8'))?.palette); } catch { return null; }
+}
 const quarantineDir = path.join(identityDir, 'quarantine');
 let analysisBusy = false, deviceLeaseUntil = 0, deviceRenewing = null, wasAuthenticated = false;
 async function exclusiveAnalysis(operation) {
@@ -225,6 +241,17 @@ async function api(req, res, url) {
     }finally{source?.bytes.fill(0);device?.start('resume');}
   }
   if (req.headers['x-scripture-armor-token'] !== token) return json(res, 403, { ok: false, error: 'forbidden' });
+  if (url.pathname === '/api/settings/palette') {
+    if (req.method === 'GET') return json(res, 200, { ok: true, palette: readPalette() });
+    if (req.method === 'POST') {
+      const palette = cleanPalette((await body(req)).palette);
+      if (!palette) return json(res, 400, { ok: false, error: 'palette must map known color names to #rrggbb values' });
+      fs.mkdirSync(identityDir, { recursive: true, mode: 0o700 });
+      fs.writeFileSync(dashboardSettingsFile, JSON.stringify({ palette }), { mode: 0o600 });
+      return json(res, 200, { ok: true, palette });
+    }
+    return json(res, 405, { ok: false, error: 'method not allowed' });
+  }
   if (req.method === 'GET' && url.pathname === '/api/account/me') {
     try { await account.ensureAuthenticated(); return json(res, 200, { ok: true, ...account.state() }); }
     catch { return json(res, 401, { ok: false, ...account.state(), error: 'Sign in and verify your email code.' }); }
@@ -372,7 +399,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname.startsWith('/api/')) return await api(req, res, url);
     if (req.method !== 'GET' || url.pathname !== '/') { res.writeHead(404); return res.end('not found'); }
-    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'content-security-policy': "default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'" });
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'content-security-policy': "default-src 'none'; img-src data:; font-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'" });
     res.end(html);
   } catch (error) { json(res, 500, { ok: false, error: error.message }); }
 });
