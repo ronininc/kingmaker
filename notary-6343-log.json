@@ -1,0 +1,565 @@
+{
+  "logFormatVersion": 1,
+  "jobId": "6343b0b3-df6d-4780-bdcd-70fb758b1c30",
+  "status": "Invalid",
+  "statusSummary": "Archive contains critical validation errors",
+  "statusCode": 4000,
+  "archiveFilename": "ScriptureArmor-notarize.zip",
+  "uploadDate": "2026-11-06T05:14:45.682Z",
+  "sha256": "94595c8dfb4cf3bd87e0bbe3516c28ceac6f0833174d2bcc98633b08dc0ba39b",
+  "ticketContents": null,
+  "issues": [
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Extensions/Ghidra/ghidra_12.2_PUBLIC_20261016_SymbolicSummaryZ3.zip/SymbolicSummaryZ3/os/mac_arm_64/libz3java.dylib",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Extensions/Ghidra/ghidra_12.2_PUBLIC_20261016_SymbolicSummaryZ3.zip/SymbolicSummaryZ3/os/mac_arm_64/libz3java.dylib",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Extensions/Ghidra/ghidra_12.2_PUBLIC_20261016_SymbolicSummaryZ3.zip/SymbolicSummaryZ3/os/mac_arm_64/libz3.dylib",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Extensions/Ghidra/ghidra_12.2_PUBLIC_20261016_SymbolicSummaryZ3.zip/SymbolicSummaryZ3/os/mac_arm_64/libz3.dylib",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Extensions/Ghidra/ghidra_12.2_PUBLIC_20261016_SymbolicSummaryZ3.zip/SymbolicSummaryZ3/os/mac_x86_64/libz3java.dylib",
+      "message": "The binary is not signed.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Extensions/Ghidra/ghidra_12.2_PUBLIC_20261016_SymbolicSummaryZ3.zip/SymbolicSummaryZ3/os/mac_x86_64/libz3java.dylib",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Extensions/Ghidra/ghidra_12.2_PUBLIC_20261016_SymbolicSummaryZ3.zip/SymbolicSummaryZ3/os/mac_x86_64/libz3.dylib",
+      "message": "The binary is not signed.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Extensions/Ghidra/ghidra_12.2_PUBLIC_20261016_SymbolicSummaryZ3.zip/SymbolicSummaryZ3/os/mac_x86_64/libz3.dylib",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Extensions/Ghidra/ghidra_12.2_PUBLIC_20261016_Jython.zip/Jython/lib/jython-standalone-2.7.4.jar/META-INF/native/osx/libjansi.jnilib",
+      "message": "The binary is not signed.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "i386"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Extensions/Ghidra/ghidra_12.2_PUBLIC_20261016_Jython.zip/Jython/lib/jython-standalone-2.7.4.jar/META-INF/native/osx/libjansi.jnilib",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "i386"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Extensions/Ghidra/ghidra_12.2_PUBLIC_20261016_Jython.zip/Jython/lib/jython-standalone-2.7.4.jar/META-INF/native/osx/libjansi.jnilib",
+      "message": "The binary is not signed.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Extensions/Ghidra/ghidra_12.2_PUBLIC_20261016_Jython.zip/Jython/lib/jython-standalone-2.7.4.jar/META-INF/native/osx/libjansi.jnilib",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Extensions/Ghidra/ghidra_12.2_PUBLIC_20261016_Jython.zip/Jython/lib/jython-standalone-2.7.4.jar/jni/Darwin/libjffi-1.2.jnilib",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Extensions/Ghidra/ghidra_12.2_PUBLIC_20261016_Jython.zip/Jython/lib/jython-standalone-2.7.4.jar/jni/Darwin/libjffi-1.2.jnilib",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Extensions/Ghidra/ghidra_12.2_PUBLIC_20261016_Jython.zip/Jython/lib/jython-standalone-2.7.4.jar/jni/Darwin/libjffi-1.2.jnilib",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Extensions/Ghidra/ghidra_12.2_PUBLIC_20261016_Jython.zip/Jython/lib/jython-standalone-2.7.4.jar/jni/Darwin/libjffi-1.2.jnilib",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Framework/Pty/lib/jna-5.14.0.jar/com/sun/jna/darwin-aarch64/libjnidispatch.jnilib",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Framework/Pty/lib/jna-5.14.0.jar/com/sun/jna/darwin-aarch64/libjnidispatch.jnilib",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Framework/Pty/lib/jna-5.14.0.jar/com/sun/jna/darwin-x86-64/libjnidispatch.jnilib",
+      "message": "The binary is not signed.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Framework/Pty/lib/jna-5.14.0.jar/com/sun/jna/darwin-x86-64/libjnidispatch.jnilib",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Framework/Gui/lib/flatlaf-3.5.4.jar/com/formdev/flatlaf/natives/libflatlaf-macos-x86_64.dylib",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Framework/Gui/lib/flatlaf-3.5.4.jar/com/formdev/flatlaf/natives/libflatlaf-macos-arm64.dylib",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp312-cp312-macosx_10_9_universal2.whl/_jpype.cpython-312-darwin.so",
+      "message": "The binary is not signed.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp312-cp312-macosx_10_9_universal2.whl/_jpype.cpython-312-darwin.so",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp312-cp312-macosx_10_9_universal2.whl/_jpype.cpython-312-darwin.so",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp312-cp312-macosx_10_9_universal2.whl/_jpype.cpython-312-darwin.so",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp310-cp310-macosx_10_9_universal2.whl/_jpype.cpython-310-darwin.so",
+      "message": "The binary is not signed.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp310-cp310-macosx_10_9_universal2.whl/_jpype.cpython-310-darwin.so",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp310-cp310-macosx_10_9_universal2.whl/_jpype.cpython-310-darwin.so",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp310-cp310-macosx_10_9_universal2.whl/_jpype.cpython-310-darwin.so",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp39-cp39-macosx_10_9_x86_64.whl/_jpype.cpython-39-darwin.so",
+      "message": "The binary is not signed.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp39-cp39-macosx_10_9_x86_64.whl/_jpype.cpython-39-darwin.so",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp311-cp311-macosx_10_9_universal2.whl/_jpype.cpython-311-darwin.so",
+      "message": "The binary is not signed.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp311-cp311-macosx_10_9_universal2.whl/_jpype.cpython-311-darwin.so",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp311-cp311-macosx_10_9_universal2.whl/_jpype.cpython-311-darwin.so",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp311-cp311-macosx_10_9_universal2.whl/_jpype.cpython-311-darwin.so",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp313-cp313-macosx_10_13_universal2.whl/_jpype.cpython-313-darwin.so",
+      "message": "The binary is not signed.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp313-cp313-macosx_10_13_universal2.whl/_jpype.cpython-313-darwin.so",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp313-cp313-macosx_10_13_universal2.whl/_jpype.cpython-313-darwin.so",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/PyGhidra/pypkg/dist/jpype1-1.5.2-cp313-cp313-macosx_10_13_universal2.whl/_jpype.cpython-313-darwin.so",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/GhidraServer/data/yajsw-stable-13.18/lib/core/jna/jna-5.12.1.jar/com/sun/jna/darwin-aarch64/libjnidispatch.jnilib",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/GhidraServer/data/yajsw-stable-13.18/lib/core/jna/jna-5.12.1.jar/com/sun/jna/darwin-aarch64/libjnidispatch.jnilib",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/GhidraServer/data/yajsw-stable-13.18/lib/core/jna/jna-5.12.1.jar/com/sun/jna/darwin-x86-64/libjnidispatch.jnilib",
+      "message": "The binary is not signed.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/GhidraServer/data/yajsw-stable-13.18/lib/core/jna/jna-5.12.1.jar/com/sun/jna/darwin-x86-64/libjnidispatch.jnilib",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/GhidraServer/data/yajsw-stable-13.18/lib/extended/sigar/sigar-lib-1.6.4.jar/sigar-1.6.4/libsigar-universal-macosx.dylib",
+      "message": "The binary is not signed.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "i386"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/GhidraServer/data/yajsw-stable-13.18/lib/extended/sigar/sigar-lib-1.6.4.jar/sigar-1.6.4/libsigar-universal-macosx.dylib",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "i386"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/GhidraServer/data/yajsw-stable-13.18/lib/extended/sigar/sigar-lib-1.6.4.jar/sigar-1.6.4/libsigar-universal64-macosx.dylib",
+      "message": "The binary is not signed.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/GhidraServer/data/yajsw-stable-13.18/lib/extended/sigar/sigar-lib-1.6.4.jar/sigar-1.6.4/libsigar-universal64-macosx.dylib",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "x86_64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/GPL/DemanglerGnu/build/os/mac_arm_64/demangler_gnu_v2_24",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/GPL/DemanglerGnu/build/os/mac_arm_64/demangler_gnu_v2_24",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/GPL/DemanglerGnu/build/os/mac_arm_64/demangler_gnu_v2_24",
+      "message": "The executable does not have the hardened runtime enabled.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087724",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/GPL/DemanglerGnu/build/os/mac_arm_64/demangler_gnu_v2_41",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/GPL/DemanglerGnu/build/os/mac_arm_64/demangler_gnu_v2_41",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/GPL/DemanglerGnu/build/os/mac_arm_64/demangler_gnu_v2_41",
+      "message": "The executable does not have the hardened runtime enabled.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087724",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/FileFormats/build/os/mac_arm_64/lzfse",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/FileFormats/build/os/mac_arm_64/lzfse",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/FileFormats/build/os/mac_arm_64/lzfse",
+      "message": "The executable does not have the hardened runtime enabled.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087724",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/os/mac_arm_64/decompile",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/os/mac_arm_64/decompile",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/os/mac_arm_64/decompile",
+      "message": "The executable does not have the hardened runtime enabled.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087724",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/os/mac_arm_64/sleigh",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/os/mac_arm_64/sleigh",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/os/mac_arm_64/sleigh",
+      "message": "The executable does not have the hardened runtime enabled.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087724",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/build/os/mac_arm_64/decompile",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/build/os/mac_arm_64/decompile",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/build/os/mac_arm_64/decompile",
+      "message": "The executable does not have the hardened runtime enabled.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087724",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/build/os/mac_arm_64/sleigh",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/build/os/mac_arm_64/sleigh",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/build/os/mac_arm_64/sleigh",
+      "message": "The executable does not have the hardened runtime enabled.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087724",
+      "architecture": "arm64"
+    }
+  ]
+}

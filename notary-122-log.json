@@ -1,0 +1,133 @@
+{
+  "logFormatVersion": 1,
+  "jobId": "8272376a-af9c-4e2a-a8c9-60f6329e0407",
+  "status": "Invalid",
+  "statusSummary": "Archive contains critical validation errors",
+  "statusCode": 4000,
+  "archiveFilename": "ScriptureArmor-1.2.2-notarize.zip",
+  "uploadDate": "2026-11-12T04:08:22.208Z",
+  "sha256": "8ccead70d4c815ac2d8b20f31ba6fdb25e0e4971da8e447e3d6fee09a8b44001",
+  "ticketContents": null,
+  "issues": [
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-1.2.2-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/GPL/DemanglerGnu/os/mac_arm_64/demangler_gnu_v2_24",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-1.2.2-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/GPL/DemanglerGnu/os/mac_arm_64/demangler_gnu_v2_24",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-1.2.2-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/GPL/DemanglerGnu/os/mac_arm_64/demangler_gnu_v2_24",
+      "message": "The executable does not have the hardened runtime enabled.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087724",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-1.2.2-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/GPL/DemanglerGnu/os/mac_arm_64/demangler_gnu_v2_41",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-1.2.2-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/GPL/DemanglerGnu/os/mac_arm_64/demangler_gnu_v2_41",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-1.2.2-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/GPL/DemanglerGnu/os/mac_arm_64/demangler_gnu_v2_41",
+      "message": "The executable does not have the hardened runtime enabled.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087724",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-1.2.2-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/FileFormats/os/mac_arm_64/lzfse",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-1.2.2-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/FileFormats/os/mac_arm_64/lzfse",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-1.2.2-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/FileFormats/os/mac_arm_64/lzfse",
+      "message": "The executable does not have the hardened runtime enabled.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087724",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-1.2.2-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/os/mac_arm_64/decompile",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-1.2.2-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/os/mac_arm_64/decompile",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-1.2.2-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/os/mac_arm_64/decompile",
+      "message": "The executable does not have the hardened runtime enabled.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087724",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-1.2.2-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/os/mac_arm_64/sleigh",
+      "message": "The binary is not signed with a valid Developer ID certificate.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087721",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-1.2.2-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/os/mac_arm_64/sleigh",
+      "message": "The signature does not include a secure timestamp.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087733",
+      "architecture": "arm64"
+    },
+    {
+      "severity": "error",
+      "code": null,
+      "path": "ScriptureArmor-1.2.2-notarize.zip/Scripture Armor.app/Contents/Resources/armor/tools/ghidra/Ghidra/Features/Decompiler/os/mac_arm_64/sleigh",
+      "message": "The executable does not have the hardened runtime enabled.",
+      "docUrl": "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues#3087724",
+      "architecture": "arm64"
+    }
+  ]
+}
