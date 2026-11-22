@@ -1,0 +1,55 @@
+{
+  "name": "Booking Barbershop Services App",
+  "description": "A booking app for my barbershop with services, staff, and appointments, plus a customer login",
+  "entities": [
+    {
+      "name": "Appointment",
+      "fields": [
+        {
+          "name": "Title",
+          "type": "string",
+          "required": true,
+          "slug": "title"
+        },
+        {
+          "name": "Description",
+          "type": "text",
+          "required": false,
+          "slug": "description"
+        },
+        {
+          "name": "Status",
+          "type": "string",
+          "required": false,
+          "slug": "status"
+        },
+        {
+          "name": "Date",
+          "type": "date",
+          "required": false,
+          "slug": "date"
+        }
+      ],
+      "slug": "appointment"
+    }
+  ],
+  "auth": {
+    "enabled": true,
+    "roles": [
+      "user",
+      "admin"
+    ]
+  },
+  "pages": [
+    {
+      "name": "Appointment list",
+      "entity": "Appointment",
+      "kind": "list"
+    },
+    {
+      "name": "New Appointment",
+      "entity": "Appointment",
+      "kind": "form"
+    }
+  ]
+}

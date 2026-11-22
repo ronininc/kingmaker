@@ -1,0 +1,65 @@
+{
+  "dispatchedAt": "2026-08-11T01:51:01.746Z",
+  "posture": "RELEASE_GATE_HOLD",
+  "counts": {
+    "claude": 5,
+    "codex": 0,
+    "operator": 4
+  },
+  "routed": [
+    {
+      "id": "security-blocked",
+      "assignee": "claude",
+      "class": "CODE",
+      "operatorGated": false
+    },
+    {
+      "id": "clean-install-unproven",
+      "assignee": "claude",
+      "class": "BUILD",
+      "operatorGated": true
+    },
+    {
+      "id": "no-data-native-internet-unproven",
+      "assignee": "operator",
+      "class": "OPERATOR",
+      "operatorGated": true
+    },
+    {
+      "id": "real-approved-internet-fetch-unproven",
+      "assignee": "operator",
+      "class": "OPERATOR",
+      "operatorGated": true
+    },
+    {
+      "id": "ui-visual-qa-unproven",
+      "assignee": "claude",
+      "class": "CODE",
+      "operatorGated": false
+    },
+    {
+      "id": "deployment-runtime-proof-unproven",
+      "assignee": "claude",
+      "class": "BUILD",
+      "operatorGated": true
+    },
+    {
+      "id": "signed-release-not-ready",
+      "assignee": "operator",
+      "class": "EXTERNAL",
+      "operatorGated": true
+    },
+    {
+      "id": "public-saas-not-ready",
+      "assignee": "operator",
+      "class": "EXTERNAL",
+      "operatorGated": true
+    },
+    {
+      "id": "local-flagship-pilot-unproven",
+      "assignee": "claude",
+      "class": "BUILD",
+      "operatorGated": true
+    }
+  ]
+}

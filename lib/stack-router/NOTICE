@@ -1,0 +1,61 @@
+NOTICE — Router Phase 2 (governed per-task routing)
+
+The routing patterns implemented in lib/ (deterministic codemod pre-filter,
+cost-shaped Thompson-sampling bandit per complexity bucket, structural
+output verifier with a tier-escalation ladder, decision-record shape,
+provider circuit-breaker/failover concepts) were studied from:
+
+    RuFlow — https://github.com/ruvnet/ruflo
+    Copyright © 2024–2026 ruvnet
+    Licensed under the MIT License.
+
+RuFlow was used as a behavioral reference only. This is a clean-room
+implementation: no RuFlow source code is reproduced, copied, or derived
+from — behavior was extracted into ~/workspace/router-phase2/
+ruflo-behavior-spec.md and re-implemented under Kingmaker's governance
+chain (Intent → Evidence → Governance → Decision → Authorization →
+Audit), with outcomes driven by the structural verifier rather than
+self-reported success.
+
+The MIT License applies to the studied reference. This implementation is
+Ronin Inc's own work.
+
+Part 2 (federation + memory-with-audit + drift checkpoints) additionally
+adapts these studied patterns:
+
+  - Federation skeleton: Ed25519 node identity, capability-gated trust
+    ladder, policy engine (message caps, claim types, delegation budgets)
+    — adapted with enforce-only authorization, a session challenge
+    handshake that runs on the live path, a human-consent gate on first
+    contact and on trust promotion, and a PII pipeline whose prefix-
+    leaking "hash" is replaced by redaction / keyed HMAC.
+  - Memory provenance field, pattern confidence counters, and temporal
+    decay — adapted with provenance made mandatory (writes without it
+    are rejected), every write logged to the hash-chained audit chain,
+    provenance-based revocation, and a default TTL.
+  - Drift checkpoints have no upstream counterpart (the reference has
+    zero drift control); that module is original Ronin Inc work.
+
+Part 3 (guardrails + doctor + rollback) additionally ports/adapts:
+
+  - The strong path validator (canonicalize + allowlist prefixes +
+    blocked names/extensions) and the terminal env-var denylist —
+    ported as-is; the spec judges both genuinely effective.
+  - The AIDefence injection-pattern screen — ADAPTED, per the spec's
+    own judgment that a regex gate is decoration: here it is an
+    Evidence signal inside the governed router. A flagged task loses
+    its fast lanes and routes frontier-tier only; the screen never
+    authorizes and never vetoes. The mod screen's invisible/bidi-char
+    stripping prep is ported into the screen.
+  - The doctor contract — stable check IDs, {id,status,detail,fix?}
+    JSON shape, ok iff no check fails (exit 1 on any failure).
+  - Rollback — composed from the reference's two byte-restoring
+    mechanisms (migration backup + memory checkpoints) into one
+    command, with snapshot manifests signed under the helpers-manifest
+    pattern (pinned public key, private key out-of-tree, fail-closed
+    verify-then-copy). The witness signing scheme (forgeable by
+    construction, drift-tolerant) is deliberately NOT ported.
+  - Guardrails are wired into governed-router.mjs, not bolted on:
+    the injection screen runs on every route (Evidence stage), and
+    the runner receives a secret-scoped sandbox env built from the
+    router's envScope — never the host environment.

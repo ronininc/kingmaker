@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "solomon-gap-report-v1",
+  "generatedAt": "2026-08-11T16:19:59.310Z",
+  "posture": "RELEASE_GATE_HOLD",
+  "gapCount": 8,
+  "gaps": [
+    {
+      "id": "clean-install-unproven",
+      "capability": "CLEAN_INSTALL_UNPROVEN",
+      "classification": "CONTROLLED_VALIDATION_BLOCKER",
+      "class": "BUILD",
+      "assignee": "claude",
+      "operatorGated": true,
+      "backingProof": "solomon:readiness:controlled-validation",
+      "reason": "CLEAN_INSTALL_UNPROVEN - Installed runtime health did not become ok:true (fetch failed).; nativeInternetQuestion=UNPROVEN",
+      "nextAction": "Build + package the desktop .app, then rerun clean-install health until runtime health returns ok:true."
+    },
+    {
+      "id": "no-data-native-internet-unproven",
+      "capability": "NO_DATA_NATIVE_INTERNET_UNPROVEN",
+      "classification": "OPERATOR_APPROVAL_REQUIRED",
+      "class": "OPERATOR",
+      "assignee": "operator",
+      "operatorGated": true,
+      "backingProof": "solomon:internet-proof",
+      "reason": null,
+      "nextAction": "Operator-approve the native no-data source-backed answer against the built app."
+    },
+    {
+      "id": "real-approved-internet-fetch-unproven",
+      "capability": "REAL_APPROVED_INTERNET_FETCH_UNPROVEN",
+      "classification": "OPERATOR_APPROVAL_REQUIRED",
+      "class": "OPERATOR",
+      "assignee": "operator",
+      "operatorGated": true,
+      "backingProof": "solomon:internet-proof",
+      "reason": "INTERNET_UNPROVEN - Current packaged Solomon executable missing: /Users/robbiebrown/Projects/TSS/desktop/dist/mac-arm64/Solomon.app/Contents/MacOS/Solomon",
+      "nextAction": "Operator-approve a real outbound fetch against the built app; record the source proof."
+    },
+    {
+      "id": "ui-visual-qa-unproven",
+      "capability": "UI_VISUAL_QA_UNPROVEN",
+      "classification": "SCRIPT_OR_ARTIFACT_MISSING",
+      "class": "CODE",
+      "assignee": "claude",
+      "operatorGated": false,
+      "backingProof": "solomon:readme-scope-flagship-completion-proof",
+      "reason": "UI_VISUAL_QA_BLOCKED - Current packaged Solomon executable missing: /Users/robbiebrown/Projects/TSS/desktop/dist/mac-arm64/Solomon.app/Contents/MacOS/Solomon",
+      "nextAction": "Build the .app, then run the packaged UI visual QA capture."
+    },
+    {
+      "id": "deployment-runtime-proof-unproven",
+      "capability": "DEPLOYMENT_RUNTIME_PROOF_UNPROVEN",
+      "classification": "CONTROLLED_VALIDATION_BLOCKER",
+      "class": "BUILD",
+      "assignee": "claude",
+      "operatorGated": true,
+      "backingProof": "solomon:tomorrow-deployment-gate",
+      "reason": "DEPLOYMENT_RUNTIME_PROOF_FAILED",
+      "nextAction": "Rerun the deployment runtime proof against the built app."
+    },
+    {
+      "id": "signed-release-not-ready",
+      "capability": "SIGNED_RELEASE_NOT_READY",
+      "classification": "PUBLIC_RELEASE_HOLD",
+      "class": "EXTERNAL",
+      "assignee": "operator",
+      "operatorGated": true,
+      "backingProof": "solomon:signing-readiness-proof",
+      "reason": null,
+      "nextAction": "Apple/Windows signing identities + notarization (operator admin + certs)."
+    },
+    {
+      "id": "public-saas-not-ready",
+      "capability": "PUBLIC_SAAS_NOT_READY",
+      "classification": "PUBLIC_RELEASE_HOLD",
+      "class": "EXTERNAL",
+      "assignee": "operator",
+      "operatorGated": true,
+      "backingProof": "solomon:public-saas-readiness-proof",
+      "reason": null,
+      "nextAction": "Depends on a signed release + a live public-ingress proof."
+    },
+    {
+      "id": "local-flagship-pilot-unproven",
+      "capability": "LOCAL_FLAGSHIP_PILOT_UNPROVEN",
+      "classification": "CONTROLLED_VALIDATION_BLOCKER",
+      "class": "BUILD",
+      "assignee": "claude",
+      "operatorGated": true,
+      "backingProof": "solomon:readiness:controlled-validation",
+      "reason": "LOCAL_FLAGSHIP_PILOT_PROOF_FAILED; fresh clean-install validation failed with exit 1",
+      "nextAction": "Fresh clean-install validation must pass exit 0 (depends on the packaged app)."
+    }
+  ],
+  "resolvedCount": 11,
+  "resolved": [
+    "REPO_HYGIENE_PASS",
+    "SOURCE_GOVERNANCE_PASS",
+    "MERKLE_PASS",
+    "AUDIT_INTEGRITY_PASS",
+    "CODEGEN_RUNNABLE_PROOF_PASS",
+    "FABRICATION_EXECUTION_BOUNDARY_PROOF_PASS",
+    "NODE_GENERATION_GOVERNANCE_PROOF_PASS",
+    "DATA_LEAKAGE_PROOF_PASS",
+    "PRIMARY_CONSTANT_AUDIT_PASS",
+    "LOOPBACK_EXPOSURE_PASS",
+    "CONTROLLED_MULTI_BUSINESS_PILOT_GATE_PASS"
+  ]
+}
