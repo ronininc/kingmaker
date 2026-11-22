@@ -23,6 +23,10 @@ const SOURCE_COMPONENTS = [
   'shield-rulepack.mjs', 'shield-registry.mjs', 'shield-rea.mjs', 'shield-eval.mjs',
   'shield-generator.mjs', 'shield-gate.mjs', 'shield-loop.mjs', 'shield-review-harness.mjs',
   'shield-extract-pack.mjs', 'shield-packs',
+  // Little Brother bridge + its host wiring: dashboard.mjs imports
+  // lb-host.mjs, which imports littlebrother-integration.mjs — the
+  // bundle is incomplete (dashboard would fail to load) without both.
+  'littlebrother-integration.mjs', 'lb-host.mjs',
 ];
 // Build flavors of the SAME product (owner, 2026-11-05): 'full' is the
 // unchanged default — full local runtimes embedded, exactly as this build
