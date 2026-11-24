@@ -1,0 +1,78 @@
+name: macOS installer proof for 620fb8c
+
+on:
+  push:
+    branches: [ci/macos-proof-620fb8c]
+
+permissions:
+  contents: read
+
+jobs:
+  installer-proof:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 620fb8c9cb95c6c8795279b0e1fa2217b85fc5a5
+      - name: Record clean-host and target facts
+        run: |
+          set -eu
+          test "$(uname -m)" = arm64
+          sw_vers
+          df -h /
+          mkdir -p "$RUNNER_TEMP/proof"
+      - name: Build exact ad-hoc draft installer
+        run: |
+          set -eu
+          scripts/build-installer.sh --out "$RUNNER_TEMP/proof" --draft 2>&1 | tee "$RUNNER_TEMP/proof/build.log"
+      - name: Verify, mount, and smoke-test exact installer UI
+        run: |
+          set -eu
+          dmg="$RUNNER_TEMP/proof/Kingmaker-Installer-unreleased-DRAFT.dmg"
+          app="$RUNNER_TEMP/proof/Kingmaker Installer.app"
+          test -f "$dmg"
+          codesign --verify --deep --strict "$app"
+          codesign -dv --verbose=4 "$app" 2> "$RUNNER_TEMP/proof/codesign.txt"
+          if xcrun stapler validate "$dmg" > "$RUNNER_TEMP/proof/stapler.txt" 2>&1; then
+            notarized=true
+          else
+            notarized=false
+          fi
+          mount="$RUNNER_TEMP/mount"
+          mkdir -p "$mount"
+          hdiutil attach -nobrowse -readonly -mountpoint "$mount" "$dmg"
+          clean_home="$RUNNER_TEMP/clean-home"
+          mkdir -p "$clean_home"
+          HOME="$clean_home" "$mount/Kingmaker Installer.app/Contents/MacOS/Kingmaker Installer" > "$RUNNER_TEMP/proof/ui.stdout.log" 2> "$RUNNER_TEMP/proof/ui.stderr.log" &
+          pid=$!
+          sleep 8
+          kill -0 "$pid"
+          launched=true
+          kill "$pid"
+          wait "$pid" || true
+          hdiutil detach "$mount"
+          bytes=$(stat -f %z "$dmg")
+          sha=$(shasum -a 256 "$dmg" | awk '{print $1}')
+          cat > "$RUNNER_TEMP/proof/receipt.json" <<EOF
+          {
+            "schema": "kingmaker.macos-installer-proof/1",
+            "sourceSha": "620fb8c9cb95c6c8795279b0e1fa2217b85fc5a5",
+            "runnerArch": "$(uname -m)",
+            "artifact": "$(basename "$dmg")",
+            "bytes": $bytes,
+            "sha256": "$sha",
+            "signing": "ad-hoc",
+            "notarized": $notarized,
+            "installedUiLaunched": $launched,
+            "realDeliverableExported": false,
+            "limit": "draft installer has no signed release manifest, so it cannot install the Kingmaker application"
+          }
+          EOF
+          cat "$RUNNER_TEMP/proof/receipt.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kingmaker-macos-installer-proof-620fb8c
+          path: ${{ runner.temp }}/proof/
+          if-no-files-found: error
