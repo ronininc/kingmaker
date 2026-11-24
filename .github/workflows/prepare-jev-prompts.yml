@@ -1,0 +1,53 @@
+name: Prepare pinned JEV score prompts
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - candidate/8gb-integrated
+    paths:
+      - .github/workflows/prepare-jev-prompts.yml
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Prepare exact pinned prompts
+        run: |
+          python -m venv venv
+          venv/bin/pip install --quiet transformers==4.57.6
+          mkdir tokenizer open-jev prompts
+          base='https://huggingface.co/Qwen/Qwen3.5-2B/resolve/15852e8c16360a2fea060d615a32b45270f8a8fc'
+          curl -fsSL --retry 4 -o tokenizer/tokenizer.json "$base/tokenizer.json"
+          curl -fsSL --retry 4 -o tokenizer/tokenizer_config.json "$base/tokenizer_config.json"
+          curl -fsSL --retry 4 -o tokenizer/chat_template.jinja "$base/chat_template.jinja"
+          curl -fsSL --retry 4 -o tokenizer/merges.txt "$base/merges.txt"
+          curl -fsSL --retry 4 -o tokenizer/vocab.json "$base/vocab.json"
+          printf '%s\n' \
+            '5f9e4d4901a92b997e463c1f46055088b6cca5ca61a6522d1b9f64c4bb81cb42 tokenizer/tokenizer.json' \
+            '49e2b6e395f959f077f1e992b338919c0d4a9732fc6e613995e06557f843500c tokenizer/tokenizer_config.json' \
+            '273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80 tokenizer/chat_template.jinja' \
+            'a9d356d7bdf1ef4949e3e748e95b8e10ad9d4e2e838eddc38a0a7b6b94d1db8d tokenizer/merges.txt' \
+            'ce99b4cb2983d118806ce0a8b777a35b093e2000a503ebde25853284c9dfa003 tokenizer/vocab.json' | sha256sum -c -
+          git -C open-jev init --quiet
+          git -C open-jev fetch --quiet --depth 1 https://github.com/Zefan-Cai/Open-Jev.git bd4118882f733574a3250a4b65fe4d884130c08b
+          git -C open-jev checkout --quiet --detach FETCH_HEAD
+          test "$(git -C open-jev rev-parse HEAD)" = 'bd4118882f733574a3250a4b65fe4d884130c08b'
+          venv/bin/python jev-housing/tools/gguf_prep_texts.py --jev-source open-jev --tokenizer tokenizer --fixtures jev-housing/fixtures.json --out prompts
+          (cd prompts && sha256sum *.txt manifest.json > SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: open-jev-pinned-prompts
+          path: prompts
+          if-no-files-found: error
+          retention-days: 7
