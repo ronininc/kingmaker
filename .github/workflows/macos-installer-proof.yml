@@ -24,8 +24,8 @@ jobs:
           mkdir -p "$RUNNER_TEMP/proof"
       - name: Build exact ad-hoc draft installer
         run: |
-          set -eu
-          scripts/build-installer.sh --out "$RUNNER_TEMP/proof" --draft 2>&1 | tee "$RUNNER_TEMP/proof/build.log"
+          set -euo pipefail
+          sh scripts/build-installer.sh --out "$RUNNER_TEMP/proof" --draft 2>&1 | tee "$RUNNER_TEMP/proof/build.log"
       - name: Verify, mount, and smoke-test exact installer UI
         run: |
           set -eu
