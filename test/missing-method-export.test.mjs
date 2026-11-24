@@ -27,6 +27,15 @@ test('ordinary typed and spoken export requests use a bounded filename and liter
   assert.equal(textExportIntent('Explain what a text export does'), null);
 });
 
+test('both desktop typed routes and the shared voice route reach the bounded export before a brain turn', async () => {
+  const cli = await readFile(new URL('../lib/cli.mjs', import.meta.url), 'utf8');
+  const command = cli.slice(cli.indexOf("else if (/^typed-command"), cli.indexOf('// THE KINGMAKER BAR'));
+  assert.match(command, /await offerLocalExport\(text\)/);
+  assert.ok(command.indexOf('await offerLocalExport(text)') < command.indexOf('brain.runTurn(text)'));
+  assert.match(cli, /const routeTurn = async[\s\S]+?await offerLocalExport\(text\)/);
+  assert.match(cli, /if \(!phoneConv && !programs\.length && !img && !skill && await offerLocalExport\(text\)\)/);
+});
+
 test('app approval uses the existing desk, and refusal or decline writes nothing', async (t) => {
   const runtimeHome = await fixture(t);
   const said = [];
@@ -79,8 +88,11 @@ test('an approved ordinary turn creates one verified artifact without replacing 
 
   assert.equal(parseMethodFile(result.distillate.text).id, result.method);
   assert.equal(result.distillate.sha256, hash(result.distillate.text));
-  assert.equal(result.distillate.checks.collision.haltedAt, 'require-new-output');
-  assert.equal(result.distillate.checks.positive.sha256, result.distillate.checks.collision.sha256);
+  assert.equal(result.distillate.checks, null, 'delivery does not wait on learning');
+  assert.equal(result.metrics.modelCalls, 0);
+  const learned = await result.learn();
+  assert.equal(learned.distillate.checks.collision.haltedAt, 'require-new-output');
+  assert.equal(learned.distillate.checks.positive.sha256, learned.distillate.checks.collision.sha256);
   assert.doesNotMatch(result.distillate.text, /Synthetic café/);
 });
 
