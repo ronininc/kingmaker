@@ -47,7 +47,9 @@ def head_parameters():
 
 
 def embedding_version(embedding):
-    result = subprocess.run([embedding, "--version"], capture_output=True, text=True, timeout=10)
+    # On the 8 GB Mac the first Metal registry initialization can exceed ten
+    # seconds while the card-backed median model remains resident.
+    result = subprocess.run([embedding, "--version"], capture_output=True, text=True, timeout=60)
     build = result.stdout + result.stderr
     # b11081 reports either "commit 161755f" or the hash in parentheses,
     # depending on the build. Bind to the hash token, not its punctuation.

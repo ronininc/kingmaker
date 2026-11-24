@@ -102,6 +102,10 @@ print("llama_perf_context_print:        load time = 2.50 ms", file=sys.stderr)
         result = self.invoke("--prompt-file", str(self.prompt), "--expected-tokens", "2")
         self.assertEqual(result.returncode, 0, result.stderr)
 
+    def test_version_gate_allows_memory_tight_mac_startup(self):
+        source = (TOOLS / "gguf_score_min.py").read_text()
+        self.assertIn('timeout=60', source)
+
     def test_single_prompt_rejects_false_load_or_score(self):
         for fixture, expected in [
             ({"build": "7654321"}, "does not report the pinned build"),
