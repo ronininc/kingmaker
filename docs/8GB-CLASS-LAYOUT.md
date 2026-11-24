@@ -10,6 +10,8 @@ Owner's ruling, 2026-11-23/24. Written up by the Claude seat for the Codex seat.
 4. **One median model plus Open-JEV** is the working pair on this class. The method files carry the capability; the model stays small.
 5. **Every class above 8 GB downloads its weights locally.** This layout is the 8 GB class only.
 
+The two-model pair is a rotation, not a concurrency promise. On the 8 GB class only one heavyweight model may remain resident: record the median turn, unload it, score through internal Open-JEV, then reload the median for the next turn. The 2026-11-24 concurrent proof grew swap by 1,239.3 MiB in one JEV turn and tripped the 768 MiB free-disk guard; grading that configuration as usable would be unsafe.
+
 ## Card configuration
 
 Kingmaker uses the card store when the host reports at most 8 GiB of physical memory. Mount the card as `/Volumes/KINGMAKERSD` or set `KINGMAKER_MODEL_CARD` to its absolute mount path before starting Kingmaker. The path must be a mounted volume. A leftover directory at that path, a symlink, or a changed mount triggers an error.

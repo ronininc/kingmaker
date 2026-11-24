@@ -67,6 +67,13 @@ async function medianTurn() {
   return response.json();
 }
 
+async function unloadMedian() {
+  const response = await fetch(`${medianHost}/api/generate`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({
+    model: argv['--median-model'], keep_alive: 0,
+  }) });
+  if (!response.ok) throw new Error(`median unload HTTP ${response.status}`);
+}
+
 function jevTurn(promptFile) {
   return new Promise((resolve, reject) => {
     const [exe, ...args] = command.map((part) => part.replaceAll('{prompt}', promptFile));
@@ -100,6 +107,10 @@ try {
         row = { step, arm: 'median', model: argv['--median-model'], ...m, model_calls: 1,
           response: m.value.response, load_s: Number(((m.value.load_duration || 0) / 1e9).toFixed(3)), loaded_after: await ollamaPs() };
         delete row.value;
+        if (argv['--exclusive'] === true) {
+          await unloadMedian();
+          row.unloaded_for_next_arm = true;
+        }
       } else {
         const m = await measured(() => jevTurn(prompt));
         row = { step, arm: 'jev', model: argv['--jev-model'], ...m,

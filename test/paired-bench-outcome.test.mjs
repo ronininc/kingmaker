@@ -46,4 +46,5 @@ test('the real runner carries a disk safety gate and ephemeral JEV residency', a
   const source = await import('node:fs/promises').then(({ readFile }) => readFile(new URL('../scripts/run-8gb-pair.mjs', import.meta.url), 'utf8'));
   assert.match(source, /disk safety gate/);
   assert.match(source, /ephemeral: true/);
+  assert.match(source, /unloaded_for_next_arm/);
 });
