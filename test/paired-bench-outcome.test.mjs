@@ -41,3 +41,9 @@ test('parses JSONL and names malformed rows', () => {
   assert.deepEqual(parseJsonl('{"a":1}\n\n{"b":2}\n'), [{ a: 1 }, { b: 2 }]);
   assert.throws(() => parseJsonl('{"a":1}\nnope'), /row 2/);
 });
+
+test('the real runner carries a disk safety gate and ephemeral JEV residency', async () => {
+  const source = await import('node:fs/promises').then(({ readFile }) => readFile(new URL('../scripts/run-8gb-pair.mjs', import.meta.url), 'utf8'));
+  assert.match(source, /disk safety gate/);
+  assert.match(source, /ephemeral: true/);
+});

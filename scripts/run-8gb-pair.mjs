@@ -24,6 +24,12 @@ function swapMb() {
   return Number(/used = ([\d.]+)M/.exec(text)?.[1]);
 }
 
+function freeDiskMb() {
+  const text = execFileSync('/bin/df', ['-k', '/System/Volumes/Data'], { encoding: 'utf8' });
+  const fields = text.trim().split('\n').at(-1).trim().split(/\s+/);
+  return Number(fields[3]) / 1024;
+}
+
 function matchingRssMb() {
   const text = execFileSync('/bin/ps', ['-axo', 'rss=,command='], { encoding: 'utf8' });
   return text.split('\n').reduce((sum, line) => {
@@ -86,6 +92,9 @@ try {
   for (let step = 0; step < 6; step += 1) {
     let row;
     try {
+      const minimumDiskMb = Number(argv['--min-disk-mb'] || 768);
+      const availableDiskMb = freeDiskMb();
+      if (availableDiskMb < minimumDiskMb) throw new Error(`disk safety gate: ${availableDiskMb.toFixed(1)} MiB free is below ${minimumDiskMb} MiB`);
       if (step % 2 === 0) {
         const m = await measured(medianTurn);
         row = { step, arm: 'median', model: argv['--median-model'], ...m, model_calls: 1,
@@ -96,7 +105,8 @@ try {
         row = { step, arm: 'jev', model: argv['--jev-model'], ...m,
           score: m.value.score, scored_through_head: m.value.scored_through_head === true,
           model_calls: m.value.model_calls, load_evidence: m.value.load_evidence,
-          loaded_after: [...await ollamaPs(), ...(m.value.loaded_after || [])] };
+          loaded_after: [...await ollamaPs(), ...(m.value.loaded_after || []),
+            ...(m.value.loaded ? [{ name: argv['--jev-model'], source: 'internal', ephemeral: true }] : [])] };
         delete row.value;
       }
     } catch (error) {
