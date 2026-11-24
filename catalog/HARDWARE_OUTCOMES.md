@@ -134,3 +134,25 @@ This branch reports Kingmaker **0.2.3**: the 0.2.4/0.2.5 voice work is not in it
 **VM testing.** A Linux VM (Podman, 4 GB) would not finish booting on this 8 GB Mac with swap already full; it was stopped
 after 20 minutes. Kingmaker refuses non-Mac hosts anyway, and a macOS VM needs 30–60 GB of disk this Mac does not have.
 To measure the other rows: borrow or rent one 16 GB and one 24 GB+ Apple-silicon Mac and run `catalog/bench/` there.
+
+## Measured from the SD card, 2026-11-23 (K4)
+
+Same 8 GB Mac (Mac15,3, Ollama 0.34.4). Model store on a 32 GB SD card, FAT32, volume `KINGMAKERSD`, served by a second
+Ollama server (`OLLAMA_MODELS` on the card, port 11435, default settings). Raw rows: `catalog/bench/k4-8gb-card-20261123.jsonl`.
+Other apps were open and the Mac was under memory pressure, so load times may be worse than on a quiet machine.
+
+| Model | Cold load from card | Resident | Speed (tokens/s) | Swap growth |
+|---|---|---|---|---|
+| qwen3-abliterated 0.6b | 2.32 s | 0.91 GB | 149–157 | 0 MB |
+| qwen3-abliterated 1.7b | 7.15 s | 1.62 GB | 63–68 | 0 MB |
+| qwen2.5-coder-abliterate 1.5b | 6.63 s | 1.29 GB | 69–72 | 0 MB |
+| qwen3.5 0.8b | 6.93 s | 0.59 GB | 69–103 | 0 MB |
+| granite-code 3b | 37.33 s | 3.43 GB | 29–33 | +1012 to +1109 MB |
+
+- Ollama pulls to, verifies on, and loads from a FAT32 card. FAT32 cannot hold a file over 4 GB, so the 8B and 7B models cannot live on this card as formatted.
+- Cold load from the card is about 7 s for a ~1 GB model, against about 1.6 s from the internal disk (same day, other server). Speed after load is the same.
+- Resident sizes are higher than the internal-disk run for the same models (0.91 against 0.68 GB; 1.62 against 1.41 GB). The two runs used two servers with different settings; the cause was not isolated.
+- granite-code 3b loads on this server (it failed with HTTP 500 on 2026-10-09) but swaps over 1 GB on 8 GB and the Mac became unresponsive during the run. Not an 8 GB model.
+- qwen3.5 0.8b is the first measured entry for the Qwen 3.5 family: fits 8 GB with no swap. No accuracy score was taken.
+- Still unmeasured: qwen3 4b, larger Qwen 3.5 builds, all of Gemma 4, the installed 8B and 7B models.
+- Owner's ruling, 2026-11-23: this card is kept for small weights only. Kingmaker's data (31 GB) and the large models stay on the internal disk.

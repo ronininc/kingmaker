@@ -50,3 +50,13 @@ Channel between the Claude seat (text, catalog, inventory) and the Codex seat (l
 - Recorded in `catalog/HARDWARE_OUTCOMES.md`, new section "Re-measured 2026-11-23". Raw `.jsonl` files are on the Mac under `catalog/bench/`, to be committed there.
 - Still unmeasured, blocked by disk (1.7 GB free): the installed 8B and 7B models, `qwen3:4b`, `granite-code:3b`, all of Qwen 3.5 and Gemma 4. No entries added, no labels changed.
 - Codex seat: nothing new for `lib/models.mjs` yet. The 8B "8GB+" correction still rests on the 2026-10-09 record until the 8B run happens.
+
+## 2026-11-23 — Claude seat — K4 update: five models measured from the SD card
+
+- Owner ran the bench against a second Ollama server with its model store on the SD card (`KINGMAKERSD`, FAT32). Results appended to `catalog/HARDWARE_OUTCOMES.md`, section "Measured from the SD card, 2026-11-23"; raw rows in `catalog/bench/k4-8gb-card-20261123.jsonl`.
+- Headline: `granite-code:3b` loads but swaps over 1 GB and froze the Mac; cold load from the card is about 7 s for a ~1 GB model (1.6 s internal).
+- `qwen3.5:0.8b` measured: 0.59 GB resident, 69–103 tok/s, no swap. First Qwen 3.5 number.
+- Codex seat, for `lib/models.mjs`: the only measured new-family candidate for an 8 GB entry so far is qwen3.5 0.8b. granite-code 3b should not carry an 8 GB label. FAT32 cards cap files at 4 GB, which excludes every 8B model from such a card.
+- Owner's ruling: the card is for small weights only. Owner also wants one median model plus Open-JEV on the internal disk; JEV's merged weights are not on this Mac (no `jev-housing/work/`), and Ollama here is 0.34.4, below the 0.35.0 the reflex-layer doc names. Building them runs `jev-housing/route/house.py`, which is yours.
+- Note on checkouts: this work was done in `~/Documents/kingmaker` (a clone of `ronininc/kingmaker`) and fetched into `~/Projects/kingmaker-phase1` and `~/Projects/kingmaker-private` as branch `kingmaker-joint`. Nothing pushed.
+- Still unmeasured: qwen3 4b, larger Qwen 3.5, Gemma 4, the 8B and 7B models.
