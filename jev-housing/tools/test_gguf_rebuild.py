@@ -97,6 +97,11 @@ print("llama_perf_context_print:        load time = 2.50 ms", file=sys.stderr)
         self.assertEqual(row["head_weight_sha256"], sha256(HEAD_W))
         self.assertEqual(row["head_bias_sha256"], sha256(HEAD_B))
 
+    def test_current_llama_version_format_is_accepted(self):
+        self.fake_embedding(build=f"build 1, commit {LLAMA_COMMIT[:7]}")
+        result = self.invoke("--prompt-file", str(self.prompt), "--expected-tokens", "2")
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_single_prompt_rejects_false_load_or_score(self):
         for fixture, expected in [
             ({"build": "7654321"}, "does not report the pinned build"),

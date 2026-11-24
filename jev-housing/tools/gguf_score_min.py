@@ -49,7 +49,9 @@ def head_parameters():
 def embedding_version(embedding):
     result = subprocess.run([embedding, "--version"], capture_output=True, text=True, timeout=10)
     build = result.stdout + result.stderr
-    if result.returncode or not re.search(rf"\({LLAMA_COMMIT[:7]}[0-9a-f]*\)", build):
+    # b11081 reports either "commit 161755f" or the hash in parentheses,
+    # depending on the build. Bind to the hash token, not its punctuation.
+    if result.returncode or not re.search(rf"(?<![0-9a-f]){LLAMA_COMMIT[:7]}(?:[0-9a-f]{{0,33}})?(?![0-9a-f])", build):
         raise SystemExit(f"llama-embedding does not report the pinned build ({LLAMA_COMMIT}): {build.strip()}")
     return build.strip()
 
