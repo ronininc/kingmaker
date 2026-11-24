@@ -1,3 +1,17 @@
+# K4 — Model catalog refresh: PARTIAL. Three models measured; the rest blocked by disk.
+
+Claude seat, 2026-11-24.
+
+## Status update (after the owner ran the bench on the 8 GB Mac)
+
+**Three installed small models were measured on the 8 GB Mac and recorded in `catalog/HARDWARE_OUTCOMES.md`. Everything else is still unmeasured: the Mac has 1.7 GB of disk free, which rules out pulling any model and makes the two installed 8B/7B models unsafe to bench.** No Qwen 3.5 or Gemma 4 entry was added, `qwen3:4b` and `granite-code:3b` were not re-run, and no label in `lib/models.mjs` was changed (that file is the backend seat's).
+
+To finish K4, free about 10 GB on the Mac, then run step 3 of the runbook below.
+
+The text under this line is the original entry, written before any measurement.
+
+---
+
 # K4 — Model catalog refresh: NOT DONE. No number was measured.
 
 Claude seat, 2026-11-24.

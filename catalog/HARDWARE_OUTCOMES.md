@@ -38,6 +38,34 @@ JSON extraction, a working regex function, a price sum, a one-line summary). "Re
 resident at a time. Each switch between roles reloaded a model (1.1–5.1 s), even the "always-warm" 0.6b reflex, and swap
 grew 1.2 GB over eight turns. A turn that stays on one model answers in ~1.5 s; a turn that changes role takes 3–7 s.
 
+## Re-measured 2026-11-24 (K4, partial: three of the installed models)
+
+Measured on the owner's 8 GB Mac: `hw.memsize` 8589934592, `hw.model` Mac15,3 (hostname "Robbies-MacBook-Pro"), Ollama
+0.34.4, 1.7 GB of disk free. Same harness as above (`bench/bench_models.py`, `bench/eval_models.py`). Raw rows:
+`catalog/bench/k4-8gb-<date>.jsonl` and `-eval.jsonl`, written on that Mac.
+
+| Model | Resident | Speed (tokens/s) | Cold load | First answer incl. load | Swap growth | Score /8 |
+|---|---|---|---|---|---|---|
+| qwen3-abliterated 0.6b | 0.68 GB | 129–136 | 1.58 s | 1.95 s | 0 MB | 5 |
+| qwen3-abliterated 1.7b | 1.41 GB | 68 | 1.56 s | 2.08 s | 0 MB | 6 |
+| qwen2.5-coder-abliterate 1.5b | 1.24 GB | 75–76 | 1.56 s | 2.00 s | 0 MB | 6 |
+
+What changed against the 2026-10-09 table:
+
+- **Resident size and score are identical** for all three (0.68 / 1.41 / 1.24 GB; 5 / 6 / 6).
+- **Speed is roughly 2–3 times higher** (1.7b: 68 against 23–28; coder 1.5b: 75–76 against 26–36; 0.6b: 129–136 against
+  59–122). The cause was not measured. Two things differ between the runs: the Ollama version, and the machine the
+  October header names (a MacBook Air M3; this run's Mac reports Mac15,3 and calls itself a MacBook Pro).
+- None of the three swapped. The label "8 GB" is measured for these three.
+
+**Not re-measured, and why.** Nothing below has a new number, so nothing below has a new label.
+
+| Model | Reason |
+|---|---|
+| qwen3-abliterated 8b, qwen2.5-coder-abliterate 7b (installed) | Not run: 1.7 GB of free disk is too little for the swap an 8B model needs on 8 GB. |
+| qwen3 4b, granite-code 3b | Not installed, and no disk to pull them. The October rows above are the latest measurement. |
+| Qwen 3.5, Gemma 4 (any size) | Not installed, and no disk to pull them. Not in the catalog; no entry added. |
+
 ## Are these the best models and weights for 8 GB? (owner asked)
 
 - **Kingmaker's own 8 GB set is right.** The abliterated Q4_K_M builds score exactly like the stock ones (abliteration cost

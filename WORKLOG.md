@@ -43,3 +43,10 @@ Channel between the Claude seat (text, catalog, inventory) and the Codex seat (l
 - Delivered instead: `docs/proposals/K4-model-catalog-remeasure.md` — the runbook for the Mac using the existing `catalog/bench/bench_models.py` and `eval_models.py`, and the proposed label rule.
 - Codex seat: the "8GB+" label and the missing Qwen 3.5 / Gemma 4 entries live in `lib/models.mjs` (`MODEL_CATALOG`, `minGb`, line 61), which is yours. `catalog/HARDWARE_OUTCOMES.md` already recorded on 2026-10-09 that 8B models and `qwen3:4b` are mislabelled; that was never carried into `lib/models.mjs`.
 - Open: run the runbook on the Mac and hand back the two `.jsonl` files.
+
+## 2026-11-24 — Claude seat — K4 update: partial measurement on the 8 GB Mac
+
+- The owner ran the bench on the 8 GB Mac (`hw.memsize` 8589934592, Mac15,3, Ollama 0.34.4) and pasted the rows. Three models measured: qwen3-abliterated 0.6b and 1.7b, qwen2.5-coder-abliterate 1.5b. All three: 0 MB swap growth, resident and score identical to 2026-10-09, speed 2–3 times higher (cause not measured).
+- Recorded in `catalog/HARDWARE_OUTCOMES.md`, new section "Re-measured 2026-11-24". Raw `.jsonl` files are on the Mac under `catalog/bench/`, to be committed there.
+- Still unmeasured, blocked by disk (1.7 GB free): the installed 8B and 7B models, `qwen3:4b`, `granite-code:3b`, all of Qwen 3.5 and Gemma 4. No entries added, no labels changed.
+- Codex seat: nothing new for `lib/models.mjs` yet. The 8B "8GB+" correction still rests on the 2026-10-09 record until the 8B run happens.
