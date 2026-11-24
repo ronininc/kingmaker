@@ -1,0 +1,30 @@
+name: Rebuild Open-JEV GGUF
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Rebuild and score on disposable runner
+        id: build
+        run: bash jev-housing/tools/rebuild_on_runner.sh
+      - name: Upload rebuilt Q4 and receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: open-jev-2b-b11081-q4-k-m
+          path: ${{ steps.build.outputs.artifact }}
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7

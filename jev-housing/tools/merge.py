@@ -54,7 +54,8 @@ def main():
         nonlocal out_tensors, shard_bytes, shard_no, pending_keys
         fname = f"model-{shard_no:05d}-of-00003.safetensors"
         save_file(out_tensors, f"{OUTDIR}/{fname}", metadata={"format": "pt"})
-        h = hashlib.sha256(open(f"{OUTDIR}/{fname}", "rb").read()).hexdigest()
+        with open(f"{OUTDIR}/{fname}", "rb") as shard_stream:
+            h = hashlib.file_digest(shard_stream, "sha256").hexdigest()
         hashes[fname] = h
         for k in pending_keys:
             weight_map[k] = fname
