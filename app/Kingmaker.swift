@@ -949,9 +949,10 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
   /// @@ghost artifacts: everything Kingmaker made (lib/artifacts.mjs), newest first.
   func setArtifacts(_ list: [[String: Any]]) { artifacts = list; if sideTab == 1 { drawChats() } }
   /// One row in the Artifacts, Skills or Plugins tab: an icon, the name, a grey line, a menu; in Select, a click marks it.
-  private func tabRow(_ id: String, _ title: String, _ detail: String, icon: NSImage?, y: inout CGFloat, menu: NSMenu, action: Selector) {
+  private func tabRow(_ id: String, _ title: String, _ detail: String, icon: NSImage?, y: inout CGFloat, menu: NSMenu, action: Selector?) {
     let bw = KingmakerBar.sideW - 16
     let b = NSButton(title: "", target: self, action: selecting ? #selector(markTapped(_:)) : action)
+    b.isEnabled = action != nil
     b.identifier = NSUserInterfaceItemIdentifier(id); b.isBordered = false; b.bezelStyle = .regularSquare; b.alignment = .left
     b.imagePosition = .imageLeading; b.imageHugsTitle = true
     icon?.size = NSSize(width: 16, height: 16); b.image = icon
@@ -996,14 +997,27 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
       }
     case 3:
       if let problem = fleetSkillsProblem { empty(problem) }
-      else if fleetSkills.isEmpty { empty("No reviewed Fleet skills are published in the verified catalog yet.") }
-      for skill in fleetSkills {
-        guard let id = skill["id"] as? String else { continue }
-        let name=(skill["name"] as? String) ?? id, version=(skill["version"] as? String) ?? "", publisher=(skill["publisher"] as? String) ?? "", status=(skill["status"] as? String) ?? "blocked", description=(skill["description"] as? String) ?? "", permissions=(skill["permissions"] as? [String] ?? []).joined(separator: ", ")
-        let detail="\(status.replacingOccurrences(of: "-", with: " ").capitalized) · v\(version) · \(publisher) · \(permissions)", title=(status=="available"||status=="update-available") ? "Add \(name)" : name
-        let symbol=status=="added" ? "checkmark.circle.fill" : status=="revoked" ? "xmark.shield" : status=="blocked" ? "lock.shield" : "plus.circle"
-        tabRow(id,title,detail,icon:NSImage(systemSymbolName:symbol,accessibilityDescription:nil),y:&y,menu:menu([],id),action:#selector(addFleetSkillRow(_:)))
-        sideList.subviews.last?.toolTip="\(description)\n\(detail)"
+      else if fleetSkills.isEmpty { empty("No reviewed entries are published in the verified Fleet index yet.") }
+      for entry in fleetSkills {
+        guard let id = entry["id"] as? String else { continue }
+        let name = (entry["name"] as? String) ?? id
+        let version = (entry["version"] as? String) ?? ""
+        let publisher = (entry["publisher"] as? String) ?? ""
+        let status = (entry["status"] as? String) ?? "blocked"
+        let type = (entry["type"] as? String) ?? "skill"
+        let typeLabel = ["brain": "Brain", "weights": "Weights", "skill": "Skill", "tool": "Tool"][type] ?? "Asset"
+        let description = (entry["description"] as? String) ?? ""
+        let permissions = entry["permissions"] as? [String] ?? []
+        let canAct = (entry["adoptable"] as? Bool) == true && fleetSkillsProblem == nil
+        let canAdd = canAct && (status == "available" || status == "update-available")
+        let needsReview = canAct && (entry["needsApproval"] as? Bool) == true
+        let title = canAdd ? "Add \(name)" : needsReview ? "Review access for \(name)" : name
+        let detail = ([typeLabel, status.replacingOccurrences(of: "-", with: " ").capitalized, "v\(version)", publisher] + permissions)
+          .joined(separator: " · ")
+        let symbols = ["added": "checkmark.circle.fill", "revoked": "xmark.shield", "blocked": "lock.shield", "indexed": "info.circle"]
+        tabRow(id, title, detail, icon: NSImage(systemSymbolName: symbols[status] ?? "plus.circle", accessibilityDescription: nil),
+               y: &y, menu: menu([], id), action: canAdd || needsReview ? #selector(addFleetSkillRow(_:)) : nil)
+        sideList.subviews.last?.toolTip = "\(description)\n\(detail)"
       }
     default: break
     }
@@ -1030,7 +1044,8 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
   private func connector(_ id: Any?) -> [String: Any]? { guard let id = id as? String else { return nil }; return connectors.first { ($0["id"] as? String) == id } }
   private func fleetSkill(_ id: Any?) -> [String: Any]? { guard let id=id as? String else { return nil };return fleetSkills.first { ($0["id"] as? String)==id } }
   @objc private func addFleetSkillRow(_ button: NSButton) {
-    guard let skill = fleetSkill(button.identifier?.rawValue), let id = skill["id"] as? String else { return }
+    guard let skill = fleetSkill(button.identifier?.rawValue), (skill["adoptable"] as? Bool) == true,
+          let id = skill["id"] as? String else { return }
     let status = (skill["status"] as? String) ?? "blocked"
     if status == "added" {
       append(who: "", "This Fleet skill is already in My Tools.")

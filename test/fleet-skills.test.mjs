@@ -2,7 +2,7 @@ import { createServer } from 'node:http';
 import { once } from 'node:events';
 import { setTimeout as delay } from 'node:timers/promises';
 import test from 'node:test';import assert from 'node:assert/strict';import {generateKeyPairSync,sign,createHash} from 'node:crypto';import {existsSync,mkdtempSync,mkdirSync,readFileSync,writeFileSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';
-import {canonicalJson} from '../vendor/fleet/fleet-packet.mjs';import {addFleetSkill,CATALOG_DOMAIN,FLEET_SKILLS_SCHEMA,loadFleetSkillCatalog,startFleetSkillRefresh,PACKAGE_DOMAIN,SKILL_PACKAGE_SCHEMA} from '../lib/fleet-skills.mjs';import {connectorTurn,listConnectors,savedConnectors} from '../lib/connectors.mjs';
+import {canonicalJson} from '../vendor/fleet/fleet-packet.mjs';import {addFleetSkill,CATALOG_DOMAIN,FLEET_INDEX_DOMAIN,FLEET_INDEX_SCHEMA,FLEET_SKILLS_SCHEMA,fleetIndexProblems,loadFleetSkillCatalog,startFleetSkillRefresh,PACKAGE_DOMAIN,SKILL_PACKAGE_SCHEMA} from '../lib/fleet-skills.mjs';import {connectorTurn,listConnectors,savedConnectors} from '../lib/connectors.mjs';
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const {privateKey,publicKey}=generateKeyPairSync('ed25519');const publicKeyPem=publicKey.export({format:'pem',type:'spki'});
 function signed(domain,value){return sign(null,Buffer.from(`${domain}:${canonicalJson(value)}`),privateKey).toString('base64');}
@@ -91,12 +91,54 @@ test('revocation received during Add prevents registration', async () => {
   assert.deepEqual(savedConnectors(state), []);
 });
 
+function indexed(type, id, overrides = {}) {
+  return {
+    type, id, version: '1.0.0', publisher: 'Ronin test collective', description: 'Synthetic reviewed metadata.',
+    source: { repo: `fixture/${type}`, commit: 'a'.repeat(40), path: 'reviewed.json', sha256: 'b'.repeat(64) },
+    state: 'reviewed', ...overrides,
+  };
+}
+
+function signedIndex(entries, publishedAt = new Date(revision++).toISOString()) {
+  const index = { schema: FLEET_INDEX_SCHEMA, publishedAt, entries };
+  return { ...index, signature: signed(FLEET_INDEX_DOMAIN, index) };
+}
+
+test('index metadata has provenance and cannot carry private content or an unapproved tool package', () => {
+  const index = { schema: FLEET_INDEX_SCHEMA, publishedAt: new Date(revision++).toISOString(), entries: [] };
+  const brain = indexed('brain', 'brain-reference');
+  const tool = indexed('tool', 'tool-reference');
+  index.entries = [brain, tool];
+  assert.deepEqual(fleetIndexProblems(index), []);
+  index.entries = [{ ...brain, source: { ...brain.source, content: 'private' } }];
+  assert.match(fleetIndexProblems(index).join(' '), /Invalid/);
+  index.entries = [{ ...tool, packageUrl: 'https://example.test/tool.json' }];
+  assert.match(fleetIndexProblems(index).join(' '), /Invalid/);
+  index.entries = [brain, { ...brain, type: 'weights' }];
+  assert.match(fleetIndexProblems(index).join(' '), /duplicate/);
+});
+
+test('an approved defensive tool registers as a declarative tool without running', async () => {
+  const bytes = packageBytes({ id: 'local-format-review' });
+  const published = publish({ id: 'local-format-review' }, bytes);
+  const tool = indexed('tool', published.entry.id, { ...published.entry, approval: 'defensive' });
+  const state = installFixture({ document: signedIndex([tool]) });
+  const view = loadFleetSkillCatalog(state);
+  assert.equal(view.skills[0].status, 'available');
+  const added = await addFleetSkill({ state, id: tool.id, fetchPackage: async () => bytes });
+  assert.equal(added.ok, true);
+  assert.equal(added.ran, false);
+  assert.equal(added.connector.kind, 'skill');
+});
+
 test('two isolated clients fetch and refresh a signed Fleet feed automatically', { timeout: 15_000 }, async t => {
   let feed = null, requestedCatalogs = 0, requestedPackages = 0;
   const server = createServer((request, response) => {
     if (request.url === '/package.json') {
       requestedPackages += 1;
       response.end(bytes);
+    } else if (request.url === '/approved-tool.json') {
+      response.end(toolBytes);
     } else if (request.url === '/catalog.json') {
       requestedCatalogs += 1;
       response.statusCode = feed ? 200 : 503;
@@ -111,8 +153,18 @@ test('two isolated clients fetch and refresh a signed Fleet feed automatically',
   const origin = `http://127.0.0.1:${server.address().port}`;
   const bytes = packageBytes();
   const reviewed = publish({ packageUrl: `${origin}/package.json` }, bytes);
-  const revoked = publish({ ...reviewed.entry, state: 'revoked', reason: 'Fixture publisher revoked this skill.' }, bytes);
-  feed = reviewed.document;
+  const skill = indexed('skill', reviewed.entry.id, reviewed.entry);
+  const toolBytes = packageBytes({ id: 'approved-tool' });
+  const references = [
+    indexed('brain', 'brain-reference'),
+    indexed('weights', 'weight-reference'),
+    indexed('tool', 'tool-reference'),
+    indexed('tool', 'approved-tool', { ...reviewed.entry, id: 'approved-tool', approval: 'defensive',
+      packageUrl: `${origin}/approved-tool.json`, packageSha256: hash(toolBytes) }),
+  ];
+  const initial = signedIndex([skill, ...references]);
+  const revoked = signedIndex([{ ...skill, state: 'revoked', reason: 'Fixture publisher revoked this skill.' }, ...references]);
+  feed = initial;
   const clients = Array.from({ length: 2 }, () => {
     const state = mkdtempSync(join(tmpdir(), 'kingmaker-fleet-feed-'));
     const fleet = join(state, 'fleet');
@@ -145,6 +197,16 @@ test('two isolated clients fetch and refresh a signed Fleet feed automatically',
   assert.equal(requestedPackages, 0);
   for (const client of clients) {
     assert.equal(existsSync(join(client.state, 'fleet', 'skills-catalog.json')), false);
+    assert.deepEqual(client.view.skills.map(entry => [entry.type, entry.status, entry.adoptable]), [
+      ['skill', 'available', true],
+      ['brain', 'indexed', false],
+      ['weights', 'indexed', false],
+      ['tool', 'indexed', false],
+      ['tool', 'available', true],
+    ]);
+    for (const reference of references.slice(0, 3)) {
+      assert.match((await addFleetSkill({ state: client.state, id: reference.id })).error, /metadata reference/);
+    }
     const added = await addFleetSkill({ state: client.state, id: reviewed.entry.id });
     assert.equal(added.ok, true);
     assert.equal(added.ran, false);
@@ -159,19 +221,23 @@ test('two isolated clients fetch and refresh a signed Fleet feed automatically',
   await awaitViews(view => !view.ok && /HTTP 503/.test(view.error));
   for (const client of clients) assert.match((await invoke(client)).text, /HTTP 503/);
 
-  feed = revoked.document;
+  feed = revoked;
   await awaitViews(view => view.ok && view.skills[0]?.status === 'revoked');
   for (const client of clients) assert.match((await invoke(client)).text, /publisher revoked/i);
 
-  feed = { ...revoked.document, skills: reviewed.document.skills };
+  feed = { ...revoked, entries: initial.entries };
   await awaitViews(view => !view.ok && /signature/i.test(view.error) && view.skills[0]?.status === 'revoked');
   for (const client of clients) assert.match((await invoke(client)).text, /signature/i);
 
-  feed = reviewed.document;
+  feed = initial;
   await awaitViews(view => !view.ok && /older/i.test(view.error) && view.skills[0]?.status === 'revoked');
+  for (const client of clients) assert.match((await invoke(client)).text, /older/i);
+
+  feed = signedIndex(initial.entries, revoked.publishedAt);
+  await awaitViews(view => !view.ok && /conflicting/i.test(view.error) && view.skills[0]?.status === 'revoked');
   for (const client of clients) {
-    assert.match((await invoke(client)).text, /older/i);
+    assert.match((await invoke(client)).text, /conflicting/i);
     assert.equal(client.modelCalls, 1);
-    assert.deepEqual(JSON.parse(readFileSync(join(client.state, 'fleet-skills', 'accepted-catalog.json'), 'utf8')), revoked.document);
+    assert.deepEqual(JSON.parse(readFileSync(join(client.state, 'fleet-skills', 'accepted-catalog.json'), 'utf8')), revoked);
   }
 });
