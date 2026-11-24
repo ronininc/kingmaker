@@ -1,0 +1,39 @@
+name: Build pinned llama embedding for Mac
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - candidate/8gb-integrated
+    paths:
+      - .github/workflows/build-llama-embedding-mac.yml
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-14
+    timeout-minutes: 30
+    steps:
+      - name: Check out pinned llama.cpp
+        run: |
+          git clone --quiet --depth 1 --branch b11081 https://github.com/ggml-org/llama.cpp.git llama.cpp
+          test "$(git -C llama.cpp rev-parse HEAD)" = "161755f29e415e2c33efe906e91843c068efd664"
+      - name: Build embedding only
+        run: |
+          cmake -S llama.cpp -B llama.cpp/build -DCMAKE_BUILD_TYPE=Release -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_SERVER=OFF -DLLAMA_CURL=OFF -DGGML_NATIVE=OFF
+          cmake --build llama.cpp/build --target llama-embedding --parallel 2
+          llama.cpp/build/bin/llama-embedding --version 2>&1 | tee llama-embedding-version.txt
+          grep -q '161755f' llama-embedding-version.txt
+          tar -C llama.cpp/build/bin -czf llama-embedding-b11081-macos-arm64.tar.gz llama-embedding libggml*.dylib libllama*.dylib
+          shasum -a 256 llama-embedding-b11081-macos-arm64.tar.gz > llama-embedding-b11081-macos-arm64.SHA256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: llama-embedding-b11081-macos-arm64
+          path: |
+            llama-embedding-b11081-macos-arm64.tar.gz
+            llama-embedding-b11081-macos-arm64.SHA256
+            llama-embedding-version.txt
+          if-no-files-found: error
+          retention-days: 7
