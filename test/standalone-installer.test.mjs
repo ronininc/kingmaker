@@ -27,7 +27,9 @@ test('standalone Kingmaker installs from signed local payload with no Launcher b
   const manifest = Buffer.from(JSON.stringify({
     schema:'kingmaker.release/1', tag:'v0.2.0', version:'0.2.0', repo:'ronininc/kingmaker',
     app:{bundleId:'com.ronininc.solghost', format:'tar+gzip', size:bytes.length, sha256:sha(bytes)},
-    parts:[{name,size:bytes.length,sha256:sha(bytes)}], launcher
+    parts:[{name,size:bytes.length,sha256:sha(bytes)}], launcher,
+    searxng:{script:'Contents/Resources/kingmaker-runtime/scripts/solomon-searxng-native-setup.mjs'},
+    knowledge:{script:'Contents/Resources/kingmaker-runtime/scripts/solomon-bootstrap-corpus.mjs', totalMB:3, corpora:[]}
   }));
   const {publicKey,privateKey} = generateKeyPairSync('rsa',{modulusLength:2048});
   // Ephemeral fixture key lives only in a temporary resource bundle. The unmodified
