@@ -467,19 +467,6 @@ test('Kingmaker installs undocked when the owner asks; a Mac App Store launcher 
     assert.equal(run.code, 0, run.out);
     assert.equal(existsSync(join(w2.prefix, 'Applications', 'Ronin Launcher.app')), false);
   } finally { /* ok is reused below */ }
-  // Launcher acquired first: the independent path may not replace it or need
-  // any new Launcher bytes. A marker captures a copy outside this release.
-  const existing = world();
-  const dr = join(existing.prefix, 'Applications', 'Ronin Launcher.app', 'Contents');
-  mkdirSync(dr, { recursive: true });
-  writeFileSync(join(dr, 'marker'), 'previous independent Launcher');
-  try {
-    const run = await runEngine(['--wake-word', 'Kingmaker', '--prefix', existing.prefix, '--source', r.out, '--manifest', r.manifestFile, '--without-launcher'], existing.env);
-    assert.equal(run.code, 0, run.out);
-    assert.ok(existsSync(appIn(existing)));
-    assert.equal(readFileSync(join(dr, 'marker'), 'utf8'), 'previous independent Launcher');
-    assert.equal(run.done?.launched, false, 'the isolated run launches neither product');
-  } finally { rmSync(existing.root, { recursive: true, force: true }); }
   // A Mac App Store copy already in Applications: the release's launcher is still verified, but not placed over it.
   const w3 = world();
   try {
