@@ -17,4 +17,4 @@ jobs:
       - run: node --test test/installer-look.test.mjs
       - run: swiftc -typecheck -parse-as-library -target arm64-apple-macos14.0 installer/KingmakerInstaller.swift -framework SwiftUI -framework AppKit
       - run: |
-          node --test --test-name-pattern='Kingmaker installs undocked' test/installer.test.mjs
+          node --test test/standalone-installer.test.mjs test/installer-signature.test.mjs
