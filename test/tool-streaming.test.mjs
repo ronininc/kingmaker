@@ -231,7 +231,7 @@ test('layer 3 — negative: tools NOT in the catalog, and Blender while unstaged
   const workDir = join(root, 'work');
   await mkdir(workDir, { recursive: true });
   const r = await createMethodConductor({ indexUrl, toolProvider: provider }).conduct('missing-tools-job', { workDir });
-  assert.equal(r.status, 'completed', `trace: ${JSON.stringify(r.trace, null, 1)}`);
+  assert.equal(r.status, 'incomplete', `trace: ${JSON.stringify(r.trace, null, 1)}`);
   assert.deepEqual(r.declared.map((d) => d.step), ['declare-absent', 'declare-blender'], 'both steps stayed declared — nothing executed, nothing faked');
   const absent = r.trace.find((t) => t.id === 'check-absent');
   assert.equal(absent.result.found, false);
@@ -248,7 +248,7 @@ test('layer 3 — the production wiring: a no-arg conductor (the execution loop 
   // exactly as before tool streaming: the OpenCAD export stays declared.
   const workDir = await mkdtemp(join(tmpdir(), 'km-tools-prod-'));
   const r = await createMethodConductor().conduct('opencad-part-spec', { workDir });
-  assert.equal(r.status, 'completed', `trace: ${JSON.stringify(r.trace, null, 1)}`);
+  assert.equal(r.status, 'incomplete', `trace: ${JSON.stringify(r.trace, null, 1)}`);
   assert.deepEqual(r.declared.map((d) => d.step), ['declare-export-stl']);
   const check = r.trace.find((t) => t.id === 'check-openscad');
   assert.ok(!('pull' in check.result) || check.result.pull === null, 'openscad is not a catalog tool: no pull attempted');

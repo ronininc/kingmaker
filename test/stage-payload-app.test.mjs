@@ -43,7 +43,7 @@ test('free Kingmaker carries only shared Armor compatibility modules, not the pa
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('verified raw payload stages into the installer app layout', () => {
+test('verified raw payload stages into the installer app layout', { skip: process.platform !== 'darwin' && 'codesign acceptance is macOS-only' }, () => {
   const dir = mkdtempSync(join(tmpdir(), 'km-stage-test-'));
   try {
     const built = buildPayload({ out: join(dir, 'payload') });

@@ -37,7 +37,7 @@ test('the SearXNG pin is read from the setup script, plain or minified', () => {
   assert.equal(searxngPin('export const OTHER = 1;'), null);
 });
 
-test('a release refuses older names, missing frontend and source maps inside the app; node_modules maps are fine', { timeout: 60_000 }, () => {
+test('a release refuses older names, missing frontend and source maps inside the app; node_modules maps are fine', { timeout: 60_000, skip: process.platform !== 'darwin' && 'signed app fixture requires macOS codesign' }, () => {
   const dir = mkdtempSync(join(tmpdir(), 'km-names-'));
   try {
     const app = makeFixtureApp(dir, { version: '0.3.0' });

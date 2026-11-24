@@ -133,7 +133,7 @@ test('docking: none, issued, older issued, altered, revoked, and a channel that 
 });
 
 test('a release manifest may carry the list, and then it must list its own launcher', () => {
-  const pin = { name: 'Ronin Launcher.app', archive: 'Ronin-Launcher-0.3.15.zip', format: 'zip', sha256: hex('b'), size: 1000, url: null, required: true };
+  const pin = { sourceRepo: 'ronininc/ronin-launcher', sourceCommit: 'a'.repeat(40), name: 'Ronin Launcher.app', archive: 'Ronin-Launcher-0.3.15.zip', format: 'zip', sha256: hex('b'), size: 1000, url: null, required: true };
   assert.deepEqual(launcherProblems(pin, { required: true }), [], 'a manifest without the list reads as before');
   const listed = [entry({ version: '0.3.14', archiveSha256: hex('a') }), entry({ archiveSha256: hex('b') })];
   assert.deepEqual(launcherProblems({ ...pin, issued: listed }, { required: true }), []);

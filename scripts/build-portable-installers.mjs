@@ -33,7 +33,9 @@ export function buildPortableInstallers({ payload, out, version } = {}) {
     cpSync(join(ROOT, 'platform/PORTABLE-NOTES.txt'), join(linuxRoot, 'PORTABLE-NOTES.txt')); cpSync(join(ROOT, 'platform/PORTABLE-NOTES.txt'), join(windowsRoot, 'PORTABLE-NOTES.txt'));
     const linux = join(out, `Kingmaker-${version}-linux-x64.tar.gz`), windows = join(out, `Kingmaker-${version}-windows-x64.zip`);
     execFileSync('tar', ['-czf', linux, '-C', scratch, `Kingmaker-${version}-linux-x64`], { env: { ...process.env, COPYFILE_DISABLE: '1' } });
-    execFileSync('ditto', ['-c', '-k', '--keepParent', windowsRoot, windows]);
+    // `ditto` is macOS-only. The portable Windows unit is ordinary ZIP data,
+    // so use the cross-platform zip CLI and keep the same top-level directory.
+    execFileSync('zip', ['-qry', windows, `Kingmaker-${version}-windows-x64`], { cwd: scratch });
     const artifacts = [{ platform: 'linux', name: linux.split('/').at(-1), size: readFileSync(linux).length, sha256: sha(linux) }, { platform: 'windows', name: windows.split('/').at(-1), size: readFileSync(windows).length, sha256: sha(windows) }];
     writeFileSync(join(out, 'portable-artifacts.json'), `${JSON.stringify({ schema: 'kingmaker.portable-artifacts/1', version, status: 'installer-candidate', artifacts }, null, 2)}\n`);
     return artifacts;
