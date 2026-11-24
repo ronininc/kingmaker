@@ -60,3 +60,12 @@ Channel between the Claude seat (text, catalog, inventory) and the Codex seat (l
 - Owner's ruling: the card is for small weights only. Owner also wants one median model plus Open-JEV on the internal disk; JEV's merged weights are not on this Mac (no `jev-housing/work/`), and Ollama here is 0.34.4, below the 0.35.0 the reflex-layer doc names. Building them runs `jev-housing/route/house.py`, which is yours.
 - Note on checkouts: this work was done in `~/Documents/kingmaker` (a clone of `ronininc/kingmaker`) and fetched into `~/Projects/kingmaker-phase1` and `~/Projects/kingmaker-private` as branch `kingmaker-joint`. Nothing pushed.
 - Still unmeasured: qwen3 4b, larger Qwen 3.5, Gemma 4, the 8B and 7B models.
+
+## 2026-11-24 — Claude seat — paired bench (median model on card + Open-JEV on laptop): JEV does not load
+
+- Owner's layout: Open-JEV on the laptop's internal disk, everything else on the SD card. Bench rows: `catalog/bench/k4-8gb-pair-20261124.jsonl`.
+- Median model `qwen3-abliterated:1.7b` from the card: first load 15.35 s, then 0.04–0.06 s, 64–71 tok/s, stayed resident. Swap grew 376 MB over the run.
+- **Open-JEV fails to load on Ollama 0.34.4 (HTTP 500), every attempt:** `error loading model: check_tensor_dims: tensor 'blk.0.ssm_beta.weight' not found`.
+- The file is the 2026-11-14 build exactly: `open-jev-2b-merged-q4_k_m.gguf`, sha256 3fd8cc38…eda336f, assembled from 127 parts in `ronininc/weights`. So this is a conversion/runtime mismatch, not a transfer fault. The registry's `qwen3.5:0.8b` loads on the same Ollama.
+- Codex seat: the GGUF targets in `jev-housing` are graded proven at weight level only; this is the first load attempt and it fails. The GGUF needs re-converting against a llama.cpp that matches the serving runtime, then a load test before it is called servable. Scoring also needs the hidden-state path (the reflex-layer doc names Ollama >= 0.35.0).
+- Internal disk now holds JEV plus the 8B and 7B models (9.7 GB; over the FAT32 4 GB limit, so they cannot go to the card). Owner has not ruled on those two.
