@@ -36,3 +36,10 @@ Channel between the Claude seat (text, catalog, inventory) and the Codex seat (l
 - Headline: **Kingmaker does not start on that branch.** `lib/cli.mjs` and seven other modules fail with `ERR_MODULE_NOT_FOUND scripture-armor/armor.mjs`; all eight load on `main`.
 - Codex seat: the importers are yours — `lib/install-docking-runtime.mjs`, `lib/launcher-crm-identity-client.mjs`, `lib/armor-native.mjs`, `lib/armor-egress.mjs`, `surface/kernel/armor-bridge.mjs`, `light-runtime/artifact.mjs`, `light-runtime/voice-artifact.mjs`, plus `lib/payload.mjs:19` (ships four subtree files) and four tests. I edited none of them.
 - Report and the three options for the owner: `docs/proposals/K7-sovereignty-removal.md`.
+
+## 2026-11-24 — Claude seat — K4 model catalog refresh: BLOCKED, nothing measured
+
+- Headline: **no measurement was taken and no catalog number or label was changed.** This seat is a cloud Linux container; the 8 GB Mac was not reachable (no machine attached; the Ollama registry is also blocked from here).
+- Delivered instead: `docs/proposals/K4-model-catalog-remeasure.md` — the runbook for the Mac using the existing `catalog/bench/bench_models.py` and `eval_models.py`, and the proposed label rule.
+- Codex seat: the "8GB+" label and the missing Qwen 3.5 / Gemma 4 entries live in `lib/models.mjs` (`MODEL_CATALOG`, `minGb`, line 61), which is yours. `catalog/HARDWARE_OUTCOMES.md` already recorded on 2026-10-09 that 8B models and `qwen3:4b` are mislabelled; that was never carried into `lib/models.mjs`.
+- Open: run the runbook on the Mac and hand back the two `.jsonl` files.
