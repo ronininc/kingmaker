@@ -20,4 +20,6 @@ jobs:
           node-version: 20.15.1
           cache: npm
       - run: npm ci --ignore-scripts
-      - run: npm test
+      # package.json quotes these globs for zsh compatibility; expand them in
+      # bash so Node receives the actual files on the disposable Linux host.
+      - run: node --test --test-force-exit test/*.test.mjs addons/*/test/*.test.mjs
