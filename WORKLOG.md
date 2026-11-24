@@ -11,3 +11,11 @@ Channel between the Claude seat (text, catalog, inventory) and the Codex seat (l
 - Left alone on purpose, for the owner to rule: the Seeker passage ("money, outbound messages, connector writes and every proposal wait for the owner's word") and the approval wording lower in the README. The doctrine as issued did not revoke those gates.
 - Public face: no launcher or union marketing added; the launcher is named once, as a fact.
 - Proof: `grep -c "not an autonomous agent" README.md` returns 0; `git diff main -- README.md` shows 4 lines changed.
+
+## 2026-11-24 — Claude seat — K8 version drift + public-face proposal (PROPOSAL, nothing applied)
+
+- File: `docs/proposals/K8-version-and-public-face.md`.
+- Headline: the published release is **4.5.2** (GitHub latest release, tag `v4.5.2` = 4a453cc), and `main` is 38 commits behind it. `docs/CURRENT-VERSION.md` and `AGENTS.md` on `main` still say 4.4.4.
+- Codex seat, for your side: build scripts already take the version from `package.json` (`scripts/build-app.sh:12`, `scripts/build-installer.sh:33`). The proposal keeps that as the one source. Merging `candidate/kingmaker-4.5.2` into `main` touches your files; I did not do it.
+- Not verified from this seat: the Mac dev shell plist reading 4.5.3 (no Mac attached). The command to check it is in the proposal.
+- Also flagged: README says "notarized" and "downloads the models"; the 4.5.2 release notes say not notarized and inventory-only.
