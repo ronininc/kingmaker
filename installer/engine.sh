@@ -137,9 +137,8 @@ legacy_apps() { # older "Sol Ghost.app" copies (same product, same bundle id), o
 }
 cemented_word() { [ -f "$DATA/install.json" ] && plutil -extract wakeWord raw -o - "$DATA/install.json" 2>/dev/null; }
 
-# This Mac, as information for the install screen: its memory (GiB as sold) and chip. Nothing is
-# picked from these numbers — the starter set is the same on every Mac, and models beyond it are
-# chosen per task at runtime and metered in.
+# This Mac's memory (GiB as sold) and chip, shown on the install screen. The staged runtime checks
+# the exact byte count when it chooses the model store. The starter set is the same on every Mac.
 MEM_GB="$(sysctl -n hw.memsize 2>/dev/null | awk '{ printf "%d", $1 / 1073741824 + 0.5 }')"; [ -n "$MEM_GB" ] || MEM_GB=8
 CHIP="$(sysctl -n machdep.cpu.brand_string 2>/dev/null || true)"
 
@@ -724,11 +723,23 @@ else
   OLLAMA="$O_DIR/Ollama.app/Contents/Resources/ollama"
   note "Installed Ollama $(mf ollama.version) in $O_DIR."
 fi
+# Prefix proofs can supply their own disposable Ollama endpoint. A live install on
+# the 8 GB class starts the same managed card server that the app will later use.
+if [ "$TOOLS_LIVE" = 1 ] && [ "$(sysctl -n hw.memsize 2>/dev/null || echo 0)" -le 8589934592 ] \
+    && { [ -z "$PREFIX" ] || [ -z "${KINGMAKER_OLLAMA_URL:-}" ]; }; then
+  CARD_ENTRY="$STAGED_APP/Contents/Resources/sol-ghost/lib/kingmaker.mjs"
+  [ -f "$STAGED_APP/Contents/Resources/sol-ghost/lib/model-storage.mjs" ] \
+    || fail "This Kingmaker release has no model-card support for this Mac. Use a release with the 8 GB card layout."
+  OLLAMA_URL="$(ELECTRON_RUN_AS_NODE=1 SOL_GHOST_HOME="$DATA" KINGMAKER_OLLAMA_BIN="$OLLAMA" \
+    "$NODE_BIN" "$CARD_ENTRY" models card-ollama 2>&1)" || fail "$OLLAMA_URL"
+fi
 if ! ollama_up "$TAGS"; then
-  if [ "$TOOLS_LIVE" = 1 ] && [ -n "$OLLAMA" ]; then
+  if [ "$TOOLS_LIVE" = 1 ] && [ -n "$OLLAMA" ] && [ -z "${CARD_ENTRY:-}" ]; then
     nohup "$OLLAMA" serve >> "$CACHE/ollama-serve.log" 2>&1 &
     for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do ollama_up "$TAGS" && break; sleep 1; done
     ollama_up "$TAGS" || fail "Ollama did not start (see $CACHE/ollama-serve.log)."
+  elif [ -n "${CARD_ENTRY:-}" ]; then
+    fail "Kingmaker's model-card Ollama stopped. Insert the card and retry."
   else
     : > "$TAGS"; note "Ollama is not answering, so the models can only be listed."
   fi
@@ -747,6 +758,11 @@ while [ "$i" -lt "$MODEL_COUNT" ]; do
   elif [ "$TOOLS_LIVE" = 0 ]; then
     note "Would pull $model$([ "$msize" -gt 0 ] && echo " ($(gb "$msize"))")$([ -n "$have" ] && echo "; this Mac has another revision")."
   else
+    if [ -n "${CARD_ENTRY:-}" ]; then
+      CARD_URL="$(ELECTRON_RUN_AS_NODE=1 SOL_GHOST_HOME="$DATA" KINGMAKER_OLLAMA_BIN="$OLLAMA" \
+        "$NODE_BIN" "$CARD_ENTRY" models card-ollama 2>&1)" || fail "$CARD_URL"
+      [ "$CARD_URL" = "$OLLAMA_URL" ] || fail "The Kingmaker model store changed during setup. Insert the card and retry."
+    fi
     : > "$CACHE/pull.err"; rm -f "$CACHE/pull.ok"
     # In the background, so Cancel (SIGTERM) stops a multi-GB pull at once instead of after it.
     ( curl -sN --max-time 7200 "$OLLAMA_URL/api/pull" -d "{\"model\":\"$model\",\"stream\":true}" 2>>"$LOG" | while IFS= read -r line; do
