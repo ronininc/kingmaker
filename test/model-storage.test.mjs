@@ -64,6 +64,17 @@ test('missing or unmounted card fails plainly and does not create a directory or
   assert.equal(existsSync(f.env.KINGMAKER_OLLAMA_MODELS), false);
 });
 
+test('a pinned installation refuses the wrong card identity without writing', (t) => {
+  const f = fixture(t);
+  const env = { ...f.env, KINGMAKER_MODEL_CARD_UUID: 'EXPECTED-CARD' };
+  assert.throws(
+    () => resolveModelStorage(f.state, { env, totalMemBytes: 8 * GB, mountDevice: () => 42, cardIdentity: () => 'other-card' }),
+    /Wrong Kingmaker model card.*expected UUID EXPECTED-CARD.*found OTHER-CARD/,
+  );
+  assert.equal(existsSync(f.state), false);
+  assert.equal(existsSync(f.env.KINGMAKER_OLLAMA_MODELS), false);
+});
+
 test('an apparent card subdirectory cannot redirect model writes to disk', (t) => {
   const f = fixture(t);
   const storage = f.resolve();

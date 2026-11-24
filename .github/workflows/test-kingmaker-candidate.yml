@@ -21,16 +21,21 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20.15.1
+          # The CLI requires node:sqlite (>=22.13); SYSTEM-REQUIREMENTS.md
+          # names Node 24 as the supported full-suite lane.
+          node-version: 24
           cache: npm
       - run: npm ci --ignore-scripts
       - name: Run deterministic test shard
-        shell: bash
-        run: |
-          mapfile -t files < <(
-            { find test -maxdepth 1 -name '*.test.mjs'; find addons -path '*/test/*.test.mjs'; } \
-              | sort \
-              | awk -v shard="${{ matrix.shard }}" 'NR % 4 == shard'
-          )
-          printf 'Shard %s: %s files\n' "${{ matrix.shard }}" "${#files[@]}"
-          node --test --test-force-exit "${files[@]}"
+        env:
+          KINGMAKER_TEST_SHARD: ${{ matrix.shard }}
+          KINGMAKER_TEST_SHARDS: 4
+          KINGMAKER_TEST_FILE_TIMEOUT_MS: 180000
+          KINGMAKER_TEST_OUTPUT_DIR: test-results
+        run: node scripts/run-test-shard.mjs
+      - name: Preserve test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingmaker-test-shard-${{ matrix.shard }}
+          path: test-results/
