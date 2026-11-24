@@ -1,7 +1,7 @@
 name: Kingmaker independent installer evidence
 on:
   push:
-    branches: [candidate/kingmaker-standalone-entry]
+    branches: [ci/standalone-proof-4ada7c2]
 permissions:
   contents: read
 jobs:
@@ -10,6 +10,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: 4ada7c23ed640da54bacd855284a4b0e0620b29f
       - uses: actions/setup-node@v4
         with:
           node-version: 24
