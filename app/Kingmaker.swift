@@ -610,6 +610,8 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
   private var crmSkillsOn: Bool { KingmakerBar.d.string(forKey: "km.crmSkills") == "on" }
   // CONNECTORS (lib/connectors.mjs): what Kingmaker can use besides its own tools, each inspected by REA first.
   private var connectors: [[String: Any]] = []
+  private var fleetSkills: [[String: Any]] = []
+  private var fleetSkillsProblem: String?
   private var connectorsPanel: NSPanel?
   private var connectorsView: NSView?
   private let connKind = NSPopUpButton(frame: .zero, pullsDown: false), connName = NSTextField(), connTarget = NSTextField()
@@ -715,8 +717,8 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
     side.wantsLayer = true; side.layer?.backgroundColor = NSColor.white.withAlphaComponent(0.035).cgColor
     sideScroll.documentView = sideList; sideScroll.drawsBackground = false; sideScroll.hasVerticalScroller = true; sideScroll.autohidesScrollers = true
     sideScroll.scrollerStyle = .overlay; sideScroll.borderType = .noBorder
-    sideTabs.segmentStyle = .separated; sideTabs.trackingMode = .selectOne; sideTabs.segmentCount = 4
-    for (i, (sym, tip)) in [("bubble.left.and.bubble.right", UI.t("Chats and projects")), ("photo.on.rectangle.angled", UI.t("Artifacts: what Kingmaker made")), ("wand.and.stars", UI.t("Skills")), ("puzzlepiece.extension", UI.t("Plugins and connectors"))].enumerated() {
+    sideTabs.segmentStyle = .separated; sideTabs.trackingMode = .selectOne; sideTabs.segmentCount = 5
+    for (i, (sym, tip)) in [("bubble.left.and.bubble.right", UI.t("Chats and projects")), ("photo.on.rectangle.angled", UI.t("Artifacts: what Kingmaker made")), ("wand.and.stars", UI.t("My Tools")), ("person.3", UI.t("Fleet Skills")), ("puzzlepiece.extension", UI.t("Plugins and connectors"))].enumerated() {
       sideTabs.setImage(NSImage(systemSymbolName: sym, accessibilityDescription: tip)?.withSymbolConfiguration(.init(pointSize: 11, weight: .medium)), forSegment: i)
       sideTabs.setToolTip(tip, forSegment: i); sideTabs.setWidth(32, forSegment: i)
     }
@@ -916,7 +918,7 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
   @objc private func sideTabChanged() {
     sideTab = sideTabs.selectedSegment; KingmakerBar.d.set(sideTab, forKey: "km.sideTab")
     marked = []; refreshSideButtons()
-    if sideTab == 1 { onCommand("artifacts") } else if sideTab >= 2 { onCommand("connectors") }
+    if sideTab == 1 { onCommand("artifacts") } else if sideTab == 3 { onCommand("fleet-skills") } else if sideTab == 2 || sideTab == 4 { onCommand("connectors") }
     drawChats(); layout()
   }
   /// Each tab's two buttons: Chats (New chat, New project), Artifacts (Refresh, Open folder), Skills (New skill, Add a
@@ -926,16 +928,18 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
       (" New chat", "square.and.pencil", #selector(newChat), " New project", "folder.badge.plus", #selector(newProject)),
       (" Refresh", "arrow.clockwise", #selector(refreshArtifacts), " Open Kingmaker's folder", "folder", #selector(openArtifactsFolder)),
       (" New skill", "wand.and.stars", #selector(openSkillPanel), " Add a skill folder…", "folder.badge.plus", #selector(openConnectorsFromSide)),
+      (" Refresh", "arrow.clockwise", #selector(refreshFleetSkills), "", "", nil),
       (" Add plugin", "puzzlepiece.extension", #selector(openConnectorsFromSide), " Refresh", "arrow.clockwise", #selector(refreshConnectorsFromSide)),
     ]
     let t = sets[sideTab]
     newChatButton.title = t.0; newChatButton.image = NSImage(systemSymbolName: t.1, accessibilityDescription: nil)?.withSymbolConfiguration(.init(pointSize: 12, weight: .medium)); newChatButton.action = t.2
     newProjectButton.title = t.3; newProjectButton.image = NSImage(systemSymbolName: t.4, accessibilityDescription: nil)?.withSymbolConfiguration(.init(pointSize: 12, weight: .medium)); newProjectButton.action = t.5
     selectMove.isHidden = sideTab != 0; selectPin.isHidden = sideTab != 0
-    selectDelete.toolTip = ["Delete the selected chats and projects", "Move the selected files to the Trash", "Remove the selected skills", "Remove the selected plugins"][sideTab]
+    selectDelete.toolTip = ["Delete the selected chats and projects", "Move the selected files to the Trash", "Remove the selected skills", "Fleet catalog entries cannot be removed here", "Remove the selected plugins"][sideTab]
   }
   @objc private func refreshArtifacts() { onCommand("artifacts") }
   @objc private func refreshConnectorsFromSide() { onCommand("connectors") }
+  @objc private func refreshFleetSkills() { onCommand("fleet-skills") }
   @objc private func openConnectorsFromSide() { openConnectors() }
   /// Kingmaker's one hidden folder (lib/kingmaker-home.mjs): opened only when the owner asks for it.
   @objc private func openArtifactsFolder() {
@@ -975,7 +979,7 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
         tabRow(path, name, "\((a["where"] as? String) ?? "") · \(when)", icon: NSWorkspace.shared.icon(forFile: path), y: &y,
                menu: menu([("Open", #selector(openArtifact(_:))), ("Show in Finder", #selector(revealArtifact(_:))), ("Move to Trash", #selector(trashArtifact(_:)))], path), action: #selector(openArtifactRow(_:)))
       }
-    case 2, 3:
+    case 2, 4:
       let items = connectors.filter { ((($0["kind"] as? String) ?? "") == "skill") == (sideTab == 2) }
       if items.isEmpty { empty(sideTab == 2 ? "No skills yet. New skill writes one; Add a skill folder brings one in." : "No plugins yet. Add plugin connects a CLI, an MCP server or a repo; REA checks each one first.") }
       for c in items {
@@ -989,6 +993,16 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
         let sym = sideTab == 2 ? "wand.and.stars" : ["mcp": "server.rack", "cli": "terminal", "repo": "shippingbox"][(c["kind"] as? String) ?? ""] ?? "puzzlepiece.extension"
         tabRow(id, name, detail, icon: NSImage(systemSymbolName: sym, accessibilityDescription: nil), y: &y, menu: menu(items, id),
                action: sideTab == 2 ? #selector(openConnectorRow(_:)) : #selector(openConnectorsFromRow(_:)))
+      }
+    case 3:
+      if fleetSkills.isEmpty { empty(fleetSkillsProblem ?? "No reviewed Fleet skills are published in the verified catalog yet.") }
+      for skill in fleetSkills {
+        guard let id = skill["id"] as? String else { continue }
+        let name=(skill["name"] as? String) ?? id, version=(skill["version"] as? String) ?? "", publisher=(skill["publisher"] as? String) ?? "", status=(skill["status"] as? String) ?? "blocked", description=(skill["description"] as? String) ?? "", permissions=(skill["permissions"] as? [String] ?? []).joined(separator: ", ")
+        let detail="\(status.replacingOccurrences(of: "-", with: " ").capitalized) · v\(version) · \(publisher) · \(permissions)", title=(status=="available"||status=="update-available") ? "Add \(name)" : name
+        let symbol=status=="added" ? "checkmark.circle.fill" : status=="revoked" ? "xmark.shield" : status=="blocked" ? "lock.shield" : "plus.circle"
+        tabRow(id,title,detail,icon:NSImage(systemSymbolName:symbol,accessibilityDescription:nil),y:&y,menu:menu([],id),action:#selector(addFleetSkillRow(_:)))
+        sideList.subviews.last?.toolTip="\(description)\n\(detail)"
       }
     default: break
     }
@@ -1013,6 +1027,8 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
     marked = []; onCommand("artifacts")
   }
   private func connector(_ id: Any?) -> [String: Any]? { guard let id = id as? String else { return nil }; return connectors.first { ($0["id"] as? String) == id } }
+  private func fleetSkill(_ id: Any?) -> [String: Any]? { guard let id=id as? String else { return nil };return fleetSkills.first { ($0["id"] as? String)==id } }
+  @objc private func addFleetSkillRow(_ b:NSButton) { guard let skill=fleetSkill(b.identifier?.rawValue),let id=skill["id"] as? String else{return};let status=(skill["status"] as? String) ?? "blocked";if status=="added" { append(who:"", "This Fleet skill is already in My Tools.");return };if (skill["needsApproval"] as? Bool)==true { let permissions=(skill["permissions"] as? [String] ?? []).joined(separator:", "),alert=NSAlert();alert.messageText="Approve new access for \(id)?";alert.informativeText="This update requests: \(permissions). Adding it does not run the skill.";alert.addButton(withTitle:"Approve update");alert.addButton(withTitle:"Cancel");guard alert.runModal() == .alertFirstButtonReturn else{return};onCommand("fleet-skill-add \(id) approve");return };if status=="revoked"||status=="blocked" { append(who:"", (skill["reason"] as? String) ?? "This Fleet skill cannot be added.");return };onCommand("fleet-skill-add \(id)") }
   @objc private func openConnectorRow(_ b: NSButton) { if let t = connector(b.identifier?.rawValue)?["target"] as? String, t.hasPrefix("/") { NSWorkspace.shared.open(URL(fileURLWithPath: t)) } }
   @objc private func openConnectorTarget(_ m: NSMenuItem) { if let t = connector(m.representedObject)?["target"] as? String, t.hasPrefix("/") { NSWorkspace.shared.open(URL(fileURLWithPath: t)) } }
   @objc private func revealConnectorTarget(_ m: NSMenuItem) { if let t = connector(m.representedObject)?["target"] as? String, t.hasPrefix("/") { NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: t)]) } }
@@ -1049,7 +1065,8 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
   @objc private func deleteMarked() {
     switch sideTab {
     case 1: trashArtifacts(Array(marked))
-    case 2, 3: removeConnectors(Array(marked))
+    case 2, 4: removeConnectors(Array(marked))
+    case 3: marked=[];drawChats()
     default:
       let ids = Set(chats.map(\.id)).intersection(marked), projs = marked.filter { $0.hasPrefix("project:") }.map { String($0.dropFirst(8)) }
       guard !ids.isEmpty || !projs.isEmpty else { return }
@@ -2895,6 +2912,7 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
       if ok { connTarget.stringValue = ""; connName.stringValue = "" }
     }
   }
+  func setFleetSkills(_ list:[[String:Any]],problem:String?,result:[String:Any]?) { fleetSkills=list;fleetSkillsProblem=problem;if sideTab==3 { drawChats() };if let r=result { append(who:"",(r["ok"] as? Bool)==true ? "Added \((r["id"] as? String) ?? "the Fleet skill") to My Tools." : "Fleet skill not added: \((r["error"] as? String) ?? "verification failed")") } }
   private func drawConnectors() {
     connList.arrangedSubviews.forEach { $0.removeFromSuperview() }
     if connectors.isEmpty { let l = NSTextField(labelWithString: "Nothing connected yet."); l.textColor = .tertiaryLabelColor; connList.addArrangedSubview(l) }
@@ -4253,6 +4271,7 @@ final class GhostApp: NSObject, NSApplicationDelegate {
         if let skills = obj["crmSkills"] as? [[String: Any]] { bar.setCrmSkills(skills, from: obj["crmSkillsFrom"] as? String, problem: obj["crmSkillsProblem"] as? String) }
         if obj.keys.contains("partial") { bar.partial(obj["partial"] as? String) }   // live dictation while fn is held
         if let list = obj["connectors"] as? [[String: Any]] { bar.setConnectors(list, result: obj["connectorResult"] as? [String: Any]) }
+        if let list = obj["fleetSkills"] as? [[String: Any]] { bar.setFleetSkills(list, problem: obj["fleetSkillsProblem"] as? String, result: obj["fleetSkillResult"] as? [String: Any]) }
         if let screen = obj["screen"] as? [String: Any] { bar.showScreen(screen) }
         if let tour = obj["tour"] as? [String: Any] { bar.startTour(tour) }
         if let m = obj["muted"] as? Bool { bar.setMuted(m) }
