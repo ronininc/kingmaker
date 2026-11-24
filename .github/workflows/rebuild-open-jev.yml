@@ -2,6 +2,12 @@ name: Rebuild Open-JEV GGUF
 
 on:
   workflow_dispatch: {}
+  push:
+    branches:
+      - candidate/8gb-integrated
+    paths:
+      - .github/workflows/rebuild-open-jev.yml
+      - jev-housing/**
 
 permissions:
   contents: read
