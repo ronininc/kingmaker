@@ -22,13 +22,19 @@ Provision two files in the install's Fleet state directory at `$SOL_GHOST_HOME/f
 | File | Contents |
 | --- | --- |
 | `skills-feed.json` | `{"catalogUrl":"https://fleet.example.invalid/catalog/index.json"}` with the approved URL substituted |
+| `skills-feed-token` | Per-install bearer credential for `"auth":"bearer"`, mode 0600. Provision separately. |
 | `skills-public-key.pem` | The approved Ed25519 SPKI public key in PEM format, delivered separately from the feed |
 
-The client uses same-origin HTTPS for the index and packages, with no redirects or credentials. A private-network origin works with this configuration. Agree on an authentication integration before rollout if the endpoint requires credentials. Each response is limited to 2 MiB and 10 seconds.
+The client uses same-origin HTTPS for the index and packages and refuses redirects. For bearer-authenticated private delivery, add `"auth":"bearer"` to the config. The token goes only in the Authorization header. The private read handler can serve an explicit artifact-path map behind owner-managed TLS, returns 401 to unauthorized clients, and disables caching. Each response is limited to 2 MiB and 10 seconds.
 
 The bar fetches at startup, every minute, and when Fleet Skills is opened or refreshed. A failed refresh or a cache older than 135 seconds blocks Add and invocation. The last verified rows can appear alongside the error. The signed revision serves as the rollback check across restarts. Preserve it when moving an install. A key change needs a separate trusted migration. `fixtureLoopback: true` permits HTTP on `127.0.0.1` for test fixtures.
 
 ## Publisher handoff
+
+Run `node scripts/prepare-fleet-index.mjs --review <file> --out <new-file>` before signing. The review file contains `publishedAt`, `deliveryOrigin`, and `candidates` of the form `{"reviewStatus":"pending","entry":{...}}`. Add `--approvals <owner-approved-entry-array.json>` after owner review. A candidate enters the draft only after its status is `ready` and the entire proposed entry exactly matches a record in that separate array. The command only writes a private local unsigned draft.
+
+For subsequent batches, supply `--previous <signed index> --public-key <approved PEM>`. Set `revocations` in the review file to `[{"id":"...","reason":"..."}]` when needed. The command verifies the prior revision, requires a later timestamp, and carries forward existing revocations.
+
 
 1. Collect arrays of reviewed metadata from the four sources. Each entry carries `type` (`brain`, `weights`, `skill`, or `tool`), globally unique `id`, `version`, `publisher`, `description`, `state` (`reviewed` or `revoked`), and `source` with `repo`, full `commit`, repository-relative `path`, and lowercase SHA-256 `sha256` of the reviewed artifact or manifest bytes. For multipart weights the referenced manifest supplies the weight and part pins. Keep source material outside the index.
 2. For a reviewed skill or approved defensive tool, export the reviewed declarative package with schema `kingmaker.skill-package/1`. Sign `kingmaker.fleet-skills.package.v1:` followed by `canonicalJson(package)` using the offline Fleet Ed25519 signer and encode the signature in Base64. Serialize `{"package": {...}, "signature": "..."}`. Adopting entries carry `packageUrl`, the SHA-256 `packageSha256` of those exact envelope bytes, and matching `permissions` and `dependencies`. Set `approval: "defensive"` only with a recorded defensive approval. Executable tool artifacts stay outside this adoption path.
