@@ -1,10 +1,16 @@
 # Streaming, memory and external drives
 
-What `lib/brain-library-access.mjs` does after the 2026-11-11 change, what was measured, and what is still open. It answers the owner's review of the installed 4.4.6 build (`kingmaker_streaming_review.md`).
+Kingmaker uses multipart downloads for model weights and bounded range reads for library content. The measurements below cover the bounded reads in `lib/brain-library-access.mjs`.
 
-## Is the streaming layer live?
+## Model weights on 8 GB
 
-**Not in this repository.** Nothing in the running app's code calls `createBrainLibraryAccess`, `streamingReadText` or `readKnowledgeStreamed`: the only callers are `test/brain-library-access.test.mjs`, and `lib/brain-library-fetch.mjs` imports one constant. The library is built and tested but not wired into a live path. Wiring it in is a separate change and has not been made.
+When an Auto turn reaches local text work on an 8 GB Mac, Kingmaker uses the measured median `huihui_ai/qwen3-abliterated:1.7b`. It checks the Brain Library catalog pins and can reuse an Ollama weight blob on the card once its SHA-256 matches. An explicit model pin keeps its existing path.
+
+When the card needs the median, Kingmaker downloads the selected release's parts to staging on the card. It checks each part's byte count and SHA-256, assembles the GGUF, and checks its complete SHA-256 before registering it with the card's Ollama. Registration uses the verified file and the release's Modelfile. Ollama loads the complete model file when the turn needs it. This is download, assemble, then load.
+
+The assembled file lives in `<card>/models/library/<slug>/<sha256>/`. Manual `kingmaker models library pull <tag>` uses the same card destination for republished task weights. A missing card or missing model pins are reported before any release part is written. Above 8 GB, the library still assembles into `<state>/models/library/<slug>/`. The Open-JEV path stays internal.
+
+The on-demand checks use a disposable card directory and a local HTTP server. They cover the delivery and registration request. Physical card and real-model load measurements are in [8 GB class layout](8GB-CLASS-LAYOUT.md).
 
 ## The controls, kept separate
 
