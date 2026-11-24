@@ -22,7 +22,7 @@ const have = (bin) => { try { execFileSync('/usr/bin/which', [bin], { stdio: 'ig
 const ready = process.platform === 'darwin' && existsSync(VENDOR) && existsSync(WHISPER) && existsSync(MODEL) && have('say') && have('afconvert');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-test('talk-back: Mia speaks and the fake browser peer receives her audio', { skip: existsSync(VENDOR) ? false : 'vendored webrtc not available' }, async () => {
+test('talk-back: Mia speaks and the fake browser peer receives her audio', { skip: process.platform !== 'darwin' ? 'macOS audio/WebRTC acceptance lane' : existsSync(VENDOR) ? false : 'vendored webrtc not available' }, async () => {
   const { RTCPeerConnection, MediaStreamTrack, OpusScript } = await loadWebrtc();
   const browser = new RTCPeerConnection({ iceServers: [] });
   const dec = new OpusScript(48000, 1, OpusScript.Application.AUDIO, { wasm: false });

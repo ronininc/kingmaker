@@ -150,7 +150,7 @@ test('--this-mac reads the installId and device hash from the install certificat
   assert.deepEqual([claims.installId, claims.deviceSha256], [INSTALL, DEVICE]);
 });
 
-test('--this-mac on a Mac with no install certificate falls back to owner-<hostname> and the installer\'s device hash, and says so', async () => {
+test('--this-mac on a Mac with no install certificate falls back to owner-<hostname> and the installer\'s device hash, and says so', { skip: process.arch !== 'arm64' && 'fixture add-on is pinned to arm64' }, async () => {
   const notFound = () => { throw Object.assign(new Error('The specified item could not be found in the keychain.'), { status: 44 }); };
   const ioreg = '| |   "IOPlatformUUID" = "ABCD-1234"\n';
   const want = createHash('sha256').update('ABCD-1234\n').digest('hex');
@@ -284,7 +284,7 @@ async function flow(over = {}, ioOver = {}) {
 }
 const engine = (r, args) => spawnSync(join(r.app, 'Contents/Resources/sol-ghost/bin/kingmaker'), args, { encoding: 'utf8', env: { ...process.env, SOL_GHOST_HOME: r.state, KM_TEST_CERT_PUB: certPub, KM_TEST_RELEASE_PUB: releasePub } });
 
-test('owner flow: builds, signs, mints this Mac\'s entitlement and installs with the installed app\'s own engine; re-running works; secrets are never printed', async () => {
+test('owner flow: builds, signs, mints this Mac\'s entitlement and installs with the installed app\'s own engine; re-running works; secrets are never printed', { skip: process.arch !== 'arm64' && 'fixture add-on is pinned to arm64' }, async () => {
   const r = await flow();
   assert.equal(r.code, 0, `${r.say}\n${r.err}`);
   assert.match(r.say, /1\/5 Built ronin-office/); assert.match(r.say, /2\/5 Signed/); assert.match(r.say, /3\/5 Staged/); assert.match(r.say, /4\/5 Minted addon\.ronin-office for install /); assert.match(r.say, /5\/5 Installed .*installed ronin-office/s);

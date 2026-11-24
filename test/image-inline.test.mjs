@@ -17,7 +17,7 @@ test('in the bar, a finished picture goes into the chat; only a terminal opens P
   assert.match(swift, /else if l\[0\] == "Image" \{ appendImage\(l\[1\]\) \}/, 'a reopened chat shows its pictures again');
 });
 
-test('inlineImage: fits the chat, never grows, links its file, refuses what is not a picture', { timeout: 180_000 }, (t) => {
+test('inlineImage: fits the chat, never grows, links its file, refuses what is not a picture', { skip: process.platform !== 'darwin' && 'AppKit is a macOS framework', timeout: 180_000 }, (t) => {
   const swift = readFileSync(at('app/Kingmaker.swift'), 'utf8');
   const fn = /\/\/ BEGIN inlineImage[^\n]*\n([\s\S]*?)\/\/ END inlineImage/.exec(swift)?.[1];
   assert.ok(fn, 'inlineImage is marked');

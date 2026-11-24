@@ -76,7 +76,7 @@ test('the packet this Mac builds: the engine\'s own sanitizer; a random install 
   const { packet: p } = sanitizeForFleet(fleetDraft({ id, version: '0.9.0', totalMemBytes: 8 * 1024 ** 3,
     preferences: [{ statement: 'Always give me the price first' }, { statement: 'email maria@acme.com every Monday' }] }));
   assert.equal(validatePacket(p).ok, true);
-  assert.equal(p.deviceClass, 'darwin-arm64-8gb');
+  assert.equal(p.deviceClass, `${process.platform}-${process.arch}-8gb`);
   assert.doesNotMatch(JSON.stringify(p), /maria|acme|monday|price first/i, 'no preference words travel');
   assert.match(describePacket(p), /price first always ×1/);
 });

@@ -26,6 +26,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci --ignore-scripts
+      - name: Install deterministic media test dependency
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - name: Run deterministic test shard
         env:
           KINGMAKER_TEST_SHARD: ${{ matrix.shard }}
