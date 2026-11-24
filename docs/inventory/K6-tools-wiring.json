@@ -1,0 +1,3257 @@
+{
+ "generated": "2026-11-24",
+ "branch": "kingmaker-joint",
+ "base": "b44cea4",
+ "rule": "WIRED = registered with the tool-calling layer with name, purpose and parameter schema",
+ "registeredMcpTools": [
+  "kingmaker_turn",
+  "kingmaker_build",
+  "kingmaker_research",
+  "kingmaker_merchant_dryrun",
+  "kingmaker_fabricate",
+  "kingmaker_twins",
+  "kingmaker_pending",
+  "kingmaker_cancel",
+  "kingmaker_status",
+  "device_capabilities",
+  "artcraft_status",
+  "artcraft_request",
+  "see-phone-screen",
+  "tap-phone",
+  "type-on-phone",
+  "press-phone-button",
+  "swipe-phone",
+  "open-phone-app",
+  "call-from-phone",
+  "send-imessage-to-contact",
+  "phone-bridge-status",
+  "ingest-browser-capture",
+  "ingest-site-crawl",
+  "ingest-youtube-transcript",
+  "ingest-voice-transcribe",
+  "voice-synthesize"
+ ],
+ "toolsIndex": [
+  {
+   "tool": "blender",
+   "version": "4.5",
+   "platform": "linux-x64",
+   "payloadStatus": "declared-not-staged",
+   "state": "NOT WIRED"
+  },
+  {
+   "tool": "blender",
+   "version": "4.5",
+   "platform": "macos-arm64",
+   "payloadStatus": "declared-not-staged",
+   "state": "NOT WIRED"
+  },
+  {
+   "tool": "blender",
+   "version": "4.5",
+   "platform": "windows-x64",
+   "payloadStatus": "declared-not-staged",
+   "state": "NOT WIRED"
+  },
+  {
+   "tool": "kali-bench",
+   "version": "1.0.0",
+   "platform": "linux-arm64",
+   "payloadStatus": "staged",
+   "state": "NOT WIRED"
+  },
+  {
+   "tool": "langcheck",
+   "version": "1.0.0",
+   "platform": "linux-arm64",
+   "payloadStatus": "declared-not-staged",
+   "state": "NOT WIRED"
+  },
+  {
+   "tool": "langcheck",
+   "version": "1.0.0",
+   "platform": "linux-x64",
+   "payloadStatus": "declared-not-staged",
+   "state": "NOT WIRED"
+  },
+  {
+   "tool": "langcheck",
+   "version": "1.0.0",
+   "platform": "macos-arm64",
+   "payloadStatus": "declared-not-staged",
+   "state": "NOT WIRED"
+  },
+  {
+   "tool": "opencode",
+   "version": "1.19.5",
+   "platform": "linux-arm64",
+   "payloadStatus": "staged",
+   "state": "NOT WIRED"
+  },
+  {
+   "tool": "opencode",
+   "version": "1.19.5",
+   "platform": "linux-x64",
+   "payloadStatus": "staged",
+   "state": "NOT WIRED"
+  },
+  {
+   "tool": "opencode",
+   "version": "1.19.5",
+   "platform": "macos-arm64",
+   "payloadStatus": "staged",
+   "state": "NOT WIRED"
+  },
+  {
+   "tool": "opencode",
+   "version": "1.19.5",
+   "platform": "macos-x64",
+   "payloadStatus": "declared-not-staged",
+   "state": "NOT WIRED"
+  },
+  {
+   "tool": "opencode",
+   "version": "1.19.5",
+   "platform": "windows-arm64",
+   "payloadStatus": "declared-not-staged",
+   "state": "NOT WIRED"
+  },
+  {
+   "tool": "opencode",
+   "version": "1.19.5",
+   "platform": "windows-x64",
+   "payloadStatus": "staged",
+   "state": "NOT WIRED"
+  }
+ ],
+ "skills": [
+  {
+   "skill": "aaa-modeling",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/aaa-modeling/LICENSE",
+    "core/skills/aaa-modeling/SKILL.md",
+    "core/skills/aaa-modeling/SOURCE.md",
+    "core/skills/aaa-modeling/VENDORED.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "agent-self-scheduling",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/agent-self-scheduling/LICENSE",
+    "core/skills/agent-self-scheduling/SKILL.md",
+    "core/skills/agent-self-scheduling/SOURCE.md",
+    "core/skills/agent-self-scheduling/VENDORED.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "ai-search-ranking",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/ai-search-ranking/LICENSE",
+    "core/skills/ai-search-ranking/SKILL.md",
+    "core/skills/ai-search-ranking/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "algo-trading",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/algo-trading/LICENSE",
+    "core/skills/algo-trading/SKILL.md",
+    "core/skills/algo-trading/SOURCE.md",
+    "core/skills/algo-trading/VENDORED.md",
+    "core/skills/algo-trading/_scores.json"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "algorithmic-art",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/algorithmic-art/LICENSE",
+    "core/skills/algorithmic-art/SKILL.md",
+    "core/skills/algorithmic-art/SOURCE.md",
+    "core/skills/algorithmic-art/templates/generator_template.js",
+    "core/skills/algorithmic-art/templates/viewer.html"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "app-remake-belt",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/app-remake-belt/LICENSE",
+    "core/skills/app-remake-belt/SKILL.md",
+    "core/skills/app-remake-belt/SOURCE.md",
+    "core/skills/app-remake-belt/references/kingmaker-wiring.md",
+    "core/skills/app-remake-belt/references/openart-demo-run/behavior-spec.md",
+    "core/skills/app-remake-belt/references/openart-demo-run/review-gaps.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "axis-projection",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/axis-projection/LICENSE",
+    "core/skills/axis-projection/SKILL.md",
+    "core/skills/axis-projection/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "big-box-store",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/big-box-store/LICENSE",
+    "core/skills/big-box-store/SKILL.md",
+    "core/skills/big-box-store/SOURCE.md",
+    "core/skills/big-box-store/assets/catalogue-ui.html",
+    "core/skills/big-box-store/assets/parse-export.py",
+    "core/skills/big-box-store/assets/product-frames.js",
+    "core/skills/big-box-store/assets/rollout-intro.html",
+    "core/skills/big-box-store/references/generated-frames.md",
+    "core/skills/big-box-store/references/pos-export-parsing.md",
+    "core/skills/big-box-store/references/rollout-animation.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "blender-3d-asset-generation",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/blender-3d-asset-generation/LICENSE",
+    "core/skills/blender-3d-asset-generation/SKILL.md",
+    "core/skills/blender-3d-asset-generation/SOURCE.md",
+    "core/skills/blender-3d-asset-generation/VENDORED.md",
+    "core/skills/blender-3d-asset-generation/agents/openai.yaml",
+    "core/skills/blender-3d-asset-generation/assets/icon.svg",
+    "core/skills/blender-3d-asset-generation/references/automation-and-qa.md",
+    "core/skills/blender-3d-asset-generation/references/blender-core.md",
+    "core/skills/blender-3d-asset-generation/references/game-ready-assets.md",
+    "core/skills/blender-3d-asset-generation/references/official-blender-sources.md",
+    "core/skills/blender-3d-asset-generation/scripts/audit_blender_asset.py"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "business-name-fit",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/business-name-fit/LICENSE",
+    "core/skills/business-name-fit/SKILL.md",
+    "core/skills/business-name-fit/SOURCE.md",
+    "core/skills/business-name-fit/references/naming-research.md",
+    "core/skills/business-name-fit/references/worked-examples.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "business-profile-recon",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/business-profile-recon/LICENSE",
+    "core/skills/business-profile-recon/SKILL.md",
+    "core/skills/business-profile-recon/SOURCE.md",
+    "core/skills/business-profile-recon/references/sources.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "claude-code-skillforge",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S",
+    "N=2"
+   ],
+   "license": "MIT",
+   "rea": "sandboxed",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/claude-code-skillforge/LICENSE",
+    "core/skills/claude-code-skillforge/README.md",
+    "core/skills/claude-code-skillforge/SKILL.md",
+    "core/skills/claude-code-skillforge/SOURCE.md",
+    "core/skills/claude-code-skillforge/VENDORED.md",
+    "core/skills/claude-code-skillforge/VERSION",
+    "core/skills/claude-code-skillforge/evaluations/eval-advanced-skill.json",
+    "core/skills/claude-code-skillforge/evaluations/eval-scan-mode.json",
+    "core/skills/claude-code-skillforge/evaluations/eval-simple-skill.json",
+    "core/skills/claude-code-skillforge/evaluations/eval-skill-with-scripts.json",
+    "core/skills/claude-code-skillforge/evaluations/eval-upgrade-mode.json",
+    "core/skills/claude-code-skillforge/examples/auditing-seo/SKILL.md",
+    "core/skills/claude-code-skillforge/examples/formatting-commits/SKILL.md",
+    "core/skills/claude-code-skillforge/examples/sample-scan-report.md",
+    "core/skills/claude-code-skillforge/examples/sample-upgrade-report.md",
+    "core/skills/claude-code-skillforge/skill.json"
+   ],
+   "nestedSkillFilesNotListed": [
+    "core/skills/claude-code-skillforge/examples/auditing-seo/SKILL.md",
+    "core/skills/claude-code-skillforge/examples/formatting-commits/SKILL.md"
+   ]
+  },
+  {
+   "skill": "cli-anything",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/cli-anything/LICENSE",
+    "core/skills/cli-anything/SKILL.md",
+    "core/skills/cli-anything/SOURCE.md",
+    "core/skills/cli-anything/references/HARNESS.md",
+    "core/skills/cli-anything/references/commands/cli-anything.md",
+    "core/skills/cli-anything/references/commands/list.md",
+    "core/skills/cli-anything/references/commands/refine.md",
+    "core/skills/cli-anything/references/commands/test.md",
+    "core/skills/cli-anything/references/commands/validate.md",
+    "core/skills/cli-anything/references/docs/PREVIEW_PROTOCOL.md",
+    "core/skills/cli-anything/references/guides/auto-save-dry-run.md",
+    "core/skills/cli-anything/references/guides/filter-translation.md",
+    "core/skills/cli-anything/references/guides/mcp-backend.md",
+    "core/skills/cli-anything/references/guides/preview-methodology.md",
+    "core/skills/cli-anything/references/guides/pypi-publishing.md",
+    "core/skills/cli-anything/references/guides/session-locking.md",
+    "core/skills/cli-anything/references/guides/skill-generation.md",
+    "core/skills/cli-anything/references/guides/timecode-precision.md",
+    "core/skills/cli-anything/scripts/preview_bundle.py",
+    "core/skills/cli-anything/scripts/repl_skin.py",
+    "core/skills/cli-anything/scripts/skill_generator.py",
+    "core/skills/cli-anything/scripts/templates/SKILL.md.template"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "cli-anything-blender",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/cli-anything-blender/LICENSE",
+    "core/skills/cli-anything-blender/SKILL.md",
+    "core/skills/cli-anything-blender/SOURCE.md",
+    "core/skills/cli-anything-blender/VENDORED.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "cli-anything-comfyui",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/cli-anything-comfyui/LICENSE",
+    "core/skills/cli-anything-comfyui/SKILL.md",
+    "core/skills/cli-anything-comfyui/SOURCE.md",
+    "core/skills/cli-anything-comfyui/VENDORED.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "cli-anything-freecad",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/cli-anything-freecad/LICENSE",
+    "core/skills/cli-anything-freecad/SKILL.md",
+    "core/skills/cli-anything-freecad/SOURCE.md",
+    "core/skills/cli-anything-freecad/VENDORED.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "cli-anything-godot",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/cli-anything-godot/LICENSE",
+    "core/skills/cli-anything-godot/SKILL.md",
+    "core/skills/cli-anything-godot/SOURCE.md",
+    "core/skills/cli-anything-godot/VENDORED.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "cli-anything-hermes",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/cli-anything-hermes/LICENSE",
+    "core/skills/cli-anything-hermes/SKILL.md",
+    "core/skills/cli-anything-hermes/SOURCE.md",
+    "core/skills/cli-anything-hermes/VENDORED.md",
+    "core/skills/cli-anything-hermes/agents/hermes.yaml",
+    "core/skills/cli-anything-hermes/scripts/install.ps1",
+    "core/skills/cli-anything-hermes/scripts/install.sh"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "cli-hub-meta-skill",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/cli-hub-meta-skill/LICENSE",
+    "core/skills/cli-hub-meta-skill/SKILL.md",
+    "core/skills/cli-hub-meta-skill/SOURCE.md",
+    "core/skills/cli-hub-meta-skill/VENDORED.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "clone",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S",
+    "N=3"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/clone/LICENSE",
+    "core/skills/clone/SKILL.md",
+    "core/skills/clone/SOURCE.md",
+    "core/skills/clone/references/cli-anything/LICENSE",
+    "core/skills/clone/references/cli-anything/SKILL.md",
+    "core/skills/clone/references/cli-anything/SOURCE.md",
+    "core/skills/clone/references/cli-anything/references/HARNESS.md",
+    "core/skills/clone/references/cli-anything/references/commands/cli-anything.md",
+    "core/skills/clone/references/cli-anything/references/commands/list.md",
+    "core/skills/clone/references/cli-anything/references/commands/refine.md",
+    "core/skills/clone/references/cli-anything/references/commands/test.md",
+    "core/skills/clone/references/cli-anything/references/commands/validate.md",
+    "core/skills/clone/references/cli-anything/references/docs/PREVIEW_PROTOCOL.md",
+    "core/skills/clone/references/cli-anything/references/guides/auto-save-dry-run.md",
+    "core/skills/clone/references/cli-anything/references/guides/filter-translation.md",
+    "core/skills/clone/references/cli-anything/references/guides/mcp-backend.md",
+    "core/skills/clone/references/cli-anything/references/guides/preview-methodology.md",
+    "core/skills/clone/references/cli-anything/references/guides/pypi-publishing.md",
+    "core/skills/clone/references/cli-anything/references/guides/session-locking.md",
+    "core/skills/clone/references/cli-anything/references/guides/skill-generation.md",
+    "core/skills/clone/references/cli-anything/references/guides/timecode-precision.md",
+    "core/skills/clone/references/cli-anything/scripts/preview_bundle.py",
+    "core/skills/clone/references/cli-anything/scripts/repl_skin.py",
+    "core/skills/clone/references/cli-anything/scripts/skill_generator.py",
+    "core/skills/clone/references/cli-anything/scripts/templates/SKILL.md.template",
+    "core/skills/clone/references/graphify/LICENSE",
+    "core/skills/clone/references/graphify/SKILL.md",
+    "core/skills/clone/references/graphify/SOURCE.md",
+    "core/skills/clone/references/graphify/references/add-watch.md",
+    "core/skills/clone/references/graphify/references/exports.md",
+    "core/skills/clone/references/graphify/references/extraction-spec.md",
+    "core/skills/clone/references/graphify/references/github-and-merge.md",
+    "core/skills/clone/references/graphify/references/hooks.md",
+    "core/skills/clone/references/graphify/references/query.md",
+    "core/skills/clone/references/graphify/references/transcribe.md",
+    "core/skills/clone/references/graphify/references/update.md",
+    "core/skills/clone/references/reverse-engineer-anything/LICENSE",
+    "core/skills/clone/references/reverse-engineer-anything/SKILL.md",
+    "core/skills/clone/references/reverse-engineer-anything/SOURCE.md",
+    "core/skills/clone/references/reverse-engineer-anything/references/android-applications.md",
+    "core/skills/clone/references/reverse-engineer-anything/references/connection-and-recovery.md",
+    "core/skills/clone/references/reverse-engineer-anything/references/evidence-workflows.md",
+    "core/skills/clone/references/reverse-engineer-anything/references/javascript-applications.md",
+    "core/skills/clone/references/reverse-engineer-anything/references/native-and-artifacts.md",
+    "core/skills/clone/references/reverse-engineer-anything/references/runtime-observation.md",
+    "core/skills/clone/references/tools.md"
+   ],
+   "nestedSkillFilesNotListed": [
+    "core/skills/clone/references/cli-anything/SKILL.md",
+    "core/skills/clone/references/graphify/SKILL.md",
+    "core/skills/clone/references/reverse-engineer-anything/SKILL.md"
+   ]
+  },
+  {
+   "skill": "cloudflare-ordering-worker",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/cloudflare-ordering-worker/LICENSE",
+    "core/skills/cloudflare-ordering-worker/SKILL.md",
+    "core/skills/cloudflare-ordering-worker/SOURCE.md",
+    "core/skills/cloudflare-ordering-worker/assets/menu.example.json",
+    "core/skills/cloudflare-ordering-worker/assets/order-client.js",
+    "core/skills/cloudflare-ordering-worker/assets/worker.js",
+    "core/skills/cloudflare-ordering-worker/assets/wrangler.toml",
+    "core/skills/cloudflare-ordering-worker/references/notifications.md",
+    "core/skills/cloudflare-ordering-worker/references/providers.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "clover-operations-command",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/clover-operations-command/LICENSE",
+    "core/skills/clover-operations-command/README.md",
+    "core/skills/clover-operations-command/SKILL.md",
+    "core/skills/clover-operations-command/SOURCE.md",
+    "core/skills/clover-operations-command/mcp-server/Dockerfile",
+    "core/skills/clover-operations-command/mcp-server/README.md",
+    "core/skills/clover-operations-command/mcp-server/merchant_registry.example.json",
+    "core/skills/clover-operations-command/mcp-server/pyproject.toml",
+    "core/skills/clover-operations-command/mcp-server/src/clover_mcp/__init__.py",
+    "core/skills/clover-operations-command/mcp-server/src/clover_mcp/clover_client.py",
+    "core/skills/clover-operations-command/mcp-server/src/clover_mcp/config.py",
+    "core/skills/clover-operations-command/mcp-server/src/clover_mcp/server.py",
+    "core/skills/clover-operations-command/mcp-server/tests/test_safety.py",
+    "core/skills/clover-operations-command/references/CLOVER_API_GUIDE.md",
+    "core/skills/clover-operations-command/references/OPERATIONS_POLICY.md",
+    "core/skills/clover-operations-command/references/TOOL_CONTRACTS.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "codex-handoff",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/codex-handoff/LICENSE",
+    "core/skills/codex-handoff/SKILL.md",
+    "core/skills/codex-handoff/SOURCE.md",
+    "core/skills/codex-handoff/references/codex-dialect.md",
+    "core/skills/codex-handoff/scripts/anchor.sh"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "coding-gen",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/coding-gen/LICENSE",
+    "core/skills/coding-gen/SKILL.md",
+    "core/skills/coding-gen/SOURCE.md",
+    "core/skills/coding-gen/references/interfaces.md",
+    "core/skills/coding-gen/scripts/verify-interfaces.sh"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "comfyui",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/comfyui/LICENSE",
+    "core/skills/comfyui/SKILL.md",
+    "core/skills/comfyui/SOURCE.md",
+    "core/skills/comfyui/VENDORED.md",
+    "core/skills/comfyui/references/official-cli.md",
+    "core/skills/comfyui/references/rest-api.md",
+    "core/skills/comfyui/references/template-integrity.md",
+    "core/skills/comfyui/references/workflow-format.md",
+    "core/skills/comfyui/scripts/_common.py",
+    "core/skills/comfyui/scripts/auto_fix_deps.py",
+    "core/skills/comfyui/scripts/check_deps.py",
+    "core/skills/comfyui/scripts/comfyui_setup.sh",
+    "core/skills/comfyui/scripts/extract_schema.py",
+    "core/skills/comfyui/scripts/fetch_logs.py",
+    "core/skills/comfyui/scripts/hardware_check.py",
+    "core/skills/comfyui/scripts/health_check.py",
+    "core/skills/comfyui/scripts/run_batch.py",
+    "core/skills/comfyui/scripts/run_workflow.py",
+    "core/skills/comfyui/scripts/ws_monitor.py",
+    "core/skills/comfyui/workflows/README.md",
+    "core/skills/comfyui/workflows/animatediff_video.json",
+    "core/skills/comfyui/workflows/flux_dev_txt2img.json",
+    "core/skills/comfyui/workflows/sd15_txt2img.json",
+    "core/skills/comfyui/workflows/sdxl_img2img.json",
+    "core/skills/comfyui/workflows/sdxl_inpaint.json",
+    "core/skills/comfyui/workflows/sdxl_txt2img.json",
+    "core/skills/comfyui/workflows/upscale_4x.json",
+    "core/skills/comfyui/workflows/wan_video_t2v.json"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "contract-and-proposal-writer",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/contract-and-proposal-writer/LICENSE",
+    "core/skills/contract-and-proposal-writer/SKILL.md",
+    "core/skills/contract-and-proposal-writer/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "copy-editing",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/copy-editing/LICENSE",
+    "core/skills/copy-editing/SKILL.md",
+    "core/skills/copy-editing/SOURCE.md",
+    "core/skills/copy-editing/references/checklist.md",
+    "core/skills/copy-editing/references/content-refresh.md",
+    "core/skills/copy-editing/references/plain-english-alternatives.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "copywriting",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/copywriting/LICENSE",
+    "core/skills/copywriting/SKILL.md",
+    "core/skills/copywriting/SOURCE.md",
+    "core/skills/copywriting/references/ai-tells.md",
+    "core/skills/copywriting/references/copy-frameworks.md",
+    "core/skills/copywriting/references/natural-transitions.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "create-skill-gen",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/create-skill-gen/LICENSE",
+    "core/skills/create-skill-gen/SKILL.md",
+    "core/skills/create-skill-gen/SOURCE.md",
+    "core/skills/create-skill-gen/references/interfaces.md",
+    "core/skills/create-skill-gen/scripts/verify-interfaces.sh"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "custom-tool-builder",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/custom-tool-builder/LICENSE",
+    "core/skills/custom-tool-builder/SKILL.md",
+    "core/skills/custom-tool-builder/SOURCE.md",
+    "core/skills/custom-tool-builder/references/interfaces.md",
+    "core/skills/custom-tool-builder/scripts/verify-interfaces.sh"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "customer-research",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/customer-research/LICENSE",
+    "core/skills/customer-research/SKILL.md",
+    "core/skills/customer-research/SOURCE.md",
+    "core/skills/customer-research/references/interviews-and-surveys.md",
+    "core/skills/customer-research/references/source-guides.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "dagster-expert",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S",
+    "D"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/dagster-expert/LICENSE",
+    "core/skills/dagster-expert/SKILL.md",
+    "core/skills/dagster-expert/SOURCE.md",
+    "core/skills/dagster-expert/VENDORED.md",
+    "core/skills/dagster-expert/references/asset-selection.md",
+    "core/skills/dagster-expert/references/assets/INDEX.md",
+    "core/skills/dagster-expert/references/assets/advanced-patterns.md",
+    "core/skills/dagster-expert/references/assets/definition-metadata.md",
+    "core/skills/dagster-expert/references/assets/dependencies.md",
+    "core/skills/dagster-expert/references/automation/choosing-automation.md",
+    "core/skills/dagster-expert/references/automation/declarative-automation/INDEX.md",
+    "core/skills/dagster-expert/references/automation/declarative-automation/advanced.md",
+    "core/skills/dagster-expert/references/automation/declarative-automation/core-concepts.md",
+    "core/skills/dagster-expert/references/automation/declarative-automation/customization.md",
+    "core/skills/dagster-expert/references/automation/declarative-automation/operands.md",
+    "core/skills/dagster-expert/references/automation/declarative-automation/operators.md",
+    "core/skills/dagster-expert/references/automation/schedules.md",
+    "core/skills/dagster-expert/references/automation/sensors/asset-sensors.md",
+    "core/skills/dagster-expert/references/automation/sensors/basic-sensors.md",
+    "core/skills/dagster-expert/references/automation/sensors/run-status-sensors.md",
+    "core/skills/dagster-expert/references/cli/api/INDEX.md",
+    "core/skills/dagster-expert/references/cli/api/agent/INDEX.md",
+    "core/skills/dagster-expert/references/cli/api/agent/get.md",
+    "core/skills/dagster-expert/references/cli/api/agent/list.md",
+    "core/skills/dagster-expert/references/cli/api/alert-policy/INDEX.md",
+    "core/skills/dagster-expert/references/cli/api/alert-policy/list.md",
+    "core/skills/dagster-expert/references/cli/api/alert-policy/sync.md",
+    "core/skills/dagster-expert/references/cli/api/artifact/INDEX.md",
+    "core/skills/dagster-expert/references/cli/api/artifact/download.md",
+    "core/skills/dagster-expert/references/cli/api/artifact/upload.md",
+    "core/skills/dagster-expert/references/cli/api/asset-check.md",
+    "core/skills/dagster-expert/references/cli/api/asset/INDEX.md",
+    "core/skills/dagster-expert/references/cli/api/asset/get-evaluations.md",
+    "core/skills/dagster-expert/references/cli/api/asset/get-events.md",
+    "core/skills/dagster-expert/references/cli/api/asset/get-health.md",
+    "core/skills/dagster-expert/references/cli/api/asset/get-partition-status.md",
+    "core/skills/dagster-expert/references/cli/api/asset/get.md",
+    "core/skills/dagster-expert/references/cli/api/asset/list.md",
+    "core/skills/dagster-expert/references/cli/api/code-location/INDEX.md",
+    "core/skills/dagster-expert/references/cli/api/code-location/add.md",
+    "core/skills/dagster-expert/references/cli/api/code-location/delete.md",
+    "core/skills/dagster-expert/references/cli/api/code-location/get.md",
+    "core/skills/dagster-expert/references/cli/api/code-location/list.md",
+    "core/skills/dagster-expert/references/cli/api/deployment/INDEX.md",
+    "core/skills/dagster-expert/references/cli/api/deployment/delete.md",
+    "core/skills/dagster-expert/references/cli/api/deployment/get.md",
+    "core/skills/dagster-expert/references/cli/api/deployment/list.md",
+    "core/skills/dagster-expert/references/cli/api/deployment/settings-get.md",
+    "core/skills/dagster-expert/references/cli/api/deployment/settings-set.md",
+    "core/skills/dagster-expert/references/cli/api/general.md",
+    "core/skills/dagster-expert/references/cli/api/insights.md",
+    "core/skills/dagster-expert/references/cli/api/issue/INDEX.md",
+    "core/skills/dagster-expert/references/cli/api/job.md",
+    "core/skills/dagster-expert/references/cli/api/organization/INDEX.md",
+    "core/skills/dagster-expert/references/cli/api/organization/saml-remove.md",
+    "core/skills/dagster-expert/references/cli/api/organization/saml-upload.md",
+    "core/skills/dagster-expert/references/cli/api/organization/settings-get.md",
+    "core/skills/dagster-expert/references/cli/api/organization/settings-set.md",
+    "core/skills/dagster-expert/references/cli/api/run/INDEX.md",
+    "core/skills/dagster-expert/references/cli/api/run/get-events.md",
+    "core/skills/dagster-expert/references/cli/api/run/get-logs.md",
+    "core/skills/dagster-expert/references/cli/api/run/get.md",
+    "core/skills/dagster-expert/references/cli/api/run/launch.md",
+    "core/skills/dagster-expert/references/cli/api/run/list.md",
+    "core/skills/dagster-expert/references/cli/api/schedule/INDEX.md",
+    "core/skills/dagster-expert/references/cli/api/schedule/get-ticks.md",
+    "core/skills/dagster-expert/references/cli/api/schedule/get.md",
+    "core/skills/dagster-expert/references/cli/api/schedule/list.md",
+    "core/skills/dagster-expert/references/cli/api/secret/INDEX.md",
+    "core/skills/dagster-expert/references/cli/api/secret/get.md",
+    "core/skills/dagster-expert/references/cli/api/secret/list.md",
+    "core/skills/dagster-expert/references/cli/api/sensor/INDEX.md",
+    "core/skills/dagster-expert/references/cli/api/sensor/get-ticks.md",
+    "core/skills/dagster-expert/references/cli/api/sensor/get.md",
+    "core/skills/dagster-expert/references/cli/api/sensor/list.md",
+    "core/skills/dagster-expert/references/cli/check.md",
+    "core/skills/dagster-expert/references/cli/create-dagster.md",
+    "core/skills/dagster-expert/references/cli/dev.md",
+    "core/skills/dagster-expert/references/cli/launch.md",
+    "core/skills/dagster-expert/references/cli/list-components.md",
+    "core/skills/dagster-expert/references/cli/list-defs.md",
+    "core/skills/dagster-expert/references/cli/list/INDEX.md",
+    "core/skills/dagster-expert/references/cli/list/component-tree.md",
+    "core/skills/dagster-expert/references/cli/list/envs.md",
+    "core/skills/dagster-expert/references/cli/list/projects.md",
+    "core/skills/dagster-expert/references/cli/plus/INDEX.md",
+    "core/skills/dagster-expert/references/cli/plus/config/set.md",
+    "core/skills/dagster-expert/references/cli/plus/config/view.md",
+    "core/skills/dagster-expert/references/cli/plus/create/ci-api-token.md",
+    "core/skills/dagster-expert/references/cli/plus/deploy/configure.md",
+    "core/skills/dagster-expert/references/cli/plus/deploy/deploy.md",
+    "core/skills/dagster-expert/references/cli/plus/integrations/dbt.md",
+    "core/skills/dagster-expert/references/cli/plus/login.md",
+    "core/skills/dagster-expert/references/cli/plus/pull/env.md",
+    "core/skills/dagster-expert/references/cli/scaffold/component.md",
+    "core/skills/dagster-expert/references/cli/scaffold/defs.md",
+    "core/skills/dagster-expert/references/cli/utils/INDEX.md",
+    "core/skills/dagster-expert/references/cli/utils/inspect-component.md",
+    "core/skills/dagster-expert/references/cli/utils/refresh-defs-state.md",
+    "core/skills/dagster-expert/references/components/creating-components.md",
+    "core/skills/dagster-expert/references/components/designing-component-integrations.md",
+    "core/skills/dagster-expert/references/components/resolved-framework.md",
+    "core/skills/dagster-expert/references/components/state-backed/creating.md",
+    "core/skills/dagster-expert/references/components/state-backed/using.md",
+    "core/skills/dagster-expert/references/components/subclassing-components.md",
+    "core/skills/dagster-expert/references/components/template-variables.md",
+    "core/skills/dagster-expert/references/deployment/config-files.md",
+    "core/skills/dagster-expert/references/env-vars.md",
+    "core/skills/dagster-expert/references/integrations/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-airbyte/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-airlift/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-aws/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-azure/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-celery-docker/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-celery-k8s/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-celery/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-census/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-dask/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-databricks/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-datadog/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-datahub/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-dbt/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-dbt/asset-checks.md",
+    "core/skills/dagster-expert/references/integrations/dagster-dbt/component-based-integration.md",
+    "core/skills/dagster-expert/references/integrations/dagster-dbt/dbt-cloud.md",
+    "core/skills/dagster-expert/references/integrations/dagster-dbt/dependencies.md",
+    "core/skills/dagster-expert/references/integrations/dagster-dbt/pythonic-integration.md",
+    "core/skills/dagster-expert/references/integrations/dagster-dbt/scaffolding.md",
+    "core/skills/dagster-expert/references/integrations/dagster-deltalake-pandas/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-deltalake-polars/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-deltalake/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-dlt/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-docker/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-duckdb-pandas/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-duckdb-polars/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-duckdb-pyspark/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-duckdb/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-fivetran/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-gcp-pandas/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-gcp-pyspark/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-gcp/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-github/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-great-expectations/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-hightouch/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-iceberg/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-jupyter/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-k8s/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-looker/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-mlflow/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-msteams/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-mysql/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-omni/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-openai/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-pagerduty/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-pandas/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-pandera/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-papertrail/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-polars/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-polytomic/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-postgres/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-powerbi/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-prometheus/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-pyspark/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-sigma/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-slack/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-sling/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-snowflake-pandas/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-snowflake-polars/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-snowflake-pyspark/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-snowflake/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-spark/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-ssh/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-tableau/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-twilio/INDEX.md",
+    "core/skills/dagster-expert/references/integrations/dagster-wandb/INDEX.md",
+    "core/skills/dagster-expert/references/migration/INDEX.md",
+    "core/skills/dagster-expert/references/migration/sensors-to-declarative-automation.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "data-visualization",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/data-visualization/LICENSE",
+    "core/skills/data-visualization/SKILL.md",
+    "core/skills/data-visualization/SOURCE.md",
+    "core/skills/data-visualization/VENDORED.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "debugging-and-error-recovery",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/debugging-and-error-recovery/LICENSE",
+    "core/skills/debugging-and-error-recovery/SKILL.md",
+    "core/skills/debugging-and-error-recovery/SOURCE.md",
+    "core/skills/debugging-and-error-recovery/VENDORED.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "deep-research",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/deep-research/LICENSE",
+    "core/skills/deep-research/SKILL.md",
+    "core/skills/deep-research/SOURCE.md",
+    "core/skills/deep-research/VENDORED.md",
+    "core/skills/deep-research/references/docsgpt-concepts.md",
+    "core/skills/deep-research/references/real-estate-investment-analysis.md",
+    "core/skills/deep-research/references/skills-monetization.md",
+    "core/skills/deep-research/references/structured-evidence-format.md",
+    "core/skills/deep-research/references/validation-gates.md",
+    "core/skills/deep-research/scripts/research_validation.py"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "deepcamera",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S",
+    "N=24"
+   ],
+   "license": "MIT",
+   "rea": "sandboxed",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/deepcamera/LICENSE",
+    "core/skills/deepcamera/SKILL.md",
+    "core/skills/deepcamera/SOURCE.md",
+    "core/skills/deepcamera/UPSTREAM_ROOT_SKILL.md",
+    "core/skills/deepcamera/VENDORED.md",
+    "core/skills/deepcamera/skills/analysis/cloud-provider-regression/SKILL.md",
+    "core/skills/deepcamera/skills/analysis/cloud-provider-regression/config.yaml",
+    "core/skills/deepcamera/skills/analysis/cloud-provider-regression/scripts/run-regression.cjs",
+    "core/skills/deepcamera/skills/analysis/home-security-benchmark/README.md",
+    "core/skills/deepcamera/skills/analysis/home-security-benchmark/SKILL.md",
+    "core/skills/deepcamera/skills/analysis/home-security-benchmark/config.yaml",
+    "core/skills/deepcamera/skills/analysis/home-security-benchmark/fixtures/tool-use-scenarios.json",
+    "core/skills/deepcamera/skills/analysis/home-security-benchmark/package-lock.json",
+    "core/skills/deepcamera/skills/analysis/home-security-benchmark/package.json",
+    "core/skills/deepcamera/skills/analysis/home-security-benchmark/scripts/generate-report.cjs",
+    "core/skills/deepcamera/skills/analysis/home-security-benchmark/scripts/run-benchmark.cjs",
+    "core/skills/deepcamera/skills/analysis/home-security-benchmark/scripts/test-model-config.cjs",
+    "core/skills/deepcamera/skills/analysis/homesafe-bench/SKILL.md",
+    "core/skills/deepcamera/skills/analysis/homesafe-bench/config.yaml",
+    "core/skills/deepcamera/skills/analysis/homesafe-bench/deploy.bat",
+    "core/skills/deepcamera/skills/analysis/homesafe-bench/deploy.sh",
+    "core/skills/deepcamera/skills/analysis/homesafe-bench/fixtures/scenarios.json",
+    "core/skills/deepcamera/skills/analysis/homesafe-bench/package-lock.json",
+    "core/skills/deepcamera/skills/analysis/homesafe-bench/package.json",
+    "core/skills/deepcamera/skills/analysis/homesafe-bench/scripts/run-benchmark.cjs",
+    "core/skills/deepcamera/skills/analysis/smarthome-bench/SKILL.md",
+    "core/skills/deepcamera/skills/analysis/smarthome-bench/config.yaml",
+    "core/skills/deepcamera/skills/analysis/smarthome-bench/deploy.bat",
+    "core/skills/deepcamera/skills/analysis/smarthome-bench/deploy.sh",
+    "core/skills/deepcamera/skills/analysis/smarthome-bench/fixtures/annotations.json",
+    "core/skills/deepcamera/skills/analysis/smarthome-bench/package-lock.json",
+    "core/skills/deepcamera/skills/analysis/smarthome-bench/package.json",
+    "core/skills/deepcamera/skills/analysis/smarthome-bench/scripts/generate-report.cjs",
+    "core/skills/deepcamera/skills/analysis/smarthome-bench/scripts/run-benchmark.cjs",
+    "core/skills/deepcamera/skills/annotation/dataset-annotation/SKILL.md",
+    "core/skills/deepcamera/skills/annotation/dataset-annotation/requirements.txt",
+    "core/skills/deepcamera/skills/annotation/dataset-annotation/scripts/annotate.py",
+    "core/skills/deepcamera/skills/annotation/dataset-management/SKILL.md",
+    "core/skills/deepcamera/skills/annotation/dataset-management/deploy.bat",
+    "core/skills/deepcamera/skills/annotation/dataset-management/deploy.sh",
+    "core/skills/deepcamera/skills/annotation/dataset-management/requirements.txt",
+    "core/skills/deepcamera/skills/annotation/dataset-management/scripts/annotation_manager.py",
+    "core/skills/deepcamera/skills/automation/ha-trigger/SKILL.md",
+    "core/skills/deepcamera/skills/automation/ha-trigger/requirements.txt",
+    "core/skills/deepcamera/skills/automation/ha-trigger/scripts/ha_trigger.py",
+    "core/skills/deepcamera/skills/automation/mqtt/SKILL.md",
+    "core/skills/deepcamera/skills/automation/mqtt/requirements.txt",
+    "core/skills/deepcamera/skills/automation/mqtt/scripts/mqtt_publish.py",
+    "core/skills/deepcamera/skills/automation/webhook/SKILL.md",
+    "core/skills/deepcamera/skills/automation/webhook/requirements.txt",
+    "core/skills/deepcamera/skills/automation/webhook/scripts/webhook.py",
+    "core/skills/deepcamera/skills/camera-providers/eufy/SKILL.md",
+    "core/skills/deepcamera/skills/camera-providers/eufy/requirements.txt",
+    "core/skills/deepcamera/skills/camera-providers/eufy/scripts/feed.py",
+    "core/skills/deepcamera/skills/camera-providers/reolink/SKILL.md",
+    "core/skills/deepcamera/skills/camera-providers/reolink/requirements.txt",
+    "core/skills/deepcamera/skills/camera-providers/reolink/scripts/feed.py",
+    "core/skills/deepcamera/skills/camera-providers/tapo/SKILL.md",
+    "core/skills/deepcamera/skills/camera-providers/tapo/requirements.txt",
+    "core/skills/deepcamera/skills/camera-providers/tapo/scripts/feed.py",
+    "core/skills/deepcamera/skills/channels/line/SKILL.md",
+    "core/skills/deepcamera/skills/channels/line/requirements.txt",
+    "core/skills/deepcamera/skills/channels/line/scripts/channel.py",
+    "core/skills/deepcamera/skills/channels/matrix/SKILL.md",
+    "core/skills/deepcamera/skills/channels/matrix/requirements.txt",
+    "core/skills/deepcamera/skills/channels/matrix/scripts/channel.py",
+    "core/skills/deepcamera/skills/channels/signal/SKILL.md",
+    "core/skills/deepcamera/skills/channels/signal/requirements.txt",
+    "core/skills/deepcamera/skills/channels/signal/scripts/channel.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/.gitignore",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/.travis.yml",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/Contributions.md",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/LICENSE",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/README.md",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/SKILL.md",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/_config.yml",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/config.yaml",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/deploy-linux.sh",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/deploy-macos.sh",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/deploy.sh",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/docker-compose.yml",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/docker/Dockerfile",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/docker/README.md",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/docker/compile.sh",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/docker/docker-compose.yml",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/ext/lib/udev/rules.d/60-libedgetpu1-max.rules",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/ext/usr/share/doc/libedgetpu1-max/copyright",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/ext/usr/share/lintian/overrides/libedgetpu1-max",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/input.json",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/lib/local_deb/lib/udev/rules.d/60-libedgetpu1-max.rules",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/lib/local_deb/usr/share/doc/libedgetpu1-max/copyright",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/lib/local_deb/usr/share/lintian/overrides/libedgetpu1-max",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/models/README.md",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/output.txt",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/requirements.txt",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/scripts/compile_model.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/scripts/compile_model_colab.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/scripts/detect.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/scripts/detect.py.bak",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/scripts/install_pycoral.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/scripts/tpu_probe.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/skills.json",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/wsl_test.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/.gitignore",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/.travis.yml",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/Contributions.md",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/LICENSE",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/README.md",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/SKILL.md",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/_config.yml",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/config.yaml",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/deploy.bat",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/docker-compose.yml",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/docker/Dockerfile",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/docker/README.md",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/docker/compile.sh",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/docker/docker-compose.yml",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/input.json",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/install_usbipd.bat",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/install_wsl.bat",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/models/README.md",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/output.txt",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/requirements.txt",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/scripts/compile_model.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/scripts/compile_model_colab.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/scripts/detect.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/scripts/detect.py.bak",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/scripts/install_pycoral.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/scripts/tpu_probe.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/scripts/wsl_wrapper.cjs",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/skills.json",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-openvino/Dockerfile",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-openvino/SKILL.md",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-openvino/config.yaml",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-openvino/deploy.bat",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-openvino/deploy.sh",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-openvino/docker-compose.yml",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-openvino/models/README.md",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-openvino/requirements.txt",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-openvino/scripts/compile_model.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-openvino/scripts/compile_model_colab.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-openvino/scripts/detect.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-openvino/scripts/device_probe.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026/SKILL.md",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026/config.yaml",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026/deploy.bat",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026/deploy.sh",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026/requirements.txt",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026/requirements_cpu.txt",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026/requirements_cuda.txt",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026/requirements_intel.txt",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026/requirements_mps.txt",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026/requirements_rocm.txt",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026/scripts/detect.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026/scripts/env_config.py",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026/yolo26n_names.json",
+    "core/skills/deepcamera/skills/integrations/homeassistant-bridge/SKILL.md",
+    "core/skills/deepcamera/skills/integrations/homeassistant-bridge/requirements.txt",
+    "core/skills/deepcamera/skills/integrations/homeassistant-bridge/scripts/bridge.py",
+    "core/skills/deepcamera/skills/lib/__init__.py",
+    "core/skills/deepcamera/skills/lib/env_config.py",
+    "core/skills/deepcamera/skills/lib/test_env_config_ane.py",
+    "core/skills/deepcamera/skills/lib/test_env_config_cuda.py",
+    "core/skills/deepcamera/skills/lib/test_env_config_mps_fallback.py",
+    "core/skills/deepcamera/skills/lib/test_env_config_rocm.py",
+    "core/skills/deepcamera/skills/segmentation/sam2-segmentation/SKILL.md",
+    "core/skills/deepcamera/skills/segmentation/sam2-segmentation/deploy.bat",
+    "core/skills/deepcamera/skills/segmentation/sam2-segmentation/deploy.sh",
+    "core/skills/deepcamera/skills/segmentation/sam2-segmentation/requirements.txt",
+    "core/skills/deepcamera/skills/segmentation/sam2-segmentation/scripts/segment.py",
+    "core/skills/deepcamera/skills/streaming/go2rtc-cameras/SKILL.md",
+    "core/skills/deepcamera/skills/streaming/go2rtc-cameras/requirements.txt",
+    "core/skills/deepcamera/skills/streaming/go2rtc-cameras/scripts/stream.py",
+    "core/skills/deepcamera/skills/training/model-training/SKILL.md",
+    "core/skills/deepcamera/skills/training/model-training/requirements.txt",
+    "core/skills/deepcamera/skills/transformation/depth-estimation/README.md",
+    "core/skills/deepcamera/skills/transformation/depth-estimation/SKILL.md",
+    "core/skills/deepcamera/skills/transformation/depth-estimation/config.yaml",
+    "core/skills/deepcamera/skills/transformation/depth-estimation/deploy.bat",
+    "core/skills/deepcamera/skills/transformation/depth-estimation/deploy.sh",
+    "core/skills/deepcamera/skills/transformation/depth-estimation/models.json",
+    "core/skills/deepcamera/skills/transformation/depth-estimation/requirements.txt",
+    "core/skills/deepcamera/skills/transformation/depth-estimation/requirements_cpu.txt",
+    "core/skills/deepcamera/skills/transformation/depth-estimation/requirements_cuda.txt",
+    "core/skills/deepcamera/skills/transformation/depth-estimation/requirements_directml.txt",
+    "core/skills/deepcamera/skills/transformation/depth-estimation/scripts/benchmark.py",
+    "core/skills/deepcamera/skills/transformation/depth-estimation/scripts/benchmark_coreml.py",
+    "core/skills/deepcamera/skills/transformation/depth-estimation/scripts/transform.py",
+    "core/skills/deepcamera/skills/transformation/depth-estimation/scripts/transform_base.py"
+   ],
+   "nestedSkillFilesNotListed": [
+    "core/skills/deepcamera/skills/analysis/cloud-provider-regression/SKILL.md",
+    "core/skills/deepcamera/skills/analysis/home-security-benchmark/SKILL.md",
+    "core/skills/deepcamera/skills/analysis/homesafe-bench/SKILL.md",
+    "core/skills/deepcamera/skills/analysis/smarthome-bench/SKILL.md",
+    "core/skills/deepcamera/skills/annotation/dataset-annotation/SKILL.md",
+    "core/skills/deepcamera/skills/annotation/dataset-management/SKILL.md",
+    "core/skills/deepcamera/skills/automation/ha-trigger/SKILL.md",
+    "core/skills/deepcamera/skills/automation/mqtt/SKILL.md",
+    "core/skills/deepcamera/skills/automation/webhook/SKILL.md",
+    "core/skills/deepcamera/skills/camera-providers/eufy/SKILL.md",
+    "core/skills/deepcamera/skills/camera-providers/reolink/SKILL.md",
+    "core/skills/deepcamera/skills/camera-providers/tapo/SKILL.md",
+    "core/skills/deepcamera/skills/channels/line/SKILL.md",
+    "core/skills/deepcamera/skills/channels/matrix/SKILL.md",
+    "core/skills/deepcamera/skills/channels/signal/SKILL.md",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-macos/SKILL.md",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-coral-tpu-win-wsl/SKILL.md",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026-openvino/SKILL.md",
+    "core/skills/deepcamera/skills/detection/yolo-detection-2026/SKILL.md",
+    "core/skills/deepcamera/skills/integrations/homeassistant-bridge/SKILL.md",
+    "core/skills/deepcamera/skills/segmentation/sam2-segmentation/SKILL.md",
+    "core/skills/deepcamera/skills/streaming/go2rtc-cameras/SKILL.md",
+    "core/skills/deepcamera/skills/training/model-training/SKILL.md",
+    "core/skills/deepcamera/skills/transformation/depth-estimation/SKILL.md"
+   ]
+  },
+  {
+   "skill": "docker-build-strategies",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "sandboxed",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/docker-build-strategies/LICENSE",
+    "core/skills/docker-build-strategies/SKILL.md",
+    "core/skills/docker-build-strategies/SOURCE.md",
+    "core/skills/docker-build-strategies/VENDORED.md",
+    "core/skills/docker-build-strategies/agents/openai.yaml",
+    "core/skills/docker-build-strategies/assets/Dockerfile.go",
+    "core/skills/docker-build-strategies/assets/Dockerfile.nodejs",
+    "core/skills/docker-build-strategies/assets/Dockerfile.python",
+    "core/skills/docker-build-strategies/assets/dockerignore-example",
+    "core/skills/docker-build-strategies/checks/verification.md",
+    "core/skills/docker-build-strategies/references/layer-caching.md",
+    "core/skills/docker-build-strategies/references/multi-stage-builds.md",
+    "core/skills/docker-build-strategies/scripts/verify-build.sh",
+    "core/skills/docker-build-strategies/skill.yaml"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "docker-compose-patterns",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/docker-compose-patterns/LICENSE",
+    "core/skills/docker-compose-patterns/SKILL.md",
+    "core/skills/docker-compose-patterns/SOURCE.md",
+    "core/skills/docker-compose-patterns/VENDORED.md",
+    "core/skills/docker-compose-patterns/agents/openai.yaml",
+    "core/skills/docker-compose-patterns/assets/bad-vs-good.md",
+    "core/skills/docker-compose-patterns/assets/compose-dev-override.yaml",
+    "core/skills/docker-compose-patterns/assets/compose-web-app.yaml",
+    "core/skills/docker-compose-patterns/checks/verification.md",
+    "core/skills/docker-compose-patterns/references/service-dependencies.md",
+    "core/skills/docker-compose-patterns/references/volumes-and-networks.md",
+    "core/skills/docker-compose-patterns/scripts/verify-compose.sh",
+    "core/skills/docker-compose-patterns/skill.yaml"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "docker-destructive-guardrails",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/docker-destructive-guardrails/LICENSE",
+    "core/skills/docker-destructive-guardrails/SKILL.md",
+    "core/skills/docker-destructive-guardrails/SOURCE.md",
+    "core/skills/docker-destructive-guardrails/VENDORED.md",
+    "core/skills/docker-destructive-guardrails/agents/openai.yaml",
+    "core/skills/docker-destructive-guardrails/checks/verification.md",
+    "core/skills/docker-destructive-guardrails/references/cross-skill-destructive-command-index.md",
+    "core/skills/docker-destructive-guardrails/references/docker-cli-destructive-commands.md",
+    "core/skills/docker-destructive-guardrails/skill.yaml"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "docker-project-foundations",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "sandboxed",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/docker-project-foundations/LICENSE",
+    "core/skills/docker-project-foundations/SKILL.md",
+    "core/skills/docker-project-foundations/SOURCE.md",
+    "core/skills/docker-project-foundations/VENDORED.md",
+    "core/skills/docker-project-foundations/agents/openai.yaml",
+    "core/skills/docker-project-foundations/assets/Dockerfile.simple",
+    "core/skills/docker-project-foundations/assets/compose-dev.yaml",
+    "core/skills/docker-project-foundations/assets/dockerignore-example",
+    "core/skills/docker-project-foundations/checks/verification.md",
+    "core/skills/docker-project-foundations/references/project-structure.md",
+    "core/skills/docker-project-foundations/scripts/verify-setup.sh",
+    "core/skills/docker-project-foundations/skill.yaml"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "emails",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/emails/LICENSE",
+    "core/skills/emails/SKILL.md",
+    "core/skills/emails/SOURCE.md",
+    "core/skills/emails/references/copy-guidelines.md",
+    "core/skills/emails/references/email-types.md",
+    "core/skills/emails/references/sequence-templates.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "fastmcp",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/fastmcp/LICENSE",
+    "core/skills/fastmcp/SKILL.md",
+    "core/skills/fastmcp/SOURCE.md",
+    "core/skills/fastmcp/VENDORED.md",
+    "core/skills/fastmcp/references/fastmcp-cli.md",
+    "core/skills/fastmcp/scripts/scaffold_fastmcp.py",
+    "core/skills/fastmcp/templates/api_wrapper.py",
+    "core/skills/fastmcp/templates/database_server.py",
+    "core/skills/fastmcp/templates/file_processor.py"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "ffmpeg-skill",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "sandboxed",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/ffmpeg-skill/.claude-plugin/plugin.json",
+    "core/skills/ffmpeg-skill/.gitignore",
+    "core/skills/ffmpeg-skill/.npmignore",
+    "core/skills/ffmpeg-skill/AGENTS.md",
+    "core/skills/ffmpeg-skill/LICENSE",
+    "core/skills/ffmpeg-skill/README.md",
+    "core/skills/ffmpeg-skill/SKILL.md",
+    "core/skills/ffmpeg-skill/SOURCE.md",
+    "core/skills/ffmpeg-skill/VENDORED.md",
+    "core/skills/ffmpeg-skill/bin/install.js",
+    "core/skills/ffmpeg-skill/examples/README.md",
+    "core/skills/ffmpeg-skill/examples/brand.json",
+    "core/skills/ffmpeg-skill/examples/make_demo.sh",
+    "core/skills/ffmpeg-skill/mcp/server.py",
+    "core/skills/ffmpeg-skill/package.json",
+    "core/skills/ffmpeg-skill/references/ci-platform-pitfalls.md",
+    "core/skills/ffmpeg-skill/references/devices.md",
+    "core/skills/ffmpeg-skill/references/gotchas.md",
+    "core/skills/ffmpeg-skill/references/process-pitfalls.md",
+    "core/skills/ffmpeg-skill/references/scripts.md",
+    "core/skills/ffmpeg-skill/scripts/_ass_overlay.py",
+    "core/skills/ffmpeg-skill/scripts/_common/__init__.py",
+    "core/skills/ffmpeg-skill/scripts/_common/asr.py",
+    "core/skills/ffmpeg-skill/scripts/_common/color.py",
+    "core/skills/ffmpeg-skill/scripts/_common/decision.py",
+    "core/skills/ffmpeg-skill/scripts/_common/drawtext.py",
+    "core/skills/ffmpeg-skill/scripts/_common/emit.py",
+    "core/skills/ffmpeg-skill/scripts/_common/emoji.py",
+    "core/skills/ffmpeg-skill/scripts/_common/fonts.py",
+    "core/skills/ffmpeg-skill/scripts/_common/probe.py",
+    "core/skills/ffmpeg-skill/scripts/_common/runner.py",
+    "core/skills/ffmpeg-skill/scripts/_common/text.py",
+    "core/skills/ffmpeg-skill/scripts/_common/timeline.py",
+    "core/skills/ffmpeg-skill/scripts/_common/wrap.py",
+    "core/skills/ffmpeg-skill/scripts/_contract.py",
+    "core/skills/ffmpeg-skill/scripts/_platforms.py",
+    "core/skills/ffmpeg-skill/scripts/audio.py",
+    "core/skills/ffmpeg-skill/scripts/background.py",
+    "core/skills/ffmpeg-skill/scripts/batch.py",
+    "core/skills/ffmpeg-skill/scripts/broll.py",
+    "core/skills/ffmpeg-skill/scripts/caption.py",
+    "core/skills/ffmpeg-skill/scripts/check.py",
+    "core/skills/ffmpeg-skill/scripts/color.py",
+    "core/skills/ffmpeg-skill/scripts/crop.py",
+    "core/skills/ffmpeg-skill/scripts/cropdetect.py",
+    "core/skills/ffmpeg-skill/scripts/cut.py",
+    "core/skills/ffmpeg-skill/scripts/deinterlace.py",
+    "core/skills/ffmpeg-skill/scripts/denoise.py",
+    "core/skills/ffmpeg-skill/scripts/export.py",
+    "core/skills/ffmpeg-skill/scripts/fit.py",
+    "core/skills/ffmpeg-skill/scripts/freeze.py",
+    "core/skills/ffmpeg-skill/scripts/graphics.py",
+    "core/skills/ffmpeg-skill/scripts/grid.py",
+    "core/skills/ffmpeg-skill/scripts/insert.py",
+    "core/skills/ffmpeg-skill/scripts/join.py",
+    "core/skills/ffmpeg-skill/scripts/look.py",
+    "core/skills/ffmpeg-skill/scripts/loop.py",
+    "core/skills/ffmpeg-skill/scripts/loudness.py",
+    "core/skills/ffmpeg-skill/scripts/metadata.py",
+    "core/skills/ffmpeg-skill/scripts/multicam.py",
+    "core/skills/ffmpeg-skill/scripts/overlay.py",
+    "core/skills/ffmpeg-skill/scripts/pad.py",
+    "core/skills/ffmpeg-skill/scripts/probe.py",
+    "core/skills/ffmpeg-skill/scripts/proxy.py",
+    "core/skills/ffmpeg-skill/scripts/redact.py",
+    "core/skills/ffmpeg-skill/scripts/render.py",
+    "core/skills/ffmpeg-skill/scripts/report.py",
+    "core/skills/ffmpeg-skill/scripts/reverse.py",
+    "core/skills/ffmpeg-skill/scripts/scenes.py",
+    "core/skills/ffmpeg-skill/scripts/sequence.py",
+    "core/skills/ffmpeg-skill/scripts/silence.py",
+    "core/skills/ffmpeg-skill/scripts/speedramp.py",
+    "core/skills/ffmpeg-skill/scripts/sphere.py",
+    "core/skills/ffmpeg-skill/scripts/stabilize.py",
+    "core/skills/ffmpeg-skill/scripts/straighten.py",
+    "core/skills/ffmpeg-skill/scripts/sync.py",
+    "core/skills/ffmpeg-skill/scripts/verify.py",
+    "core/skills/ffmpeg-skill/scripts/waveform.py",
+    "core/skills/ffmpeg-skill/templates/audiogram.json",
+    "core/skills/ffmpeg-skill/templates/facebook.json",
+    "core/skills/ffmpeg-skill/templates/linkedin.json",
+    "core/skills/ffmpeg-skill/templates/podcast.json",
+    "core/skills/ffmpeg-skill/templates/reels.json",
+    "core/skills/ffmpeg-skill/templates/shorts.json",
+    "core/skills/ffmpeg-skill/templates/tiktok.json",
+    "core/skills/ffmpeg-skill/templates/x.json",
+    "core/skills/ffmpeg-skill/templates/youtube-shorts.json",
+    "core/skills/ffmpeg-skill/templates/youtube.json"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "founder-metric-reel",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/founder-metric-reel/LICENSE",
+    "core/skills/founder-metric-reel/SKILL.md",
+    "core/skills/founder-metric-reel/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "gcode",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/gcode/LICENSE",
+    "core/skills/gcode/SKILL.md",
+    "core/skills/gcode/SOURCE.md",
+    "core/skills/gcode/VENDORED.md",
+    "core/skills/gcode/agents/openai.yaml",
+    "core/skills/gcode/scripts/orca_presets.py"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "get-available-resources",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/get-available-resources/LICENSE",
+    "core/skills/get-available-resources/SKILL.md",
+    "core/skills/get-available-resources/SOURCE.md",
+    "core/skills/get-available-resources/VENDORED.md",
+    "core/skills/get-available-resources/references/resource_semantics.md",
+    "core/skills/get-available-resources/references/snapshot_schema.md",
+    "core/skills/get-available-resources/references/sources.md",
+    "core/skills/get-available-resources/scripts/_common.py",
+    "core/skills/get-available-resources/scripts/accelerator_diagnostics.py",
+    "core/skills/get-available-resources/scripts/detect_resources.py",
+    "core/skills/get-available-resources/scripts/plan_workload.py",
+    "core/skills/get-available-resources/scripts/snapshot_tools.py"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "gh-fix-ci",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/gh-fix-ci/LICENSE.txt",
+    "core/skills/gh-fix-ci/SKILL.md",
+    "core/skills/gh-fix-ci/SOURCE.md",
+    "core/skills/gh-fix-ci/VENDORED.md",
+    "core/skills/gh-fix-ci/agents/openai.yaml",
+    "core/skills/gh-fix-ci/assets/github-small.svg",
+    "core/skills/gh-fix-ci/scripts/inspect_pr_checks.py"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "godot-prompter",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S",
+    "N=23"
+   ],
+   "license": "MIT",
+   "rea": "sandboxed",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/godot-prompter/LICENSE",
+    "core/skills/godot-prompter/README.md",
+    "core/skills/godot-prompter/SKILL.md",
+    "core/skills/godot-prompter/SOURCE.md",
+    "core/skills/godot-prompter/VENDORED.md",
+    "core/skills/godot-prompter/agents/.gitkeep",
+    "core/skills/godot-prompter/agents/godot-animator.md",
+    "core/skills/godot-prompter/agents/godot-code-reviewer.md",
+    "core/skills/godot-prompter/agents/godot-game-architect.md",
+    "core/skills/godot-prompter/agents/godot-game-dev.md",
+    "core/skills/godot-prompter/agents/godot-performance-profiler.md",
+    "core/skills/godot-prompter/skills/2d-essentials/SKILL.md",
+    "core/skills/godot-prompter/skills/2d-essentials/references/2d-particles.md",
+    "core/skills/godot-prompter/skills/2d-essentials/references/custom-drawing.md",
+    "core/skills/godot-prompter/skills/2d-essentials/references/lights-and-shadows.md",
+    "core/skills/godot-prompter/skills/2d-essentials/references/parallax.md",
+    "core/skills/godot-prompter/skills/2d-essentials/references/tilemap.md",
+    "core/skills/godot-prompter/skills/3d-essentials/SKILL.md",
+    "core/skills/godot-prompter/skills/3d-essentials/references/common-pitfalls.md",
+    "core/skills/godot-prompter/skills/3d-essentials/references/decals.md",
+    "core/skills/godot-prompter/skills/3d-essentials/references/environment-and-post.md",
+    "core/skills/godot-prompter/skills/3d-essentials/references/fog-recipes.md",
+    "core/skills/godot-prompter/skills/3d-essentials/references/global-illumination.md",
+    "core/skills/godot-prompter/skills/3d-essentials/references/godot-4.7-additions.md",
+    "core/skills/godot-prompter/skills/3d-essentials/references/lod-and-culling.md",
+    "core/skills/godot-prompter/skills/3d-essentials/references/materials-and-lighting-recipes.md",
+    "core/skills/godot-prompter/skills/3d-essentials/references/renderer-comparison.md",
+    "core/skills/godot-prompter/skills/animation-system/SKILL.md",
+    "core/skills/godot-prompter/skills/animation-system/references/bone-constraints.md",
+    "core/skills/godot-prompter/skills/animation-system/references/common-pitfalls.md",
+    "core/skills/godot-prompter/skills/animation-system/references/common-recipes.md",
+    "core/skills/godot-prompter/skills/animation-system/references/ik-recipes.md",
+    "core/skills/godot-prompter/skills/animation-system/references/ik-solver-comparison.md",
+    "core/skills/godot-prompter/skills/animation-system/references/retargeting.md",
+    "core/skills/godot-prompter/skills/animation-system/references/skeleton-modifiers.md",
+    "core/skills/godot-prompter/skills/animation-system/references/sprite-animation.md",
+    "core/skills/godot-prompter/skills/animation-system/references/state-machine-examples.md",
+    "core/skills/godot-prompter/skills/audio-system/SKILL.md",
+    "core/skills/godot-prompter/skills/audio-system/references/audio-settings.md",
+    "core/skills/godot-prompter/skills/audio-system/references/interactive-music.md",
+    "core/skills/godot-prompter/skills/audio-system/references/music-manager.md",
+    "core/skills/godot-prompter/skills/audio-system/references/sfx-pooling.md",
+    "core/skills/godot-prompter/skills/camera-system/SKILL.md",
+    "core/skills/godot-prompter/skills/camera-system/references/camera-zones.md",
+    "core/skills/godot-prompter/skills/camera-system/references/camera3d-patterns.md",
+    "core/skills/godot-prompter/skills/camera-system/references/split-screen.md",
+    "core/skills/godot-prompter/skills/camera-system/references/transitions.md",
+    "core/skills/godot-prompter/skills/component-system/SKILL.md",
+    "core/skills/godot-prompter/skills/dependency-injection/SKILL.md",
+    "core/skills/godot-prompter/skills/dependency-injection/references/autoloads.md",
+    "core/skills/godot-prompter/skills/dependency-injection/references/export-injection.md",
+    "core/skills/godot-prompter/skills/dependency-injection/references/scene-injection.md",
+    "core/skills/godot-prompter/skills/dependency-injection/references/service-locator.md",
+    "core/skills/godot-prompter/skills/dependency-injection/references/testing-with-di.md",
+    "core/skills/godot-prompter/skills/event-bus/SKILL.md",
+    "core/skills/godot-prompter/skills/event-bus/references/anti-patterns.md",
+    "core/skills/godot-prompter/skills/event-bus/references/testing.md",
+    "core/skills/godot-prompter/skills/event-bus/references/typed-signals.md",
+    "core/skills/godot-prompter/skills/gdscript-patterns/SKILL.md",
+    "core/skills/godot-prompter/skills/gdscript-patterns/references/abstract-classes.md",
+    "core/skills/godot-prompter/skills/gdscript-patterns/references/common-idioms.md",
+    "core/skills/godot-prompter/skills/gdscript-patterns/references/export-annotations.md",
+    "core/skills/godot-prompter/skills/gdscript-patterns/references/super-in-virtual-methods.md",
+    "core/skills/godot-prompter/skills/gdscript-patterns/references/variadic-functions.md",
+    "core/skills/godot-prompter/skills/godot-debugging/SKILL.md",
+    "core/skills/godot-prompter/skills/godot-debugging/references/performance-debugging.md",
+    "core/skills/godot-prompter/skills/godot-debugging/references/scene-tree-debugging.md",
+    "core/skills/godot-prompter/skills/godot-debugging/references/signal-tracing.md",
+    "core/skills/godot-prompter/skills/godot-debugging/references/systematic-method.md",
+    "core/skills/godot-prompter/skills/godot-mentor/SKILL.md",
+    "core/skills/godot-prompter/skills/godot-optimization/SKILL.md",
+    "core/skills/godot-prompter/skills/godot-optimization/references/cpu-bottlenecks.md",
+    "core/skills/godot-prompter/skills/godot-optimization/references/draw-calls.md",
+    "core/skills/godot-prompter/skills/godot-optimization/references/memory-management.md",
+    "core/skills/godot-prompter/skills/godot-optimization/references/physics-tuning.md",
+    "core/skills/godot-prompter/skills/godot-project-setup/SKILL.md",
+    "core/skills/godot-prompter/skills/godot-testing/SKILL.md",
+    "core/skills/godot-prompter/skills/godot-testing/gdunit4-reference.md",
+    "core/skills/godot-prompter/skills/godot-testing/gut-reference.md",
+    "core/skills/godot-prompter/skills/godot-testing/references/running-tests.md",
+    "core/skills/godot-prompter/skills/godot-testing/references/tdd-workflow.md",
+    "core/skills/godot-prompter/skills/godot-testing/references/testing-patterns.md",
+    "core/skills/godot-prompter/skills/godot-ui/SKILL.md",
+    "core/skills/godot-prompter/skills/godot-ui/references/anchors-in-code.md",
+    "core/skills/godot-prompter/skills/godot-ui/references/focus-and-navigation.md",
+    "core/skills/godot-prompter/skills/godot-ui/references/foldable-container.md",
+    "core/skills/godot-prompter/skills/godot-ui/references/signals.md",
+    "core/skills/godot-prompter/skills/godot-ui/references/theme-system.md",
+    "core/skills/godot-prompter/skills/godot-ui/references/ui-patterns.md",
+    "core/skills/godot-prompter/skills/input-handling/SKILL.md",
+    "core/skills/godot-prompter/skills/input-handling/references/action-rebinding.md",
+    "core/skills/godot-prompter/skills/input-handling/references/event-propagation.md",
+    "core/skills/godot-prompter/skills/input-handling/references/gamepad.md",
+    "core/skills/godot-prompter/skills/input-handling/references/input-buffering.md",
+    "core/skills/godot-prompter/skills/input-handling/references/mouse.md",
+    "core/skills/godot-prompter/skills/input-handling/references/touch.md",
+    "core/skills/godot-prompter/skills/math-essentials/SKILL.md",
+    "core/skills/godot-prompter/skills/math-essentials/references/curves-and-paths.md",
+    "core/skills/godot-prompter/skills/math-essentials/references/game-math-recipes.md",
+    "core/skills/godot-prompter/skills/math-essentials/references/random-numbers.md",
+    "core/skills/godot-prompter/skills/physics-system/SKILL.md",
+    "core/skills/godot-prompter/skills/physics-system/references/area-recipes.md",
+    "core/skills/godot-prompter/skills/physics-system/references/collision-layers.md",
+    "core/skills/godot-prompter/skills/physics-system/references/collision-shapes.md",
+    "core/skills/godot-prompter/skills/physics-system/references/interpolation-camera.md",
+    "core/skills/godot-prompter/skills/physics-system/references/interpolation-tuning.md",
+    "core/skills/godot-prompter/skills/physics-system/references/jolt-differences.md",
+    "core/skills/godot-prompter/skills/physics-system/references/ragdoll-recipes.md",
+    "core/skills/godot-prompter/skills/physics-system/references/raycasting-recipes.md",
+    "core/skills/godot-prompter/skills/physics-system/references/rigidbody-recipes.md",
+    "core/skills/godot-prompter/skills/physics-system/references/softbody-recipes.md",
+    "core/skills/godot-prompter/skills/physics-system/references/staticbody-recipes.md",
+    "core/skills/godot-prompter/skills/physics-system/references/troubleshooting.md",
+    "core/skills/godot-prompter/skills/resource-pattern/SKILL.md",
+    "core/skills/godot-prompter/skills/resource-pattern/references/collections.md",
+    "core/skills/godot-prompter/skills/resource-pattern/references/configuration-pattern.md",
+    "core/skills/godot-prompter/skills/resource-pattern/references/editor-integration.md",
+    "core/skills/godot-prompter/skills/resource-pattern/references/saving-resources.md",
+    "core/skills/godot-prompter/skills/resource-pattern/references/sharing-vs-unique.md",
+    "core/skills/godot-prompter/skills/save-load/SKILL.md",
+    "core/skills/godot-prompter/skills/save-load/references/configfile.md",
+    "core/skills/godot-prompter/skills/save-load/references/json-saves.md",
+    "core/skills/godot-prompter/skills/save-load/references/save-architecture.md",
+    "core/skills/godot-prompter/skills/save-load/references/version-migration.md",
+    "core/skills/godot-prompter/skills/scene-organization/SKILL.md",
+    "core/skills/godot-prompter/skills/state-machine/SKILL.md",
+    "core/skills/godot-prompter/skills/state-machine/references/hierarchical-and-parallel.md",
+    "core/skills/godot-prompter/skills/using-godot-prompter/SKILL.md",
+    "core/skills/godot-prompter/skills/using-godot-prompter/references/antigravity-tools.md",
+    "core/skills/godot-prompter/skills/using-godot-prompter/references/codex-tools.md",
+    "core/skills/godot-prompter/skills/using-godot-prompter/references/copilot-tools.md",
+    "core/skills/godot-prompter/skills/using-godot-prompter/references/cursor-tools.md",
+    "core/skills/godot-prompter/skills/using-godot-prompter/references/gemini-tools.md"
+   ],
+   "nestedSkillFilesNotListed": [
+    "core/skills/godot-prompter/skills/2d-essentials/SKILL.md",
+    "core/skills/godot-prompter/skills/3d-essentials/SKILL.md",
+    "core/skills/godot-prompter/skills/animation-system/SKILL.md",
+    "core/skills/godot-prompter/skills/audio-system/SKILL.md",
+    "core/skills/godot-prompter/skills/camera-system/SKILL.md",
+    "core/skills/godot-prompter/skills/component-system/SKILL.md",
+    "core/skills/godot-prompter/skills/dependency-injection/SKILL.md",
+    "core/skills/godot-prompter/skills/event-bus/SKILL.md",
+    "core/skills/godot-prompter/skills/gdscript-patterns/SKILL.md",
+    "core/skills/godot-prompter/skills/godot-debugging/SKILL.md",
+    "core/skills/godot-prompter/skills/godot-mentor/SKILL.md",
+    "core/skills/godot-prompter/skills/godot-optimization/SKILL.md",
+    "core/skills/godot-prompter/skills/godot-project-setup/SKILL.md",
+    "core/skills/godot-prompter/skills/godot-testing/SKILL.md",
+    "core/skills/godot-prompter/skills/godot-ui/SKILL.md",
+    "core/skills/godot-prompter/skills/input-handling/SKILL.md",
+    "core/skills/godot-prompter/skills/math-essentials/SKILL.md",
+    "core/skills/godot-prompter/skills/physics-system/SKILL.md",
+    "core/skills/godot-prompter/skills/resource-pattern/SKILL.md",
+    "core/skills/godot-prompter/skills/save-load/SKILL.md",
+    "core/skills/godot-prompter/skills/scene-organization/SKILL.md",
+    "core/skills/godot-prompter/skills/state-machine/SKILL.md",
+    "core/skills/godot-prompter/skills/using-godot-prompter/SKILL.md"
+   ]
+  },
+  {
+   "skill": "graphite",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/graphite/LICENSE",
+    "core/skills/graphite/SKILL.md",
+    "core/skills/graphite/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "gsap-core",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/gsap-core/LICENSE",
+    "core/skills/gsap-core/SKILL.md",
+    "core/skills/gsap-core/SOURCE.md",
+    "core/skills/gsap-core/VENDORED.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "gsap-scrolltrigger",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/gsap-scrolltrigger/LICENSE",
+    "core/skills/gsap-scrolltrigger/SKILL.md",
+    "core/skills/gsap-scrolltrigger/SOURCE.md",
+    "core/skills/gsap-scrolltrigger/VENDORED.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "gsap-timeline",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/gsap-timeline/LICENSE",
+    "core/skills/gsap-timeline/SKILL.md",
+    "core/skills/gsap-timeline/SOURCE.md",
+    "core/skills/gsap-timeline/VENDORED.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "humanizer",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/humanizer/LICENSE",
+    "core/skills/humanizer/SKILL.md",
+    "core/skills/humanizer/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "immersive-evidence-workspace",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/immersive-evidence-workspace/LICENSE",
+    "core/skills/immersive-evidence-workspace/SKILL.md",
+    "core/skills/immersive-evidence-workspace/SOURCE.md",
+    "core/skills/immersive-evidence-workspace/assets/ar-workspace-template.html",
+    "core/skills/immersive-evidence-workspace/assets/node-map-variant.html",
+    "core/skills/immersive-evidence-workspace/assets/workspace-template.html",
+    "core/skills/immersive-evidence-workspace/references/manifest-schema.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "internal-comms",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/internal-comms/LICENSE",
+    "core/skills/internal-comms/SKILL.md",
+    "core/skills/internal-comms/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "kingmaker-cloudflare-release",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/kingmaker-cloudflare-release/LICENSE",
+    "core/skills/kingmaker-cloudflare-release/SKILL.md",
+    "core/skills/kingmaker-cloudflare-release/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "kingmaker-doc-author",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/kingmaker-doc-author/LICENSE",
+    "core/skills/kingmaker-doc-author/SKILL.md",
+    "core/skills/kingmaker-doc-author/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "kingmaker-engine-verifier",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/kingmaker-engine-verifier/LICENSE",
+    "core/skills/kingmaker-engine-verifier/SKILL.md",
+    "core/skills/kingmaker-engine-verifier/SOURCE.md",
+    "core/skills/kingmaker-engine-verifier/references/av-capture.md",
+    "core/skills/kingmaker-engine-verifier/references/engine-checklists.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "kingmaker-flagship-driver",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/kingmaker-flagship-driver/LICENSE",
+    "core/skills/kingmaker-flagship-driver/SKILL.md",
+    "core/skills/kingmaker-flagship-driver/SOURCE.md",
+    "core/skills/kingmaker-flagship-driver/references/completion-loop.md",
+    "core/skills/kingmaker-flagship-driver/references/repo-access.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "kingmaker-native-internet",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/kingmaker-native-internet/LICENSE",
+    "core/skills/kingmaker-native-internet/SKILL.md",
+    "core/skills/kingmaker-native-internet/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "kingmaker-proof-authoring",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/kingmaker-proof-authoring/LICENSE",
+    "core/skills/kingmaker-proof-authoring/SKILL.md",
+    "core/skills/kingmaker-proof-authoring/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "kingmaker-proof-runner",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/kingmaker-proof-runner/LICENSE",
+    "core/skills/kingmaker-proof-runner/SKILL.md",
+    "core/skills/kingmaker-proof-runner/SOURCE.md",
+    "core/skills/kingmaker-proof-runner/references/proof-taxonomy.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "kingmaker-readme-sync",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/kingmaker-readme-sync/LICENSE",
+    "core/skills/kingmaker-readme-sync/SKILL.md",
+    "core/skills/kingmaker-readme-sync/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "kingmaker-repo-hygiene",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/kingmaker-repo-hygiene/LICENSE",
+    "core/skills/kingmaker-repo-hygiene/SKILL.md",
+    "core/skills/kingmaker-repo-hygiene/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "kingmaker-voice-runtime",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/kingmaker-voice-runtime/LICENSE",
+    "core/skills/kingmaker-voice-runtime/README.md",
+    "core/skills/kingmaker-voice-runtime/SKILL.md",
+    "core/skills/kingmaker-voice-runtime/SOURCE.md",
+    "core/skills/kingmaker-voice-runtime/resources/COMMAND_LIBRARY.md",
+    "core/skills/kingmaker-voice-runtime/resources/CONNECTOR_POLICY.md",
+    "core/skills/kingmaker-voice-runtime/resources/START_PROMPT.txt",
+    "core/skills/kingmaker-voice-runtime/resources/VOICE_ACCEPTANCE_TESTS.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "kingmaker-voice-verification",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/kingmaker-voice-verification/LICENSE",
+    "core/skills/kingmaker-voice-verification/SKILL.md",
+    "core/skills/kingmaker-voice-verification/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "lead-magnets",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/lead-magnets/LICENSE",
+    "core/skills/lead-magnets/SKILL.md",
+    "core/skills/lead-magnets/SOURCE.md",
+    "core/skills/lead-magnets/references/benchmarks.md",
+    "core/skills/lead-magnets/references/content-to-skill-corpus-design.md",
+    "core/skills/lead-magnets/references/content-to-skill-release.md",
+    "core/skills/lead-magnets/references/content-to-skill.md",
+    "core/skills/lead-magnets/references/format-guide.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "local-seo-manager",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/local-seo-manager/LICENSE",
+    "core/skills/local-seo-manager/SKILL.md",
+    "core/skills/local-seo-manager/SOURCE.md",
+    "core/skills/local-seo-manager/references/local-schema-types.md",
+    "core/skills/local-seo-manager/references/local-seo-checklist.md",
+    "core/skills/local-seo-manager/references/review-response-templates.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "marketing-ideas",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/marketing-ideas/LICENSE",
+    "core/skills/marketing-ideas/SKILL.md",
+    "core/skills/marketing-ideas/SOURCE.md",
+    "core/skills/marketing-ideas/references/guerrilla-marketing.md",
+    "core/skills/marketing-ideas/references/ideas-by-category.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "mcp-server-builder",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/mcp-server-builder/LICENSE",
+    "core/skills/mcp-server-builder/README.md",
+    "core/skills/mcp-server-builder/SKILL.md",
+    "core/skills/mcp-server-builder/SOURCE.md",
+    "core/skills/mcp-server-builder/VENDORED.md",
+    "core/skills/mcp-server-builder/examples/mini-openapi.json",
+    "core/skills/mcp-server-builder/examples/sample-tool-manifest.json",
+    "core/skills/mcp-server-builder/references/openapi-extraction-guide.md",
+    "core/skills/mcp-server-builder/references/production-hardening-guide.md",
+    "core/skills/mcp-server-builder/references/python-server-template.md",
+    "core/skills/mcp-server-builder/references/typescript-server-template.md",
+    "core/skills/mcp-server-builder/references/validation-checklist.md",
+    "core/skills/mcp-server-builder/scripts/mcp_validator.py",
+    "core/skills/mcp-server-builder/scripts/openapi_to_mcp.py"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "movie-gen",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/movie-gen/LICENSE",
+    "core/skills/movie-gen/SKILL.md",
+    "core/skills/movie-gen/SOURCE.md",
+    "core/skills/movie-gen/references/interfaces.md",
+    "core/skills/movie-gen/scripts/verify-interfaces.sh"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "native-capability-extraction",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/native-capability-extraction/LICENSE",
+    "core/skills/native-capability-extraction/SKILL.md",
+    "core/skills/native-capability-extraction/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "observability-and-instrumentation",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/observability-and-instrumentation/LICENSE",
+    "core/skills/observability-and-instrumentation/SKILL.md",
+    "core/skills/observability-and-instrumentation/SOURCE.md",
+    "core/skills/observability-and-instrumentation/VENDORED.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "offers",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/offers/LICENSE",
+    "core/skills/offers/SKILL.md",
+    "core/skills/offers/SOURCE.md",
+    "core/skills/offers/references/bonus-stacking.md",
+    "core/skills/offers/references/examples.md",
+    "core/skills/offers/references/guarantee-design.md",
+    "core/skills/offers/references/offer-anatomy.md",
+    "core/skills/offers/references/offer-formats.md",
+    "core/skills/offers/references/saas-offers.md",
+    "core/skills/offers/references/scarcity-urgency.md",
+    "core/skills/offers/references/value-equation.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "office",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/office/LICENSE",
+    "core/skills/office/SKILL.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "open-harness",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/open-harness/LICENSE",
+    "core/skills/open-harness/SKILL.md",
+    "core/skills/open-harness/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "paper-search-pro",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "sandboxed",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/paper-search-pro/.gitignore",
+    "core/skills/paper-search-pro/.skillignore",
+    "core/skills/paper-search-pro/CLAUDE.md",
+    "core/skills/paper-search-pro/LICENSE.txt",
+    "core/skills/paper-search-pro/NOTICE.md",
+    "core/skills/paper-search-pro/README.md",
+    "core/skills/paper-search-pro/README.zh.md",
+    "core/skills/paper-search-pro/SKILL.md",
+    "core/skills/paper-search-pro/SOURCE.md",
+    "core/skills/paper-search-pro/THIRD_PARTY.md",
+    "core/skills/paper-search-pro/VENDORED.md",
+    "core/skills/paper-search-pro/assets/benchmark_queries/custom_zh_queries.json",
+    "core/skills/paper-search-pro/assets/benchmark_queries/litsearch_subset.json",
+    "core/skills/paper-search-pro/assets/benchmark_queries/sparbench_subset.json",
+    "core/skills/paper-search-pro/assets/default_config.yaml",
+    "core/skills/paper-search-pro/assets/md_template.md.jinja",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/.gitignore",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/.parcelrc",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/README.md",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/components.json",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/eslint.config.js",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/index.html",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/package.json",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/pnpm-lock.yaml",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/postcss.config.js",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/public/favicon.svg",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/public/icons.svg",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/App.css",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/App.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/assets/react.svg",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/assets/vite.svg",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/adapters/KickerAccordion.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/adapters/KickerAlert.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/adapters/SearchInput.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/adapters/SegmentedToggle.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/adapters/SimpleTooltip.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/audit/AuditTab.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/audit/ComplianceSummary.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/audit/PhaseGroup.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/audit/PrismaRow.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/audit/StatusDot.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/audit/audit-utils.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/chrome/LayoutSwitcher.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/chrome/thumbs/Thumbs.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/extensions/ExtensionsTab.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/hero/FilterBar.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/hero/ReportTitle.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/hero/SliderWithZones.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/hero/TierStrip.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/hero/tops/BrandLink.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/hero/tops/DocumentTop.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/hero/tops/EditorialTop.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/hero/tops/SwissTop.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/methods/CitationScatter.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/methods/DiscoveryCurve.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/methods/MethodologyAccordion.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/methods/MethodsTab.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/methods/RcsHistogram.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/methods/SearchStrategies.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/methods/SectionHeader.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/methods/Stat.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/methods/TierAllocation.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/methods/TopicsTreemap.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/methods/YearBarChart.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/methods/useInsights.ts",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/papers/JournalRank.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/papers/PaperCardItem.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/papers/PaperList.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/papers/PaperRowCatalog.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/papers/PaperRowIndex.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/papers/PaperRowIndexHeader.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/papers/PaperSheet.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/papers/QuickJump.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/papers/TierDot.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/papers/TierHeader.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/papers/ZoneFilter.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/accordion.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/alert.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/aspect-ratio.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/avatar.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/badge.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/breadcrumb.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/button.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/calendar.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/card.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/carousel.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/chart.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/checkbox.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/collapsible.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/command.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/context-menu.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/dialog.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/drawer.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/dropdown-menu.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/form.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/hover-card.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/input.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/label.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/menubar.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/navigation-menu.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/popover.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/progress.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/radio-group.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/resizable.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/scroll-area.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/select.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/separator.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/sheet.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/skeleton.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/slider.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/sonner.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/switch.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/table.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/tabs.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/textarea.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/toggle-group.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/toggle.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/components/ui/tooltip.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/fonts/geist-mono.woff2",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/fonts/geist-sans.woff2",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/lib/format.ts",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/lib/i18n.ts",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/lib/mock-data.ts",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/lib/normalize.ts",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/lib/prisma-titles.ts",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/lib/safari-detect.ts",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/lib/types.ts",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/lib/utils.ts",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/src/main.tsx",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/tailwind.config.js",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/tsconfig.app.json",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/tsconfig.json",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/tsconfig.node.json",
+    "core/skills/paper-search-pro/assets/webartifacts_app/paper-report/vite.config.ts",
+    "core/skills/paper-search-pro/pytest.ini",
+    "core/skills/paper-search-pro/references/agent_mode.md",
+    "core/skills/paper-search-pro/references/arxiv_helper_cheatsheet.md",
+    "core/skills/paper-search-pro/references/citation_chasing.md",
+    "core/skills/paper-search-pro/references/classifier_subagent_prompt.md",
+    "core/skills/paper-search-pro/references/crossref_helper_cheatsheet.md",
+    "core/skills/paper-search-pro/references/error_handling.md",
+    "core/skills/paper-search-pro/references/journal_metrics.md",
+    "core/skills/paper-search-pro/references/openalex_helper_cheatsheet.md",
+    "core/skills/paper-search-pro/references/openreview_helper_cheatsheet.md",
+    "core/skills/paper-search-pro/references/output_files.md",
+    "core/skills/paper-search-pro/references/prisma_s_checklist.md",
+    "core/skills/paper-search-pro/references/pubmed_helper_cheatsheet.md",
+    "core/skills/paper-search-pro/references/query_planner.md",
+    "core/skills/paper-search-pro/references/rcs_rubric.md",
+    "core/skills/paper-search-pro/references/report_title.md",
+    "core/skills/paper-search-pro/references/runtime_bootstrap.md",
+    "core/skills/paper-search-pro/references/search_export/chinese_methodology.md",
+    "core/skills/paper-search-pro/references/search_export/filters_library.md",
+    "core/skills/paper-search-pro/references/search_export/methodology.md",
+    "core/skills/paper-search-pro/references/search_export/press_checklist.md",
+    "core/skills/paper-search-pro/references/search_export/proximity_table.json",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/acm_dl.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/cab_cabi.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/cinahl_ebsco.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/clinicaltrials_gov.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/cnki.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/cochrane_central.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/econlit_ebsco.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/embase_com.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/embase_ovid.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/eric.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/ieee_xplore.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/psycinfo_ebsco.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/psycinfo_ovid.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/pubmed.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/scifinder.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/scopus.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/sinomed.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/wanfang.md",
+    "core/skills/paper-search-pro/references/search_export/syntax_cards/wos.md",
+    "core/skills/paper-search-pro/references/setup.md",
+    "core/skills/paper-search-pro/references/source_routing.md",
+    "core/skills/paper-search-pro/references/ss_helper_cheatsheet.md",
+    "core/skills/paper-search-pro/references/stop_decision.md",
+    "core/skills/paper-search-pro/references/summary_writer.md",
+    "core/skills/paper-search-pro/references/tier_decision.md",
+    "core/skills/paper-search-pro/scripts/__init__.py",
+    "core/skills/paper-search-pro/scripts/agent_search.py",
+    "core/skills/paper-search-pro/scripts/arxiv_helper.py",
+    "core/skills/paper-search-pro/scripts/config.py",
+    "core/skills/paper-search-pro/scripts/crossref_helper.py",
+    "core/skills/paper-search-pro/scripts/data_materialization.py",
+    "core/skills/paper-search-pro/scripts/detect_language.py",
+    "core/skills/paper-search-pro/scripts/discovery_curve.py",
+    "core/skills/paper-search-pro/scripts/federated_kg_resolver.py",
+    "core/skills/paper-search-pro/scripts/generate_exports.py",
+    "core/skills/paper-search-pro/scripts/html_renderer_webartifacts.py",
+    "core/skills/paper-search-pro/scripts/journal_rank.py",
+    "core/skills/paper-search-pro/scripts/md_report.py",
+    "core/skills/paper-search-pro/scripts/nssd_helper.py",
+    "core/skills/paper-search-pro/scripts/openalex_guard.py",
+    "core/skills/paper-search-pro/scripts/openalex_helper.py",
+    "core/skills/paper-search-pro/scripts/openreview_helper.py",
+    "core/skills/paper-search-pro/scripts/prisma_s_logger.py",
+    "core/skills/paper-search-pro/scripts/pubmed_helper.py",
+    "core/skills/paper-search-pro/scripts/quota_guard.py",
+    "core/skills/paper-search-pro/scripts/rank_filter.py",
+    "core/skills/paper-search-pro/scripts/rank_intent.py",
+    "core/skills/paper-search-pro/scripts/rcs_parser.py",
+    "core/skills/paper-search-pro/scripts/report_identity.py",
+    "core/skills/paper-search-pro/scripts/requirements.lock",
+    "core/skills/paper-search-pro/scripts/requirements.txt",
+    "core/skills/paper-search-pro/scripts/search_export/__init__.py",
+    "core/skills/paper-search-pro/scripts/search_export/deeplink.py",
+    "core/skills/paper-search-pro/scripts/search_export/generate.py",
+    "core/skills/paper-search-pro/scripts/search_export/linter.py",
+    "core/skills/paper-search-pro/scripts/search_export/proximity.py",
+    "core/skills/paper-search-pro/scripts/search_export/vocab_verify.py",
+    "core/skills/paper-search-pro/scripts/semantic_cache.py",
+    "core/skills/paper-search-pro/scripts/sjr_helper.py",
+    "core/skills/paper-search-pro/scripts/source_fallback.py",
+    "core/skills/paper-search-pro/scripts/ss_helper.py",
+    "core/skills/paper-search-pro/scripts/types.py",
+    "core/skills/paper-search-pro/scripts/vendored/LICENSE-paperqa.txt",
+    "core/skills/paper-search-pro/scripts/vendored/README-vendored.md",
+    "core/skills/paper-search-pro/scripts/vendored/__init__.py",
+    "core/skills/paper-search-pro/scripts/vendored/tenacity_retry.py",
+    "core/skills/paper-search-pro/scripts/yiigle_helper.py"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "parametric-cad-verify",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/parametric-cad-verify/LICENSE",
+    "core/skills/parametric-cad-verify/SKILL.md",
+    "core/skills/parametric-cad-verify/SOURCE.md",
+    "core/skills/parametric-cad-verify/VENDORED.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "penetration-testing",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/penetration-testing/LICENSE",
+    "core/skills/penetration-testing/SKILL.md",
+    "core/skills/penetration-testing/SOURCE.md",
+    "core/skills/penetration-testing/references/interfaces.md",
+    "core/skills/penetration-testing/scripts/verify-interfaces.sh"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "playwright-cli",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/playwright-cli/LICENSE",
+    "core/skills/playwright-cli/SKILL.md",
+    "core/skills/playwright-cli/SOURCE.md",
+    "core/skills/playwright-cli/VENDORED.md",
+    "core/skills/playwright-cli/references/element-attributes.md",
+    "core/skills/playwright-cli/references/playwright-tests.md",
+    "core/skills/playwright-cli/references/pr-attachments.md",
+    "core/skills/playwright-cli/references/request-mocking.md",
+    "core/skills/playwright-cli/references/running-code.md",
+    "core/skills/playwright-cli/references/session-management.md",
+    "core/skills/playwright-cli/references/storage-state.md",
+    "core/skills/playwright-cli/references/test-generation.md",
+    "core/skills/playwright-cli/references/tracing.md",
+    "core/skills/playwright-cli/references/video-recording.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "pricing",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/pricing/LICENSE",
+    "core/skills/pricing/SKILL.md",
+    "core/skills/pricing/SOURCE.md",
+    "core/skills/pricing/references/pricing-models.md",
+    "core/skills/pricing/references/pricing-page-teardown.md",
+    "core/skills/pricing/references/research-methods.md",
+    "core/skills/pricing/references/tier-structure.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "rea",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/rea/LICENSE",
+    "core/skills/rea/SKILL.md",
+    "core/skills/rea/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "referrals",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/referrals/LICENSE",
+    "core/skills/referrals/SKILL.md",
+    "core/skills/referrals/SOURCE.md",
+    "core/skills/referrals/references/affiliate-operations.md",
+    "core/skills/referrals/references/affiliate-programs.md",
+    "core/skills/referrals/references/program-examples.md",
+    "core/skills/referrals/references/review-platform-rules.md",
+    "core/skills/referrals/references/review-program-operations.md",
+    "core/skills/referrals/references/review-programs.md",
+    "core/skills/referrals/references/viral-mechanisms.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "research",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/research/LICENSE",
+    "core/skills/research/SKILL.md",
+    "core/skills/research/SOURCE.md",
+    "core/skills/research/VENDORED.md",
+    "core/skills/research/modules/academic.md",
+    "core/skills/research/modules/business.md",
+    "core/skills/research/modules/general.md",
+    "core/skills/research/modules/tech.md",
+    "core/skills/research/references/reddit.md",
+    "core/skills/research/references/source-tiers.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "scheduler",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "sandboxed",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/scheduler/CRON_REFERENCE.md",
+    "core/skills/scheduler/LICENSE",
+    "core/skills/scheduler/PLATFORM_SETUP.md",
+    "core/skills/scheduler/SKILL.md",
+    "core/skills/scheduler/SOURCE.md",
+    "core/skills/scheduler/VENDORED.md",
+    "core/skills/scheduler/scripts/parse-cron.py",
+    "core/skills/scheduler/scripts/setup-crontab.sh",
+    "core/skills/scheduler/scripts/setup-launchd.sh",
+    "core/skills/scheduler/scripts/setup-schtasks.ps1"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "security-and-hardening",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/security-and-hardening/LICENSE",
+    "core/skills/security-and-hardening/SKILL.md",
+    "core/skills/security-and-hardening/SOURCE.md",
+    "core/skills/security-and-hardening/VENDORED.md",
+    "core/skills/security-and-hardening/references/hardening-patterns.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "security-audit",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/security-audit/AI-AND-LLM.md",
+    "core/skills/security-audit/ATTACK-CLASSES.md",
+    "core/skills/security-audit/CLIENT-SIDE.md",
+    "core/skills/security-audit/CLOUD-AND-DEPLOYMENT.md",
+    "core/skills/security-audit/DATA-ISOLATION-AND-LIFECYCLE.md",
+    "core/skills/security-audit/DESKTOP-MOBILE-AND-LOCAL-IPC.md",
+    "core/skills/security-audit/HUNTING.md",
+    "core/skills/security-audit/LICENSE",
+    "core/skills/security-audit/MEMORY-SAFETY-AND-BINARY.md",
+    "core/skills/security-audit/PROTOCOLS-RPC-AND-MESSAGING.md",
+    "core/skills/security-audit/RECONNAISSANCE.md",
+    "core/skills/security-audit/RESOURCE-EXHAUSTION-AND-AVAILABILITY.md",
+    "core/skills/security-audit/SKILL.md",
+    "core/skills/security-audit/SOURCE.md",
+    "core/skills/security-audit/SUPPLY-CHAIN-AND-RELEASE.md",
+    "core/skills/security-audit/VALIDATION-AND-REPORTING.md",
+    "core/skills/security-audit/WEB-PROTOCOL-AND-AUTH.md",
+    "core/skills/security-audit/report-schema.json",
+    "core/skills/security-audit/validate-coverage-ledger.cjs",
+    "core/skills/security-audit/validate-coverage-ledger.test.cjs",
+    "core/skills/security-audit/validate-findings.cjs",
+    "core/skills/security-audit/validate-findings.test.cjs"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "service-business-website",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/service-business-website/LICENSE",
+    "core/skills/service-business-website/SKILL.md",
+    "core/skills/service-business-website/SOURCE.md",
+    "core/skills/service-business-website/assets/_headers",
+    "core/skills/service-business-website/assets/animations.css",
+    "core/skills/service-business-website/assets/config.template.js",
+    "core/skills/service-business-website/assets/deploy-cloudflare.sh",
+    "core/skills/service-business-website/references/architecture.md",
+    "core/skills/service-business-website/references/motion.md",
+    "core/skills/service-business-website/references/security-cloudflare.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "site-media-fetch",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/site-media-fetch/LICENSE",
+    "core/skills/site-media-fetch/SKILL.md",
+    "core/skills/site-media-fetch/SOURCE.md",
+    "core/skills/site-media-fetch/references/commands.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "skill-creator",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/skill-creator/LICENSE.txt",
+    "core/skills/skill-creator/SKILL.md",
+    "core/skills/skill-creator/SOURCE.md",
+    "core/skills/skill-creator/agents/analyzer.md",
+    "core/skills/skill-creator/agents/comparator.md",
+    "core/skills/skill-creator/agents/grader.md",
+    "core/skills/skill-creator/assets/eval_review.html",
+    "core/skills/skill-creator/eval-viewer/generate_review.py",
+    "core/skills/skill-creator/eval-viewer/viewer.html",
+    "core/skills/skill-creator/references/schemas.md",
+    "core/skills/skill-creator/scripts/__init__.py",
+    "core/skills/skill-creator/scripts/aggregate_benchmark.py",
+    "core/skills/skill-creator/scripts/generate_report.py",
+    "core/skills/skill-creator/scripts/improve_description.py",
+    "core/skills/skill-creator/scripts/package_skill.py",
+    "core/skills/skill-creator/scripts/quick_validate.py",
+    "core/skills/skill-creator/scripts/run_eval.py",
+    "core/skills/skill-creator/scripts/run_loop.py",
+    "core/skills/skill-creator/scripts/utils.py"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "skill-kokoro-tts-tool",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/skill-kokoro-tts-tool/LICENSE",
+    "core/skills/skill-kokoro-tts-tool/SKILL.md",
+    "core/skills/skill-kokoro-tts-tool/SOURCE.md",
+    "core/skills/skill-kokoro-tts-tool/VENDORED.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "skill-matchmaker",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/skill-matchmaker/LICENSE",
+    "core/skills/skill-matchmaker/SKILL.md",
+    "core/skills/skill-matchmaker/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "social",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/social/LICENSE",
+    "core/skills/social/SKILL.md",
+    "core/skills/social/SOURCE.md",
+    "core/skills/social/references/carousel-frameworks.md",
+    "core/skills/social/references/listening-sources-template.md",
+    "core/skills/social/references/listening.md",
+    "core/skills/social/references/platform-limits.md",
+    "core/skills/social/references/platforms.md",
+    "core/skills/social/references/post-templates.md",
+    "core/skills/social/references/reverse-engineering.md",
+    "core/skills/social/references/short-form-video.md",
+    "core/skills/social/references/x-algorithm.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "social-media-gen",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/social-media-gen/LICENSE",
+    "core/skills/social-media-gen/SKILL.md",
+    "core/skills/social-media-gen/SOURCE.md",
+    "core/skills/social-media-gen/references/interfaces.md",
+    "core/skills/social-media-gen/scripts/verify-interfaces.sh"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "spanish-regional-localization",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/spanish-regional-localization/LICENSE",
+    "core/skills/spanish-regional-localization/SKILL.md",
+    "core/skills/spanish-regional-localization/SOURCE.md",
+    "core/skills/spanish-regional-localization/references/regional-glossary.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "theme-factory",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/theme-factory/LICENSE",
+    "core/skills/theme-factory/SKILL.md",
+    "core/skills/theme-factory/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "trading-agents",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/trading-agents/LICENSE",
+    "core/skills/trading-agents/SKILL.md",
+    "core/skills/trading-agents/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "universal-modder",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S",
+    "N=11"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/universal-modder/LICENSE",
+    "core/skills/universal-modder/SKILL.md",
+    "core/skills/universal-modder/SOURCE.md",
+    "core/skills/universal-modder/UPSTREAM_AGENTS.md",
+    "core/skills/universal-modder/VENDORED.md",
+    "core/skills/universal-modder/skills/asset-pipeline/SKILL.md",
+    "core/skills/universal-modder/skills/fal-assets/SKILL.md",
+    "core/skills/universal-modder/skills/game-automation/SKILL.md",
+    "core/skills/universal-modder/skills/game-recon/SKILL.md",
+    "core/skills/universal-modder/skills/game-research-websearch/SKILL.md",
+    "core/skills/universal-modder/skills/mashup-mods/SKILL.md",
+    "core/skills/universal-modder/skills/mod-any-game/SKILL.md",
+    "core/skills/universal-modder/skills/mod-any-game/references/case-studies.md",
+    "core/skills/universal-modder/skills/mod-any-game/references/engines/bethesda.md",
+    "core/skills/universal-modder/skills/mod-any-game/references/engines/big-frameworks.md",
+    "core/skills/universal-modder/skills/mod-any-game/references/engines/dotnet-xna.md",
+    "core/skills/universal-modder/skills/mod-any-game/references/engines/genie-aoe2.md",
+    "core/skills/universal-modder/skills/mod-any-game/references/engines/godot.md",
+    "core/skills/universal-modder/skills/mod-any-game/references/engines/minecraft.md",
+    "core/skills/universal-modder/skills/mod-any-game/references/engines/misc-engines.md",
+    "core/skills/universal-modder/skills/mod-any-game/references/engines/native.md",
+    "core/skills/universal-modder/skills/mod-any-game/references/engines/retro-decomp.md",
+    "core/skills/universal-modder/skills/mod-any-game/references/engines/source.md",
+    "core/skills/universal-modder/skills/mod-any-game/references/engines/unity.md",
+    "core/skills/universal-modder/skills/mod-any-game/references/engines/unreal.md",
+    "core/skills/universal-modder/skills/mod-any-game/references/safety.md",
+    "core/skills/universal-modder/skills/publish-mod/SKILL.md",
+    "core/skills/universal-modder/skills/reverse-engineering/SKILL.md",
+    "core/skills/universal-modder/skills/share-field-notes/SKILL.md",
+    "core/skills/universal-modder/skills/showcase-video/SKILL.md"
+   ],
+   "nestedSkillFilesNotListed": [
+    "core/skills/universal-modder/skills/asset-pipeline/SKILL.md",
+    "core/skills/universal-modder/skills/fal-assets/SKILL.md",
+    "core/skills/universal-modder/skills/game-automation/SKILL.md",
+    "core/skills/universal-modder/skills/game-recon/SKILL.md",
+    "core/skills/universal-modder/skills/game-research-websearch/SKILL.md",
+    "core/skills/universal-modder/skills/mashup-mods/SKILL.md",
+    "core/skills/universal-modder/skills/mod-any-game/SKILL.md",
+    "core/skills/universal-modder/skills/publish-mod/SKILL.md",
+    "core/skills/universal-modder/skills/reverse-engineering/SKILL.md",
+    "core/skills/universal-modder/skills/share-field-notes/SKILL.md",
+    "core/skills/universal-modder/skills/showcase-video/SKILL.md"
+   ]
+  },
+  {
+   "skill": "verify-claims",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/verify-claims/LICENSE",
+    "core/skills/verify-claims/SKILL.md",
+    "core/skills/verify-claims/SOURCE.md",
+    "core/skills/verify-claims/VENDORED.md",
+    "core/skills/verify-claims/dependencies/claim-verifier.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "voice-operations-command",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/voice-operations-command/LICENSE",
+    "core/skills/voice-operations-command/SKILL.md",
+    "core/skills/voice-operations-command/SOURCE.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "wake-word-detection",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Unlicense",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/wake-word-detection/LICENSE",
+    "core/skills/wake-word-detection/SKILL.md",
+    "core/skills/wake-word-detection/SOURCE.md",
+    "core/skills/wake-word-detection/VENDORED.md",
+    "core/skills/wake-word-detection/references/advanced-patterns.md",
+    "core/skills/wake-word-detection/references/security-examples.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "web-artifacts-builder",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/web-artifacts-builder/LICENSE.txt",
+    "core/skills/web-artifacts-builder/SKILL.md",
+    "core/skills/web-artifacts-builder/SOURCE.md",
+    "core/skills/web-artifacts-builder/scripts/bundle-artifact.sh",
+    "core/skills/web-artifacts-builder/scripts/init-artifact.sh",
+    "core/skills/web-artifacts-builder/scripts/shadcn-components.tar.gz"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "webapp-testing",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Apache-2.0",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/webapp-testing/LICENSE.txt",
+    "core/skills/webapp-testing/SKILL.md",
+    "core/skills/webapp-testing/SOURCE.md",
+    "core/skills/webapp-testing/VENDORED.md",
+    "core/skills/webapp-testing/examples/console_logging.py",
+    "core/skills/webapp-testing/examples/element_discovery.py",
+    "core/skills/webapp-testing/examples/static_html_automation.py",
+    "core/skills/webapp-testing/scripts/with_server.py"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "website-build-standard",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/website-build-standard/LICENSE",
+    "core/skills/website-build-standard/SKILL.md",
+    "core/skills/website-build-standard/SOURCE.md",
+    "core/skills/website-build-standard/assets/media-editor-kit.html",
+    "core/skills/website-build-standard/references/build-checklist.md",
+    "core/skills/website-build-standard/references/logo-svg.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "wholesale-real-estate",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "Ronin",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/wholesale-real-estate/LICENSE",
+    "core/skills/wholesale-real-estate/SKILL.md",
+    "core/skills/wholesale-real-estate/SOURCE.md",
+    "core/skills/wholesale-real-estate/assets/assignment-agreement.md",
+    "core/skills/wholesale-real-estate/assets/deal-one-sheet.md",
+    "core/skills/wholesale-real-estate/assets/lead-sheet-template.csv",
+    "core/skills/wholesale-real-estate/assets/outreach-scripts.md",
+    "core/skills/wholesale-real-estate/assets/purchase-and-sale-agreement.md",
+    "core/skills/wholesale-real-estate/assets/seller-authorization-to-release.md",
+    "core/skills/wholesale-real-estate/assets/seller-disclosures.md",
+    "core/skills/wholesale-real-estate/references/compliance-and-legal.md",
+    "core/skills/wholesale-real-estate/references/platform-directory.md",
+    "core/skills/wholesale-real-estate/references/stage1-setup.md",
+    "core/skills/wholesale-real-estate/references/stage2-lead-lists.md",
+    "core/skills/wholesale-real-estate/references/stage3-skip-tracing.md",
+    "core/skills/wholesale-real-estate/references/stage4-outreach.md",
+    "core/skills/wholesale-real-estate/references/stage5-acquisition.md",
+    "core/skills/wholesale-real-estate/references/stage6-dispositions.md",
+    "core/skills/wholesale-real-estate/references/stage7-close.md",
+    "core/skills/wholesale-real-estate/scripts/deal_calc.py"
+   ],
+   "nestedSkillFilesNotListed": []
+  },
+  {
+   "skill": "workflows",
+   "state": "NOT WIRED",
+   "reasons": [
+    "S"
+   ],
+   "license": "MIT",
+   "rea": "clean",
+   "listed": true,
+   "callable": true,
+   "files": [
+    "core/skills/workflows/LICENSE",
+    "core/skills/workflows/SKILL.md",
+    "core/skills/workflows/SOURCE.md",
+    "core/skills/workflows/VENDORED.md"
+   ],
+   "nestedSkillFilesNotListed": []
+  }
+ ],
+ "looseFiles": [
+  "core/skills/.gitkeep"
+ ],
+ "totals": {
+  "platformEntries": 13,
+  "wiredPlatformEntries": 0,
+  "skills": 106,
+  "wiredSkills": 0,
+  "skillFiles": 1561
+ }
+}
