@@ -10,6 +10,14 @@ Owner's ruling, 2026-11-23/24. Written up by the Claude seat for the Codex seat.
 4. **One median model plus Open-JEV** is the working pair on this class. The method files carry the capability; the model stays small.
 5. **Every class above 8 GB downloads its weights locally.** This layout is the 8 GB class only.
 
+## Card configuration
+
+Kingmaker uses the card store when the host reports at most 8 GiB of physical memory. Mount the card as `/Volumes/KINGMAKERSD` or set `KINGMAKER_MODEL_CARD` to its absolute mount path before starting Kingmaker. The path must be a mounted volume. A leftover directory at that path, a symlink, or a changed mount triggers an error.
+
+The managed Ollama process uses `<card>/ollama-models` and listens on `127.0.0.1:11437`. The Brain Library assembly root for general-purpose models is `<card>/models/library`. The internal Ollama endpoint and Open-JEV's existing internal storage stay separate. Weight Hunter code and Kingmaker's state directory stay internal. A model selected by Weight Hunter uses the model's own storage lane.
+
+If the card is missing, startup and card-backed downloads report where Kingmaker expected it. Insert the card and retry. A conflicting listener on port 11437 is reported before requests can write weights there. On machines above 8 GiB, the normal Ollama and Brain Library paths continue to apply.
+
 ## What was measured on the owner's 8 GB Mac (Mac15,3, Ollama 0.34.4)
 
 Raw rows are in `catalog/bench/k4-8gb-*.jsonl`; the tables are in `catalog/HARDWARE_OUTCOMES.md`.
@@ -21,11 +29,9 @@ Raw rows are in `catalog/bench/k4-8gb-*.jsonl`; the tables are in `catalog/HARDW
 - A 3.4 GB model (`granite-code:3b`) swapped over 1 GB and froze the Mac. Not an 8 GB model.
 - **Open-JEV does not load.** See the order below.
 
-## What the code does today (Codex: these are the gaps)
+## Brain Library transport and remaining gaps
 
-- **Where a library pull lands.** `kingmaker models library pull <tag>` (`lib/bench-cli.mjs`, `materializeLibraryModel` in `lib/brain-library-fetch.mjs`) downloads release parts from `ronininc/kingmaker-brain-library`, checks every part and the whole file by SHA-256, and assembles into `<state>/models/library/<slug>`. `<state>` is `~/Library/Application Support/sol-ghost` on the internal disk (`lib/paths.mjs`). It requires free disk of twice the model size there. On the 8 GB class this must land on the card.
-- **Where Ollama keeps models.** `lib/ollama-runtime.mjs` honours `KINGMAKER_OLLAMA_MODELS` / `OLLAMA_MODELS`. Nothing sets it to the card for the 8 GB class. Tonight it was set by hand for a second server.
-- **No class switch.** Nothing in the code says "8 GB: card store plus stream; above: local download". `lib/models.mjs` only filters the catalog by `minGb`.
+- **How a library pull lands.** `materializeLibraryModel` in `lib/brain-library-fetch.mjs` downloads the release parts, verifies each part and the assembled GGUF against its SHA-256, and requires about twice the model size in free space on the assembly volume.
 - **Streaming is not live for model weights.** `docs/STREAMING-AND-EXTERNAL-DRIVES.md` says the running app does not call the streaming layer (`lib/brain-library-access.mjs`), and that the model server loads the complete model file. Today "streamed from the Brain Library" means: downloaded in parts, verified, assembled into a whole file, then loaded.
 - **JEV's weights are not in the Brain Library's format.** They sit in `ronininc/weights` as 127 ten-megabyte files in the git tree (`jev/parts/`), pushed by a driver that hit GitHub's rate limit twice. The library path expects release assets with a parts manifest.
 - **Two exceptions on this Mac.** `huihui_ai/qwen3-abliterated:8b` (5.0 GB) and `qwen2.5-coder-abliterate:7b` (4.7 GB) are on the internal disk. They are not JEV, and they are over the FAT32 limit, so they cannot go to this card. Owner has not ruled on them.

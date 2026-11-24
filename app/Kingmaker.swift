@@ -3034,9 +3034,12 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
     let size = parts.count > 1 ? " \(parts[1].uppercased())" : ""
     return "\(family)\(size)\(t.contains("abliterat") || t.contains("dolphin") ? " · abliterated" : "")"
   }
+  private static let usesModelCard = ProcessInfo.processInfo.physicalMemory <= 8 * 1024 * 1024 * 1024
+  private static let modelBaseURL = usesModelCard ? "http://127.0.0.1:11437" : "http://127.0.0.1:11434"
+  var prepareModelCard: ((@escaping (String?, String?) -> Void) -> Void)?
   private func loadModels() {
     let keep = modelPin ?? "auto"
-    var req = URLRequest(url: URL(string: "http://127.0.0.1:11434/api/tags")!); req.timeoutInterval = 2
+    var req = URLRequest(url: URL(string: Self.modelBaseURL + "/api/tags")!); req.timeoutInterval = 2
     URLSession.shared.dataTask(with: req) { [weak self] data, _, _ in
       let models = ((data.flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] })?["models"] as? [[String: Any]] ?? [])
       let installed = models.compactMap { m -> (String, Double)? in guard let n = m["name"] as? String else { return nil }; return (n, Double((m["size"] as? NSNumber)?.int64Value ?? 0) / 1e9) }
@@ -3076,19 +3079,44 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
     guard alert.runModal() == .alertFirstButtonReturn else { loadModels(); return }
     loadModels()   // the picker goes back to Auto or the pinned model while it downloads (not the ↓ row)
     append(who: "", "Downloading \(c?.name ?? tag)…")
-    var req = URLRequest(url: URL(string: "http://127.0.0.1:11434/api/pull")!); req.httpMethod = "POST"; req.timeoutInterval = 6 * 3600
+    statusLabel.stringValue = "Downloading…"
+    if Self.usesModelCard {
+      guard let prepareModelCard else {
+        statusLabel.stringValue = ""
+        append(who: "", "Kingmaker could not reach its model card.")
+        return
+      }
+      prepareModelCard { [weak self] base, error in
+        guard let self else { return }
+        guard let base else {
+          self.statusLabel.stringValue = ""
+          self.append(who: "", error ?? "Kingmaker could not reach its model card.")
+          return
+        }
+        self.downloadModel(tag, name: c?.name ?? tag, base: base)
+      }
+    } else {
+      downloadModel(tag, name: c?.name ?? tag, base: Self.modelBaseURL)
+    }
+  }
+  private func downloadModel(_ tag: String, name: String, base: String) {
+    var req = URLRequest(url: URL(string: base + "/api/pull")!); req.httpMethod = "POST"; req.timeoutInterval = 6 * 3600
     req.httpBody = try? JSONSerialization.data(withJSONObject: ["name": tag, "stream": true])
-    let task = URLSession.shared.dataTask(with: req) { [weak self] _, _, err in
+    URLSession.shared.dataTask(with: req) { [weak self] data, response, err in
+      let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+      let events = String(data: data ?? Data(), encoding: .utf8)?.split(separator: "\n").compactMap {
+        try? JSONSerialization.jsonObject(with: Data($0.utf8)) as? [String: Any]
+      }
+      let success = err == nil && (!Self.usesModelCard || ((200..<300).contains(status) && events?.last?["status"] as? String == "success"))
+      let failure = err?.localizedDescription ?? events?.last?["error"] as? String ?? "Ollama did not finish the download."
       DispatchQueue.main.async {
         guard let self else { return }
         self.statusLabel.stringValue = ""
-        self.append(who: "", err == nil ? "\(c?.name ?? tag) is ready and pinned: writing goes to it. Choose Auto on the right to unpin." : "The download stopped: \(err!.localizedDescription)")
-        if err == nil { KingmakerBar.d.set(tag, forKey: "km.modelPin") }
+        self.append(who: "", success ? "\(name) is ready and pinned: writing goes to it. Choose Auto on the right to unpin." : "The download stopped: \(failure)")
+        if success { KingmakerBar.d.set(tag, forKey: "km.modelPin") }
         self.loadModels()
       }
-    }
-    task.resume()
-    statusLabel.stringValue = "Downloading…"
+    }.resume()
   }
 
   /// The / list: Kingmaker's own tools, the plugin connectors (MCP servers) and the apps from its device scan.
@@ -3933,6 +3961,10 @@ final class GhostApp: NSObject, NSApplicationDelegate {
     buildEditMenu()
     watchFnKey()
     buildMenuBar()
+    bar.prepareModelCard = { [weak self] done in
+      guard let self else { done(nil, "Kingmaker is unavailable."); return }
+      self.prepareCardOllama(done)
+    }
     _ = barLinkKey()
     if ProcessInfo.processInfo.environment["SOL_GHOST_GLOW_DEMO"] == "1" { demo(); return }
     if ProcessInfo.processInfo.environment["SOL_GHOST_GLOW_ATTACH"] == "1" { attach(); return }
@@ -4206,6 +4238,30 @@ final class GhostApp: NSObject, NSApplicationDelegate {
       log(lastLine)
       transition(to: "down"); render()
     }
+  }
+
+  /// Ask the same storage check used by startup before the menu sends a model pull.
+  private func prepareCardOllama(_ done: @escaping (String?, String?) -> Void) {
+    guard let resources = Bundle.main.resourceURL else { done(nil, "Kingmaker's runtime is unavailable."); return }
+    let p = Process()
+    let output = Pipe()
+    p.executableURL = URL(fileURLWithPath: runtimeBinary.path)
+    p.arguments = [resources.appendingPathComponent("sol-ghost/lib/kingmaker.mjs").path, "models", "card-ollama"]
+    var env = ProcessInfo.processInfo.environment
+    env["ELECTRON_RUN_AS_NODE"] = "1"
+    env["SOL_GHOST_HOME"] = stateDir.path
+    p.environment = env
+    p.standardOutput = output
+    p.standardError = output
+    p.terminationHandler = { process in
+      let text = String(data: output.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)?
+        .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+      DispatchQueue.main.async {
+        if process.terminationStatus == 0, URL(string: text)?.scheme == "http" { done(text, nil) }
+        else { done(nil, text.isEmpty ? "Kingmaker could not reach its model card." : text) }
+      }
+    }
+    do { try p.run() } catch { done(nil, error.localizedDescription) }
   }
 
   private func claimTermination(_ generation: UUID, reason: String) -> Bool {
