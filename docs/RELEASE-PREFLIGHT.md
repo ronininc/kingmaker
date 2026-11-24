@@ -2,10 +2,26 @@
 
 This is a read-only prerequisite check. It never builds, signs, notarizes, uploads, publishes, makes a production change, or enrolls a device. Exit 0 means local conditions permit the owner to start the existing build/check lane, **not** that anything can be promoted. Exit 1 is a blocker; exit 2 is malformed input. Do not treat a Linux check or a draft installer as a release.
 
+## Before building anything
+
+Use host phase first. It requires neither a built app nor a signed manifest, and it does not read an enrollment code or any private key. The operating machine must have the current pinned Kingmaker codesigning identity and the outer Developer ID, an exact clean product checkout, an exact clean engine checkout with its macOS packager, the project Node version and Apple build tools, and the stated free space on scratch.
+
+```sh
+node scripts/release-preflight.mjs --phase host \
+  --source "$PRODUCT_CHECKOUT" --source-commit "$PRODUCT_FULL_SHA" \
+  --engine-source "$ENGINE_CHECKOUT" --engine-commit "$ENGINE_FULL_SHA" \
+  --scratch "$BUILD_SCRATCH" --runtime-dir "$LOCAL_RUNTIME_INPUTS" \
+  --runtime-plan "$APPROVED_RUNTIME_INVENTORY" --check-notary
+```
+
+The nonsecret runtime inventory is an object with `sourceCommit`, `engineCommit`, and `inputs`. Every required runtime kind (the existing `REQUIRED_RUNTIMES` shipping list) names one distinct local input file using `{kind,file,size,sha256}`; files must be directly inside the input directory. Build and hash these inputs through the existing approved acquisition lane before reporting host readiness. The preflight checks the inventory against the checkout commits and actual local bytes; it does not attest the acquisition process, open archives, or fetch missing inputs. The host can omit `--check-notary` to inventory Apple tools without a network credential test; the output explicitly reports the profile was not checked. Host exit 0 never permits promotion or proves the packaged output.
+
+## After the owner has built and staged the signed artifact
+
 On the approved Apple silicon release host, use a separate clean checkout for the exact product source and point to an existing packaged app and staged signed manifest. Do not put private keys or signing credentials in this checkout or a generic CI runner. Existing owner-lane environment supplies the Developer ID identity name, notarization keychain profile, and enrollment configuration; do not pass credentials on the command line.
 
 ```sh
-node scripts/release-preflight.mjs \
+node scripts/release-preflight.mjs --phase artifact \
   --source "$PRODUCT_CHECKOUT" --source-commit "$PRODUCT_FULL_SHA" \
   --engine-source "$ENGINE_CHECKOUT" --engine-commit "$ENGINE_FULL_SHA" \
   --app "$PACKAGED_APP" --build-receipt "$BUILD_RECEIPT" \

@@ -18,7 +18,7 @@ jobs:
       - name: Real CI host must fail closed
         run: |
           set +e
-          node scripts/release-preflight.mjs > "${RUNNER_TEMP}/release-preflight.json"
+          node scripts/release-preflight.mjs --phase host > "${RUNNER_TEMP}/release-preflight.json"
           status=$?
           set -e
           test "$status" -eq 1

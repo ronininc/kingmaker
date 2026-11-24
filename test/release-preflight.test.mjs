@@ -107,3 +107,36 @@ test('production metadata cannot be inferred from Linux or unconfigured flags', 
   assert.throws(()=>parseArgs(['--minimum-free-gib','0']));
   assert.throws(()=>parseArgs(['--key','ignored']));
 });
+
+test('host phase can pass before any app, signed manifest, enrollment configuration or notary key read', async (t) => {
+  const f=fixture(t);
+  rmSync(f.options.app,{recursive:true});
+  rmSync(f.options.staging,{recursive:true});
+  delete f.options.buildReceipt;
+  delete f.deps.env.KINGMAKER_ENROLL_URL;
+  delete f.deps.env.KINGMAKER_ENROLL_CODE;
+  f.deps.publicKey=()=>{ assert.fail('host must not read even the manifest public key'); };
+  f.options.phase='host';
+  f.options.checkNotary=false;
+  f.options.runtimeDir=join(f.options.source,'runtime');
+  f.options.runtimePlan=join(f.options.source,'runtime-plan.json');
+  f.put(join(f.options.engineSource,'desktop','run-electron-builder.mjs'),'fixture code');
+  const inputs=REQUIRED_RUNTIMES.map((kind,i)=>{
+    const file='input-'+i+'.tar.gz';
+    f.put(join(f.options.runtimeDir,file),kind);
+    return {kind,file,size:Buffer.byteLength(kind),sha256:sha(kind)};
+  });
+  f.put(f.options.runtimePlan,JSON.stringify({sourceCommit,engineCommit,inputs}));
+  const r=await preflight(f.options,f.deps);
+  assert.equal(r.phase,'host');
+  assert.equal(r.readyForOwnerBuild,true,JSON.stringify(r));
+  assert.equal(r.readyForPublication,false);
+  assert.equal(checks(r)['outer-notary'],'not-checked');
+  assert.ok(!r.checks.some((c)=>['staged-assets','offline-signature','enrollment-config','app-code-signature'].includes(c.id)));
+  f.put(join(f.options.runtimeDir,inputs[0].file),'stale bytes');
+  const blocked=await preflight(f.options,f.deps);
+  assert.equal(blocked.readyForOwnerBuild,false);
+  assert.equal(checks(blocked)['runtime-inputs'],'blocked');
+  assert.throws(()=>parseArgs(['--phase','unknown']));
+  assert.equal(parseArgs(['--phase','host']).phase,'host');
+});

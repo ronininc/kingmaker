@@ -60,6 +60,9 @@ function enrollmentUrl(value) {
 export async function preflight(options, { env = process.env, host = { platform: process.platform, arch: process.arch }, command = silentCommand,
   fsCapacity = statfsSync, pin = readPin(), publicKey = () => readFileSync(join(ROOT, 'lib', 'kingmaker-release-public.pem'), 'utf8') } = {}) {
   const checks = [];
+  const phase = options.phase ?? 'artifact';
+  const hostOnly = phase === 'host';
+  if (phase !== 'host' && phase !== 'artifact') throw Error('Invalid phase.');
   function check(id, pass, success, blocker, facts) {
     checks.push({ id, status: pass ? 'pass' : 'blocked', detail: pass ? success : blocker, ...(facts ? { facts } : {}) });
     return pass;
@@ -74,7 +77,7 @@ export async function preflight(options, { env = process.env, host = { platform:
   })();
   check('source', clean && /^\d+\.\d+\.\d+$/.test(pkg?.version ?? ''), 'Exact clean source checkout and package version.', 'Point --source and --source-commit at the exact clean intended release checkout.');
 
-  const app = options.app, resources = app && join(app, 'Contents', 'Resources');
+  const app = hostOnly ? null : options.app, resources = app && join(app, 'Contents', 'Resources');
   const runtime = resources && join(resources, 'sol-ghost');
   const missingRuntimes = REQUIRED_PATHS.filter((name) => !resources || !existsSync(join(resources, name)));
   const engine = app && join(app, 'Contents', 'MacOS', 'KingmakerEngine');
@@ -82,7 +85,7 @@ export async function preflight(options, { env = process.env, host = { platform:
   const codeFacts = appCode ? (command('/usr/bin/codesign', ['-d', '--verbose=4', app]).stderr ?? '') : '';
   const hardened = appCode && /\bflags=[^\n]*\bruntime\b/.test(codeFacts);
   const innerDeveloperId = /^Authority=Developer ID Application:/m.test(codeFacts);
-  check('app-code-signature', appCode && hardened, 'The packaged app meets the pinned Kingmaker certificate and hardened runtime.', 'Supply the exact signed packaged Kingmaker.app: pinned app identity, hardened runtime, no ad-hoc substitution.', { innerDeveloperId, outerAppleNotaryIsSeparate: true });
+  if (!hostOnly) check('app-code-signature', appCode && hardened, 'The packaged app meets the pinned Kingmaker certificate and hardened runtime.', 'Supply the exact signed packaged Kingmaker.app: pinned app identity, hardened runtime, no ad-hoc substitution.', { innerDeveloperId, outerAppleNotaryIsSeparate: true });
   let p = null;
   try { p = runtime && jsonFile(join(runtime, 'payload.json'), 20 * 1024 * 1024); } catch {}
   let payloadOk = false;
@@ -96,10 +99,10 @@ export async function preflight(options, { env = process.env, host = { platform:
       }
     }
   } catch { payloadOk = false; }
-  check('runtime', payloadOk, 'Bundled runtime closure and payload-file checks passed.', 'Rebuild the full runtime from the intended checkout and provide its complete, version-matched payload inventory.', { missingRuntimes });
+  if (!hostOnly) check('runtime', payloadOk, 'Bundled runtime closure and payload-file checks passed.', 'Rebuild the full runtime from the intended checkout and provide its complete, version-matched payload inventory.', { missingRuntimes });
 
   let built = null;
-  try { built = options.buildReceipt && jsonFile(options.buildReceipt); } catch {}
+  try { built = !hostOnly && options.buildReceipt && jsonFile(options.buildReceipt); } catch {}
   let appMeta = null;
   if (appCode) {
     try { const p = command('/usr/bin/plutil', ['-convert', 'json', '-o', '-', join(app, 'Contents', 'Info.plist')]); if (p.status === 0) appMeta = JSON.parse(p.stdout); } catch {}
@@ -113,7 +116,46 @@ export async function preflight(options, { env = process.env, host = { platform:
     built?.engineCommit === options.engineCommit && built?.appVersion === pkg?.version &&
     built?.engineBuild === engineBuild && DIGEST.test(built?.engineSha256 ?? '') &&
     await sha256File(engine).catch(() => '') === built.engineSha256);
-  check('build-provenance', provenance, 'Source/runtime receipts match the inspected arm64 app bytes and bundle metadata.', 'Provide exact engine checkout/commit and the matching owner-lane receipt with source commit, package version, engine build marker, and SHA-256 of KingmakerEngine.');
+  if (!hostOnly) check('build-provenance', provenance, 'Source/runtime receipts match the inspected arm64 app bytes and bundle metadata.', 'Provide exact engine checkout/commit and the matching owner-lane receipt with source commit, package version, engine build marker, and SHA-256 of KingmakerEngine.');
+
+  if (hostOnly) {
+    const cleanEngine = rtCommit && (() => {
+      const r = command('/usr/bin/git', ['-C', options.engineSource, 'status', '--porcelain', '--untracked-files=no']);
+      return r.status === 0 && !r.stdout?.trim();
+    })();
+    check('engine-source', cleanEngine && regular(join(options.engineSource,'desktop','run-electron-builder.mjs')),
+      'Exact clean engine checkout and existing packager entry.', 'Provide the approved engine checkout and its full source commit, with the existing macOS packager.');
+    const node = options.nodeVersion ?? process.versions.node;
+    const [a,b,c] = node.split('.').map(Number);
+    const nodeOK = a > 24 || (a === 24 && (b > 22 || (b === 22 && c >= 1)));
+    const sdk = Boolean(mac && command('/usr/bin/xcrun',['--sdk','macosx','--show-sdk-path']).status === 0 &&
+      command('/usr/bin/xcrun',['--find','swiftc']).status === 0);
+    check('build-dependencies', nodeOK && sdk, 'Node meets the project floor, and the macOS SDK and Swift compiler are available.',
+      'Use Node 24.22.1 or newer and the approved Xcode/macOS SDK; no tools are installed by this command.');
+    // Before packaging there is no signed app or archive. The operator supplies a
+    // nonsecret input inventory from the approved acquisition lane, not a new key.
+    let verifiedKinds = [];
+    try {
+      const root = options.runtimeDir;
+      const plan = options.runtimePlan && jsonFile(options.runtimePlan);
+      if (root && plan?.engineCommit === options.engineCommit && plan?.sourceCommit === options.sourceCommit &&
+          Array.isArray(plan?.inputs) && plan.inputs.length === REQUIRED_RUNTIMES.length && lstatSync(root).isDirectory()) {
+        const kinds = new Set(), files = new Set();
+        for (const item of plan.inputs) {
+          if (!REQUIRED_RUNTIMES.includes(item?.kind) || kinds.has(item.kind) ||
+              files.has(item?.file) || !SAFE_NAME.test(item?.file ?? '') || !DIGEST.test(item?.sha256 ?? '') ||
+              !Number.isSafeInteger(item?.size) || item.size <= 0) break;
+          const path = join(root,item.file);
+          if (!regular(path) || lstatSync(path).size !== item.size || await sha256File(path) !== item.sha256) break;
+          kinds.add(item.kind); files.add(item.file);
+        }
+        verifiedKinds = [...kinds];
+      }
+    } catch {}
+    check('runtime-inputs', verifiedKinds.length === REQUIRED_RUNTIMES.length,
+      'Owner-provided local runtime inputs match the source-linked inventory and actual bytes.',
+      'Supply --runtime-dir and --runtime-plan from the approved acquisition lane; no network acquisition occurs.', { missingKinds: REQUIRED_RUNTIMES.filter((k) => !verifiedKinds.includes(k)) });
+  }
 
   let unpacked = 0;
   if (appCode) {
@@ -128,7 +170,7 @@ export async function preflight(options, { env = process.env, host = { platform:
   };
   const planned = options.minimumFreeGib ?? 32;
   const minimum = Math.max(planned * GIB, unpacked * 3 + 2 * GIB);
-  for (const name of ['scratch', 'staging']) {
+  for (const name of hostOnly ? ['scratch'] : ['scratch', 'staging']) {
     const dir = options[name], freeBytes = dir ? free(dir) : 0;
     check(name+'-capacity', Boolean(dir && writable(dir) && freeBytes >= minimum), 'Writable local volume with adequate preflight headroom.',
       'Supply an existing writable '+name+' directory with the stated free bytes. This check does not reserve space.', { freeBytes, minimumBytes: minimum, appAllocatedBytes: unpacked || null });
@@ -144,10 +186,19 @@ export async function preflight(options, { env = process.env, host = { platform:
   const profile = typeof env.KINGMAKER_NOTARY_PROFILE === 'string' ? env.KINGMAKER_NOTARY_PROFILE : '';
   const toolsOk = mac && command('/usr/bin/xcrun',['--find','notarytool']).status === 0 && command('/usr/bin/xcrun',['--find','stapler']).status === 0;
   const notaryOk = Boolean(toolsOk && profile && options.checkNotary && command('/usr/bin/xcrun',['notarytool','history','--keychain-profile',profile,'--output-format','json']).status === 0);
-  check('outer-notary', notaryOk, 'Outer installer: notarytool and stapler found; configured profile passed a read-only Apple history request.', 'Outer installer: use the approved notary profile and pass --check-notary to verify it read-only. Without verification, this gate remains blocked.');
+  if (hostOnly && !options.checkNotary && toolsOk) checks.push({id:'outer-notary',status:'not-checked',detail:'Apple tools present. Add --check-notary to verify the local profile with a read-only history query.'});
+  else check('outer-notary', notaryOk, 'Outer installer: notarytool and stapler found; configured profile passed a read-only Apple history request.', 'Outer installer: use the approved notary profile and pass --check-notary to verify it read-only. Without verification, this gate remains blocked.');
 
-  const hasEnroll = enrollmentUrl(env.KINGMAKER_ENROLL_URL) && envHas(env, 'KINGMAKER_ENROLL_CODE');
-  check('enrollment-config', hasEnroll, 'An HTTPS enrollment URL and enrollment-code variable are configured; code value not read.', 'Configure the existing HTTPS enrollment endpoint and code variable on the approved host. This does not mint keys or validate the code.');
+  const hasEnroll = !hostOnly && enrollmentUrl(env.KINGMAKER_ENROLL_URL) && envHas(env, 'KINGMAKER_ENROLL_CODE');
+  if (!hostOnly) check('enrollment-config', hasEnroll, 'An HTTPS enrollment URL and enrollment-code variable are configured; code value not read.', 'Configure the existing HTTPS enrollment endpoint and code variable on the approved host. This does not mint keys or validate the code.');
+
+  if (hostOnly) return {
+    phase,
+    readyForOwnerBuild: checks.every((c) => c.status === 'pass' || c.status === 'not-checked'),
+    readyForPublication: false, checks,
+    publicationBlockers: ['Artifact phase, actual signing and notarization, signed staging, enrollment, and exact clean customer install are not verified.'],
+    scope: 'Read-only host and acquisition input checks. No install, build, private key read, signing, upload, enrollment or publish performed.',
+  };
 
   let manifest = null, signatureOk = false, packagePolicy = false, physicalOk = false, pubKeyFingerprint = null;
   const assets = options.staging;
@@ -179,6 +230,7 @@ export async function preflight(options, { env = process.env, host = { platform:
   check('manifest-policy', packagePolicy, 'Signed manifest version, source, architecture, runtime marker, and production ship policy agree.', 'Regenerate the signed manifest from the exact app/source; resolve production provenance/version/Launcher pin/enrollment policy mismatches.');
   check('staged-assets', physicalOk, 'Local staged payload parts and Launcher archive match the signed pins.', 'Stage the exact signed release parts and Launcher archive; every size and hash must match.');
   return {
+    phase,
     readyForOwnerBuild: checks.every((c) => c.status === 'pass'),
     readyForPublication: false,
     checks,
@@ -190,7 +242,7 @@ export async function preflight(options, { env = process.env, host = { platform:
   };
 }
 
-const FLAGS = new Map([['--source','source'],['--source-commit','sourceCommit'],['--engine-source','engineSource'],['--engine-commit','engineCommit'],['--app','app'],['--build-receipt','buildReceipt'],['--scratch','scratch'],['--staging','staging'],['--minimum-free-gib','minimumFreeGib']]);
+const FLAGS = new Map([['--phase','phase'],['--runtime-dir','runtimeDir'],['--runtime-plan','runtimePlan'],['--source','source'],['--source-commit','sourceCommit'],['--engine-source','engineSource'],['--engine-commit','engineCommit'],['--app','app'],['--build-receipt','buildReceipt'],['--scratch','scratch'],['--staging','staging'],['--minimum-free-gib','minimumFreeGib']]);
 export function parseArgs(argv) {
   const out = {};
   for (let i=0; i<argv.length; i++) {
@@ -199,7 +251,10 @@ export function parseArgs(argv) {
     const key = FLAGS.get(raw);
     const value = argv[++i];
     if (!key || !value || value.startsWith('--') || Object.hasOwn(out,key)) throw Error('Invalid or repeated option.');
-    if (key === 'minimumFreeGib') {
+    if (key === 'phase') {
+      if (value !== 'host' && value !== 'artifact') throw Error('Expected host or artifact phase.');
+      out.phase=value;
+    } else if (key === 'minimumFreeGib') {
       if (!/^\d+$/.test(value) || Number(value) < 1 || Number(value) > 10000) throw Error('Minimum free GiB must be a positive integer within 1..10000.');
       out[key]=Number(value);
     } else out[key] = key.endsWith('Commit') ? value.toLowerCase() : resolve(value);
