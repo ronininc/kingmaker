@@ -12,7 +12,11 @@ permissions:
 jobs:
   node-suite:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,6 +24,13 @@ jobs:
           node-version: 20.15.1
           cache: npm
       - run: npm ci --ignore-scripts
-      # package.json quotes these globs for zsh compatibility; expand them in
-      # bash so Node receives the actual files on the disposable Linux host.
-      - run: node --test --test-force-exit test/*.test.mjs addons/*/test/*.test.mjs
+      - name: Run deterministic test shard
+        shell: bash
+        run: |
+          mapfile -t files < <(
+            { find test -maxdepth 1 -name '*.test.mjs'; find addons -path '*/test/*.test.mjs'; } \
+              | sort \
+              | awk -v shard="${{ matrix.shard }}" 'NR % 4 == shard'
+          )
+          printf 'Shard %s: %s files\n' "${{ matrix.shard }}" "${#files[@]}"
+          node --test --test-force-exit "${files[@]}"
