@@ -1,0 +1,25 @@
+name: Kingmaker read-only release preflight tests
+on:
+  push:
+    branches: [candidate/owner-release-preflight]
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci --ignore-scripts
+      - run: node --test test/release-preflight.test.mjs
+      - name: Real CI host must fail closed
+        run: |
+          set +e
+          node scripts/release-preflight.mjs > "${RUNNER_TEMP}/release-preflight.json"
+          status=$?
+          set -e
+          test "$status" -eq 1
+          node --input-type=module -e 'import fs from "node:fs"; const a=JSON.parse(fs.readFileSync(process.argv[1])); if(a.readyForOwnerBuild || a.readyForPublication || !a.checks.some(x=>x.id==="host"&&x.status==="blocked"))process.exit(1)' "${RUNNER_TEMP}/release-preflight.json"
