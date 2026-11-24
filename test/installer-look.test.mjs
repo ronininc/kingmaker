@@ -23,10 +23,17 @@ test('the window moves, resizes, goes full screen and remembers where it was', (
   assert.doesNotMatch(swift, /PackPicker|installer\.packs|selectedPack/, 'no pack picker remains');
 });
 
-test('its words follow the language setting, and the Ronin Launcher is listed', () => {
-  for (const w of ['Wake word', 'Give me a name', 'One download: everything, or nothing.']) assert.ok(swift.includes(`L.t("${w}")`), w);
+test('its words follow the language setting, including the optional Launcher', () => {
+  for (const w of ['Wake word', 'Give me a name', 'Install Kingmaker on its own.', 'Also install Ronin Launcher (optional)']) assert.ok(swift.includes(`L.t("${w}")`), w);
   assert.ok(!swift.includes('Choose your pack'), 'the pack choice is gone from the window and its words');
   assert.match(swift, /Caps\(text: L\.t\(\{ if case \.failed/, 'the main button\'s label goes through L.t');
   for (const w of ['Download & Install', 'Download & Update', 'Try again']) assert.ok(swift.includes(`"${w}": ["es":`), `${w} is translated`);
-  assert.match(swift, /Kingmaker\.app · Ronin Launcher/);
+  assert.doesNotMatch(swift, /Kingmaker\.app · Ronin Launcher/);
+});
+
+test('the stock installer opts out of Launcher unless the customer checks its separate optional box', () => {
+  assert.match(swift, /@Published var installLauncher = false/);
+  assert.match(swift, /Toggle\(isOn: \$installer\.installLauncher\)/);
+  assert.match(swift, /let launcherChoice = installLauncher \? \[\] : \["--without-launcher"\]/);
+  assert.match(swift, /p\.arguments = \[engine\.path, "--wake-word", word\] \+ terms \+ launcherChoice \+ Installer\.devArgs/);
 });

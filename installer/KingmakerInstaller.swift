@@ -114,7 +114,8 @@ enum L {
     "Text size": ["es": "Tamaño del texto", "fr": "Taille du texte", "de": "Textgröße", "pt": "Tamanho do texto", "it": "Dimensione testo", "ja": "文字サイズ", "zh": "文字大小", "ko": "글자 크기"],
     "Opens at": ["es": "Se abre en", "fr": "S’ouvre en", "de": "Öffnet", "pt": "Abre em", "it": "Si apre", "ja": "表示位置", "zh": "打开位置", "ko": "열리는 위치"],
     "Language": ["es": "Idioma", "fr": "Langue", "de": "Sprache", "pt": "Idioma", "it": "Lingua", "ja": "言語", "zh": "语言", "ko": "언어"],
-    "One download: everything, or nothing.": ["es": "Una descarga: todo o nada.", "fr": "Un seul téléchargement : tout ou rien.", "de": "Ein Download: alles oder nichts.", "pt": "Um download: tudo ou nada.", "it": "Un download: tutto o niente.", "ja": "ダウンロードは一度：すべてか、何もなしか。", "zh": "一次下载：全部，或什么都不装。", "ko": "한 번의 다운로드: 전부 아니면 아무것도."],
+    "Install Kingmaker on its own.": ["es": "Instala solo Kingmaker.", "fr": "Installer Kingmaker seul.", "de": "Nur Kingmaker installieren.", "pt": "Instale apenas o Kingmaker.", "it": "Installa solo Kingmaker.", "ja": "Kingmaker 単体をインストール。", "zh": "单独安装 Kingmaker。", "ko": "Kingmaker만 설치합니다."],
+    "Also install Ronin Launcher (optional)": ["es": "Instalar también Ronin Launcher (opcional)", "fr": "Installer aussi Ronin Launcher (facultatif)", "de": "Auch Ronin Launcher installieren (optional)", "pt": "Instalar também o Ronin Launcher (opcional)", "it": "Installa anche Ronin Launcher (facoltativo)", "ja": "Ronin Launcher もインストール（オプション）", "zh": "同时安装 Ronin Launcher（可选）", "ko": "Ronin Launcher도 설치(선택 사항)"],
     "1 to 3 words, letters only. Cemented at install: to change it later, delete Kingmaker and install it again.": ["es": "De 1 a 3 palabras, solo letras. Queda fijada al instalar: para cambiarla, borra Kingmaker e instálalo de nuevo.", "fr": "1 à 3 mots, lettres seulement. Fixé à l’installation : pour le changer, supprimez Kingmaker et réinstallez-le.", "de": "1 bis 3 Wörter, nur Buchstaben. Wird bei der Installation festgelegt: zum Ändern Kingmaker löschen und neu installieren.", "pt": "De 1 a 3 palavras, só letras. Fica fixa na instalação: para mudar, apague o Kingmaker e instale de novo.", "it": "Da 1 a 3 parole, solo lettere. Fissata all’installazione: per cambiarla, elimina Kingmaker e reinstallalo.", "ja": "1〜3語、文字のみ。インストール時に固定されます。変えるには Kingmaker を削除して再インストールしてください。", "zh": "1 到 3 个词，仅限字母。安装时固定：要更改，请删除 Kingmaker 后重新安装。", "ko": "1~3단어, 글자만. 설치 시 고정됩니다. 바꾸려면 Kingmaker를 삭제하고 다시 설치하세요."],
   ]
 }
@@ -174,6 +175,7 @@ final class Installer: ObservableObject {
   @Published var hasManifest = true
   @Published var termsAccepted = false
   @Published var showingTerms = false
+  @Published var installLauncher = false   // independent by default; the checkbox is the only normal opt-in
   @Published var customizing = false   // the Customize popover
   /// What still stands between the person and the button (nil = it can be pressed).
   var blocker: String? {
@@ -228,7 +230,10 @@ final class Installer: ObservableObject {
     buffer = Data()
     let p = Process()
     p.executableURL = URL(fileURLWithPath: "/bin/bash")
-    p.arguments = [engine.path, "--wake-word", word] + terms + Installer.devArgs
+    // Keep the existing engine and all verification gates. Do not download or place
+    // Launcher unless the person explicitly adds it to this install.
+    let launcherChoice = installLauncher ? [] : ["--without-launcher"]
+    p.arguments = [engine.path, "--wake-word", word] + terms + launcherChoice + Installer.devArgs
     let out = Pipe()
     p.standardOutput = out
     p.standardError = FileHandle.nullDevice
@@ -365,11 +370,11 @@ struct InstallerView: View {
             Text(line).font(Machine.mono(10)).foregroundColor(Machine.inkDim).padding(.top, 8)
               .accessibilityLabel(line)
           }
-          Text(L.t("One download: everything, or nothing."))
+          Text(L.t("Install Kingmaker on its own."))
             .font(.system(size: 12 * look.scale)).foregroundColor(Machine.inkDim).padding(.top, 10)
           controls.padding(.horizontal, 40).padding(.top, 22)
           Rectangle().fill(Machine.lineFaint).frame(height: 1).padding(.top, 22)
-          Text("Kingmaker.app · Ronin Launcher · the abliterated models · the knowledge library · SearXNG · Hands of Horus")
+          Text("Kingmaker.app · local model support · knowledge library · SearXNG · Hands of Horus")
             .font(Machine.mono(9.5)).foregroundColor(Machine.inkFaint).multilineTextAlignment(.center).padding(.top, 10).padding(.horizontal, 20)
           Text(verbatim: "Free for personal, noncommercial use · PolyForm Noncommercial 1.0.0")
             .font(Machine.mono(9.5)).foregroundColor(Machine.inkFaint).padding(.top, 3).padding(.bottom, 16)
@@ -444,6 +449,11 @@ struct InstallerView: View {
           }
           .padding(.top, 8)
         }
+        Toggle(isOn: $installer.installLauncher) {
+          Text(L.t("Also install Ronin Launcher (optional)")).font(Machine.mono(11)).foregroundColor(Machine.ink)
+        }
+        .toggleStyle(.checkbox)
+        .padding(.top, 8)
         Button(action: { installer.start() }) {
           Caps(text: L.t({ if case .failed = installer.phase { return "Try again" } else { return installer.cementedWord == nil ? "Download & Install" : "Download & Update" } }()), size: 13, color: .black)
             .frame(maxWidth: .infinity).padding(.vertical, 13)
