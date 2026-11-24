@@ -38,7 +38,7 @@ JSON extraction, a working regex function, a price sum, a one-line summary). "Re
 resident at a time. Each switch between roles reloaded a model (1.1–5.1 s), even the "always-warm" 0.6b reflex, and swap
 grew 1.2 GB over eight turns. A turn that stays on one model answers in ~1.5 s; a turn that changes role takes 3–7 s.
 
-## Re-measured 2026-11-24 (K4, partial: three of the installed models)
+## Re-measured 2026-11-23 (K4, partial: three of the installed models)
 
 Measured on the owner's 8 GB Mac: `hw.memsize` 8589934592, `hw.model` Mac15,3 (hostname "Robbies-MacBook-Pro"), Ollama
 0.34.4, 1.7 GB of disk free. Same harness as above (`bench/bench_models.py`, `bench/eval_models.py`). Raw rows:
