@@ -25,7 +25,7 @@ jobs:
       - name: Prepare exact pinned prompts
         run: |
           python -m venv venv
-          venv/bin/pip install --quiet transformers==4.57.6
+          venv/bin/pip install --quiet transformers==4.57.6 jinja2==3.1.6
           mkdir tokenizer open-jev prompts
           base='https://huggingface.co/Qwen/Qwen3.5-2B/resolve/15852e8c16360a2fea060d615a32b45270f8a8fc'
           curl -fsSL --retry 4 -o tokenizer/tokenizer.json "$base/tokenizer.json"
