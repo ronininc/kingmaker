@@ -1028,7 +1028,31 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
   }
   private func connector(_ id: Any?) -> [String: Any]? { guard let id = id as? String else { return nil }; return connectors.first { ($0["id"] as? String) == id } }
   private func fleetSkill(_ id: Any?) -> [String: Any]? { guard let id=id as? String else { return nil };return fleetSkills.first { ($0["id"] as? String)==id } }
-  @objc private func addFleetSkillRow(_ b:NSButton) { guard let skill=fleetSkill(b.identifier?.rawValue),let id=skill["id"] as? String else{return};let status=(skill["status"] as? String) ?? "blocked";if status=="added" { append(who:"", "This Fleet skill is already in My Tools.");return };if (skill["needsApproval"] as? Bool)==true { let permissions=(skill["permissions"] as? [String] ?? []).joined(separator:", "),alert=NSAlert();alert.messageText="Approve new access for \(id)?";alert.informativeText="This update requests: \(permissions). Adding it does not run the skill.";alert.addButton(withTitle:"Approve update");alert.addButton(withTitle:"Cancel");guard alert.runModal() == .alertFirstButtonReturn else{return};onCommand("fleet-skill-add \(id) approve");return };if status=="revoked"||status=="blocked" { append(who:"", (skill["reason"] as? String) ?? "This Fleet skill cannot be added.");return };onCommand("fleet-skill-add \(id)") }
+  @objc private func addFleetSkillRow(_ button: NSButton) {
+    guard let skill = fleetSkill(button.identifier?.rawValue), let id = skill["id"] as? String else { return }
+    let status = (skill["status"] as? String) ?? "blocked"
+    if status == "added" {
+      append(who: "", "This Fleet skill is already in My Tools.")
+      return
+    }
+    if (skill["needsApproval"] as? Bool) == true {
+      guard let pin = skill["packageSha256"] as? String else { return }
+      let permissions = (skill["permissions"] as? [String] ?? []).joined(separator: ", ")
+      let alert = NSAlert()
+      alert.messageText = "Approve new access for \(id)?"
+      alert.informativeText = "Requested permissions: \(permissions). Adding this update does not run the skill."
+      alert.addButton(withTitle: "Approve update")
+      alert.addButton(withTitle: "Cancel")
+      guard alert.runModal() == .alertFirstButtonReturn else { return }
+      onCommand("fleet-skill-add \(id) approve \(pin)")
+      return
+    }
+    if status == "revoked" || status == "blocked" {
+      append(who: "", (skill["reason"] as? String) ?? "This Fleet skill cannot be added.")
+      return
+    }
+    onCommand("fleet-skill-add \(id)")
+  }
   @objc private func openConnectorRow(_ b: NSButton) { if let t = connector(b.identifier?.rawValue)?["target"] as? String, t.hasPrefix("/") { NSWorkspace.shared.open(URL(fileURLWithPath: t)) } }
   @objc private func openConnectorTarget(_ m: NSMenuItem) { if let t = connector(m.representedObject)?["target"] as? String, t.hasPrefix("/") { NSWorkspace.shared.open(URL(fileURLWithPath: t)) } }
   @objc private func revealConnectorTarget(_ m: NSMenuItem) { if let t = connector(m.representedObject)?["target"] as? String, t.hasPrefix("/") { NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: t)]) } }
