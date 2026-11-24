@@ -1,5 +1,8 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {generateKeyPairSync,sign,createHash} from 'node:crypto';import {mkdtempSync,mkdirSync,readFileSync,writeFileSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';
-import {canonicalJson} from '../vendor/fleet/fleet-packet.mjs';import {addFleetSkill,CATALOG_DOMAIN,FLEET_SKILLS_SCHEMA,loadFleetSkillCatalog,PACKAGE_DOMAIN,SKILL_PACKAGE_SCHEMA} from '../lib/fleet-skills.mjs';import {connectorTurn,listConnectors,savedConnectors} from '../lib/connectors.mjs';
+import { createServer } from 'node:http';
+import { once } from 'node:events';
+import { setTimeout as delay } from 'node:timers/promises';
+import test from 'node:test';import assert from 'node:assert/strict';import {generateKeyPairSync,sign,createHash} from 'node:crypto';import {existsSync,mkdtempSync,mkdirSync,readFileSync,writeFileSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';
+import {canonicalJson} from '../vendor/fleet/fleet-packet.mjs';import {addFleetSkill,CATALOG_DOMAIN,FLEET_SKILLS_SCHEMA,loadFleetSkillCatalog,startFleetSkillRefresh,PACKAGE_DOMAIN,SKILL_PACKAGE_SCHEMA} from '../lib/fleet-skills.mjs';import {connectorTurn,listConnectors,savedConnectors} from '../lib/connectors.mjs';
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const {privateKey,publicKey}=generateKeyPairSync('ed25519');const publicKeyPem=publicKey.export({format:'pem',type:'spki'});
 function signed(domain,value){return sign(null,Buffer.from(`${domain}:${canonicalJson(value)}`),privateKey).toString('base64');}
@@ -86,4 +89,89 @@ test('revocation received during Add prevents registration', async () => {
   });
   assert.match(result.error, /catalog changed/i);
   assert.deepEqual(savedConnectors(state), []);
+});
+
+test('two isolated clients fetch and refresh a signed Fleet feed automatically', { timeout: 15_000 }, async t => {
+  let feed = null, requestedCatalogs = 0, requestedPackages = 0;
+  const server = createServer((request, response) => {
+    if (request.url === '/package.json') {
+      requestedPackages += 1;
+      response.end(bytes);
+    } else if (request.url === '/catalog.json') {
+      requestedCatalogs += 1;
+      response.statusCode = feed ? 200 : 503;
+      response.end(JSON.stringify(feed));
+    } else {
+      response.writeHead(404).end();
+    }
+  });
+  server.listen(0, '127.0.0.1');
+  await once(server, 'listening');
+  t.after(() => { server.closeAllConnections(); server.close(); });
+  const origin = `http://127.0.0.1:${server.address().port}`;
+  const bytes = packageBytes();
+  const reviewed = publish({ packageUrl: `${origin}/package.json` }, bytes);
+  const revoked = publish({ ...reviewed.entry, state: 'revoked', reason: 'Fixture publisher revoked this skill.' }, bytes);
+  feed = reviewed.document;
+  const clients = Array.from({ length: 2 }, () => {
+    const state = mkdtempSync(join(tmpdir(), 'kingmaker-fleet-feed-'));
+    const fleet = join(state, 'fleet');
+    mkdirSync(fleet);
+    writeFileSync(join(fleet, 'skills-feed.json'), JSON.stringify({ catalogUrl: `${origin}/catalog.json`, fixtureLoopback: true }));
+    writeFileSync(join(fleet, 'skills-public-key.pem'), publicKeyPem);
+    const client = { state, view: null, modelCalls: 0 };
+    const poll = startFleetSkillRefresh(state, view => { client.view = view; }, { intervalMs: 25 });
+    t.after(poll.stop);
+    return client;
+  });
+  async function awaitViews(predicate) {
+    for (let tries = 0; tries < 250; tries += 1) {
+      if (clients.every(client => client.view && predicate(client.view))) return;
+      await delay(20);
+    }
+    assert.fail(JSON.stringify(clients.map(client => client.view)));
+  }
+  const invoke = client => connectorTurn(client.connector, 'pear,1\napple,2', {
+    state: client.state,
+    fetchImpl: async (_url, options) => {
+      client.modelCalls += 1;
+      assert.match(JSON.parse(options.body).messages[0].content, /Aggregate a synthetic produce list/);
+      return Response.json({ message: { content: 'apple 2 before pear 1' } });
+    },
+  });
+
+  await awaitViews(view => view.ok && view.skills[0]?.status === 'available');
+  assert.ok(requestedCatalogs >= 2);
+  assert.equal(requestedPackages, 0);
+  for (const client of clients) {
+    assert.equal(existsSync(join(client.state, 'fleet', 'skills-catalog.json')), false);
+    const added = await addFleetSkill({ state: client.state, id: reviewed.entry.id });
+    assert.equal(added.ok, true);
+    assert.equal(added.ran, false);
+    assert.equal(client.modelCalls, 0);
+    assert.ok(savedConnectors(client.state).some(connector => connector.id === added.connector.id));
+    client.connector = added.connector;
+    assert.equal((await invoke(client)).text, 'apple 2 before pear 1');
+  }
+  assert.equal(requestedPackages, 2);
+
+  feed = null;
+  await awaitViews(view => !view.ok && /HTTP 503/.test(view.error));
+  for (const client of clients) assert.match((await invoke(client)).text, /HTTP 503/);
+
+  feed = revoked.document;
+  await awaitViews(view => view.ok && view.skills[0]?.status === 'revoked');
+  for (const client of clients) assert.match((await invoke(client)).text, /publisher revoked/i);
+
+  feed = { ...revoked.document, skills: reviewed.document.skills };
+  await awaitViews(view => !view.ok && /signature/i.test(view.error) && view.skills[0]?.status === 'revoked');
+  for (const client of clients) assert.match((await invoke(client)).text, /signature/i);
+
+  feed = reviewed.document;
+  await awaitViews(view => !view.ok && /older/i.test(view.error) && view.skills[0]?.status === 'revoked');
+  for (const client of clients) {
+    assert.match((await invoke(client)).text, /older/i);
+    assert.equal(client.modelCalls, 1);
+    assert.deepEqual(JSON.parse(readFileSync(join(client.state, 'fleet-skills', 'accepted-catalog.json'), 'utf8')), revoked.document);
+  }
 });

@@ -995,7 +995,8 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
                action: sideTab == 2 ? #selector(openConnectorRow(_:)) : #selector(openConnectorsFromRow(_:)))
       }
     case 3:
-      if fleetSkills.isEmpty { empty(fleetSkillsProblem ?? "No reviewed Fleet skills are published in the verified catalog yet.") }
+      if let problem = fleetSkillsProblem { empty(problem) }
+      else if fleetSkills.isEmpty { empty("No reviewed Fleet skills are published in the verified catalog yet.") }
       for skill in fleetSkills {
         guard let id = skill["id"] as? String else { continue }
         let name=(skill["name"] as? String) ?? id, version=(skill["version"] as? String) ?? "", publisher=(skill["publisher"] as? String) ?? "", status=(skill["status"] as? String) ?? "blocked", description=(skill["description"] as? String) ?? "", permissions=(skill["permissions"] as? [String] ?? []).joined(separator: ", ")
@@ -1033,6 +1034,10 @@ final class KingmakerBar: NSObject, NSTextFieldDelegate, NSWindowDelegate, NSTex
     let status = (skill["status"] as? String) ?? "blocked"
     if status == "added" {
       append(who: "", "This Fleet skill is already in My Tools.")
+      return
+    }
+    if let problem = fleetSkillsProblem {
+      append(who: "", problem)
       return
     }
     if (skill["needsApproval"] as? Bool) == true {
