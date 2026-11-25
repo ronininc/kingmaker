@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildManifest, issuanceProblems, launcherProblems } from '../lib/release-manifest.mjs';
+import { buildManifest, issuanceProblems, launcherProblems, manifestProblems, shipProblems } from '../lib/release-manifest.mjs';
 
 const sha = 'a'.repeat(40);
 const otherSha = 'b'.repeat(40);
@@ -65,4 +65,30 @@ test('manifest construction preserves the exact separately pinned Launcher prove
   assert.deepEqual(issuanceProblems(JSON.parse(JSON.stringify(m)), { required: true }), []);
   m.launcher.sourceCommit = sha;
   assert.match(issuanceProblems(m, { required: true }).join(' '), /does not match/);
+});
+
+
+test('explicit harness-only release needs no Launcher bytes but keeps the signing lane and release-tree provenance', () => {
+  const version = '4.4.2', pin = 'd'.repeat(64);
+  const tree = { repo: 'ronininc/Kingmaker', commit: sha, version };
+  const args = {
+    version, tag: 'v4.4.2', distribution: 'harness-only',
+    app: { bundleId: 'com.ronininc.solghost' },
+    archive: { name: 'Kingmaker-4.4.2.tar.gz', size: 1, sha256: pin },
+    parts: [{ name: 'Kingmaker-4.4.2.tar.gz.part01', size: 1, sha256: pin }],
+    partSize: 1, issuance: { tree, installer: {...tree} },
+  };
+  const m = buildManifest(args);
+  assert.equal('launcher' in m, false);
+  assert.equal('launcher' in m.issuance, false);
+  assert.deepEqual(manifestProblems(m), []);
+  const options = { pkgVersion: version, enroll: { url: 'https://example.test/enroll', code: 'fixture' } };
+  assert.deepEqual(shipProblems(m, options), []);
+  assert.match(shipProblems(m, {...options, pin: null, enroll: null}).join(' '), /no Kingmaker Release certificate.*no update enrollment/);
+  assert.match(shipProblems({...m, distribution: undefined}, options).join(' '), /Launcher pin is not sound/);
+  assert.match(manifestProblems({...m, issuance: undefined}).join(' '), /no issuance provenance/);
+  assert.throws(() => buildManifest({...args, distribution: 'not-a-lane'}), /distribution is not supported/);
+  assert.throws(() => buildManifest({...args, launcher}), /harness-only must not carry a Launcher pin/);
+  assert.throws(() => buildManifest({...args, issuance: {...args.issuance, launcher: {...tree}}}), /harness-only must not claim Launcher issuance/);
+  assert.throws(() => buildManifest({...args, issuance: {...args.issuance, installer: {...tree, commit: otherSha}}}), /installer was built from/);
 });

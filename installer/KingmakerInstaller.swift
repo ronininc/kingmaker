@@ -175,6 +175,7 @@ final class Installer: ObservableObject {
   @Published var hasManifest = true
   @Published var termsAccepted = false
   @Published var showingTerms = false
+  @Published var offersLauncher = false
   @Published var installLauncher = false   // independent by default; the checkbox is the only normal opt-in
   @Published var customizing = false   // the Customize popover
   /// What still stands between the person and the button (nil = it can be pressed).
@@ -196,7 +197,18 @@ final class Installer: ObservableObject {
 
   /// What is installed already: an installed Kingmaker keeps its cemented word, so the field is locked to it.
   func inspect() {
-    hasManifest = Bundle.main.url(forResource: "kingmaker-manifest", withExtension: "json") != nil
+    let manifestURL = Bundle.main.url(forResource: "kingmaker-manifest", withExtension: "json")
+    hasManifest = manifestURL != nil
+    if let manifestURL, let data = try? Data(contentsOf: manifestURL),
+       let manifest = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+       manifest["distribution"] as? String != "harness-only",
+       let launcher = manifest["launcher"] as? [String: Any],
+       let archive = launcher["archive"] as? String, !archive.isEmpty {
+      offersLauncher = true
+    } else {
+      offersLauncher = false
+      installLauncher = false
+    }
     guard let engine else { return }
     let p = Process()
     p.executableURL = URL(fileURLWithPath: "/bin/bash")
@@ -232,7 +244,7 @@ final class Installer: ObservableObject {
     p.executableURL = URL(fileURLWithPath: "/bin/bash")
     // Keep the existing engine and all verification gates. Do not download or place
     // Launcher unless the person explicitly adds it to this install.
-    let launcherChoice = installLauncher ? [] : ["--without-launcher"]
+    let launcherChoice = offersLauncher && installLauncher ? [] : ["--without-launcher"]
     p.arguments = [engine.path, "--wake-word", word] + terms + launcherChoice + Installer.devArgs
     let out = Pipe()
     p.standardOutput = out
@@ -449,11 +461,13 @@ struct InstallerView: View {
           }
           .padding(.top, 8)
         }
-        Toggle(isOn: $installer.installLauncher) {
-          Text(L.t("Also install Ronin Launcher (optional)")).font(Machine.mono(11)).foregroundColor(Machine.ink)
+        if installer.offersLauncher {
+          Toggle(isOn: $installer.installLauncher) {
+            Text(L.t("Also install Ronin Launcher (optional)")).font(Machine.mono(11)).foregroundColor(Machine.ink)
+          }
+          .toggleStyle(.checkbox)
+          .padding(.top, 8)
         }
-        .toggleStyle(.checkbox)
-        .padding(.top, 8)
         Button(action: { installer.start() }) {
           Caps(text: L.t({ if case .failed = installer.phase { return "Try again" } else { return installer.cementedWord == nil ? "Download & Install" : "Download & Update" } }()), size: 13, color: .black)
             .frame(maxWidth: .infinity).padding(.vertical, 13)

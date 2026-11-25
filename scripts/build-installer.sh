@@ -7,7 +7,7 @@
 #   options: --out <dir> (default dist) · --no-dmg · --draft
 #
 # A DMG is what owners download, so it is built only when it can ship (lib/release-manifest.mjs shipProblems): a
-# manifest of this checkout's version, with the starter model set and the Ronin Launcher, the right macOS floor, and the update
+# manifest of this checkout's version, with the starter model set and either a pinned Ronin Launcher or an explicit harness-only distribution, the right macOS floor, and the update
 # enrollment (KINGMAKER_ENROLL_URL + KINGMAKER_ENROLL_CODE). Otherwise it stops and says why. --draft builds it anyway,
 # named …-DRAFT.dmg, for a look on this Mac; --no-dmg builds only the app.
 #

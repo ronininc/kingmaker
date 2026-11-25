@@ -6,7 +6,7 @@
 //
 //   node scripts/release-parts.mjs [--app <Kingmaker.app>] [--out <dir>] [--tag v0.2.0]
 //                                  [--part-size <bytes>] [--level 1-9] [--dry-run] [--offline] [--pins <file>]
-//                                  [--skip-codesign] [--notarize] [--sign-key <private.pem>] --launcher <ronin-launcher-pin.json>
+//                                  [--skip-codesign] [--notarize] [--sign-key <private.pem>] (--launcher <ronin-launcher-pin.json> | --harness-only)
 //                                  [--platforms <platforms.json>] [--tree-repo <owner/name>] [--tree-commit <sha>]
 //
 //   --platforms  pins for the NON-mac platforms (lib/release-platforms.mjs): { "linux": {...}, "windows": {...} },
@@ -26,7 +26,7 @@
 //   --out        default: dist/release/<tag>
 //   --dry-run    stream the archive through the hashes without writing a single part (no disk), print the manifest
 //   --offline    no network: model digests from this Mac's Ollama, Ollama/Homebrew pins from --pins (else none)
-//   --launcher   the Ronin Launcher pin (ronin-launcher: app/scripts/package-for-kingmaker.sh); required. Its zip must sit
+//   --launcher   the Ronin Launcher pin (ronin-launcher: app/scripts/package-for-kingmaker.sh). Its zip must sit
 //                beside the pin; it's checked against the pin and copied into the release folder
 //   --notarize   notarize + staple the app first (needs a Developer ID signature and KINGMAKER_NOTARY_PROFILE, a
 //                `xcrun notarytool store-credentials` profile); refuses otherwise rather than pretend
@@ -34,6 +34,7 @@
 //                bytes → kingmaker-manifest.json.sig, which the installer verifies against the pinned public key
 //                (lib/kingmaker-release-public.pem). Without it the release is written unsigned and the output says so.
 //
+//   --harness-only  omit the Launcher and its issuance from this explicitly marked manifest.
 // The manifest it writes is also what scripts/build-installer.sh embeds in Kingmaker Installer.app.
 
 import { createHash } from 'node:crypto';
@@ -44,7 +45,7 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 // Ronin's signing check needs its private tooling; without it (the public repo) every app counts as unverified.
 const { verifyKingmakerSignature } = await import('./kingmaker-mac-signing.mjs').catch(() => ({ verifyKingmakerSignature: () => ({ ok: false, adhoc: false }) }));
-import { buildManifest, cleanTempParts, DEFAULT_REPO, issuanceProblems, MANIFEST_FILE, MAX_PART_BYTES, sha256sums, splitStream, verifyParts } from '../lib/release-manifest.mjs';
+import { buildManifest, cleanTempParts, DEFAULT_REPO, HARNESS_ONLY, issuanceProblems, MANIFEST_FILE, MAX_PART_BYTES, sha256sums, splitStream, verifyParts } from '../lib/release-manifest.mjs';
 import { verifyStagedRelease } from './release-gate.mjs';
 import { signManifestBytes, verifyManifestBytes, pubkeyFingerprint } from '../lib/release-signing.mjs';
 import { RELEASE_PUBLIC_KEY_PEM } from '../lib/release-pubkey.mjs';
@@ -275,6 +276,10 @@ export function notarizeApp(app, { env = process.env, run = spawnSync } = {}) {
 export async function main({ argv = process.argv.slice(2), env = process.env, out: print = console.log, offlineDigests = localOllamaDigests, fetcher = fetchOk } = {}) {
   const dryRun = argv.includes('--dry-run');
   const offline = argv.includes('--offline');
+  const pinFile = arg(argv, '--launcher');
+  const harnessOnly = argv.includes('--harness-only');
+  const distribution = harnessOnly ? HARNESS_ONLY : undefined;
+  if (Boolean(pinFile) === harnessOnly) { print('✗ Select exactly one of --launcher <ronin-launcher-pin.json> or --harness-only.'); return 1; }
   const engineSrc = env.KINGMAKER_ENGINE_SRC ? resolve(env.KINGMAKER_ENGINE_SRC) : null; // the engine's source checkout
   if (!engineSrc && !arg(argv, '--app', null)) { print('✗ Give --app <Kingmaker.app>, or set KINGMAKER_ENGINE_SRC to the engine source checkout that builds it.'); return 1; }
   const app = resolve(arg(argv, '--app', engineSrc && join(engineSrc, 'desktop', 'dist-ghost', 'Kingmaker.app')));
@@ -325,28 +330,46 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
   const searxng = searxngPlan(app);
   print(`· knowledge library: ${knowledge ? `${knowledge.corpora.length} confirmed corpora, ${(knowledge.totalMB / 1024).toFixed(1)} GB` : 'no bootstrap script in this app'}`);
 
-  // THE RONIN LAUNCHER (required): its pin, and its zip checked against it and carried in the same release.
-  const pinFile = arg(argv, '--launcher');
-  if (!pinFile) { print('✗ --launcher <ronin-launcher-pin.json> is required: the Ronin Launcher installs with Kingmaker.'); return 1; }
-  let launcher;
-  try {
-    launcher = JSON.parse(readFileSync(pinFile, 'utf8'));
-    const zip = join(dirname(resolve(pinFile)), String(launcher.archive));
-    const bytes = readFileSync(zip), got = createHash('sha256').update(bytes).digest('hex');
-    if (got !== launcher.sha256 || bytes.length !== launcher.size) throw new Error(`${launcher.archive} is ${bytes.length} bytes, sha256 ${got.slice(0, 12)}…, not the pin's`);
-    if (!dryRun) { mkdirSync(outDir, { recursive: true }); writeFileSync(join(outDir, launcher.archive), bytes); }
-    print(`· Ronin Launcher ${launcher.version}: ${launcher.archive} ${(launcher.size / 1e6).toFixed(1)} MB, sha256 ${launcher.sha256.slice(0, 12)}…`);
-  } catch (error) { print(`✗ The Ronin Launcher pin doesn't check out: ${error.message}`); return 1; }
-  // The issued-build list rides in the signed manifest once it lists this release's launcher. Until that entry is
-  // added (scripts/launcher-ledger.mjs add), the release is built exactly as before and says what is missing.
-  {
-    const ledger = readLedger();
-    const bad = ledgerProblems(ledger);
-    if (bad.length) { print(`✗ lib/launcher-issued.json is not sound: ${bad.join('; ')}`); return 1; }
-    const own = ledger.entries.find((e) => e.archiveSha256 === launcher.sha256);
-    if (own && !own.revoked) launcher.issued = ledger.entries;
-    else print(`! Ronin Launcher ${launcher.version} is ${own ? 'REVOKED on' : 'not on'} the issued-build list (lib/launcher-issued.json). An installed Kingmaker will call it unknown and stay undocked until it is listed: node scripts/launcher-ledger.mjs add --zip <its zip> --version ${launcher.version}`);
+  // A bundled release continues requiring the pinned Launcher. Omission is an explicit signed lane.
+  let launcher = null;
+  if (!harnessOnly) {
+    try {
+      launcher = JSON.parse(readFileSync(pinFile, 'utf8'));
+      const zip = join(dirname(resolve(pinFile)), String(launcher.archive));
+      const bytes = readFileSync(zip), got = createHash('sha256').update(bytes).digest('hex');
+      if (got !== launcher.sha256 || bytes.length !== launcher.size) throw new Error(`${launcher.archive} is ${bytes.length} bytes, sha256 ${got.slice(0, 12)}…, not the pin's`);
+      if (!dryRun) { mkdirSync(outDir, { recursive: true }); writeFileSync(join(outDir, launcher.archive), bytes); }
+      print(`· Ronin Launcher ${launcher.version}: ${launcher.archive} ${(launcher.size / 1e6).toFixed(1)} MB, sha256 ${launcher.sha256.slice(0, 12)}…`);
+    } catch (error) { print(`✗ The Ronin Launcher pin doesn't check out: ${error.message}`); return 1; }
+    // The issued-build list rides in the signed manifest once it lists this release's launcher. Until that entry is
+    // added (scripts/launcher-ledger.mjs add), the release is built exactly as before and says what is missing.
+    {
+      const ledger = readLedger();
+      const bad = ledgerProblems(ledger);
+      if (bad.length) { print(`✗ lib/launcher-issued.json is not sound: ${bad.join('; ')}`); return 1; }
+      const own = ledger.entries.find((e) => e.archiveSha256 === launcher.sha256);
+      if (own && !own.revoked) launcher.issued = ledger.entries;
+      else print(`! Ronin Launcher ${launcher.version} is ${own ? 'REVOKED on' : 'not on'} the issued-build list (lib/launcher-issued.json). An installed Kingmaker will call it unknown and stay undocked until it is listed: node scripts/launcher-ledger.mjs add --zip <its zip> --version ${launcher.version}`);
+    }
+  } else {
+    print('· Harness-only release: no Launcher pin or archive will be issued.');
   }
+
+  // ISSUANCE PROVENANCE (the 2026-10-21 acceptance lesson): the tree this release is built from, the tree
+  // the installer sources in it come from (this tree — installer/engine.sh is hashed below from it), and,
+  // when bundled, the separate tree recorded on the Launcher pin. Check before streaming the app parts:
+  // a release whose artifacts come from another tree is not issuable, and this is where that is decided —
+  // not by an owner whose installer refuses a signature at acceptance time.
+  const treeRepo = arg(argv, '--tree-repo', env.KINGMAKER_TREE_REPO || 'ronininc/kingmaker-private');
+  const treeCommit = arg(argv, '--tree-commit', env.KINGMAKER_TREE_COMMIT || null);
+  const issuance = {
+    tree: { repo: treeRepo, commit: treeCommit, version: facts.version },
+    installer: { repo: treeRepo, commit: treeCommit, version: facts.version },
+    ...(harnessOnly ? {} : { launcher: { repo: launcher.sourceRepo ?? launcher.source?.repo ?? null, commit: launcher.sourceCommit ?? launcher.source?.commit ?? null, version: launcher.version } }),
+  };
+  const issProblems = issuanceProblems({ version: facts.version, distribution, launcher, issuance }, { required: true });
+  if (issProblems.length) { for (const p of issProblems) print(`✗ Not issuable: ${p}`); print('✗ Record the build provenance (--tree-commit and, when bundled, Launcher pin sourceRepo/sourceCommit) and rebuild.'); return 1; }
+  print(`· issuance: tree ${treeRepo}@${String(treeCommit).slice(0, 12)}; installer matches its tree${launcher ? "; Launcher has separately pinned provenance" : ""}`);
 
   // The archive, streamed straight into the parts. With --deterministic the archive is first written by
   // lib/deterministic-archive.mjs (sorted entries, epoch mtimes, zeroed owners, gzip -n) so the same app
@@ -391,22 +414,6 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
     for (const [name, entry] of Object.entries(platforms)) print(`· platform ${name}: ${entry?.status ?? '?'}`);
   }
 
-  // ISSUANCE PROVENANCE (the 2026-10-21 acceptance lesson): the tree this release is built from, the tree
-  // the installer sources in it come from (this tree — installer/engine.sh is hashed below from it), and the
-  // tree the launcher artifact was built from (recorded on its pin). Checked BEFORE anything is written:
-  // a release whose artifacts come from another tree is not issuable, and this is where that is decided —
-  // not by an owner whose installer refuses a signature at acceptance time.
-  const treeRepo = arg(argv, '--tree-repo', env.KINGMAKER_TREE_REPO || 'ronininc/kingmaker-private');
-  const treeCommit = arg(argv, '--tree-commit', env.KINGMAKER_TREE_COMMIT || null);
-  const issuance = {
-    tree: { repo: treeRepo, commit: treeCommit, version: facts.version },
-    installer: { repo: treeRepo, commit: treeCommit, version: facts.version },
-    launcher: { repo: launcher.sourceRepo ?? launcher.source?.repo ?? null, commit: launcher.sourceCommit ?? launcher.source?.commit ?? null, version: launcher.version },
-  };
-  const issProblems = issuanceProblems({ version: facts.version, issuance });
-  if (issProblems.length) { for (const p of issProblems) print(`✗ Not issuable: ${p}`); print('✗ Record the build provenance (tree --tree-commit; launcher pin sourceRepo/sourceCommit from a launcher built from this tree) and rebuild. Nothing was written.'); return 1; }
-  print(`· issuance: tree ${treeRepo}@${String(treeCommit).slice(0, 12)}; installer + launcher built from the same tree`);
-
   // Pin the install/update engine's sha256 in the (signed) manifest, so the installed app can authenticate the engine
   // it downloads before running it. This is the SAME engine.sh publish-update.sh ships; it verifies the match.
   const engineSha256 = createHash('sha256').update(readFileSync(join(ROOT, 'installer', 'engine.sh'))).digest('hex');
@@ -414,7 +421,7 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
     version: facts.version, tag, repo: arg(argv, '--repo', DEFAULT_REPO),
     app: facts, archive: { name: archive, size: split.size, sha256: split.sha256 }, parts: split.parts, partSize,
     ollama, homebrew, tailscale, models, brew: BREW_TOOLS, knowledge, searxng, launcher, engineSha256,
-    platforms, issuance,
+    platforms, issuance, distribution,
   });
   for (const p of split.parts) print(`· ${p.name}  ${(p.size / 1e9).toFixed(3)} GB  sha256 ${p.sha256}`);
   print(`· whole archive ${archive}: ${(split.size / 1e9).toFixed(3)} GB, sha256 ${split.sha256}`);
@@ -450,7 +457,7 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
     print('! NOT signed: set KINGMAKER_RELEASE_SIGNING_KEY (or pass --sign-key) to the OFFLINE private key so the installer can verify this release. Unsigned releases still install, but the installer cannot prove they are yours.');
   }
 
-  writeFileSync(join(outDir, 'SHA256SUMS'), sha256sums([...split.parts, { name: launcher.archive, sha256: launcher.sha256 }, { name: MANIFEST_FILE, sha256: createHash('sha256').update(manifestText).digest('hex') }]));
+  writeFileSync(join(outDir, 'SHA256SUMS'), sha256sums([...split.parts, ...(launcher ? [{ name: launcher.archive, sha256: launcher.sha256 }] : []), { name: MANIFEST_FILE, sha256: createHash('sha256').update(manifestText).digest('hex') }]));
   const check = await verifyParts(manifest, outDir);
   if (!check.ok) { print(`✗ The parts just written do not verify: ${check.problems.join('; ')}`); return 1; }
   print(`✓ ${split.parts.length} part(s) + ${MANIFEST_FILE} + SHA256SUMS in ${outDir}, re-read and verified.`);
@@ -460,10 +467,10 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
   // gate does not get a publish command.
   const gate = await verifyStagedRelease({ manifest, partsDir: outDir, sourceApp: app, stageDir: join(outDir, '.gate-stage'), signature: argv.includes('--skip-codesign') ? 'skip' : 'require', requireIssuance: true });
   if (!gate.ok) { print(`✗ The staged release fails the gate: ${gate.problems.join('; ')}`); return 1; }
-  print('✓ staged gate: the archived app is identical to the inspected app, passes the installer signature test, and its installer + launcher were built from this release\'s tree (issuance)');
+  print('✓ staged gate: the archived app is identical to the inspected app, passes the installer signature test, and its issuance provenance matches');
   print('Not published. To publish (the operator\'s call):');
   const sigAsset = keyPath ? ` ${JSON.stringify(join(outDir, sigName))}` : '';
-  print(`  gh release create ${tag} --repo ${manifest.repo} --draft --title "Kingmaker ${facts.version}" ${split.parts.map((p) => JSON.stringify(join(outDir, p.name))).join(' ')} ${JSON.stringify(join(outDir, launcher.archive))} ${JSON.stringify(join(outDir, MANIFEST_FILE))}${sigAsset} ${JSON.stringify(join(outDir, 'SHA256SUMS'))} "<Kingmaker Installer DMG>"`);
+  print(`  gh release create ${tag} --repo ${manifest.repo} --draft --title "Kingmaker ${facts.version}" ${split.parts.map((p) => JSON.stringify(join(outDir, p.name))).join(' ')} ${launcher ? JSON.stringify(join(outDir, launcher.archive)) + " " : ""}${JSON.stringify(join(outDir, MANIFEST_FILE))}${sigAsset} ${JSON.stringify(join(outDir, 'SHA256SUMS'))} "<Kingmaker Installer DMG>"`);
   print(`Then build the installer around this manifest: scripts/build-installer.sh --manifest ${join(outDir, MANIFEST_FILE)}`);
   return 0;
 }

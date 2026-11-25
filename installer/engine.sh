@@ -609,6 +609,10 @@ fail_at unpack
 # Same source as the parts, sha256 and size checked, its signature checked, staged beside Kingmaker.app. Never opened.
 LAUNCHER_STAGED=""
 L_ARCHIVE="$(mf launcher.archive)"
+if [ "$(mf distribution)" = "harness-only" ]; then
+  [ -z "$L_ARCHIVE" ] || fail "A harness-only release cannot carry a Ronin Launcher."
+  WITHOUT_LAUNCHER=1
+fi
 # UNDOCKED (owner's choice: --without-launcher or KINGMAKER_WITHOUT_LAUNCHER=1). Kingmaker is free and runs on its own;
 # the launcher docks to it, never the other way round. Undocked skips the launcher entirely — nothing is fetched,
 # nothing in Applications is touched. It is never a fallback: a launcher that fails its checks below still fails
