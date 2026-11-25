@@ -1,0 +1,206 @@
+name: Kingmaker private harness assembly
+
+# A branch push never starts this job. The exact CI tag may only be pushed
+# after explicitly approving the job and its dedicated runner.
+on:
+  workflow_dispatch:
+  push:
+    tags: ['ci-proof-kingmaker-harness-ae55f9a']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kingmaker-private-harness-assembly
+  cancel-in-progress: false
+
+env:
+  KINGMAKER_SHA: ae55f9ac5dfa2b8fbba2044f6d5150ecd52a5982
+  TSS_SHA: 4d514a623d51f78b0faed0d0edabd41b5e279cfd
+  MINIMUM_FREE_KIB: '33554432'
+
+jobs:
+  assemble:
+    if: github.repository == 'ronininc/kingmaker' && github.event.repository.private == true
+    # Default hosted ARM64 macOS runners expose only 14 GB of SSD. Never
+    # substitute them or lower the existing 32 GiB release-host floor.
+    runs-on: [self-hosted, macOS, ARM64, kingmaker-assembly-arm64]
+    timeout-minutes: 45
+    steps:
+      - name: Require a dedicated Apple silicon host and measured release scratch
+        shell: bash
+        env:
+          KIT_ROOT: ${{ vars.KINGMAKER_RUNTIME_KIT_ROOT }}
+          KIT_SHA256: ${{ vars.KINGMAKER_RUNTIME_KIT_MANIFEST_SHA256 }}
+        run: |
+          set -euo pipefail
+          test "$(uname -s):$(uname -m)" = Darwin:arm64
+          for scratch in "$GITHUB_WORKSPACE" "$RUNNER_TEMP"; do
+            test -d "$scratch" && test -w "$scratch"
+            row="$(df -kP "$scratch" | awk 'NR==2 {print $1, $4}')"
+            read -r device free_kib <<< "$row"
+            fs="$(diskutil info -plist "$device" | plutil -extract FilesystemType raw -)"
+            [[ "$fs" == apfs && "$free_kib" =~ ^[0-9]+$ && "$free_kib" -ge "$MINIMUM_FREE_KIB" ]] || {
+              echo "::error::Assembly requires writable APFS with at least 32 GiB free before checkout or downloads."
+              exit 1
+            }
+            printf 'Release scratch: %s KiB free on APFS\n' "$free_kib"
+          done
+          [[ "$KIT_ROOT" == /* && -f "$KIT_ROOT/runtime-kit.json" && "$KIT_SHA256" =~ ^[0-9a-f]{64}$ ]] || {
+            echo "::error::Owner-pinned runtime kit must be present on the build host. No dependency pulls attempted."
+            exit 1
+          }
+          printf '%s  %s\n' "$KIT_SHA256" "$KIT_ROOT/runtime-kit.json" | shasum -a 256 -c -
+          command -v python3.13 >/dev/null
+          xcrun --find swiftc >/dev/null
+
+      - name: Check out the reviewed assembly helper only
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          path: assembly-recipe
+          persist-credentials: false
+          sparse-checkout: scripts/ci-stage-harness-runtime.py
+          sparse-checkout-cone-mode: false
+
+      - name: Check out the exact private Kingmaker source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ env.KINGMAKER_SHA }}
+          path: kingmaker
+          persist-credentials: false
+
+      - name: Require an explicit TSS-only checkout route
+        shell: bash
+        env:
+          PRESEEDED_TSS: ${{ vars.KINGMAKER_APPROVED_TSS_SOURCE_ROOT }}
+          TSS_READER: ${{ secrets.KINGMAKER_TSS_CONTENTS_READ }}
+        run: |
+          set -euo pipefail
+          if [[ -n "$PRESEEDED_TSS" ]]; then
+            [[ "$PRESEEDED_TSS" == /* ]]
+            git -C "$PRESEEDED_TSS" cat-file -e "$TSS_SHA^{commit}"
+            GIT_LFS_SKIP_SMUDGE=1 git clone --shared --no-checkout -- "$PRESEEDED_TSS" "$GITHUB_WORKSPACE/engine"
+            GIT_LFS_SKIP_SMUDGE=1 git -C "$GITHUB_WORKSPACE/engine" checkout --detach "$TSS_SHA"
+          elif [[ -z "$TSS_READER" ]]; then
+            echo "::error::Supply the approved exact TSS checkout on this build host or a short-lived TSS-only contents-read grant."
+            exit 1
+          fi
+
+      - name: Check out the exact private TSS engine when it is not preseeded
+        if: vars.KINGMAKER_APPROVED_TSS_SOURCE_ROOT == ''
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: ronininc/TSS
+          ref: ${{ env.TSS_SHA }}
+          token: ${{ secrets.KINGMAKER_TSS_CONTENTS_READ }}
+          path: engine
+          persist-credentials: false
+
+      - name: Bind both checkouts and verify complete private runtime kit
+        shell: bash
+        env:
+          KIT_ROOT: ${{ vars.KINGMAKER_RUNTIME_KIT_ROOT }}
+          KIT_SHA256: ${{ vars.KINGMAKER_RUNTIME_KIT_MANIFEST_SHA256 }}
+        run: |
+          set -euo pipefail
+          test "$(git -C kingmaker rev-parse HEAD)" = "$KINGMAKER_SHA"
+          test "$(git -C engine rev-parse HEAD)" = "$TSS_SHA"
+          test -z "$(git -C engine status --porcelain --untracked-files=no)"
+          stage="$(mktemp -d "$RUNNER_TEMP/km-assembly.XXXXXX")"
+          echo "ASSEMBLY_STAGE=$stage" >> "$GITHUB_ENV"
+          python3.13 assembly-recipe/scripts/ci-stage-harness-runtime.py \
+            --kit "$KIT_ROOT" --sha256 "$KIT_SHA256" --source "$KINGMAKER_SHA" \
+            --engine "$TSS_SHA" --destination "$stage/staged-runtimes"
+
+      - name: Install build-only Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24.22.1'
+
+      - name: Acquire and verify the existing pinned Mac binaries
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          name=kingmaker-runtime-tools-arm64-2026-11-24.tar.gz
+          gh release download kingmaker-build-inputs-2026-11-24 -R ronininc/kingmaker \
+            --pattern "$name" --dir "$ASSEMBLY_STAGE"
+          (
+            cd "$ASSEMBLY_STAGE"
+            printf '%s  %s\n' 02c4cd7add03ccf61ffa420541ad17ba5a10e28058e61c8945cf70aae1b80035 "$name" | shasum -a 256 -c -
+          )
+          mkdir -p kingmaker/app/Resources
+          tar -xzf "$ASSEMBLY_STAGE/$name" -C kingmaker/app/Resources bin/ffmpeg bin/ffprobe bin/uv bin/uvx
+          for bin in ffmpeg ffprobe uv uvx; do
+            test -x "kingmaker/app/Resources/bin/$bin"
+            lipo -verify_arch arm64 "kingmaker/app/Resources/bin/$bin"
+          done
+
+      - name: Compile exact engine and assemble the private candidate
+        shell: bash
+        working-directory: engine
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+          SOLOMON_RELEASE_SIGNING: local-unsigned
+          SOLOMON_SIGNING_IDENTITY: '-'
+          SOLOMON_REQUIRE_FULL_RUNTIME: '1'
+        run: |
+          set -euo pipefail
+          npm ci
+          npm --prefix server ci
+          npm --prefix app ci
+          npm run package:prep
+          for runtime in "$ASSEMBLY_STAGE/staged-runtimes/"*; do
+            name="${runtime##*/}"
+            test ! -e "desktop/build/$name"
+            mv "$runtime" "desktop/build/$name"
+          done
+          # package:prep would erase staged runtime inputs if rerun here.
+          SOLOMON_SKIP_PACKAGE_PREP=true SOL_GHOST_SOURCE="$GITHUB_WORKSPACE/kingmaker" npm run package:ghost
+
+      - name: Assert complete app and exercise the supported installer engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          app="$GITHUB_WORKSPACE/engine/desktop/dist-ghost/Kingmaker.app"
+          codesign --verify --deep --strict "$app"
+          codesign -dv --verbose=2 "$app" 2>&1 | grep 'Signature=adhoc'
+          lipo -verify_arch arm64 "$app/Contents/MacOS/KingmakerEngine"
+          node --input-type=module - "$app" <<'NODE'
+          import { inspectApp } from './kingmaker/scripts/release-parts.mjs';
+          const facts = inspectApp(process.argv[2], { allowAdhoc: true });
+          if (facts.version !== '4.5.1' || facts.signing !== 'ad-hoc' || !facts.solomonBuild) process.exit(1);
+          console.log('Complete bundle, exact version, and bundled Node verified. Ad-hoc build is not customer-installable.');
+          NODE
+          node --test kingmaker/test/standalone-installer.test.mjs kingmaker/test/installer-signature.test.mjs kingmaker/test/release-issuance.test.mjs
+
+      - name: Create bounded candidate and provenance receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          app="$GITHUB_WORKSPACE/engine/desktop/dist-ghost/Kingmaker.app"
+          out="$ASSEMBLY_STAGE/receipt"
+          mkdir "$out"
+          remaining="$(df -kP "$out" | awk 'NR==2 {print $4}')"
+          [[ "$remaining" =~ ^[0-9]+$ && "$remaining" -ge 8388608 ]]
+          ditto -c -k --keepParent "$app" "$out/Kingmaker-adhoc-not-for-customers.zip"
+          size="$(stat -f %z "$out/Kingmaker-adhoc-not-for-customers.zip")"
+          test "$size" -le 5368709120
+          unzip -tq "$out/Kingmaker-adhoc-not-for-customers.zip"
+          (
+            cd "$out"
+            shasum -a 256 Kingmaker-adhoc-not-for-customers.zip > SHA256SUMS
+            printf 'kingmakerCommit=%s\nengineCommit=%s\nmode=private-adhoc-no-notary\n' "$KINGMAKER_SHA" "$TSS_SHA" > build-provenance.txt
+            printf 'engineSha256=%s\n' "$(shasum -a 256 "$app/Contents/MacOS/KingmakerEngine" | awk '{print $1}')" >> build-provenance.txt
+          )
+
+      - name: Retain private candidate for owner-lane verification
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: kingmaker-ae55f9a-private-ad-hoc
+          path: ${{ env.ASSEMBLY_STAGE }}/receipt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 2
