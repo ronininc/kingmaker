@@ -6,7 +6,7 @@
 //
 //   node scripts/release-parts.mjs [--app <Kingmaker.app>] [--out <dir>] [--tag v0.2.0]
 //                                  [--part-size <bytes>] [--level 1-9] [--dry-run] [--offline] [--pins <file>]
-//                                  [--skip-codesign] [--notarize] [--sign-key <private.pem>] (--launcher <ronin-launcher-pin.json> | --harness-only)
+//                                  [--skip-codesign] [--notarize] [--sign-key <private.pem>] [--gate-scratch <dir>] (--launcher <ronin-launcher-pin.json> | --harness-only)
 //                                  [--platforms <platforms.json>] [--tree-repo <owner/name>] [--tree-commit <sha>]
 //
 //   --platforms  pins for the NON-mac platforms (lib/release-platforms.mjs): { "linux": {...}, "windows": {...} },
@@ -34,13 +34,14 @@
 //                bytes → kingmaker-manifest.json.sig, which the installer verifies against the pinned public key
 //                (lib/kingmaker-release-public.pem). Without it the release is written unsigned and the output says so.
 //
+//   --gate-scratch  writable parent for the independent extracted-app signature gate (default: parts directory).
+//                    Useful on an already-approved separate APFS work volume; never skips or substitutes the gate.
 //   --harness-only  omit the Launcher and its issuance from this explicitly marked manifest.
 // The manifest it writes is also what scripts/build-installer.sh embeds in Kingmaker Installer.app.
 
 import { createHash } from 'node:crypto';
 import { spawn, spawnSync } from 'node:child_process';
-import { createReadStream, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { accessSync, constants, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 // Ronin's signing check needs its private tooling; without it (the public repo) every app counts as unverified.
@@ -290,6 +291,16 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
   try { facts = inspectApp(app, { skipCodesign: argv.includes('--skip-codesign'), allowAdhoc: env.KINGMAKER_ALLOW_ADHOC === '1' }); } catch (error) { print(`✗ ${error.message}`); return 1; }
   const tag = arg(argv, '--tag', `v${facts.version}`);
   const outDir = resolve(arg(argv, '--out', join(ROOT, 'dist', 'release', tag)));
+  const scratchArg = arg(argv, '--gate-scratch');
+  let gateRoot = outDir;
+  if (argv.includes('--gate-scratch')) {
+    try {
+      if (!scratchArg || scratchArg.startsWith('--')) throw new Error('missing directory');
+      gateRoot = realpathSync(scratchArg);
+      if (!statSync(gateRoot).isDirectory()) throw new Error('not a directory');
+      accessSync(gateRoot, constants.W_OK);
+    } catch (error) { print(`✗ --gate-scratch must be an existing writable directory: ${error.message}`); return 1; }
+  }
   if (argv.includes('--notarize')) {
     const n = notarizeApp(app, { env });
     print(n.ok ? `✓ ${n.line}` : `✗ ${n.line}`);
@@ -371,22 +382,21 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
   if (issProblems.length) { for (const p of issProblems) print(`✗ Not issuable: ${p}`); print('✗ Record the build provenance (--tree-commit and, when bundled, Launcher pin sourceRepo/sourceCommit) and rebuild.'); return 1; }
   print(`· issuance: tree ${treeRepo}@${String(treeCommit).slice(0, 12)}; installer matches its tree${launcher ? "; Launcher has separately pinned provenance" : ""}`);
 
-  // The archive, streamed straight into the parts. With --deterministic the archive is first written by
-  // lib/deterministic-archive.mjs (sorted entries, epoch mtimes, zeroed owners, gzip -n) so the same app
-  // always produces the same archive sha256; the temp file lives in the system temp and is removed after.
+  // Stream the app into the parts in one pass. Deterministic mode normalizes the
+  // stream itself, so it never writes an additional, full compressed archive.
   const archive = `Kingmaker-${facts.version}.tar.gz`;
   if (!dryRun) { mkdirSync(outDir, { recursive: true }); cleanTempParts(outDir); }
   let archiveSource;
   let tarExit = Promise.resolve(0);
   let tarErr = '';
-  let detTmp = null;
+  let deterministicFlavor = null;
   let killArchive = () => {};
   if (argv.includes('--deterministic')) {
-    const { createDeterministicArchive } = await import('../lib/deterministic-archive.mjs');
-    detTmp = join(tmpdir(), `kingmaker-deterministic-${process.pid}.tar.gz`);
-    const det = await createDeterministicArchive({ dir: app, outFile: detTmp, level });
-    print(`· deterministic archive (${det.flavor} tar, normalized): sha256 ${det.sha256}`);
-    archiveSource = createReadStream(detTmp);
+    const { streamDeterministicArchive } = await import('../lib/deterministic-archive.mjs');
+    const det = streamDeterministicArchive({ dir: app, level });
+    deterministicFlavor = det.flavor;
+    archiveSource = det.stream;
+    killArchive = () => archiveSource.destroy();
   } else {
     const tar = spawn('tar', ['-c', '-z', '--xattrs', '--options', `gzip:compression-level=${level}`, '-f', '-', '-C', dirname(app), basename(app)], { env: { ...env, COPYFILE_DISABLE: '1' }, stdio: ['ignore', 'pipe', 'pipe'] });
     tar.stderr.on('data', (d) => { tarErr += d; });
@@ -397,13 +407,12 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
   let split;
   try { split = await splitStream(archiveSource, { partSize, outDir: dryRun ? null : outDir, archive }); } catch (error) {
     killArchive();
-    if (detTmp) rmSync(detTmp, { force: true });
     if (!dryRun) cleanTempParts(outDir);
     print(`✗ Splitting the archive failed: ${error.message}`);
     return 1;
   }
   if ((await tarExit) !== 0) { print(`✗ tar failed: ${tarErr.trim().slice(-300)}`); return 1; }
-  if (detTmp) rmSync(detTmp, { force: true });
+  if (deterministicFlavor) print(`· deterministic archive (${deterministicFlavor} normalization, streamed): sha256 ${split.sha256}`);
   // The non-mac platform pins (lib/release-platforms.mjs): declared platforms beyond the macOS parts built
   // here. Only pins are carried — the artifacts are built on their own hosts (xtool for off-Mac Apple-side
   // builds) and placed at <out>/<platform>/<name> by whoever built them.
@@ -465,7 +474,15 @@ export async function main({ argv = process.argv.slice(2), env = process.env, ou
   // tree-identical to the inspected app above, and passing the installer's own signature test. v0.4.2 shipped
   // an archive whose app failed that test because every check ran on the build tree. A release that fails the
   // gate does not get a publish command.
-  const gate = await verifyStagedRelease({ manifest, partsDir: outDir, sourceApp: app, stageDir: join(outDir, '.gate-stage'), signature: argv.includes('--skip-codesign') ? 'skip' : 'require', requireIssuance: true });
+  let gate;
+  // Only a fresh, owned subdirectory can be removed. An operator-provided
+  // parent (or a stale directory from an earlier run) is never a cleanup target.
+  const stageDir = mkdtempSync(join(gateRoot, 'kingmaker-gate-'));
+  try {
+    gate = await verifyStagedRelease({ manifest, partsDir: outDir, sourceApp: app, stageDir, keepStage: true, signature: argv.includes('--skip-codesign') ? 'skip' : 'require', requireIssuance: true });
+  } finally {
+    rmSync(stageDir, { recursive: true, force: true });
+  }
   if (!gate.ok) { print(`✗ The staged release fails the gate: ${gate.problems.join('; ')}`); return 1; }
   print('✓ staged gate: the archived app is identical to the inspected app, passes the installer signature test, and its issuance provenance matches');
   print('Not published. To publish (the operator\'s call):');
